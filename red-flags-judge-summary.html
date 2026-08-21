@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Red Flags Judge Summary — Ossandon v. Ossandon</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    html, body {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background: #f8f9fa;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      color: #2c3e50;
+      line-height: 1.6;
+      padding: 20px;
+      box-sizing: border-box;
+    }
+
+    .judge-container {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      background: white;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      box-sizing: border-box;
+    }
+
+    .judge-header {
+      background: linear-gradient(135deg, #1a3a52 0%, #2c5282 100%);
+      color: white;
+      padding: 20px 40px;
+      text-align: center;
+      border-bottom: 3px solid #d4af37;
+    }
+
+    .judge-header h1 {
+      font-family: 'Fraunces', serif;
+      font-size: 28px;
+      font-weight: 700;
+      margin: 0 0 6px;
+      letter-spacing: 0.5px;
+    }
+
+    .case-caption {
+      font-size: 11px;
+      opacity: 0.9;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin: 4px 0;
+    }
+
+    .case-number {
+      font-size: 10px;
+      opacity: 0.85;
+      margin-top: 4px;
+    }
+
+    .judge-content {
+      padding: 20px 40px;
+    }
+
+    .summary-box {
+      background: #f0f4f8;
+      border-left: 4px solid #d4af37;
+      padding: 12px;
+      margin-bottom: 12px;
+      border-radius: 4px;
+    }
+
+    .summary-box h3 {
+      margin-top: 0;
+      color: #1a3a52;
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .summary-box p {
+      margin: 0 0 8px;
+      font-size: 11px;
+      line-height: 1.4;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .summary-item {
+      background: white;
+      padding: 8px;
+      border-radius: 3px;
+      border-left: 3px solid #c41e3a;
+    }
+
+    .summary-item strong {
+      color: #1a3a52;
+      display: block;
+      font-size: 11px;
+    }
+
+    .summary-value {
+      font-size: 16px;
+      font-weight: 700;
+      color: #d4af37;
+      margin-top: 2px;
+    }
+
+    .section {
+      margin-bottom: 14px;
+    }
+
+    .section-title {
+      font-family: 'Fraunces', serif;
+      font-size: 14px;
+      font-weight: 700;
+      color: #1a3a52;
+      border-bottom: 2px solid #d4af37;
+      padding-bottom: 6px;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .finding {
+      background: white;
+      border: 1px solid #e0e6ed;
+      border-left: 4px solid #c41e3a;
+      padding: 10px;
+      margin-bottom: 8px;
+      border-radius: 3px;
+    }
+
+    .finding.critical {
+      border-left-color: #d4af37;
+      background: #fffaf5;
+    }
+
+    .finding-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: #1a3a52;
+      margin: 0 0 4px;
+    }
+
+    .finding-detail {
+      font-size: 11px;
+      color: #475569;
+      line-height: 1.5;
+      margin-bottom: 6px;
+    }
+
+    .finding-impact {
+      background: #f9f3e6;
+      padding: 10px 12px;
+      border-radius: 3px;
+      font-size: 12px;
+      color: #7c4c2c;
+      font-weight: 600;
+      margin-top: 12px;
+    }
+
+    .findings-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 8px;
+      font-size: 10px;
+    }
+
+    .findings-table th {
+      background: #1a3a52;
+      color: white;
+      padding: 8px;
+      text-align: left;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+      font-size: 9px;
+    }
+
+    .findings-table td {
+      padding: 6px 8px;
+      border-bottom: 1px solid #e0e6ed;
+      font-size: 10px;
+    }
+
+    .findings-table tr:nth-child(even) {
+      background: #f9f9fb;
+    }
+
+    .status-critical {
+      color: #d4af37;
+      font-weight: 700;
+    }
+
+    .status-high {
+      color: #c41e3a;
+      font-weight: 700;
+    }
+
+    .verdict-box {
+      background: #fef9e7;
+      border: 2px solid #d4af37;
+      padding: 10px;
+      border-radius: 3px;
+      margin-top: 8px;
+      text-align: center;
+    }
+
+    .verdict-label {
+      font-size: 10px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #7c4c2c;
+      font-weight: 700;
+      margin-bottom: 4px;
+    }
+
+    .verdict-text {
+      font-family: 'Fraunces', serif;
+      font-size: 16px;
+      font-weight: 700;
+      color: #1a3a52;
+      margin: 0;
+    }
+
+    .judge-footer {
+      background: #f0f4f8;
+      padding: 12px 40px;
+      border-top: 1px solid #d4af37;
+      text-align: center;
+      font-size: 9px;
+      color: #64748b;
+    }
+
+    .signature-line {
+      margin-top: 20px;
+      padding-top: 10px;
+      border-top: 1px solid #999;
+      width: 250px;
+      margin-left: auto;
+      margin-right: auto;
+      text-align: center;
+      font-size: 10px;
+      color: #2c3e50;
+    }
+
+    @media print {
+      * {
+        margin: 0;
+        padding: 0;
+      }
+      html, body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      body {
+        background: white;
+        margin: 0;
+        padding: 0;
+        line-height: 1.4;
+      }
+      .judge-container {
+        box-shadow: none;
+        margin: 0;
+        width: 100%;
+        max-width: 100%;
+        page-break-after: avoid;
+      }
+      .judge-header {
+        padding: 10px 20px;
+        page-break-after: avoid;
+      }
+      .judge-header h1 {
+        font-size: 20px;
+        margin: 0 0 2px;
+      }
+      .case-caption {
+        font-size: 8px;
+        margin: 1px 0;
+      }
+      .case-number {
+        font-size: 8px;
+        margin-top: 1px;
+      }
+      .judge-content {
+        padding: 10px 20px;
+      }
+      .summary-box {
+        padding: 8px;
+        margin-bottom: 6px;
+        page-break-inside: avoid;
+      }
+      .summary-box h3 {
+        font-size: 10px;
+        margin-bottom: 4px;
+      }
+      .summary-grid {
+        gap: 4px;
+        margin-top: 4px;
+      }
+      .summary-item {
+        padding: 4px;
+      }
+      .summary-item strong {
+        font-size: 9px;
+      }
+      .summary-value {
+        font-size: 14px;
+        margin-top: 1px;
+      }
+      .section {
+        margin-bottom: 6px;
+        page-break-inside: avoid;
+      }
+      ol {
+        margin: 0;
+        padding-left: 16px;
+      }
+      ol li {
+        margin-bottom: 2px;
+      }
+      .section-title {
+        font-size: 11px;
+        padding-bottom: 2px;
+        margin-bottom: 4px;
+      }
+      .finding {
+        padding: 6px;
+        margin-bottom: 4px;
+        page-break-inside: avoid;
+      }
+      .finding-title {
+        font-size: 10px;
+        margin: 0 0 2px;
+      }
+      .finding-detail {
+        font-size: 9px;
+        line-height: 1.3;
+        margin-bottom: 3px;
+      }
+      .finding-impact {
+        padding: 4px 6px;
+        font-size: 9px;
+        margin-top: 4px;
+      }
+      .verdict-box {
+        padding: 8px;
+        margin-top: 6px;
+        page-break-inside: avoid;
+      }
+      .verdict-text {
+        font-size: 13px;
+        margin: 0;
+      }
+      .judge-footer {
+        padding: 8px 12px;
+        font-size: 8px;
+      }
+      .judge-footer p {
+        margin: 0;
+        line-height: 1.3;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="judge-container">
+    <!-- HEADER -->
+    <div class="judge-header">
+      <h1>RED FLAGS SUMMARY</h1>
+      <div class="case-caption">Ossandon v. Ossandon</div>
+      <div class="case-number">Superior Court of Arizona, Pima County | No. D2024-1669</div>
+      <div class="case-number" style="margin-top: 12px; font-size: 11px;">August 14, 2026</div>
+    </div>
+
+    <div class="judge-content">
+      <!-- EXECUTIVE SUMMARY -->
+      <div class="summary-box">
+        <h3>Disclosure, Credibility & Conduct Issues</h3>
+        <p>This summary identifies critical deficiencies in Respondent's (Constanza Ossandon) disclosures, undisclosed assets, material contradictions, and pattern of conduct including court order non-compliance and disparagement.</p>
+        <div class="summary-grid">
+          <div class="summary-item">
+            <strong>Critical Issues</strong>
+            <div class="summary-value">9</div>
+          </div>
+          <div class="summary-item">
+            <strong>High Priority Discrepancies</strong>
+            <div class="summary-value">4</div>
+          </div>
+          <div class="summary-item">
+            <strong>Conduct Violations</strong>
+            <div class="summary-value">3</div>
+          </div>
+          <div class="summary-item">
+            <strong>Estate Unverified</strong>
+            <div class="summary-value">$1.76M</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CRITICAL FINDINGS -->
+      <div class="section">
+        <div class="section-title">🚨 Critical Findings</div>
+
+        <div class="finding critical">
+          <div class="finding-title">1. SSI Account ••5296 — Never Disclosed & Regulatory Violation</div>
+          <div class="finding-detail">
+            <strong>Finding:</strong> Chase Checking account ••5296 (SSI representative-payee account for minor child Nico) has never been produced in discovery. Nico's Social Security Income ($967/month) flows through this account, controlled entirely by Respondent as rep-payee. Existence of account proven by recurring ~$967/mo flows visible on disclosed accounts plus August 2025 backlog sweep of $3,236.77. <strong>REGULATORY VIOLATION:</strong> SSI payments held in representative payee's personal account (Respondent's name) instead of in separate account in beneficiary's (Nico's) name as required by 42 CFR 416.601 (Social Security Administration representative payee regulations mandate SSI funds be held in account titled to beneficiary, not payee, and kept separate from payee's personal funds).
+          </div>
+          <div class="finding-impact">⚠ IMPACT: Entire asset account omitted from disclosure; understatement of resources available to Respondent; non-compliance with court-ordered discovery; violation of federal SSI representative payee regulations; potential misappropriation of minor's entitlement.</div>
+        </div>
+
+        <div class="finding critical">
+          <div class="finding-title">2. Undisclosed Jewelry & Personal Property</div>
+          <div class="finding-detail">
+            <strong>Finding:</strong> Respondent has never disclosed wedding ring or jewelry given to her by Petitioner's mother. Wedding ring alone represents significant marital property value. Respondent claims she does not possess the wedding ring, yet there is no documentation of sale proceeds, gift transfer, or other disposition. Absence of disclosure + absence of sale records + claim of non-possession = inconsistent narrative suggesting hidden asset.
+          </div>
+          <div class="finding-impact">⚠ IMPACT: Significant personal property asset never disclosed; no accounting for disposition; inconsistent explanations regarding asset status; potential concealment of marital property.</div>
+        </div>
+
+        <div class="finding critical">
+          <div class="finding-title">3. Date-of-Service (6/23/2024) Statements — Complete Gap</div>
+          <div class="finding-detail">
+            <strong>Finding:</strong> NO statement dated June 23, 2024 (date of service) has been produced for ANY account. Petitioner's documented estate assets comprise 98.2% of the claimed marital estate valuation ($1,763,809.14), resting solely on BeachFleischman Expert's Findings Letter (June 29, 2026) — a derived reconstruction, not underlying bank records. Respondent's disclosed checking/savings accounts total only ~$14,345 at DOS (W's Chase checking $11,337; savings $1,508 + $1,500), yet expert verified these only as of 11/28/2025—over 17 months after DOS with no intermediate statements.
+          </div>
+          <div class="finding-impact">⚠ IMPACT: All estate valuations are uncontested expert estimates without documentary verification; no independent confirmation of account balances at DOS; largest marital asset unverified.</div>
+        </div>
+      </div>
+
+      <!-- HIGH PRIORITY ISSUES -->
+      <div class="section">
+        <div class="section-title">⚠ High Priority Discrepancies</div>
+
+        <table class="findings-table">
+          <thead>
+            <tr>
+              <th>Issue</th>
+              <th>Status</th>
+              <th>Impact</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Sworn Statement: "NO" Earning Capacity</strong><br/>Respondent stated under oath she is "not looking or able to work"<br/>Reality: $68,325+/yr active employment (Helping Hearts $54,718 + Fleet Feet $13,607)</td>
+              <td><span class="status-high">PERJURY RISK</span></td>
+              <td>Under-oath false statement contradicts documented employment; directly contradicts child support & spousal maintenance income basis; raises credibility and willful non-compliance concerns</td>
+            </tr>
+            <tr>
+              <td><strong>Fleet Feet Employment: Position for Discount Access</strong><br/>$13,607/yr claimed income; yet $4,000 spent at Fleet Feet (~$250/mo running gear)</td>
+              <td><span class="status-high">INCOME MOTIVE QUESTIONED</span></td>
+              <td>Minimal Fleet Feet hours (~$254/week) suggest unwillingness to expand work; yet spends $250/month on marathon training gear at same retailer; contradicts financial hardship claims while maintaining discretionary hobby spending</td>
+            </tr>
+            <tr>
+              <td><strong>No Bank Account Statements (June 2024–Present)</strong><br/>Only credit card statements disclosed; NO checking/savings accounts produced for 20+ months</td>
+              <td><span class="status-high">CRITICAL GAP</span></td>
+              <td>Cannot trace deposits, transfers, cash flow, or hidden money since DOS; Respondent may have concealed accounts or activity; YTD income estimates only; no verification of actual funds available</td>
+            </tr>
+            <tr>
+              <td><strong>Expert Budget Grossly Overstated vs. Actual Expenses</strong><br/>Miessner claims $10,147/mo need; actual documented expenses $8,107/mo</td>
+              <td><span class="status-high">INFLATED</span></td>
+              <td>Necessary expenses: Miessner $7,567 vs Coni actual $5,128 (overstated by $2,439/mo or 48%); expert's "need" inflated to justify higher support awards</td>
+            </tr>
+            <tr>
+              <td><strong>Chase CD ••2285</strong><br/>$268,400 (verified; home sale proceeds)</td>
+              <td><span class="status-high">EXCLUDED FROM INCOME</span></td>
+              <td>Expert (Miessner) excluded CD and interest from income to reduce support obligation; Respondent plans house purchase; selective asset treatment</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- COMPLIANCE ISSUE -->
+      <div class="section">
+        <div class="section-title">Represented as Disclosed, But NOT in File</div>
+        <p>Respondent's counsel (Belleau Family Law) has represented in disclosure letters that the following items were "disclosed," yet they do not appear in transmitted documents:</p>
+        <div class="finding">
+          <div class="finding-title">Chase Checking ••8531</div>
+          <div class="finding-detail">
+            Belleau's 9/3/2024 letter claimed "June 2024 statement disclosed" and 8/6/2025 letter claimed "Aug 2024–July 2025." File contains Aug–Nov 2025 only. <strong>Missing:</strong> June 2024 statement + entire Aug 2024–July 2025 range (no overlap).
+          </div>
+        </div>
+        <div class="finding">
+          <div class="finding-title">Chase Savings ••3063 & ••1874</div>
+          <div class="finding-detail">
+            Same pattern: statements claimed as disclosed in 8/6/2025 letter (Sept 2024–July 2025 for ••3063; May–July 2025 for ••1874) but missing from file. File shows Aug–Nov 2025 only.
+          </div>
+        </div>
+      </div>
+
+      <!-- VERDICT -->
+      <div class="verdict-box">
+        <div class="verdict-label">Finding of Court</div>
+        <p class="verdict-text">Disclosures INCOMPLETE and SUBJECT TO CHALLENGE</p>
+        <p style="font-size: 10px; color: #7c4c2c; margin-top: 6px; line-height: 1.4;">
+          Critical asset (SSI account ••5296) never disclosed. Marital estate ($1.76M) lacks DOS bank statements. "NO earning capacity" claim contradicted by $68,325+/yr documented income. Warrant immediate motion to compel complete disclosures and raise credibility questions.
+        </p>
+      </div>
+
+      <!-- TEMP ORDERS VIOLATIONS -->
+      <div class="section">
+        <div class="section-title">Temporary Orders — Non-Compliance</div>
+        <div class="finding critical">
+          <div class="finding-title">Unannounced Visits & Court Order Violations</div>
+          <div class="finding-detail">
+            <strong>Finding:</strong> Respondent has failed to comply with Court's Temporary Orders regarding notification and visitation procedures. Evidence of unannounced visits to children's home in violation of court-ordered protocols for child exchanges and parental access.
+          </div>
+          <div class="finding-impact">⚠ IMPACT: Violation of court orders; evidence of disregard for judicial directives; affects custody and parenting time assessments.</div>
+        </div>
+      </div>
+
+      <!-- EXPERT BUDGET INFLATION -->
+      <div class="section">
+        <div class="section-title">Expert Budget Grossly Overstated vs. Actual Documented Expenses</div>
+        <div class="finding critical">
+          <div class="finding-title">Miessner Schedule 2 Inflated $2,040/Month Above Actual Spending</div>
+          <div class="finding-detail">
+            <strong>Finding:</strong> Respondent's expert (CPA Miessner) claims Schedule 2 monthly need of <strong>$10,147.00/month</strong>. However, AFI mapping of actual documented transactions shows: (1) <strong>Necessary Expenses:</strong> Miessner budget $7,567/month vs. Respondent's ACTUAL documented spending $5,127.60/month—expert overstated necessity expenses by <strong>$2,439.40/month (48% inflation)</strong>; (2) <strong>Discretionary Expenses:</strong> Miessner budget $1,450/month vs. actual $2,979.39/month (Respondent higher here); (3) <strong>Combined gap:</strong> Miessner Schedule 2 total ($10,147) vs. AFI actual control ($8,106.99) = <strong>$2,040.01/month difference</strong>. Expert's budget for "necessary living expenses" is significantly overstated compared to what Respondent actually spends and what is documented by transaction audit.
+          </div>
+          <div class="finding-impact">⚠ IMPACT: Expert's inflated budget artificially inflates "need" argument used to justify higher spousal/child support awards; discrepancy undermines credibility of expert calculations; Respondent's actual documented necessary expenses are nearly 50% LOWER than expert claimed; suggests expert budget was engineered to support higher maintenance/support figures rather than based on actual verified spending.</div>
+        </div>
+      </div>
+
+      <!-- FLEET FEET EMPLOYMENT: RELUCTANT COMPLIANCE WITH WORK REQUIREMENT -->
+      <div class="section">
+        <div class="section-title">Fleet Feet Employment: Minimal Hours, Unwillingness to Expand Work</div>
+        <div class="finding critical">
+          <div class="finding-title">Minimal Fleet Feet Income ($13,607/yr) Suggests Unwillingness to Work</div>
+          <div class="finding-detail">
+            <strong>Finding:</strong> Respondent's Fleet Feet employment is minimal-hours position earning only $13,607/year (approximately $254/week or ~10 hours/week at minimum wage). Despite working in running shoe retailer, Respondent spent <strong>$4,000 at Fleet Feet over 16 months (~$250/month)</strong> on running shoes and athletic gear—funding marathon hobby/training while claiming financial hardship. Pattern indicates: (1) Fleet Feet employment is <strong>minimal position despite claimed "NO earning capacity"</strong>—suggests unwillingness to expand work hours or seek better income, not actual inability; (2) Respondent maintains active marathon hobby ($250+/month athletic spending) despite sworn claims of "NO earning capacity" and financial need; (3) Contradicts financial hardship narrative when discretionary spending on hobby gear exceeds reasonable living expenses for children.
+          </div>
+          <div class="finding-impact">⚠ IMPACT: Minimal Fleet Feet hours/income suggest unwillingness to work or expand employment; discretionary $250/month hobby spending contradicts financial need claims; shows priorities (marathon training > children's basic clothing); pattern consistent with overall bad-faith non-compliance and choice to understate capacity despite maintaining active employment and discretionary spending.</div>
+        </div>
+      </div>
+
+      <!-- COMPULSIVE SHOPPING BEHAVIOR & FINANCIAL CONTRADICTION -->
+      <div class="section">
+        <div class="section-title">Compulsive Shopping Behavior & Financial Misrepresentation</div>
+        <div class="finding critical">
+          <div class="finding-title">High-Volume Discretionary Spending Contradicts Claimed Financial Need</div>
+          <div class="finding-detail">
+            <strong>Finding:</strong> Transaction analysis reveals pattern of compulsive shopping and frequent returns while claiming financial hardship: <strong>$21,813.37 in discretionary clothing/Amazon purchases over 16 months ($1,363.34/month average)</strong>. Breakdown: (1) <strong>Clothing (apparel only):</strong> $9,464.53 across 168 transactions, including weekly online shopping; Abercrombie & Fitch alone shows 5+ return transactions in single day (01/17/2025: returns of -$118.26, -$96.17, -$172.20, -$98.88, -$40.72); (2) <strong>Amazon:</strong> $12,348.84 across 415 transactions over 16 months—averaging 26 transactions/month or ~6 per week, with daily charges ranging from $7.60 to $169.59 showing multiple purchases per day; (3) <strong>Multiple card usage pattern:</strong> Primary card CC 5013 used for majority of shopping (January 2025), transitioning to CC 4381 (February 2025 onward), with both cards used for same merchants on same day to spread purchases (e.g., Amazon transactions on 02/09-02/13: CC 4381 charged $244.63, $-15.89 (return), $-228.74 (return), $173.76 on consecutive/same-day transactions); multiple charges on same day across merchants (e.g., 01/15: 4 separate Amazon charges on CC 5013 totaling $188.58); (4) <strong>Return patterns:</strong> Frequent returns across merchants suggest impulsive purchasing; Abercrombie returns alone total $655.15+ in 2-month period. <strong>CONTRAST:</strong> Minor children documented wearing same outfit repeatedly to school throughout week, indicating inadequate basic clothing provision despite high-volume personal discretionary spending and active multi-card spending pattern.
+          </div>
+          <div class="finding-impact">⚠ IMPACT: Pattern of compulsive shopping directly contradicts sworn financial need claims and "NO earning capacity" position; demonstrates misplaced priorities (personal shopping >> children's basic needs); refusal to work matched only by willingness to spend compulsively; shows fundamental bad faith: claims inability to work and financial hardship while simultaneously spending $1,400+/month on discretionary items; impulsive/compulsive behavior pattern undermines credibility; consistent with overall unwillingness to comply with financial obligations absent court enforcement.</div>
+        </div>
+      </div>
+
+      <!-- PATTERN OF UNWILLINGNESS TO WORK & NON-COMPLIANCE -->
+      <div class="section">
+        <div class="section-title">Pattern of Unwillingness to Work & Forced Compliance</div>
+        <div class="finding critical">
+          <div class="finding-title">Sworn "NO Earning Capacity" Contradicted by Court-Forced Employment</div>
+          <div class="finding-detail">
+            <strong>Finding:</strong> Respondent's overall pattern demonstrates unwillingness to work and deliberate non-compliance with financial obligations: (1) <strong>Sworn statement "NO earning capacity"</strong> is false—she actively works and earns $68,325+/yr (Helping Hearts $54,718 + Fleet Feet $13,607); (2) <strong>Despite claiming inability to work</strong>, she maintains employment, suggesting choice to understate capacity rather than actual inability; (3) <strong>No cash withdrawals documented</strong> despite active employment—suggests funds paid via card/check for tracking and control purposes; (4) <strong>Weekend trip to Phoenix with friends shows ZERO expenses</strong> in disclosed accounts—either paid cash (unavailable from no checking/savings statements) or others covered costs, inconsistent with claimed financial hardship; (5) <strong>Pattern consistent with bad-faith non-compliance:</strong> Refuses settlement, violates temp orders, takes child, makes disparaging statements, all while claiming inability to work and financial hardship.
+          </div>
+          <div class="finding-impact">⚠ IMPACT: Demonstrates pattern of willful non-compliance and bad faith; refusal to acknowledge earning capacity until forced by court orders; false sworn statement regarding capacity; spending patterns (compulsive shopping, entertainment, birthday trips) inconsistent with claimed need; overall conduct shows unwillingness to comply with financial obligations absent court enforcement; undermines credibility of all financial representations.</div>
+        </div>
+      </div>
+
+      <!-- BAD FAITH SETTLEMENT & LITIGATION DELAY -->
+      <div class="section">
+        <div class="section-title">Bad Faith Settlement Conduct & Litigation Delay</div>
+        <div class="finding critical">
+          <div class="finding-title">Refusal to Settle; Unreasonable Litigation Tactics</div>
+          <div class="finding-detail">
+            <strong>Finding:</strong> Since August 2026 judicial settlement conference, Respondent has refused to engage in good-faith settlement negotiations. Despite judge-ordered settlement discussions, Respondent: (1) rejected all settlement proposals, including reasonable offers; (2) refused to agree to holiday schedule for minor child Nico; (3) took possession of Nico in violation of agreed terms, incurring additional legal fees and court interventions; (4) maintained unreasonable positions on all material issues. Respondent's deliberate obstruction of settlement has forced Petitioner to incur substantial additional attorney fees and court costs.
+          </div>
+          <div class="finding-impact">⚠ IMPACT: Deliberate delay tactics and bad-faith settlement posture; abuse of legal process to force continued litigation; unreasonable custody/access conduct; unnecessary financial burden on Petitioner; demonstrates pattern of non-compliance and willful disregard for court direction.</div>
+        </div>
+      </div>
+
+      <!-- PARENTAL ALIENATION & DEFAMATION -->
+      <div class="section">
+        <div class="section-title">Parental Alienation & Disparagement</div>
+        <div class="finding critical">
+          <div class="finding-title">Defamatory Statements About Petitioner's Partner</div>
+          <div class="finding-detail">
+            <strong>Finding:</strong> Respondent has made repeated disparaging statements about Petitioner's significant other to third parties, including: (1) referring to her as a "P" girl to the minor children; (2) falsely telling childcare providers, ABC, and other individuals that the partner had an affair with Petitioner and "broke up" their marriage; (3) characterizing her as a prostitute and stating she is "being paid" by Petitioner.
+          </div>
+          <div class="finding-impact">⚠ IMPACT: Parental alienation; defamatory statements to third parties; communications to state agencies containing false claims; harm to children's relationship with father; potential contempt of court if court orders prohibit such conduct.</div>
+        </div>
+      </div>
+
+      <!-- RECOMMENDATIONS FOR COURT -->
+      <div class="section" style="margin-top: 8px;">
+        <div class="section-title">Recommended Court Actions</div>
+        <ol style="font-size: 10px; line-height: 1.4; color: #475569; margin: 0; padding-left: 20px;">
+          <li style="margin-bottom: 2px;"><strong>Compel Complete Bank Account Disclosure:</strong> Demand production of ALL checking and savings account statements (DOS to present). Respondent has produced only credit card statements since June 2024 — no checking/savings statements for 20+ months, preventing tracing of deposits, transfers, and hidden money flow.</li>
+          <li style="margin-bottom: 2px;"><strong>Compel Production of SSI Account ••5296:</strong> Full statements DOS-to-present, account in Nico's name, and explanation for housing SSI funds in Respondent's personal account in violation of 42 CFR 416.601.</li>
+          <li style="margin-bottom: 2px;"><strong>Challenge Earning Capacity Claim:</strong> Cross-examine on "NO capacity" using pay stubs showing $68,325+/yr employment. Adjust support calculations.</li>
+          <li style="margin-bottom: 2px;"><strong>Subpoena Banks Directly:</strong> If counsel non-compliance continues, subpoena Chase and all financial institutions for complete DOS-to-present statements (checking, savings, money market) to identify account activity, transfers, and deposits Respondent has concealed.</li>
+        </ol>
+      </div>
+    </div>
+
+    <div class="judge-footer">
+      <p>Ossandon v. Ossandon | No. D2024-1669 | Pima County Superior Court<br/>
+      Red Flags Summary | August 14, 2026</p>
+    </div>
+  </div>
+</body>
+</html>

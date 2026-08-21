@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Schedules & Calendar — Veritas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="ai-chat.css" />
+  <style>
+    .sched-grid { display: grid; grid-template-columns: 1.3fr .9fr; gap: 22px; }
+    .sched-col { display: flex; flex-direction: column; gap: 22px; min-width: 0; }
+    .week-grid { display: grid; grid-template-columns: 120px repeat(7, 1fr); border: 1px solid var(--line); border-radius: 14px; overflow: hidden; }
+    .week-grid > div { padding: 12px 10px; border-right: 1px solid var(--line-soft); border-bottom: 1px solid var(--line-soft); font-size: 12px; min-height: 84px; }
+    .week-grid > div:nth-child(8n) { border-right: none; }
+    .week-head { background: #f6f8fb; font-size: 11px; text-transform: uppercase; letter-spacing: .45px; color: var(--mute); font-weight: 700; min-height: auto !important; }
+    .week-label { background: #fbfcfe; font-weight: 700; color: var(--navy-800); }
+    .time-chip { display: inline-block; margin-top: 6px; padding: 3px 8px; border-radius: 999px; background: var(--gold-soft); color: #8a6528; font-size: 10.5px; font-weight: 700; }
+    .holiday-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .holiday-table th, .holiday-table td { border: 1px solid var(--line); padding: 10px; vertical-align: top; }
+    .holiday-table th { background: #f6f8fb; text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .45px; color: var(--mute); }
+    .callout { border-radius: 12px; padding: 14px 15px; border: 1px solid var(--line); background: linear-gradient(180deg, #fff, #f8fafc); }
+    .callout h4 { font-size: 13px; margin-bottom: 6px; }
+    .callout p { font-size: 12px; color: var(--slate); line-height: 1.5; }
+    .deadline-list, .exchange-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .deadline, .exchange { display: grid; grid-template-columns: 88px 1fr; gap: 14px; align-items: start; padding: 12px; border: 1px solid var(--line-soft); border-radius: 12px; background: #fbfcfe; }
+    .deadline .when, .exchange .when { font-family: 'Fraunces', serif; color: var(--navy-900); font-size: 18px; }
+    .deadline h5, .exchange h5 { font-size: 13px; margin-bottom: 4px; }
+    .deadline p, .exchange p { font-size: 12px; color: var(--slate); line-height: 1.45; }
+    .rail-card { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 18px; box-shadow: var(--shadow); }
+    .rail-card h4 { font-size: 14px; margin-bottom: 10px; }
+    .rail-card ul { list-style: none; display: flex; flex-direction: column; gap: 8px; }
+    .rail-card li { font-size: 12px; color: var(--slate); line-height: 1.45; padding: 8px 10px; background: var(--bg); border-radius: 10px; }
+    @media (max-width: 1200px) {
+      .sched-grid { grid-template-columns: 1fr; }
+      .week-grid { grid-template-columns: 100px repeat(7, minmax(110px, 1fr)); overflow-x: auto; }
+    }
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">
+        <img src="logo-vfi.jpg" alt="VFI Logo" />
+        <span class="brand-mark-fallback">VFI</span>
+      </div>
+      <div class="brand-text">
+        <span class="brand-name">Veritas</span>
+        <span class="brand-sub">Financial Intelligence</span>
+      </div>
+    </div>
+    <nav class="nav">
+      <div class="nav-group-label">Workspace</div>
+      <a class="nav-item" href="index.html"><span class="nav-ico">◆</span> Dashboard</a>
+      <a class="nav-item" href="index.html"><span class="nav-ico">▤</span> Matters</a>
+      <a class="nav-item active" href="schedules.html"><span class="nav-ico">◷</span> Calendar</a>
+      <a class="nav-item" href="#"><span class="nav-ico">☑</span> Tasks</a>
+      <a class="nav-item" href="discovery-intake.html"><span class="nav-ico">▦</span> Documents</a>
+      <a class="nav-item" href="#"><span class="nav-ico">◍</span> Clients</a>
+
+      <div class="nav-group-label">Analysis Modules</div>
+      <a class="nav-item" href="income-imputation.html"><span class="nav-ico">💠</span> Income Engine</a>
+      <a class="nav-item" href="spousal.html"><span class="nav-ico">⚖</span> Support Calculator</a>
+      <a class="nav-item" href="child-support.html"><span class="nav-ico">◈</span> Child Support</a>
+      <a class="nav-item" href="equitable-distribution.html"><span class="nav-ico">⊟</span> Assets</a>
+      <a class="nav-item" data-module="discovery" href="discovery-intake.html"><span class="nav-ico">◎</span> Discovery</a>
+      <a class="nav-item" href="custody.html"><span class="nav-ico">⌘</span> Custody</a>
+      <a class="nav-item" href="afi.html"><span class="nav-ico">🧾</span> AFI Expenses</a>
+      <a class="nav-item" href="estate.html"><span class="nav-ico">▧</span> Reports</a>
+
+      <div class="nav-group-label">Tools</div>
+      <a class="nav-item" data-module="forensic" href="forensic-tracing.html"><span class="nav-ico">⌕</span> Forensic Tracing</a>
+      <a class="nav-item" href="settlement.html"><span class="nav-ico">⇄</span> Settlement Modeling</a>
+      <a class="nav-item" href="credits.html"><span class="nav-ico">⊕</span> Credits &amp; Adjustments</a>
+      <a class="nav-item" href="regulations.html"><span class="nav-ico">⚖</span> Regulations</a>
+      <a class="nav-item" href="equitable-distribution.html"><span class="nav-ico">§</span> Prenup Module</a>
+      <a class="nav-item" href="discovery-intake.html"><span class="nav-ico">⤓</span> Document Intake</a>
+      <a class="nav-item" href="discovery-intake.html"><span class="nav-ico">◉</span> Compliance</a>
+      <a class="nav-item" href="red-flags.html"><span class="nav-ico">🚩</span> Red-Flag Detection</a>
+    </nav>
+
+    <div class="sidebar-foot">
+      <div class="plan-chip"><span style="color:var(--green)">●</span> Secure Connection · encrypted &amp; confidential</div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div class="matter-switcher">
+        <span class="matter-label">Active Matter</span>
+        <button class="matter-btn">
+          <strong>Ossandon v. Ossandon</strong>
+          <span class="case-no">No. D2024-1669 · Pima County, AZ</span>
+          <span class="chev">▾</span>
+        </button>
+      </div>
+      <div class="topbar-right">
+        <button class="btn ghost">Export Calendar</button>
+        <button class="btn primary">＋ Add Rotation</button>
+      </div>
+    </header>
+
+    <div class="content">
+      <section class="page-head">
+        <div>
+          <h1>Schedules &amp; Parenting Calendar</h1>
+          <p class="sub">Weekly parenting-time structure, holiday rotations, school breaks, exchange logistics and case deadlines.</p>
+        </div>
+      </section>
+
+      <div class="sched-grid">
+        <div class="sched-col">
+          <section class="panel">
+            <div class="panel-head">
+              <h3>Regular Weekly Schedule</h3>
+              <span class="tag">2-2-5-5 example</span>
+            </div>
+            <div style="overflow-x:auto;">
+              <div class="week-grid">
+                <div class="week-head">Block</div><div class="week-head">Mon</div><div class="week-head">Tue</div><div class="week-head">Wed</div><div class="week-head">Thu</div><div class="week-head">Fri</div><div class="week-head">Sat</div><div class="week-head">Sun</div>
+                <div class="week-label">School day</div><div>Parent A<span class="time-chip">8:00am</span></div><div>Parent A</div><div>Parent B</div><div>Parent B</div><div>Parent A weekend</div><div>Parent A weekend</div><div>Parent A weekend</div>
+                <div class="week-label">Exchange</div><div>School drop / pickup</div><div>No exchange</div><div>After school</div><div>No exchange</div><div>After school</div><div>No exchange</div><div>Return 6:00pm</div>
+                <div class="week-label">Notes</div><div>Homework folder</div><div>Therapy 4:30pm</div><div>Soccer transport</div><div>Medication bag</div><div>Weekend gear</div><div>Activity window</div><div>School reset</div>
+              </div>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-head">
+              <h3>Holiday &amp; School-Break Rotation</h3>
+              <span class="tag">Alternating years</span>
+            </div>
+            <table class="holiday-table">
+              <thead>
+                <tr><th>Holiday / Break</th><th>Even Years</th><th>Odd Years</th><th>Exchange Rule</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Thanksgiving</td><td>Parent A</td><td>Parent B</td><td>Wednesday 6:00pm to Sunday 6:00pm</td></tr>
+                <tr><td>Winter Break</td><td>Split by segment</td><td>Split by segment</td><td>Segment 1 ends Dec 26 noon; Segment 2 ends day before school resumes</td></tr>
+                <tr><td>Spring Break</td><td>Parent B</td><td>Parent A</td><td>Release from school to day before school resumes</td></tr>
+                <tr><td>Child Birthday</td><td>Shared 3-hour block or alternating dinner</td><td>Shared 3-hour block or alternating dinner</td><td>Does not override overnight unless specified</td></tr>
+                <tr><td>Summer Vacation</td><td>2 non-consecutive weeks each</td><td>2 non-consecutive weeks each</td><td>Notice deadline 60 days before summer start</td></tr>
+              </tbody>
+            </table>
+          </section>
+
+          <section class="panel">
+            <div class="panel-head">
+              <h3>Exchange Logistics</h3>
+              <span class="tag">Operational details</span>
+            </div>
+            <ul class="exchange-list">
+              <li class="exchange"><div class="when">1</div><div><h5>School-year exchanges</h5><p>Default at school dismissal so neither parent needs direct face-to-face contact unless school is closed.</p></div></li>
+              <li class="exchange"><div class="when">2</div><div><h5>No-school day fallback</h5><p>Use a fixed neutral site, exact time and 15-minute grace rule, with notice required for late arrival.</p></div></li>
+              <li class="exchange"><div class="when">3</div><div><h5>Transportation allocation</h5><p>Specify who picks up, who returns, and whether activity transport follows possession or enrollment parent.</p></div></li>
+              <li class="exchange"><div class="when">4</div><div><h5>Belongings / medication / devices</h5><p>List mandatory transfer items so conflicts over uniforms, medicine, homework or chargers do not repeat.</p></div></li>
+            </ul>
+          </section>
+        </div>
+
+        <div class="sched-col">
+          <div class="rail-card">
+            <h4>Schedule Tracks</h4>
+            <ul>
+              <li>Regular school-week rotation</li>
+              <li>Holiday priority and overrides</li>
+              <li>Summer and travel election windows</li>
+              <li>Case deadlines and compliance reminders</li>
+            </ul>
+          </div>
+
+          <div class="rail-card">
+            <h4>Drafting Reminders</h4>
+            <ul>
+              <li>Define whether holiday time overrides the base weekly pattern.</li>
+              <li>Set exact exchange times, not vague “afternoon” language.</li>
+              <li>Include notice windows for camps, vacations and out-of-state travel.</li>
+              <li>Clarify what happens when school is not in session.</li>
+            </ul>
+          </div>
+
+          <section class="panel">
+            <div class="panel-head">
+              <h3>Deadline Calendar</h3>
+              <span class="tag">Case management</span>
+            </div>
+            <ul class="deadline-list">
+              <li class="deadline"><div class="when">30 d</div><div><h5>Summer election notice</h5><p>Parent claiming summer blocks gives written proposed dates with a conflict-resolution deadline.</p></div></li>
+              <li class="deadline"><div class="when">14 d</div><div><h5>Holiday itinerary notice</h5><p>Addresses, flight details, emergency contacts, and any third-party caregiver information.</p></div></li>
+              <li class="deadline"><div class="when">72 h</div><div><h5>Non-emergency medical notice</h5><p>Upcoming appointments, specialist referrals, therapy changes or medication updates.</p></div></li>
+              <li class="deadline"><div class="when">24 h</div><div><h5>Schedule-change request</h5><p>Advance notice for swaps when possible, with a written acceptance requirement to avoid ambiguity.</p></div></li>
+            </ul>
+          </section>
+
+          <section class="panel">
+            <div class="panel-head">
+              <h3>Template Notes</h3>
+              <span class="tag">Software-ready</span>
+            </div>
+            <div class="callout">
+              <h4>Use this page as the scheduling spine</h4>
+              <p>The software can grow from this into a real parenting-plan builder: save multiple schedule scenarios, compare equal-time vs. primary-residential models, calculate holiday overrides, and tie deadlines to custody and child-support modules.</p>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </main>
+  <script src="ai-chat.js"></script>
+  <script src="logo-handler.js"></script>
+</body>
+</html>

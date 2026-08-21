@@ -1,0 +1,542 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Spousal Maintenance — Veritas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="spousal.css" />
+  <link rel="stylesheet" href="ai-chat.css" />
+  <style>
+    /* NEW: Single-page consolidated layout */
+    .analysis-tabs { display: none; } /* Hide old tabs */
+
+    .sections-container {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+    }
+
+    .section-panel {
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      background: #fafafa;
+      overflow: hidden;
+    }
+
+    .section-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      background: #f0f0f0;
+      border-bottom: 1px solid #ddd;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .section-header:hover {
+      background: #e8e8e8;
+    }
+
+    .section-header.expanded {
+      background: #e8d4b0;
+      border-bottom: 2px solid #997700;
+    }
+
+    .section-title {
+      font-weight: 600;
+      font-size: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .section-icon {
+      font-size: 20px;
+    }
+
+    .section-toggle {
+      width: 24px;
+      height: 24px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      transition: transform 0.2s;
+    }
+
+    .section-toggle.open {
+      transform: rotate(180deg);
+    }
+
+    .section-content {
+      padding: 20px;
+      display: none;
+      max-height: 0;
+      overflow: hidden;
+      transition: max-height 0.3s ease-out, padding 0.3s ease-out;
+    }
+
+    .section-content.open {
+      display: block;
+      max-height: 2000px;
+      overflow: visible;
+    }
+
+    .comparison-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 16px;
+      padding-bottom: 16px;
+      border-bottom: 1px solid #eee;
+    }
+
+    .comparison-row:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .comparison-cell {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .comparison-label {
+      font-size: 12px;
+      color: #666;
+      font-weight: 600;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+    }
+
+    .comparison-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: #333;
+    }
+
+    .comparison-note {
+      font-size: 12px;
+      color: #999;
+      margin-top: 4px;
+    }
+
+    /* Quick summary at top */
+    .quick-summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .summary-card {
+      padding: 16px;
+      border-radius: 6px;
+      background: white;
+      border: 1px solid #ddd;
+    }
+
+    .summary-card.highlight {
+      background: #f9f3e6;
+      border-color: #d4a574;
+    }
+
+    .summary-label {
+      font-size: 11px;
+      color: #666;
+      text-transform: uppercase;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .summary-value {
+      font-size: 20px;
+      font-weight: 700;
+      color: #333;
+    }
+
+    .summary-detail {
+      font-size: 12px;
+      color: #999;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+  <!-- ===================== SIDEBAR ===================== -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">
+        <img src="logo-vfi.jpg" alt="VFI Logo" />
+        <span class="brand-mark-fallback">VFI</span>
+      </div>
+      <div class="brand-text">
+        <span class="brand-name">Veritas</span>
+        <span class="brand-sub">Financial Intelligence</span>
+      </div>
+    </div>
+    <nav class="nav">
+      <div class="nav-group-label">Workspace</div>
+      <a class="nav-item" href="index.html"><span class="nav-ico">◆</span> Dashboard</a>
+      <a class="nav-item" href="index.html"><span class="nav-ico">▤</span> Matters</a>
+      <div class="nav-group-label">Analysis Modules</div>
+      <a class="nav-item" href="discovery-intake.html"><span class="nav-ico">⤓</span> Discovery Intake</a>
+      <a class="nav-item active" href="spousal.html"><span class="nav-ico">⚖</span> Spousal Maintenance</a>
+      <a class="nav-item" href="child-support.html"><span class="nav-ico">◈</span> Child Support</a>
+      <a class="nav-item" href="custody.html"><span class="nav-ico">⌘</span> Child Custody</a>
+      <a class="nav-item" href="schedules.html"><span class="nav-ico">◷</span> Schedules &amp; Calendar</a>
+      <a class="nav-item" href="afi.html"><span class="nav-ico">≠</span> AFI Discrepancy</a>
+      <a class="nav-item" href="forensic-tracing.html"><span class="nav-ico">⌕</span> Forensic Tracing</a>
+      <a class="nav-item" href="settlement.html"><span class="nav-ico">⇄</span> Settlement Modeling</a>
+      <a class="nav-item" href="regulations.html"><span class="nav-ico">⚖</span> Regulations</a>
+    </nav>
+    <div class="sidebar-foot"><div class="plan-chip">Firm Plan · 12 seats</div></div>
+  </aside>
+
+  <!-- ===================== MAIN ===================== -->
+  <main class="main">
+    <header class="topbar">
+      <div class="matter-switcher">
+        <span class="matter-label">Active Matter</span>
+        <button class="matter-btn">
+          <strong>Case Analysis</strong>
+          <span class="case-no">Case reference</span>
+          <span class="chev">▾</span>
+        </button>
+      </div>
+      <div class="topbar-right">
+        <div class="user">
+          <div class="avatar">TH</div>
+          <div class="user-meta">
+            <span class="user-name">Tamara Huffman</span>
+            <span class="user-role">Developer</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="content">
+      <section class="page-head">
+        <div>
+          <h1>Spousal Maintenance Analysis</h1>
+          <p class="sub">AZ §25-319 guideline formula · 21-year marriage · supported spouse analysis</p>
+        </div>
+        <div class="head-actions">
+          <a href="dashboard-spousal.html" class="btn ghost">📊 Dashboard</a>
+          <button class="btn ghost" id="spWordBtn">⤓ Word (.docx)</button>
+          <button class="btn ghost" id="spPdfBtn">⎙ PDF</button>
+          <button class="btn ghost" id="resetBtn">Reset numbers</button>
+          <button class="btn primary">Save as master calc</button>
+        </div>
+      </section>
+
+      <!-- QUICK SUMMARY AT TOP -->
+      <div class="quick-summary">
+        <div class="summary-card highlight">
+          <div class="summary-label">Base Guideline Maintenance</div>
+          <div class="summary-value" id="summaryBase">2,090/mo</div>
+          <div class="summary-detail">No property income reduction</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-label">After Property Income Reduction</div>
+          <div class="summary-value" id="summaryAdjusted">1,433/mo</div>
+          <div class="summary-detail">Depending on asset attribution</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-label">Supported Spouse Documented Need</div>
+          <div class="summary-value" id="summaryNeed">4,777/mo</div>
+          <div class="summary-detail">Essential expenses only</div>
+        </div>
+        <div class="summary-card">
+          <div class="summary-label">Income Gap</div>
+          <div class="summary-value" id="summaryGap">–</div>
+          <div class="summary-detail">Paying spouse income vs formula</div>
+        </div>
+      </div>
+
+      <!-- CONSOLIDATED ANALYSIS SECTIONS -->
+      <div class="sections-container">
+
+        <!-- ===== SECTION 1: INCOME GAP FORMULA ===== -->
+        <div class="section-panel">
+          <div class="section-header" onclick="toggleSection(this)">
+            <div class="section-title">
+              <span class="section-icon">⚖️</span>
+              Income Gap Formula (Base Calculation)
+            </div>
+            <div class="section-toggle">▼</div>
+          </div>
+          <div class="section-content open" id="income-gap-content">
+            <p style="color: #666; margin-bottom: 16px;">Standard AZ §25-319 guideline: 20% of (supportor's income - supported spouse's income) x duration factor</p>
+            <div class="comparison-row">
+              <div class="comparison-cell">
+                <div class="comparison-label">Paying Spouse Gross Income</div>
+                <div class="comparison-value">$12,500/mo</div>
+              </div>
+              <div class="comparison-cell">
+                <div class="comparison-label">Supported Spouse Gross Income</div>
+                <div class="comparison-value">$12,028/mo</div>
+              </div>
+              <div class="comparison-cell">
+                <div class="comparison-label">Income Difference</div>
+                <div class="comparison-value">$472/mo</div>
+              </div>
+            </div>
+            <div class="comparison-row">
+              <div class="comparison-cell">
+                <div class="comparison-label">20% of Difference</div>
+                <div class="comparison-value">$94/mo</div>
+              </div>
+              <div class="comparison-cell">
+                <div class="comparison-label">Duration (21 years)</div>
+                <div class="comparison-value">100%</div>
+              </div>
+              <div class="comparison-cell">
+                <div class="comparison-label">Base Maintenance</div>
+                <div class="comparison-value" style="color: #997700; font-weight: 800;">$2,090/mo</div>
+              </div>
+            </div>
+            <div class="ai-chat-container" id="aiChat-income-gap"></div>
+          </div>
+        </div>
+
+        <!-- ===== SECTION 2: AFI-BASED ANALYSIS ===== -->
+        <div class="section-panel">
+          <div class="section-header" onclick="toggleSection(this)">
+            <div class="section-title">
+              <span class="section-icon">📊</span>
+              AFI-Based Analysis (Actual Expenses)
+            </div>
+            <div class="section-toggle">▼</div>
+          </div>
+          <div class="section-content" id="afi-based-content">
+            <p style="color: #666; margin-bottom: 16px;">Compare guideline result to supported spouse's actual documented living expenses</p>
+            <div class="comparison-row">
+              <div class="comparison-cell">
+                <div class="comparison-label">Supported Spouse Documented Essential</div>
+                <div class="comparison-value">4,777/mo</div>
+                <div class="comparison-note">200 transactions, bank statements</div>
+              </div>
+              <div class="comparison-cell">
+                <div class="comparison-label">Guideline Result</div>
+                <div class="comparison-value">2,090/mo</div>
+                <div class="comparison-note">Per formula above</div>
+              </div>
+              <div class="comparison-cell">
+                <div class="comparison-label">Shortfall</div>
+                <div class="comparison-value" style="color: #d9534f;">2,687/mo</div>
+                <div class="comparison-note">Insufficient property/income?</div>
+              </div>
+            </div>
+            <div class="ai-chat-container" id="aiChat-afi-based"></div>
+          </div>
+        </div>
+
+        <!-- ===== SECTION 3: PROPERTY INCOME IMPACT ===== -->
+        <div class="section-panel">
+          <div class="section-header" onclick="toggleSection(this)">
+            <div class="section-title">
+              <span class="section-icon">💰</span>
+              Property Income Reduction (§25-319(B))
+            </div>
+            <div class="section-toggle">▼</div>
+          </div>
+          <div class="section-content" id="property-income-content">
+            <p style="color: #666; margin-bottom: 16px;">When supported spouse has significant assets, court may attribute investment income, reducing maintenance obligation</p>
+            <div class="comparison-row">
+              <div class="comparison-cell">
+                <div class="comparison-label">Scenario</div>
+                <div class="comparison-value" style="font-size: 14px; font-weight: 600;">CD •••2285 @ 3.92%</div>
+              </div>
+              <div class="comparison-cell">
+                <div class="comparison-label">Attributed Income</div>
+                <div class="comparison-value">876/mo</div>
+              </div>
+              <div class="comparison-cell">
+                <div class="comparison-label">Adjusted Maintenance</div>
+                <div class="comparison-value" style="color: #997700;">1,433/mo</div>
+              </div>
+            </div>
+            <div class="comparison-row">
+              <div class="comparison-cell">
+                <div class="comparison-label">Scenario</div>
+                <div class="comparison-value" style="font-size: 14px; font-weight: 600;">Liquid $440k @ 10%</div>
+              </div>
+              <div class="comparison-cell">
+                <div class="comparison-label">Attributed Income</div>
+                <div class="comparison-value">3,670/mo</div>
+              </div>
+              <div class="comparison-cell">
+                <div class="comparison-label">Adjusted Maintenance</div>
+                <div class="comparison-value" style="color: #28a745;">0/mo</div>
+              </div>
+            </div>
+            <div class="ai-chat-container" id="aiChat-property-income"></div>
+          </div>
+        </div>
+
+        <!-- ===== SECTION 4: INCOME SCENARIO MATRIX ===== -->
+        <div class="section-panel">
+          <div class="section-header" onclick="toggleSection(this)">
+            <div class="section-title">
+              <span class="section-icon">📈</span>
+              Income Scenario Matrix
+            </div>
+            <div class="section-toggle">▼</div>
+          </div>
+          <div class="section-content" id="income-matrix-content">
+            <p style="color: #666; margin-bottom: 16px;">Sensitivity analysis: How does maintenance change across different income assumptions?</p>
+            <div style="overflow-x: auto;">
+              <table style="width: 100%; font-size: 12px; border-collapse: collapse;">
+                <thead>
+                  <tr style="background: #f0f0f0; border-bottom: 2px solid #ddd;">
+                    <th style="padding: 8px; text-align: left; font-weight: 600;">Luis Income</th>
+                    <th style="padding: 8px; text-align: right;">Maintenance</th>
+                    <th style="padding: 8px; text-align: right;">vs Coni Need</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr style="border-bottom: 1px solid #eee;">
+                    <td style="padding: 8px;">$10,000/mo</td>
+                    <td style="padding: 8px; text-align: right;">($406)/mo</td>
+                    <td style="padding: 8px; text-align: right; color: #d9534f;">Negative</td>
+                  </tr>
+                  <tr style="border-bottom: 1px solid #eee;">
+                    <td style="padding: 8px;">$12,028/mo (Equal)</td>
+                    <td style="padding: 8px; text-align: right;">$0/mo</td>
+                    <td style="padding: 8px; text-align: right; color: #d9534f;">No maintenance</td>
+                  </tr>
+                  <tr style="border-bottom: 1px solid #eee;">
+                    <td style="padding: 8px;">$15,000/mo</td>
+                    <td style="padding: 8px; text-align: right;">$596/mo</td>
+                    <td style="padding: 8px; text-align: right; color: #d9534f;">–4,181/mo shortfall</td>
+                  </tr>
+                  <tr>
+                    <td style="padding: 8px;">$20,000/mo</td>
+                    <td style="padding: 8px; text-align: right;">$1,594/mo</td>
+                    <td style="padding: 8px; text-align: right; color: #d9534f;">–3,183/mo shortfall</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="ai-chat-container" id="aiChat-income-matrix"></div>
+          </div>
+        </div>
+
+        <!-- ===== SECTION 5: EXPERT COMPARISON ===== -->
+        <div class="section-panel">
+          <div class="section-header" onclick="toggleSection(this)">
+            <div class="section-title">
+              <span class="section-icon">🔍</span>
+              Expert Comparison (Coni vs Miessner)
+            </div>
+            <div class="section-toggle">▼</div>
+          </div>
+          <div class="section-content" id="expert-compare-content">
+            <p style="color: #666; margin-bottom: 16px;">Comparison of Coni's documented expenses vs. Miessner expert's claimed needs</p>
+            <div class="comparison-row">
+              <div class="comparison-cell">
+                <div class="comparison-label">Coni Essential Only</div>
+                <div class="comparison-value">4,777/mo</div>
+                <div class="comparison-note">Documented: 200 txns</div>
+              </div>
+              <div class="comparison-cell">
+                <div class="comparison-label">Miessner Claims</div>
+                <div class="comparison-value">~10,147/mo</div>
+                <div class="comparison-note">Expert report</div>
+              </div>
+              <div class="comparison-cell">
+                <div class="comparison-label">Overstatement</div>
+                <div class="comparison-value" style="color: #d9534f;">+5,370/mo</div>
+                <div class="comparison-note">113% higher than actual</div>
+              </div>
+            </div>
+            <div style="background: #fff3cd; padding: 12px; border-radius: 6px; margin-top: 12px; font-size: 12px;">
+              <strong>Key Overstatements by Miessner:</strong>
+              <ul style="margin: 8px 0; padding-left: 20px;">
+                <li>Housekeeping: Claims $400/mo vs Coni's $90/mo (+$310/mo)</li>
+                <li>Activities: Claims $300/mo vs Coni's $36.50/mo (+$263.50/mo)</li>
+              </ul>
+            </div>
+            <div class="ai-chat-container" id="aiChat-expert-compare"></div>
+          </div>
+        </div>
+
+        <!-- ===== SECTION 6: DEVIATION ANALYSIS ===== -->
+        <div class="section-panel">
+          <div class="section-header" onclick="toggleSection(this)">
+            <div class="section-title">
+              <span class="section-icon">📝</span>
+              Deviation Analysis
+            </div>
+            <div class="section-toggle">▼</div>
+          </div>
+          <div class="section-content" id="deviation-content">
+            <p style="color: #666; margin-bottom: 16px;">Arguments to increase or decrease the guideline maintenance amount</p>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+              <div style="border: 1px solid #d9534f; padding: 12px; border-radius: 6px; background: #fde9e9;">
+                <div style="font-weight: 600; color: #d9534f; margin-bottom: 8px;">Arguments for INCREASE</div>
+                <ul style="margin: 0; padding-left: 16px; font-size: 12px;">
+                  <li>Coni's documented need ($4,777) exceeds guideline ($2,090)</li>
+                  <li>Income gap minimal; guideline inadequate</li>
+                  <li>22-year marriage justifies support</li>
+                </ul>
+              </div>
+              <div style="border: 1px solid #28a745; padding: 12px; border-radius: 6px; background: #e8f5e9;">
+                <div style="font-weight: 600; color: #28a745; margin-bottom: 8px;">Arguments for DECREASE/NO MAINTENANCE</div>
+                <ul style="margin: 0; padding-left: 16px; font-size: 12px;">
+                  <li>Incomes approximately equal ($12.5k vs $12k)</li>
+                  <li>Coni has significant property assets (~$440k)</li>
+                  <li>Discretionary expenses inflate claimed need</li>
+                </ul>
+              </div>
+            </div>
+            <div class="ai-chat-container" id="aiChat-deviation"></div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- ===== AI CHATBOT (FIXED AT BOTTOM) ===== -->
+      <section style="margin-top: 40px; border-top: 2px solid #ddd; padding-top: 24px;">
+        <h3 style="margin-bottom: 16px;">AI Investigation Assistant</h3>
+        <p style="color: #666; margin-bottom: 16px; font-size: 14px;">Ask questions about this calculation, income scenarios, or expert challenges</p>
+        <div class="ai-chat-container" id="aiChat-general"></div>
+      </section>
+
+    </div>
+  </main>
+
+  <script>
+    function toggleSection(header) {
+      const toggle = header.querySelector('.section-toggle');
+      const content = header.nextElementSibling;
+
+      // Close all other sections
+      document.querySelectorAll('.section-header.expanded').forEach(h => {
+        if (h !== header) {
+          h.classList.remove('expanded');
+          h.querySelector('.section-toggle').classList.remove('open');
+          h.nextElementSibling.classList.remove('open');
+        }
+      });
+
+      // Toggle this section
+      header.classList.toggle('expanded');
+      toggle.classList.toggle('open');
+      content.classList.toggle('open');
+    }
+
+    // Open first section by default
+    document.querySelector('.section-header').click();
+  </script>
+  <script src="safe-text.js"></script>
+  <script src="spousal.js"></script>
+</body>
+</html>

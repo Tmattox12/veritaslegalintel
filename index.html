@@ -1,0 +1,493 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Veritas — Family Law Financial Intelligence</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <!-- Veritas AI Chat Widget -->
+  <link rel="stylesheet" href="ai-chat-widget.css" />
+  <!-- Reconciliation Modal -->
+  <link rel="stylesheet" href="reconciliation-modal.css" />
+  <style>
+    /* ---- Dashboard card grid (matches reference layout, reuses Veritas palette) ---- */
+    .dash-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+    @media (max-width: 1100px) { .dash-grid { grid-template-columns: 1fr; } }
+    .dcard { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px 20px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 14px; }
+    .dcard.full { grid-column: 1 / -1; }
+    .dcard-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+    .dcard-title { display: flex; align-items: flex-start; gap: 10px; }
+    .dcard-title .ico { width: 32px; height: 32px; border-radius: 9px; display: flex; align-items: center; justify-content: center; background: var(--bg); border: 1px solid var(--line); font-size: 15px; flex: none; }
+    .dcard-title h3 { font-size: 14.5px; font-weight: 600; color: var(--navy-900); line-height: 1.2; }
+    .dcard-title .st { display: block; font-size: 11px; color: var(--mute); margin-top: 3px; }
+    .dcard-metrics { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+    .dmetric { background: var(--bg); border: 1px solid var(--line-soft); border-radius: 10px; padding: 10px 12px; }
+    .dmetric .k { font-size: 10px; text-transform: uppercase; letter-spacing: .4px; color: var(--slate); }
+    .dmetric .v { font-family: 'Fraunces', serif; font-size: 19px; color: var(--navy-900); margin-top: 4px; line-height: 1.1; }
+    .dmetric .u { font-size: 11px; color: var(--mute); }
+    .drow { display: flex; align-items: center; justify-content: space-between; gap: 10px; font-size: 12.5px; padding: 6px 0; border-bottom: 1px solid var(--line-soft); }
+    .drow:last-child { border-bottom: none; }
+    .drow .lbl { color: var(--slate); }
+    .drow .val { font-weight: 600; color: var(--ink); }
+    .dbadge { font-size: 10.5px; font-weight: 600; border-radius: 20px; padding: 2px 9px; white-space: nowrap; }
+    .dbadge.ok { color: var(--green); background: var(--green-soft); }
+    .dbadge.warn { color: var(--amber); background: var(--amber-soft); }
+    .dbadge.risk { color: var(--red); background: var(--red-soft); }
+    .dcard-link { margin-top: auto; font-size: 12px; font-weight: 600; color: var(--navy-700); text-decoration: none; }
+    .dcard-link:hover { color: var(--gold); }
+    .dintel { display: flex; flex-direction: column; gap: 9px; }
+    .dintel-item { display: flex; gap: 9px; align-items: flex-start; font-size: 12px; color: var(--slate); line-height: 1.4; }
+    .dintel-item .dot { width: 8px; height: 8px; border-radius: 50%; margin-top: 4px; flex: none; }
+    .dot.amber { background: var(--amber); } .dot.red { background: var(--red); } .dot.green { background: var(--green); }
+    .dintel-item strong { color: var(--ink); font-weight: 600; }
+    .dintake { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; }
+    @media (max-width: 900px) { .dintake { grid-template-columns: repeat(2, 1fr); } }
+    .dintake-col .k { font-size: 11px; color: var(--slate); }
+    .dintake-col .v { font-size: 15px; font-weight: 600; color: var(--navy-900); margin: 5px 0; }
+    .tag.sample { color: var(--gold); background: var(--gold-soft); border-color: #e9d3a6; }
+
+    /* icon badge tints */
+    .ico.blue { background: #eaf1fb; color: #2e5b8a; border-color: #d7e5f6; }
+    .ico.green { background: var(--green-soft); color: var(--green); border-color: #cfe8dc; }
+    .ico.gold { background: var(--gold-soft); color: var(--gold); border-color: #e9d3a6; }
+    .ico.red { background: var(--red-soft); color: var(--red); border-color: #f2cfc7; }
+    .ico.violet { background: #eee9fb; color: #6b4fb0; border-color: #ddd3f3; }
+    .ico.teal { background: #e2f4f2; color: #2f7d76; border-color: #c9e8e4; }
+
+    /* donut + legend */
+    .dchart { display: flex; align-items: center; gap: 18px; }
+    .donut { width: 118px; height: 118px; border-radius: 50%; flex: none; position: relative; }
+    .donut::after { content: ''; position: absolute; inset: 17px; background: var(--card); border-radius: 50%; }
+    .donut-c { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1; }
+    .donut-c b { font-family: 'Fraunces', serif; font-size: 19px; color: var(--navy-900); line-height: 1; }
+    .donut-c span { font-size: 9.5px; color: var(--slate); margin-top: 3px; }
+    .dlegend { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+    .dleg { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--slate); }
+    .dleg .sw { width: 9px; height: 9px; border-radius: 2px; flex: none; }
+    .dleg .amt { margin-left: auto; font-weight: 600; color: var(--ink); }
+
+    /* mini calendar */
+    .dcal { display: flex; gap: 16px; align-items: flex-start; }
+    .mcal { flex: none; width: 178px; }
+    .mcal-head { display: flex; align-items: center; justify-content: space-between; font-size: 12px; font-weight: 600; color: var(--navy-900); margin-bottom: 7px; }
+    .mcal-head .nav { color: var(--mute); cursor: default; }
+    .mcal-grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 2px; }
+    .mcal-grid span { text-align: center; font-size: 9.5px; padding: 3px 0; border-radius: 5px; color: var(--ink); }
+    .mcal-grid .dow { color: var(--mute); font-weight: 600; }
+    .mcal-grid .mut { color: #c3cbd8; }
+    .mcal-grid .pa { background: #eaf1fb; }
+    .mcal-grid .pb { background: #e2f4f2; }
+    .mcal-grid .xfer { background: var(--gold-soft); font-weight: 700; color: var(--gold); }
+    .cal-side { flex: 1; padding-top: 6px; }
+    .cal-side .big { font-family: 'Fraunces', serif; font-size: 26px; color: var(--navy-900); }
+    .cal-legend { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 8px; }
+    .cal-legend .dleg { font-size: 11px; }
+
+    /* date-range control */
+    .daterange { display: flex; align-items: center; gap: 8px; background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 7px 12px; font-size: 12.5px; color: var(--ink); font-weight: 500; }
+    .daterange .chev { font-size: 11px; }
+  </style>
+</head>
+<body>
+  <!-- ===================== SIDEBAR ===================== -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">
+        <img src="logo-vfi.jpg" alt="VFI Logo" />
+        <span class="brand-mark-fallback">VFI</span>
+      </div>
+      <div class="brand-text">
+        <span class="brand-name">Veritas</span>
+        <span class="brand-sub">Financial Intelligence</span>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <div class="nav-group-label">Workspace</div>
+      <a class="nav-item active" href="index.html"><span class="nav-ico">◆</span> Dashboard</a>
+      <a class="nav-item" href="#"><span class="nav-ico">▤</span> Matters</a>
+      <a class="nav-item" href="schedules.html"><span class="nav-ico">◷</span> Calendar</a>
+      <a class="nav-item" href="#"><span class="nav-ico">☑</span> Tasks</a>
+      <a class="nav-item" href="#"><span class="nav-ico">◍</span> Clients</a>
+
+      <div class="nav-group-label">Analysis Modules</div>
+      <a class="nav-item" href="income-imputation.html"><span class="nav-ico">💠</span> Income Engine</a>
+      <a class="nav-item" href="spousal.html"><span class="nav-ico">⚖</span> Support Calculator</a>
+      <a class="nav-item" href="child-support.html"><span class="nav-ico">◈</span> Child Support</a>
+      <a class="nav-item" href="equitable-distribution.html"><span class="nav-ico">⊟</span> Assets</a>
+      <a class="nav-item" href="custody.html"><span class="nav-ico">⌘</span> Custody</a>
+      <a class="nav-item" href="afi.html"><span class="nav-ico">🧾</span> AFI Expenses</a>
+      <a class="nav-item" href="credits.html"><span class="nav-ico">⊕</span> Credits &amp; Adjustments</a>
+
+      <div class="nav-group-label">Tools</div>
+      <a class="nav-item" href="document-hub-master.html" data-module="document-hub"><span class="nav-ico">📁</span> Document Hub</a>
+      <a class="nav-item" href="estate.html"><span class="nav-ico">▧</span> Reports</a>
+      <a class="nav-item" data-module="forensic" href="forensic-tracing.html"><span class="nav-ico">⌕</span> Forensic Tracing</a>
+      <a class="nav-item" href="settlement.html"><span class="nav-ico">⇄</span> Settlement Modeling</a>
+      <a class="nav-item" href="regulations.html"><span class="nav-ico">⚖</span> Regulations</a>
+      <a class="nav-item" href="equitable-distribution.html"><span class="nav-ico">§</span> Prenup Module</a>
+      <a class="nav-item" href="discovery-intake.html"><span class="nav-ico">⤓</span> Document Intake</a>
+      <a class="nav-item" href="discovery-intake.html"><span class="nav-ico">◉</span> Compliance</a>
+      <a class="nav-item" href="red-flags.html"><span class="nav-ico">🚩</span> Red-Flag Detection</a>
+    </nav>
+
+    <div class="sidebar-foot">
+      <div class="plan-chip"><span style="color:var(--green)">●</span> Secure Connection · encrypted &amp; confidential</div>
+    </div>
+  </aside>
+
+  <!-- ===================== MAIN ===================== -->
+  <main class="main">
+    <!-- Top bar -->
+    <header class="topbar">
+      <div class="matter-switcher">
+        <span class="matter-label">Active Matter</span>
+        <button class="matter-btn">
+          <strong>Sample Case · Petitioner v. Respondent</strong>
+          <span class="case-no">No. SAMPLE001 · Sample County, State</span>
+          <span class="chev">▾</span>
+        </button>
+      </div>
+
+      <div class="topbar-right">
+        <div class="daterange"><span>🗓</span><span>Aug 5 – Aug 12, 2026</span><span class="chev">▾</span></div>
+        <button class="icon-btn" title="Filter">⋔</button>
+        <button class="icon-btn" title="Notifications">🔔<span class="dot"></span></button>
+        <div class="user">
+          <div class="avatar">TH</div>
+          <div class="user-meta">
+            <span class="user-name">Workspace User</span>
+            <span class="user-role">Anderson Matter</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Scroll region -->
+    <div class="content">
+      <!-- Greeting + status -->
+      <section class="page-head">
+        <div>
+          <h1>Financial Dashboard</h1>
+          <p class="sub">Expense analysis organized by AFI (Affidavit of Financial Information) categories.</p>
+        </div>
+        <div class="head-actions">
+          <button class="btn ghost">Export Summary</button>
+          <button class="btn primary">＋ Add Expense</button>
+        </div>
+      </section>
+
+      <!-- Income context banner from cross-page sync -->
+      <div id="dashIncomeContextBar" style="display:none;margin-bottom:14px;padding:8px 12px;border:1px solid #d7e0ec;border-radius:8px;background:#f7f9fc;font-size:11.5px;color:#2f4563;line-height:1.5"></div>
+
+      <!-- ===================== DASHBOARD CARD GRID ===================== -->
+      <div class="dash-grid">
+
+        <!-- Income Engine -->
+        <article class="dcard">
+          <div class="dcard-head">
+            <div class="dcard-title">
+              <span class="ico blue">💠</span>
+              <div><h3>Income Engine</h3><span class="st">Primary source of truth</span></div>
+            </div>
+          </div>
+          <div class="dchart">
+            <div class="donut" id="dashIncomeDonut" style="background:conic-gradient(var(--navy-600) 0 79%, var(--gold) 79% 100%)">
+              <div class="donut-c"><b id="dashIncomeCombined">$300,640</b><span>combined / yr</span></div>
+            </div>
+            <div class="dlegend">
+              <div class="dleg"><span class="sw" style="background:var(--navy-600)"></span><span id="dashIncomePetitionerLabel">Petitioner — W-2 base</span><span class="amt" id="dashIncomePetitionerAmt">$236,819</span></div>
+              <div class="dleg"><span class="sw" style="background:var(--gold)"></span><span id="dashIncomeRespondentLabel">Respondent — imputed</span><span class="amt" id="dashIncomeRespondentAmt">$63,821</span></div>
+            </div>
+          </div>
+          <div class="dintel">
+            <div class="dintel-item"><span class="dot green"></span><span>Income summary data removed</span></div>
+          </div>
+          <a class="dcard-link" href="income-imputation.html">Go to Income Engine →</a>
+        </article>
+
+        <!-- Child Expenses Summary -->
+        <article class="dcard">
+          <div class="dcard-head">
+            <div class="dcard-title">
+              <span class="ico green">👨‍👩‍👧‍👦</span>
+              <div><h3>Child Expenses</h3><span class="st">Monthly costs for children</span></div>
+            </div>
+          </div>
+          <div class="drow"><span class="lbl">Health Insurance</span><span class="val">—</span></div>
+          <div class="drow"><span class="lbl">Dental/Vision Insurance</span><span class="val">—</span></div>
+          <div class="drow"><span class="lbl">Child Care</span><span class="val">—</span></div>
+          <div class="drow"><span class="lbl">Medical & Dental (unreimbursed)</span><span class="val">—</span></div>
+          <div class="drow"><span class="lbl">Extraordinary Child Expenses</span><span class="val">—</span></div>
+          <a class="dcard-link" href="child-support.html">View Child Support Analysis →</a>
+        </article>
+
+        <!-- Housing Expenses -->
+        <article class="dcard">
+          <div class="dcard-head">
+            <div class="dcard-title">
+              <span class="ico gold">🏠</span>
+              <div><h3>Housing Expenses</h3><span class="st">Mortgage, rent & maintenance</span></div>
+            </div>
+          </div>
+          <div class="drow"><span class="lbl">Mortgage/Rent Payment</span><span class="val">—</span></div>
+          <div class="drow"><span class="lbl">Homeowners Insurance & Taxes</span><span class="val">—</span></div>
+          <div class="drow"><span class="lbl">Repairs & Upkeep</span><span class="val">—</span></div>
+          <div class="drow"><span class="lbl">Yard Work/Pool/Pest Control</span><span class="val">—</span></div>
+          <div class="drow"><span class="lbl">Homeowners Association Fee</span><span class="val">—</span></div>
+          <a class="dcard-link" href="housing-analysis.html">View Housing Details →</a>
+        </article>
+
+        <!-- Discovery Compliance -->
+        <article class="dcard">
+          <div class="dcard-head">
+            <div class="dcard-title">
+              <span class="ico red">◎</span>
+              <div><h3>Discovery Compliance</h3><span class="st">Disclosure completeness</span></div>
+            </div>
+          </div>
+          <div class="dintel">
+            <div class="dintel-item"><span class="dot amber"></span><span>Discovery compliance details removed</span></div>
+          </div>
+          <div class="drow"><span class="lbl">Marital estate current values</span><span class="dbadge warn">Largely undocumented</span></div>
+          <div class="drow"><span class="lbl">Sanction Risk</span><span class="dbadge ok">Low</span></div>
+          <a class="dcard-link" href="discovery-intake.html">Go to Discovery →</a>
+        </article>
+
+        <!-- Custody Schedule -->
+        <article class="dcard">
+          <div class="dcard-head">
+            <div class="dcard-title">
+              <span class="ico violet">⌘</span>
+              <div><h3>Custody Schedule</h3><span class="st">50/50 parenting time · Aug 2026</span></div>
+            </div>
+          </div>
+          <div class="dcal">
+            <div class="mcal">
+              <div class="mcal-head"><span class="nav">‹</span><span>August 2026</span><span class="nav">›</span></div>
+              <div class="mcal-grid">
+                <span class="dow">S</span><span class="dow">M</span><span class="dow">T</span><span class="dow">W</span><span class="dow">T</span><span class="dow">F</span><span class="dow">S</span>
+                <span class="mut">26</span><span class="mut">27</span><span class="mut">28</span><span class="mut">29</span><span class="mut">30</span><span class="mut">31</span><span class="pb">1</span>
+                <span class="pb">2</span><span class="xfer">3</span><span class="pa">4</span><span class="pa">5</span><span class="pa">6</span><span class="pa">7</span><span class="pa">8</span>
+                <span class="pa">9</span><span class="xfer">10</span><span class="pb">11</span><span class="pb">12</span><span class="pb">13</span><span class="pb">14</span><span class="pb">15</span>
+                <span class="pb">16</span><span class="xfer">17</span><span class="pa">18</span><span class="pa">19</span><span class="pa">20</span><span class="pa">21</span><span class="pa">22</span>
+                <span class="pa">23</span><span class="xfer">24</span><span class="pb">25</span><span class="pb">26</span><span class="pb">27</span><span class="pb">28</span><span class="pb">29</span>
+                <span class="pb">30</span><span class="xfer">31</span><span class="mut">1</span><span class="mut">2</span><span class="mut">3</span><span class="mut">4</span><span class="mut">5</span>
+              </div>
+            </div>
+            <div class="cal-side">
+              <div class="big">—</div>
+              <div class="st">custody schedule data removed</div>
+              <div class="drow" style="margin-top:8px"><span class="lbl">Next exchange</span><span class="val">—</span></div>
+              <div class="cal-legend">
+                <div class="dleg"><span class="sw" style="background:#eaf1fb"></span>Petitioner</div>
+                <div class="dleg"><span class="sw" style="background:#e2f4f2"></span>Respondent</div>
+                <div class="dleg"><span class="sw" style="background:var(--gold-soft)"></span>Transfer</div>
+              </div>
+            </div>
+          </div>
+          <a class="dcard-link" href="custody.html">View Full Schedule →</a>
+        </article>
+
+        <!-- Childcare & Expenses -->
+        <article class="dcard">
+          <div class="dcard-head">
+            <div class="dcard-title">
+              <span class="ico teal">🧾</span>
+              <div><h3>Childcare &amp; Expenses</h3><span class="st">Extraordinary child costs</span></div>
+            </div>
+          </div>
+          <div class="drow"><span class="lbl">Extraordinary child expenses</span><span class="val">—</span></div>
+          <div class="drow"><span class="lbl">Expense analysis</span><span class="val" id="dashAfiNeed">Data removed</span></div>
+          <div class="drow"><span class="lbl">Window period</span><span class="val">—</span></div>
+          <div class="drow"><span class="lbl">Childcare arrangements</span><span class="val">—</span></div>
+          <div class="drow"><span class="lbl">Cost split</span><span class="val">—</span></div>
+          <a class="dcard-link" href="afi.html">View Expense Details →</a>
+        </article>
+
+        <!-- Utilities & Communications -->
+        <article class="dcard">
+          <div class="dcard-head">
+            <div class="dcard-title">
+              <span class="ico gold">⚡</span>
+              <div><h3>Utilities &amp; Communications</h3><span class="st">Monthly utility costs</span></div>
+            </div>
+          </div>
+          <div class="drow"><span class="lbl">Water, Sewer & Garbage</span><span class="val">—</span></div>
+          <div class="drow"><span class="lbl">Electricity</span><span class="val">—</span></div>
+          <div class="drow"><span class="lbl">Gas</span><span class="val">—</span></div>
+          <div class="drow"><span class="lbl">Telephone & Mobile Phone</span><span class="val">—</span></div>
+          <div class="drow"><span class="lbl">Internet & Cable/Satellite</span><span class="val">—</span></div>
+          <a class="dcard-link" href="utilities-analysis.html">View Utilities Details →</a>
+        </article>
+
+        <!-- Transportation & Automobile -->
+        <article class="dcard">
+          <div class="dcard-head">
+            <div class="dcard-title">
+              <span class="ico blue">🚗</span>
+              <div><h3>Transportation &amp; Automobile</h3><span class="st">Vehicle & transportation costs</span></div>
+            </div>
+          </div>
+          <div class="drow"><span class="lbl">Car Insurance</span><span class="val">—</span></div>
+          <div class="drow"><span class="lbl">Car Payment</span><span class="val">—</span></div>
+          <div class="drow"><span class="lbl">Repair & Maintenance</span><span class="val">—</span></div>
+          <div class="drow"><span class="lbl">Gas & Oil</span><span class="val">—</span></div>
+          <div class="drow"><span class="lbl">Bus Fare/Parking Fees</span><span class="val">—</span></div>
+          <a class="dcard-link" href="transportation-analysis.html">View Transportation Details →</a>
+        </article>
+
+        <!-- Food & Clothing -->
+        <article class="dcard">
+          <div class="dcard-head">
+            <div class="dcard-title">
+              <span class="ico violet">👕</span>
+              <div><h3>Food &amp; Clothing</h3><span class="st">Groceries and apparel costs</span></div>
+            </div>
+          </div>
+          <div class="drow"><span class="lbl">Food & Household Supplies</span><span class="val">—</span></div>
+          <div class="drow"><span class="lbl">School Lunches</span><span class="val">—</span></div>
+          <div class="drow"><span class="lbl">Meals Outside Home</span><span class="val">—</span></div>
+          <div class="drow"><span class="lbl">Clothing & Work Uniforms</span><span class="val">—</span></div>
+          <div class="drow"><span class="lbl">Laundry & Cleaning</span><span class="val">—</span></div>
+          <a class="dcard-link" href="food-clothing-analysis.html">View Food &amp; Clothing Details →</a>
+        </article>
+
+        <!-- Miscellaneous Expenses -->
+        <article class="dcard">
+          <div class="dcard-head">
+            <div class="dcard-title">
+              <span class="ico teal">📋</span>
+              <div><h3>Miscellaneous Expenses</h3><span class="st">School, insurance, and other costs</span></div>
+            </div>
+          </div>
+          <div class="drow"><span class="lbl">School & School Supplies</span><span class="val">—</span></div>
+          <div class="drow"><span class="lbl">Extracurricular Activities</span><span class="val">—</span></div>
+          <div class="drow"><span class="lbl">Life & Disability Insurance</span><span class="val">—</span></div>
+          <div class="drow"><span class="lbl">Personal Care & Recreation</span><span class="val">—</span></div>
+          <div class="drow"><span class="lbl">Union/Professional Dues</span><span class="val">—</span></div>
+          <a class="dcard-link" href="miscellaneous-analysis.html">View Miscellaneous Details →</a>
+        </article>
+
+        <!-- Outstanding Debts -->
+        <article class="dcard">
+          <div class="dcard-head">
+            <div class="dcard-title">
+              <span class="ico green">💳</span>
+              <div><h3>Outstanding Debts</h3><span class="st">Current liabilities and payments</span></div>
+            </div>
+          </div>
+          <div class="drow"><span class="lbl">Total Outstanding Debts</span><span class="val">—</span></div>
+          <div class="drow"><span class="lbl">Monthly Debt Payments</span><span class="val">—</span></div>
+          <div class="drow"><span class="lbl">Number of Accounts</span><span class="val">—</span></div>
+          <div class="dintel">
+            <div class="dintel-item"><span class="dot amber"></span><span>List includes all installment payments and creditor accounts</span></div>
+          </div>
+          <a class="dcard-link" href="debts-analysis.html">View Debts Details →</a>
+        </article>
+
+        <!-- Reconciliation Hub -->
+        <article class="dcard">
+          <div class="dcard-head">
+            <div class="dcard-title">
+              <span class="ico teal">📋</span>
+              <div><h3>Reconciliation Hub</h3><span class="st">Import & manage expenses</span></div>
+            </div>
+          </div>
+          <div class="dintel">
+            <div class="dintel-item"><span class="dot green"></span><span><strong>Auto-mapping</strong> financial documents to expense categories</span></div>
+            <div class="dintel-item"><span class="dot amber"></span><span><strong>8 categories</strong> with 90%+ accuracy rate</span></div>
+            <div class="dintel-item"><span class="dot blue"></span><span><strong>Document Management</strong> hub for all imports</span></div>
+          </div>
+          <div style="margin-top: 12px; display: flex; gap: 8px;">
+            <a class="dcard-link" href="afi.html" style="flex: 1; text-align: center; margin: 0;">Import Data →</a>
+            <a class="dcard-link" href="document-management.html" style="flex: 1; text-align: center; margin: 0;">View Hub →</a>
+          </div>
+        </article>
+
+        <!-- Regulations (preserved) -->
+        <article class="dcard">
+          <div class="dcard-head">
+            <div class="dcard-title">
+              <span class="ico gold">⚖</span>
+              <div><h3>Regulations</h3><span class="st">AZ guidelines &amp; statutes</span></div>
+            </div>
+          </div>
+          <div class="dintel">
+            <div class="dintel-item"><span class="dot green"></span><span>Arizona guidelines <strong>active</strong> (Sept 2025 SM guidelines)</span></div>
+            <div class="dintel-item"><span class="dot amber"></span><span>Spousal maintenance — A.R.S. <strong>§25-319</strong>; fee-shifting <strong>§25-324</strong></span></div>
+          </div>
+          <a class="dcard-link" href="regulations.html">Open Regulations →</a>
+        </article>
+
+        <!-- Financial Summary (full width) -->
+        <article class="dcard full">
+          <div class="dcard-head">
+            <div class="dcard-title">
+              <span class="ico blue">📊</span>
+              <div><h3>Financial Summary</h3><span class="st">Expense summary by category</span></div>
+            </div>
+          </div>
+          <div class="dintake">
+            <div class="dintake-col"><div class="k">Housing</div><div class="v">—</div><span class="dbadge">Expenses</span></div>
+            <div class="dintake-col"><div class="k">Utilities</div><div class="v">—</div><span class="dbadge">Expenses</span></div>
+            <div class="dintake-col"><div class="k">Food</div><div class="v">—</div><span class="dbadge">Expenses</span></div>
+            <div class="dintake-col"><div class="k">Transportation</div><div class="v">—</div><span class="dbadge">Expenses</span></div>
+            <div class="dintake-col"><div class="k">Child Expenses</div><div class="v">—</div><span class="dbadge">Expenses</span></div>
+            <div class="dintake-col"><div class="k">Total Monthly</div><div class="v">—</div><span class="dbadge">Summary</span></div>
+          </div>
+          <a class="dcard-link" href="summary-analysis.html">View Financial Summary →</a>
+        </article>
+
+      </div>
+
+      <footer class="foot">
+        <span>Veritas · Family Law Financial Intelligence</span>
+        <span class="foot-dim">Arizona guidelines active · California (beta) available · Work product — privileged &amp; confidential</span>
+      </footer>
+    </div>
+  </main>
+
+  <div id="syncNotification" style="display: none; position: fixed; bottom: 20px; right: 20px; padding: 12px 16px; background: #2196f3; color: white; border-radius: 6px; z-index: 9998; font-size: 12px;"></div>
+
+  <!-- Real-time sync -->
+  <script src="//cdn.socket.io/4.6.0/socket.io.min.js"></script>
+  <script src="safe-text.js"></script>
+  <script src="recon-modal.js"></script>
+  <script src="api-client.js"></script>
+  <script src="case-manager.js"></script>
+  <script src="socket-client.js"></script>
+  <script src="sync-handler.js"></script>
+  <script src="app.js"></script>
+  <script src="logo-handler.js"></script>
+  <script>
+    // Sample data placeholder
+    (function() {
+      // All personally identifiable and sensitive data has been removed
+      // This page is a template for the Veritas dashboard system
+    })();
+  </script>
+  <!-- Veritas AI Chat Widget -->
+  <script src="ai-chat-config.js"></script>
+  <script src="ai-chat-widget.js"></script>
+  <!-- Reconciliation Modal -->
+  <script src="reconciliation-modal.js"></script>
+  <script src="reconciliation-data-enhanced.js"></script>
+  <script>
+    function openRecon(category) {
+      const reconData = RECONCILIATION_DATA[category];
+      if (reconData) {
+        openReconciliation(reconData);
+      } else {
+        alert('No reconciliation data available for this category');
+      }
+    }
+  </script>
+</body>
+</html>
+

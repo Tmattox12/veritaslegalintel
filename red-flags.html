@@ -1,0 +1,497 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Red Flags & Audit — Veritas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 20px; }
+    .stat-card { padding: 20px; border-radius: 8px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .stat-card.critical { background: #fef2f2; border-top: 4px solid #ef4444; }
+    .stat-card.high { background: #fffbeb; border-top: 4px solid #f59e0b; }
+    .stat-card.medium { background: #fefce8; border-top: 4px solid #eab308; }
+    .stat-card.resolved { background: #f0fdf4; border-top: 4px solid #10b981; }
+    .stat-number { font-size: 32px; font-weight: 700; color: #1e293b; }
+    .stat-label { font-size: 13px; font-weight: 600; color: #475569; margin-top: 4px; text-transform: uppercase; letter-spacing: 0.5px; }
+    .stat-desc { font-size: 11px; color: #64748b; margin-top: 4px; }
+
+    .flag-item { background: white; border-radius: 8px; padding: 20px; border-left: 4px solid #dbeafe; margin-bottom: 16px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .flag-item.critical { border-left-color: #ef4444; background: #fef2f2; }
+    .flag-item.high { border-left-color: #f59e0b; background: #fffbeb; }
+    .flag-item.medium { border-left-color: #eab308; background: #fefce8; }
+    .flag-item.resolved { border-left-color: #10b981; background: #f0fdf4; }
+
+    .flag-header { display: flex; align-items: flex-start; gap: 12px; margin-bottom: 12px; }
+    .flag-badge { display: inline-block; padding: 4px 10px; border-radius: 6px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
+    .flag-badge.critical { background: #fee2e2; color: #991b1b; }
+    .flag-badge.high { background: #fef3c7; color: #92400e; }
+    .flag-badge.medium { background: #fef08a; color: #713f12; }
+    .flag-badge.resolved { background: #dcfce7; color: #166534; }
+
+    .flag-title { font-size: 16px; font-weight: 700; color: #1e293b; flex: 1; }
+    .flag-amount { font-size: 14px; font-weight: 700; color: #1e40af; }
+
+    .flag-body { font-size: 13px; color: #475569; line-height: 1.6; }
+    .flag-body strong { color: #1e293b; }
+
+    .flag-details { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin-top: 12px; padding-top: 12px; border-top: 1px solid rgba(30,41,59,0.1); }
+    .detail { font-size: 12px; }
+    .detail-label { color: #64748b; font-size: 10px; text-transform: uppercase; letter-spacing: 0.4px; font-weight: 700; margin-bottom: 4px; }
+    .detail-value { color: #1e293b; font-weight: 700; }
+
+    .action-required { background: #fef2f2; border: 1px solid #fecaca; padding: 12px; border-radius: 6px; font-size: 12px; color: #7f1d1d; margin-top: 12px; }
+    .action-required::before { content: '⚠ '; font-weight: 700; }
+
+    .issue-table, .summary-table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-top: 16px; }
+    th { background: #f1f5f9; padding: 14px; text-align: left; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; color: #475569; border-bottom: 2px solid #e2e8f0; }
+    td { padding: 14px; border-bottom: 1px solid #e2e8f0; font-size: 13px; }
+    tr:hover td { background: #f8fafc; }
+    tr:last-child td { border-bottom: none; }
+
+    .badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+    .badge.critical { background: #fee2e2; color: #991b1b; }
+    .badge.high { background: #fef3c7; color: #92400e; }
+    .badge.medium { background: #fef08a; color: #713f12; }
+    .badge.resolved { background: #dcfce7; color: #166534; }
+
+    .recommendations { background: #eff6ff; border-left: 4px solid #0284c7; padding: 20px; border-radius: 8px; margin-top: 20px; }
+    .recommendations h3 { color: #0c4a6e; margin-bottom: 12px; font-size: 16px; }
+    .rec-list { margin-left: 20px; color: #0c4a6e; }
+    .rec-list li { margin-bottom: 8px; font-size: 13px; line-height: 1.6; }
+
+    .panel { background: white; border-radius: 8px; padding: 24px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
+    .panel-head { margin-bottom: 20px; }
+    .panel-head h3 { font-size: 18px; font-weight: 700; color: #1e293b; margin-bottom: 0; }
+
+    .footer { text-align: center; padding: 20px; color: #64748b; font-size: 12px; border-top: 1px solid #e2e8f0; margin-top: 40px; }
+  </style>
+</head>
+<body>
+  <!-- ===================== SIDEBAR ===================== -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">
+        <img src="logo-vfi.jpg" alt="VFI Logo" />
+        <span class="brand-mark-fallback">VFI</span>
+      </div>
+      <div class="brand-text">
+        <span class="brand-name">Veritas</span>
+        <span class="brand-sub">Financial Intelligence</span>
+      </div>
+    </div>
+    <nav class="nav">
+      <div class="nav-group-label">Workspace</div>
+      <a class="nav-item" href="index.html"><span class="nav-ico">◆</span> Dashboard</a>
+      <a class="nav-item" href="index.html"><span class="nav-ico">▤</span> Matters</a>
+      <a class="nav-item" href="schedules.html"><span class="nav-ico">◷</span> Calendar</a>
+      <a class="nav-item" href="#"><span class="nav-ico">☑</span> Tasks</a>
+      <a class="nav-item" href="discovery-intake.html"><span class="nav-ico">▦</span> Documents</a>
+      <a class="nav-item" href="#"><span class="nav-ico">◍</span> Clients</a>
+
+      <div class="nav-group-label">Analysis Modules</div>
+      <a class="nav-item" href="income-imputation.html"><span class="nav-ico">💠</span> Income Engine</a>
+      <a class="nav-item" href="spousal.html"><span class="nav-ico">⚖</span> Support Calculator</a>
+      <a class="nav-item" href="child-support.html"><span class="nav-ico">◈</span> Child Support</a>
+      <a class="nav-item" href="equitable-distribution.html"><span class="nav-ico">⊟</span> Assets</a>
+      <a class="nav-item" data-module="discovery" href="discovery-intake.html"><span class="nav-ico">◎</span> Discovery</a>
+      <a class="nav-item" href="custody.html"><span class="nav-ico">⌘</span> Custody</a>
+      <a class="nav-item" href="afi.html"><span class="nav-ico">🧾</span> AFI Expenses</a>
+      <a class="nav-item" href="estate.html"><span class="nav-ico">▧</span> Reports</a>
+
+      <div class="nav-group-label">Tools</div>
+      <a class="nav-item" data-module="forensic" href="forensic-tracing.html"><span class="nav-ico">⌕</span> Forensic Tracing</a>
+      <a class="nav-item" href="settlement.html"><span class="nav-ico">⇄</span> Settlement Modeling</a>
+      <a class="nav-item" href="credits.html"><span class="nav-ico">⊕</span> Credits &amp; Adjustments</a>
+      <a class="nav-item" href="regulations.html"><span class="nav-ico">⚖</span> Regulations</a>
+      <a class="nav-item" href="equitable-distribution.html"><span class="nav-ico">§</span> Prenup Module</a>
+      <a class="nav-item" href="discovery-intake.html"><span class="nav-ico">⤓</span> Document Intake</a>
+      <a class="nav-item" href="discovery-intake.html"><span class="nav-ico">◉</span> Compliance</a>
+      <a class="nav-item active" href="red-flags.html"><span class="nav-ico">🚩</span> Red-Flag Detection</a>
+    </nav>
+
+    <div class="sidebar-foot">
+      <div class="plan-chip"><span style="color:var(--green)">●</span> Secure Connection · encrypted &amp; confidential</div>
+    </div>
+  </aside>
+
+  <!-- ===================== MAIN ===================== -->
+  <main class="main">
+    <header class="topbar">
+      <div class="matter-switcher">
+        <span class="matter-label">Active Matter</span>
+        <button class="matter-btn">
+          <strong>Ossandon v. Ossandon</strong>
+          <span class="case-no">No. D2024-1669 · Pima County, AZ</span>
+          <span class="chev">▾</span>
+        </button>
+      </div>
+      <div class="topbar-right">
+        <div class="user">
+          <div class="avatar">TH</div>
+          <div class="user-meta">
+            <span class="user-name">Workspace User</span>
+            <span class="user-role">Ossandon Matter</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="content">
+      <section class="page-head">
+        <div>
+          <h1>Red Flags & Data Audit</h1>
+          <p class="sub">Executive summary of critical issues, data quality gaps, and verification status · <strong>August 13, 2026</strong></p>
+        </div>
+        <div class="head-actions">
+          <button class="btn ghost" id="exportPdfBtn">⎙ Export PDF</button>
+        </div>
+      </section>
+
+      <!-- SUMMARY STATS -->
+      <div class="summary-grid">
+        <div class="stat-card critical">
+          <div class="stat-number">3</div>
+          <div class="stat-label">Critical</div>
+          <div class="stat-desc">Disclosure & financial misrepresentation</div>
+        </div>
+        <div class="stat-card high">
+          <div class="stat-number">5</div>
+          <div class="stat-label">High Priority</div>
+          <div class="stat-desc">Income & disclosure gaps</div>
+        </div>
+        <div class="stat-card medium">
+          <div class="stat-number">1</div>
+          <div class="stat-label">Capacity Claim</div>
+          <div class="stat-desc">"NO" she can't work</div>
+        </div>
+      </div>
+
+      <!-- CRITICAL ISSUES -->
+      <div class="panel">
+        <div class="panel-head">
+          <h3>🚨 Critical Disclosure Deficiencies</h3>
+        </div>
+
+        <div class="flag-item critical">
+          <div class="flag-header">
+            <span class="flag-badge critical">CRITICAL</span>
+            <span class="flag-title">SSI Account ••5296 — Never Disclosed</span>
+            <span class="flag-amount">Nico's Account</span>
+          </div>
+          <div class="flag-body">
+            Chase Checking ••5296 (SSI representative-payee account) has never been produced. Nico's SSI ($967/mo) flows through here, controlled by Constanza as rep-payee. Evidence of account exists via ~$967/mo flows on disclosed accounts + Aug 2025 backlog sweep of $3,236.77.
+            <div class="flag-details">
+              <div class="detail"><div class="detail-label">Nico SSI:</div><div class="detail-value">$967/mo</div></div>
+              <div class="detail"><div class="detail-label">Status:</div><div class="detail-value">Never produced</div></div>
+              <div class="detail"><div class="detail-label">Risk:</div><div class="detail-value">Understate resources</div></div>
+            </div>
+            <div class="action-required">⚠ RED FLAG: Why was Nico's entire SSI account omitted from disclosure? Request: ALL statements, DOS (6/23/2024) → present.</div>
+          </div>
+        </div>
+
+        <div class="flag-item critical">
+          <div class="flag-header">
+            <span class="flag-badge critical">CRITICAL</span>
+            <span class="flag-title">Date-of-Service (6/23/2024) Statements — Complete Gap</span>
+            <span class="flag-amount">$1,763,809 Estate</span>
+          </div>
+          <div class="flag-body">
+            <strong>NO statement dated 6/23/2024 has been produced for ANY account.</strong> The entire marital estate valuation ($1,763,809.14) rests on BeachFleischman's Findings Letter reconstruction, not underlying bank records. Largest unverified asset: Caterpillar 401(k) ($686,527).
+            <div class="flag-details">
+              <div class="detail"><div class="detail-label">Cat 401(k):</div><div class="detail-value">$686,527 (unverified)</div></div>
+              <div class="detail"><div class="detail-label">All DOS:</div><div class="detail-value">Missing</div></div>
+              <div class="detail"><div class="detail-label">Source:</div><div class="detail-value">Findings Letter only</div></div>
+            </div>
+            <div class="action-required">⚠ RED FLAG: All DOS statements missing. Valuations are uncontested claims without originals. Largest single asset ($686K) unverified.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="flag-item critical">
+        <div class="flag-header">
+          <span class="flag-badge critical">CRITICAL</span>
+          <span class="flag-title">Compulsive Shopping & Financial Misrepresentation</span>
+          <span class="flag-amount">$21,813 over 16 mo</span>
+        </div>
+        <div class="flag-body">
+          <strong>Compulsive spending contradicts "NO earning capacity" claim and sworn financial hardship.</strong> $1,363/month average ($9,464 clothing + $12,348 Amazon, 583 transactions using multiple cards CC 5013 and CC 4381). Frequent returns pattern. <strong>Yet minor children wear same outfit all week to school.</strong> Shows unwillingness to work while spending compulsively—fundamental bad faith: refuses work obligation yet spends on discretionary items.
+          <div class="flag-details">
+            <div class="detail"><div class="detail-label">Monthly Avg:</div><div class="detail-value">$1,363/mo</div></div>
+            <div class="detail"><div class="detail-label">Transactions:</div><div class="detail-value">583 total</div></div>
+            <div class="detail"><div class="detail-label">Issue:</div><div class="detail-value">Won't work, will spend</div></div>
+          </div>
+          <div class="action-required">⚠ RED FLAG: Pattern shows unwillingness to work (false "NO capacity" claim) paired with compulsive $1,400+/month spending. Despite earning $68K, refuses settlement and compliance. Misplaced priorities: marathon training & shopping >> children's basic clothing.</div>
+        </div>
+      </div>
+    </div>
+
+      <!-- HIGH PRIORITY ISSUES -->
+      <div class="panel">
+        <div class="panel-head">
+          <h3>⚠ High Priority Issues — Disclosure & Income Gaps</h3>
+        </div>
+
+        <div class="flag-item high">
+          <div class="flag-header">
+            <span class="flag-badge high">HIGH</span>
+            <span class="flag-title">False Earning Capacity Claim; Unwillingness to Work</span>
+            <span class="flag-amount">$68K Income</span>
+          </div>
+          <div class="flag-body">
+            Respondent sworn under oath: "NO earning capacity" / "not looking or able to work." Reality: Works and earns $68,325/yr (Helping Hearts $54,718 + Fleet Feet $13,607). Fleet Feet position is minimal hours (~10/week at minimum wage), yet she simultaneously spends $250/month on marathon training gear at same retailer. Pattern: Claims inability to work while compulsively spending $1,400+/month—fundamental contradiction showing unwillingness to work or expand employment.
+            <div class="flag-details">
+              <div class="detail"><div class="detail-label">Actual Income:</div><div class="detail-value">$68,325/yr</div></div>
+              <div class="detail"><div class="detail-label">Sworn Claim:</div><div class="detail-value">"NO capacity"</div></div>
+              <div class="detail"><div class="detail-label">Status:</div><div class="detail-value">Unwilling to work</div></div>
+            </div>
+            <div class="action-required">⚠ RED FLAG: False sworn statement about earning capacity; minimal hours/income despite maintaining employment; compulsive $1,400+/month spending contradicts financial need claims; pattern of unwillingness to work paired with refusal to settle; non-compliance and bad faith.</div>
+          </div>
+        </div>
+
+        <div class="flag-item high">
+          <div class="flag-header">
+            <span class="flag-badge high">HIGH</span>
+            <span class="flag-title">Represented as Disclosed But NOT in File</span>
+            <span class="flag-amount">8 Items Missing</span>
+          </div>
+          <div class="flag-body">
+            Belleau's letters claim these were "disclosed," but they do not appear in what was transmitted. Each should be re-produced or Belleau should identify the transmittal.
+            <div class="flag-details">
+              <div class="detail"><div class="detail-label">••8531:</div><div class="detail-value">June 2024 missing</div></div>
+              <div class="detail"><div class="detail-label">••3063:</div><div class="detail-value">Sept 2024-July 2025 missing</div></div>
+              <div class="detail"><div class="detail-label">••1874:</div><div class="detail-value">May-July 2025 missing</div></div>
+            </div>
+            <div class="action-required">⚠ Pattern investigation: Are these gaps selective re-disclosure, account rotation, or processing errors? Request: Belleau re-produce or identify transmittal letter for each item.</div>
+          </div>
+        </div>
+
+<div class="flag-item high">
+          <div class="flag-header">
+            <span class="flag-badge high">HIGH</span>
+            <span class="flag-title">Pay Record Gaps — Income Gaps and Missing Stubs</span>
+            <span class="flag-amount">$7,191+ Gap</span>
+          </div>
+          <div class="flag-body">
+            <strong>Fleet Feet:</strong> Missing Apr–Dec 2025 (transition from Whitlow to Resourcing Edge); no 2024/2025 W-2s. <strong>Helping Hearts:</strong> Aug–Dec 2025 missing; $7,191 gap between 1099-NEC ($41,961) and produced stubs ($23,797.50).
+            <div class="flag-details">
+              <div class="detail"><div class="detail-label">Fleet Feet:</div><div class="detail-value">Apr-Dec 2025 missing</div></div>
+              <div class="detail"><div class="detail-label">HH Gap:</div><div class="detail-value">$7,191 unexplained</div></div>
+              <div class="detail"><div class="detail-label">Impact:</div><div class="detail-value">$25K+ material</div></div>
+            </div>
+            <div class="action-required">⚠ RED FLAG: Was there a 9-month employment gap for Fleet Feet, or disclosure issue? Is $7,191 missing income or 1099-issued payments? Request: Complete stubs + W-2s. Estimates only temporary.</div>
+          </div>
+        </div>
+
+        <div class="flag-item high">
+          <div class="flag-header">
+            <span class="flag-badge high">HIGH</span>
+            <span class="flag-title">Chase CD ••2285 — Screenshot Only, No Statement</span>
+            <span class="flag-amount">$268,400.36</span>
+          </div>
+          <div class="flag-body">
+            Only a screenshot (8/6/2025) was produced. CD balance ~$268,400, claimed as Coni's half of home-sale proceeds. Actual CD periodic statement never produced.
+            <div class="flag-details">
+              <div class="detail"><div class="detail-label">Amount:</div><div class="detail-value">$268,400</div></div>
+              <div class="detail"><div class="detail-label">Rate:</div><div class="detail-value">3.92%</div></div>
+              <div class="detail"><div class="detail-label">Proof:</div><div class="detail-value">Screenshot only</div></div>
+            </div>
+            <div class="action-required">⚠ Request: Actual CD statements (opening 4/29/2025 → present) + account-opening & source-of-funds documentation. When was home sale closed? Do ••8531 withdrawals match 4/29/2025?</div>
+          </div>
+        </div>
+
+        <div class="flag-item high">
+          <div class="flag-header">
+            <span class="flag-badge high">HIGH</span>
+            <span class="flag-title">Bank Statements Current Through Nov 2025 Only</span>
+            <span class="flag-amount">All of 2026 Missing</span>
+          </div>
+          <div class="flag-body">
+            Chase ••8531, ••3063, ••1874 stop at Nov 2025. No 2026 statements at all. Missing 8+ months to tie to pay records and verify no hidden transfers.
+            <div class="flag-details">
+              <div class="detail"><div class="detail-label">Have:</div><div class="detail-value">Aug-Nov 2025 only</div></div>
+              <div class="detail"><div class="detail-label">Missing:</div><div class="detail-value">Dec 2025 → present (all 2026)</div></div>
+            </div>
+            <div class="action-required">⚠ Request: Updated statements through present. Verify 2026 income flows match paystubs. Catch any hidden withdrawals or transfers.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CAPACITY CLAIM / WORK DENIAL -->
+      <div class="panel">
+        <div class="panel-head">
+          <h3>⚖ Capacity Claim — "NO She Can't Work"</h3>
+        </div>
+
+        <div class="flag-item high">
+          <div class="flag-header">
+            <span class="flag-badge high">RED FLAG</span>
+            <span class="flag-title">Constanza Claims "NO" Earning Capacity</span>
+            <span class="flag-amount">Contradicted by Income</span>
+          </div>
+          <div class="flag-body">
+            <strong>Opposing Position (Belleau):</strong> Constanza has zero earning capacity and cannot work. <strong>Reality:</strong> She is actively employed at Helping Hearts (~$54,718/yr, 2026 YTD annualized) + Fleet Feet (~$13,607/yr, Q1-2025 documented). She works 2 jobs while claiming she can't work.
+            <div class="flag-details">
+              <div class="detail"><div class="detail-label">HH Income:</div><div class="detail-value">$54,718/yr</div></div>
+              <div class="detail"><div class="detail-label">Fleet Feet:</div><div class="detail-value">$13,607/yr</div></div>
+              <div class="detail"><div class="detail-label">Combined:</div><div class="detail-value">$68,325+/yr</div></div>
+              <div class="detail"><div class="detail-label">Claim:</div><div class="detail-value">$0 capacity</div></div>
+            </div>
+            <div class="action-required">⚠ CONTRADICTION: She's employed and earning $68K+ but claims zero capacity. This contradicts child support & spousal maintenance income basis. Challenge her capacity claim with evidence of current employment.</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- MISSING DOCUMENTS SUMMARY -->
+      <div class="panel">
+        <div class="panel-head">
+          <h3>📋 Missing Documents Priority List</h3>
+        </div>
+        <table class="issue-table">
+          <thead>
+            <tr>
+              <th>Priority</th>
+              <th>Document</th>
+              <th>Status</th>
+              <th>Impact</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td><span class="badge critical">1</span></td><td><strong>Chase ••5296 (SSI)</strong></td><td>Never disclosed</td><td>$967/mo understatement</td></tr>
+            <tr><td><span class="badge critical">2</span></td><td><strong>DOS 6/23/2024 Statements</strong></td><td>All accounts missing</td><td>$1.76M estate unverified</td></tr>
+            <tr><td><span class="badge high">3</span></td><td><strong>Part A Re-productions</strong></td><td>Claimed sent, not in file</td><td>Closure of gaps</td></tr>
+            <tr><td><span class="badge high">4</span></td><td><strong>Chase CD ••2285 Statement</strong></td><td>Screenshot only</td><td>$268K asset unproven</td></tr>
+            <tr><td><span class="badge high">5</span></td><td><strong>Luis/Marital Statements</strong></td><td>No current values</td><td>401(k) $686K unverified</td></tr>
+            <tr><td><span class="badge high">6</span></td><td><strong>2026 Bank Statements</strong></td><td>All accounts missing</td><td>Verify 2026 income flows</td></tr>
+            <tr><td><span class="badge high">7</span></td><td><strong>Pay Records</strong></td><td>Apr-Dec 2025 gaps</td><td>$25K+ income material</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- VERIFIED DOCUMENTS -->
+      <div class="panel">
+        <div class="panel-head">
+          <h3>✓ Documents on File (Verified)</h3>
+        </div>
+
+        <div class="flag-item resolved">
+          <div class="flag-header">
+            <span class="flag-badge resolved">ON FILE</span>
+            <span class="flag-title">Chase Freedom ••5013 (Community CC)</span>
+            <span class="flag-amount">Sept 2024 – Nov 2025</span>
+          </div>
+          <div class="flag-body">
+            Constanza's community credit card statements on file. Full transaction detail available for expense analysis.
+            <div class="flag-details">
+              <div class="detail"><div class="detail-label">Period:</div><div class="detail-value">Sept 2024 – Nov 2025</div></div>
+              <div class="detail"><div class="detail-label">Status:</div><div class="detail-value">Complete ✓</div></div>
+              <div class="detail"><div class="detail-label">Gap:</div><div class="detail-value">DOS statement + Dec 2025→present</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flag-item resolved">
+          <div class="flag-header">
+            <span class="flag-badge resolved">ON FILE</span>
+            <span class="flag-title">Fleet Feet W-2 & Stubs (Partial)</span>
+            <span class="flag-amount">Some periods</span>
+          </div>
+          <div class="flag-body">
+            Fleet Feet documentation on file: Aug–Oct 2024, Jan-Mar 2025, Feb-Jun 2026. Gap: Apr-Dec 2025.
+            <div class="flag-details">
+              <div class="detail"><div class="detail-label">Have:</div><div class="detail-value">Partial periods</div></div>
+              <div class="detail"><div class="detail-label">Missing:</div><div class="detail-value">Apr-Dec 2025 + W-2s</div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="flag-item resolved">
+          <div class="flag-header">
+            <span class="flag-badge resolved">ON FILE</span>
+            <span class="flag-title">Helping Hearts 1099-NEC & Stubs (Partial)</span>
+            <span class="flag-amount">Most periods</span>
+          </div>
+          <div class="flag-body">
+            Helping Hearts income documented: Jan-Jul 2025, Feb-Jul 2026, 2024 annual 1099. Gap: Aug-Dec 2025 (estimated via 1099 residual).
+            <div class="flag-details">
+              <div class="detail"><div class="detail-label">2025 Total:</div><div class="detail-value">$41,961 (1099)</div></div>
+              <div class="detail"><div class="detail-label">Documented:</div><div class="detail-value">$23,797.50</div></div>
+              <div class="detail"><div class="detail-label">Gap (estimated):</div><div class="detail-value">$18,163.50</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RECOMMENDATIONS -->
+      <div class="recommendations">
+        <h3>📋 Litigation Strategy — Key Actions</h3>
+        <ol class="rec-list">
+          <li><strong>Challenge "NO Capacity" Claim Immediately.</strong> Constanza claims zero earning capacity but is employed at Helping Hearts ($54,718/yr) + Fleet Feet ($13,607/yr) = $68,325+/yr. Use her own pay stubs to contradict her assertion in child support & spousal maintenance arguments.</li>
+          <li><strong>Meet & Confer on Disclosure Deficiencies.</strong> Issue formal letter per Missing_Documents_and_Disclosure_Discrepancies_7.30.26.md. Demand Belleau re-produce items claimed as "disclosed" or explain why absent. Focus: SSI account ••5296 was never disclosed at all.</li>
+          <li><strong>Demand DOS 6/23/2024 Statements for All Accounts.</strong> The $1.76M marital estate rests on BeachFleischman Findings Letter reconstruction. Without original bank statements (Caterpillar 401(k) $686,527 largest unverified), valuations are uncontested claims.</li>
+          <li><strong>Request Chase CD ••2285 Statements + Source Documentation.</strong> Only screenshot ($268,400) on file. Need: actual CD statements (opening 4/29/2025 → present) + account-opening & source-of-funds docs to verify home-sale-proceeds claim ($268K is material 15% of estate).</li>
+          <li><strong>Subpoena Bank Statements Directly if Needed.</strong> Chase and other institutions for full DOS-to-present periods, bypassing counsel. Document Belleau's delays for discovery violation record.</li>
+          <li><strong>Update Income Calculations with Verified Data.</strong> Once missing pay records obtained (Fleet Feet Apr-Dec 2025, Helping Hearts Aug-Dec 2025), recalculate child support & spousal maintenance using verified figures, not estimates.</li>
+        </ol>
+      </div>
+
+      <!-- SUMMARY TABLE -->
+      <div class="panel">
+        <div class="panel-head">
+          <h3>📊 Red Flags Summary</h3>
+        </div>
+        <table class="summary-table">
+          <thead>
+            <tr>
+              <th>Category</th>
+              <th>Count</th>
+              <th>Key Issues</th>
+              <th>Priority</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Critical Disclosure Gaps</strong></td>
+              <td>2</td>
+              <td>SSI account never disclosed; DOS statements all missing ($1.76M unverified)</td>
+              <td><span class="badge critical">CRITICAL</span></td>
+            </tr>
+            <tr>
+              <td><strong>High Priority Gaps</strong></td>
+              <td>5</td>
+              <td>$19,916 mystery expense; pay records gaps; CD screenshot only; 2026 statements missing</td>
+              <td><span class="badge high">HIGH</span></td>
+            </tr>
+            <tr>
+              <td><strong>Capacity Contradiction</strong></td>
+              <td>1</td>
+              <td>"NO" capacity claim vs $68K+ actual employment income (2 jobs)</td>
+              <td><span class="badge high">HIGH</span></td>
+            </tr>
+            <tr>
+              <td><strong>Partial Documentation</strong></td>
+              <td>3</td>
+              <td>Fleet Feet, Helping Hearts, Chase statements (gaps to fill)</td>
+              <td><span class="badge medium">MEDIUM</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="footer">
+        <p><strong>Ossandon v. Ossandon</strong> | No. D2024-1669 (Pima County, Arizona)</p>
+        <p>Audit Date: August 13, 2026 | Period Reviewed: September 2024 – November 2025</p>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    document.getElementById('exportPdfBtn')?.addEventListener('click', () => {
+      window.print();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Income Imputation — Veritas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="document-support.css" />
+  <style>
+    .income-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 14px; margin-bottom: 20px; }
+    @media (max-width: 1200px) { .income-grid { grid-template-columns: 1fr; } }
+
+    .income-card {
+      border: 1px solid #d7e0ec;
+      border-radius: 10px;
+      background: #fff;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      box-shadow: 0 1px 3px rgba(15, 23, 42, 0.06);
+    }
+    .income-card.active {
+      border-color: #1c6b52;
+      box-shadow: 0 0 0 2px rgba(28, 107, 82, 0.14);
+      background: #f4fbf7;
+    }
+    .income-card-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 10px; }
+    .income-card-title { font-size: 13px; font-weight: 800; color: #1a2f4f; }
+    .income-card-sub { font-size: 11px; color: #5b6472; margin-top: 3px; line-height: 1.4; }
+    .income-card-badge { display: inline-block; font-size: 10px; font-weight: 700; color: #1c6b52; background: #e6f3ec; border-radius: 999px; padding: 2px 8px; white-space: nowrap; }
+    .income-card-value { font-family: 'Fraunces', serif; font-size: 28px; color: #12233b; line-height: 1.05; }
+    .income-card-meta { display: grid; gap: 6px; margin-top: 2px; }
+    .income-card-row { display: flex; justify-content: space-between; gap: 8px; font-size: 11px; color: #51617a; }
+    .income-card-row strong { color: #1a2f4f; }
+    .income-card-row.strong { font-weight: 700; color: #1a2f4f; }
+    .income-card-foot { font-size: 11px; color: #2e5b8a; text-decoration: none; border-bottom: 1px dotted #2e5b8a; width: fit-content; }
+    .income-card-foot:hover { border-bottom-style: solid; }
+    .income-support-btn { display: inline-flex; align-items: center; justify-content: center; width: fit-content; padding: 5px 9px; border: 1px solid #cdd8e7; border-radius: 999px; background: #f7f9fc; color: #1c3f66; font-size: 10px; font-weight: 700; cursor: pointer; }
+    .income-support-btn:hover { background: #eef4fb; border-color: #2e5b8a; }
+    .income-group-title { font-size: 12px; font-weight: 800; color: #1a2f4f; text-transform: uppercase; letter-spacing: .04em; margin: 4px 0 8px; }
+    .income-group-note { font-size: 11px; color: #5b6472; margin: 0 0 8px; }
+    .income-toggle-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 4px 0 0; }
+    .income-tax-chip { font-size: 10px; font-weight: 700; color: #1c3f66; background: #edf3fb; border: 1px solid #cdd8e7; border-radius: 999px; padding: 2px 8px; }
+    .income-compare-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 10px; margin-top: 10px; }
+    .income-compare-card { border: 1px solid #d7e0ec; border-radius: 10px; background: #fff; padding: 12px; cursor: pointer; }
+    .income-compare-card.active { border-color: #1c6b52; box-shadow: 0 0 0 2px rgba(28, 107, 82, 0.14); background: #f4fbf7; }
+    .income-compare-title { font-size: 12px; font-weight: 800; color: #1a2f4f; }
+    .income-compare-sub { font-size: 11px; color: #5b6472; margin-top: 2px; }
+    .income-compare-value { font-family: 'Fraunces', serif; font-size: 30px; color: #12233b; line-height: 1.05; margin-top: 8px; }
+    .income-compare-var { font-size: 11px; margin-top: 6px; color: #2f4563; }
+
+    .comparison-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 12px; }
+    .comparison-table th { background: #f5f0e8; padding: 8px; text-align: left; font-weight: 600; border: 1px solid #ddd; }
+    .comparison-table td { padding: 8px; border: 1px solid #ddd; }
+    .comparison-table .amount { text-align: right; font-weight: 600; color: #1c3f66; }
+    .comparison-table .variance { text-align: right; font-weight: 600; }
+    .variance.negative { color: #c62828; }
+    .variance.positive { color: #2e7d32; }
+
+    .scenario-buttons { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
+    .scenario-btn { padding: 6px 12px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: 600; transition: all 0.2s; }
+    .scenario-btn:hover { border-color: #2e5b8a; background: #f0f7ff; }
+    .scenario-btn.active { background: #2e5b8a; color: white; border-color: #2e5b8a; }
+
+    .imputation-method { background: white; border-radius: 6px; padding: 12px; margin-bottom: 12px; border-left: 4px solid #2e5b8a; }
+    .method-title { font-weight: 600; color: #1c3f66; margin-bottom: 6px; font-size: 12px; }
+    .method-desc { font-size: 11px; color: #666; line-height: 1.5; }
+
+    .input-row { display: grid; grid-template-columns: 1fr auto; gap: 12px; margin-bottom: 8px; align-items: center; }
+    .input-label { font-size: 11px; color: #666; font-weight: 500; }
+    .input-field { padding: 6px 8px; border: 1px solid #ddd; border-radius: 3px; font-size: 11px; }
+
+
+    .flag-box { background: #ffebee; border-left: 4px solid #c62828; padding: 12px; border-radius: 4px; margin-top: 12px; }
+    .flag-title { color: #c62828; font-weight: 700; font-size: 11px; }
+    .flag-detail { font-size: 10px; color: #666; margin-top: 4px; line-height: 1.5; }
+
+    .note { font-size: 11px; color: #666; margin-top: 12px; padding: 12px; background: #f9f7f3; border-radius: 4px; line-height: 1.5; }
+
+    .ie-summary { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin: 0 0 20px; }
+    .ie-sum-col { background: #fff; border: 1px solid #e6ebf1; border-top: 3px solid #1c3f66; border-radius: 6px; padding: 12px 14px; }
+    .ie-sum-paying { border-top-color: #1c3f66; }
+    .ie-sum-supported { border-top-color: #2f7d5b; }
+    .ie-sum-combined { border-top-color: #b8893b; background: #fffdf8; }
+    .ie-sum-role { font-size: 10px; text-transform: uppercase; letter-spacing: .05em; color: #7a8a9a; font-weight: 700; }
+    .ie-sum-amt { font-size: 24px; font-weight: 800; color: #1c3f66; font-family: 'Fraunces', Georgia, serif; margin: 2px 0; }
+    .ie-sum-sub { font-size: 12px; color: #4d5f78; font-weight: 600; }
+    .ie-sum-split { font-size: 13px; color: #b8893b; font-weight: 800; margin-top: 4px; }
+    .ie-sum-label { font-size: 10.5px; color: #7a8a9a; margin-top: 6px; line-height: 1.4; }
+  </style>
+</head>
+<body>
+  <!-- ===================== SIDEBAR ===================== -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">
+        <img src="logo-vfi.jpg" alt="VFI Logo" />
+        <span class="brand-mark-fallback">VFI</span>
+      </div>
+      <div class="brand-text">
+        <span class="brand-name">Veritas</span>
+        <span class="brand-sub">Financial Intelligence</span>
+      </div>
+    </div>
+    <nav class="nav">
+      <div class="nav-group-label">Workspace</div>
+      <a class="nav-item" href="index.html"><span class="nav-ico">◆</span> Dashboard</a>
+      <a class="nav-item" href="index.html"><span class="nav-ico">▤</span> Matters</a>
+      <a class="nav-item" href="schedules.html"><span class="nav-ico">◷</span> Calendar</a>
+      <a class="nav-item" href="#"><span class="nav-ico">☑</span> Tasks</a>
+      <a class="nav-item" href="discovery-intake.html"><span class="nav-ico">▦</span> Documents</a>
+      <a class="nav-item" href="#"><span class="nav-ico">◍</span> Clients</a>
+
+      <div class="nav-group-label">Analysis Modules</div>
+      <a class="nav-item active" href="income-imputation.html"><span class="nav-ico">💠</span> Income Engine</a>
+      <a class="nav-item" href="spousal.html"><span class="nav-ico">⚖</span> Support Calculator</a>
+      <a class="nav-item" href="child-support.html"><span class="nav-ico">◈</span> Child Support</a>
+      <a class="nav-item" href="equitable-distribution.html"><span class="nav-ico">⊟</span> Assets</a>
+      <a class="nav-item" data-module="discovery" href="discovery-intake.html"><span class="nav-ico">◎</span> Discovery</a>
+      <a class="nav-item" href="custody.html"><span class="nav-ico">⌘</span> Custody</a>
+      <a class="nav-item" href="afi.html"><span class="nav-ico">🧾</span> AFI Expenses</a>
+      <a class="nav-item" href="estate.html"><span class="nav-ico">▧</span> Reports</a>
+
+      <div class="nav-group-label">Tools</div>
+      <a class="nav-item" data-module="forensic" href="forensic-tracing.html"><span class="nav-ico">⌕</span> Forensic Tracing</a>
+      <a class="nav-item" href="settlement.html"><span class="nav-ico">⇄</span> Settlement Modeling</a>
+      <a class="nav-item" href="credits.html"><span class="nav-ico">⊕</span> Credits &amp; Adjustments</a>
+      <a class="nav-item" href="regulations.html"><span class="nav-ico">⚖</span> Regulations</a>
+      <a class="nav-item" href="equitable-distribution.html"><span class="nav-ico">§</span> Prenup Module</a>
+      <a class="nav-item" href="discovery-intake.html"><span class="nav-ico">⤓</span> Document Intake</a>
+      <a class="nav-item" href="discovery-intake.html"><span class="nav-ico">◉</span> Compliance</a>
+      <a class="nav-item" href="red-flags.html"><span class="nav-ico">🚩</span> Red-Flag Detection</a>
+    </nav>
+
+    <div class="sidebar-foot">
+      <div class="plan-chip"><span style="color:var(--green)">●</span> Secure Connection · encrypted &amp; confidential</div>
+    </div>
+  </aside>
+
+  <!-- ===================== MAIN ===================== -->
+  <main class="main">
+    <header class="topbar">
+      <div class="matter-switcher">
+        <span class="matter-label">Active Matter</span>
+        <button class="matter-btn">
+          <strong>Ossandon v. Ossandon</strong>
+          <span class="case-no">No. D2024-1669 · Pima County, AZ</span>
+          <span class="chev">▾</span>
+        </button>
+      </div>
+      <div class="topbar-right">
+        <div class="user">
+          <div class="avatar">TH</div>
+          <div class="user-meta">
+            <span class="user-name">Workspace User</span>
+            <span class="user-role">Ossandon Matter</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="content">
+      <section class="page-head">
+        <div>
+          <h1>Income Imputation & Analysis</h1>
+          <p class="sub">Evaluate claimed vs. actual vs. imputable income · identify discrepancies · build defense</p>
+        </div>
+      </section>
+
+      <!-- Selected-income summary header (single source of truth for downstream calcs) -->
+      <div id="incomeEngineSummary" class="ie-summary">
+        <div class="ie-sum-col ie-sum-paying">
+          <div class="ie-sum-role">Paying spouse — Luis</div>
+          <div class="ie-sum-amt" id="ieSumLuisAnnual">$0</div>
+          <div class="ie-sum-sub"><span id="ieSumLuisMonthly">$0</span>/mo · <span id="ieSumLuisPct">0%</span> of combined</div>
+          <div class="ie-sum-label" id="ieSumLuisLabel">—</div>
+        </div>
+        <div class="ie-sum-col ie-sum-supported">
+          <div class="ie-sum-role">Supported spouse — Constanza</div>
+          <div class="ie-sum-amt" id="ieSumConiAnnual">$0</div>
+          <div class="ie-sum-sub"><span id="ieSumConiMonthly">$0</span>/mo · <span id="ieSumConiPct">0%</span> of combined</div>
+          <div class="ie-sum-label" id="ieSumConiLabel">—</div>
+        </div>
+        <div class="ie-sum-col ie-sum-combined">
+          <div class="ie-sum-role">Combined income</div>
+          <div class="ie-sum-amt" id="ieSumCombinedAnnual">$0</div>
+          <div class="ie-sum-sub"><span id="ieSumCombinedMonthly">$0</span>/mo</div>
+          <div class="ie-sum-split"><span id="ieSumSplitConi">Coni 0%</span> · <span id="ieSumSplitLuis">Luis 0%</span></div>
+          <div class="ie-sum-label">Income share drives extraordinary / child-expense allocation</div>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <h3>➕ Additional Income Types</h3>
+          <span class="tag">Interest · other · asset-share</span>
+        </div>
+        <p class="income-group-note">Use this section to include income beyond employer cards. Values here are part of the same master income selection and flow automatically to AFI, spousal, and child support.</p>
+        <div class="note" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;align-items:end;">
+          <label style="display:grid;gap:4px;">
+            <span style="font-size:12px;font-weight:700;color:#1c3f66;">Luis other annual income</span>
+            <input id="iePayingOtherAnnual" type="number" min="0" step="1" placeholder="0" style="padding:8px;border:1px solid #d4dce8;border-radius:8px;">
+          </label>
+          <label style="display:grid;gap:4px;">
+            <span style="font-size:12px;font-weight:700;color:#1c3f66;">Coni CD interest annual income</span>
+            <input id="ieSupportedInterestAnnual" type="number" min="0" step="1" placeholder="0" style="padding:8px;border:1px solid #d4dce8;border-radius:8px;">
+          </label>
+          <label style="display:grid;gap:4px;">
+            <span style="font-size:12px;font-weight:700;color:#1c3f66;">CD interest legal basis</span>
+            <select id="ieCdInterestLegalBasis" style="padding:8px;border:1px solid #d4dce8;border-radius:8px;">
+              <option value="disputed" selected>Disputed / unresolved (exclude)</option>
+              <option value="allowed">Allowed in calculation (include)</option>
+              <option value="excluded">Excluded by ruling/position (exclude)</option>
+            </select>
+          </label>
+          <label style="display:grid;gap:4px;">
+            <span style="font-size:12px;font-weight:700;color:#1c3f66;">Coni other annual income</span>
+            <input id="ieSupportedOtherAnnual" type="number" min="0" step="1" placeholder="0" style="padding:8px;border:1px solid #d4dce8;border-radius:8px;">
+          </label>
+          <label style="display:grid;gap:4px;">
+            <span style="font-size:12px;font-weight:700;color:#1c3f66;">Asset-share recipient</span>
+            <select id="ieAssetShareRecipient" style="padding:8px;border:1px solid #d4dce8;border-radius:8px;">
+              <option value="supported">Coni</option>
+              <option value="paying">Luis</option>
+            </select>
+          </label>
+          <label style="display:grid;gap:4px;">
+            <span style="font-size:12px;font-weight:700;color:#1c3f66;">Asset-share rate (%)</span>
+            <input id="ieAssetShareRatePct" type="number" min="0" step="0.1" placeholder="5" style="padding:8px;border:1px solid #d4dce8;border-radius:8px;">
+          </label>
+        </div>
+        <label style="display:flex;align-items:center;gap:8px;margin-top:8px;font-size:12px;color:#2b3a4c;cursor:pointer;">
+          <input id="ieIncludeCdInterestInSupport" type="checkbox" style="width:15px;height:15px;" disabled> Include CD interest in support calculations (Spousal / Child / AFI)
+        </label>
+        <div id="ieCdInterestRuleNote" class="income-group-note" style="margin-top:4px;color:#8a6a1f;"></div>
+        <div id="ieAssetSharePreview" class="income-group-note" style="margin-top:8px;"></div>
+        <div id="ieSumExtras" class="income-group-note" style="margin-top:4px;color:#425c7f;"></div>
+      </div>
+
+      <!-- Paying Spouse Income Analysis -->
+      <div class="panel">
+        <div class="panel-head">
+          <h3>💰 Paying Spouse — Income Analysis</h3>
+          <span class="tag">W-2 wages + bonus</span>
+        </div>
+
+        <div id="payingSpouseCards" class="income-grid"></div>
+
+        <!-- Bonus issue -->
+        <div class="flag-box">
+          <div class="flag-title">⚖ ISSUE: Is the bonus counted?</div>
+          <div class="flag-detail">Whether the bonus counts as income for support turns on its <strong>character</strong>. Pick the character below for a recommendation. Base only = $236,819 W-2; all-in = $336,819 (W-2 + $100,000 bonus). The support calculators use whichever paying-spouse card you select above.</div>
+        </div>
+
+        <div class="note" id="bonusCharPanel">
+          <label style="display:block;font-weight:700;color:#1c3f66;margin-bottom:6px;">Bonus character → recommendation <span style="font-weight:400;color:#8a94a3;">(check all that apply)</span></label>
+          <div id="bonusCharChecks" style="display:flex;flex-direction:column;gap:4px;max-width:460px;">
+            <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:#2b3a4c;cursor:pointer;"><input type="checkbox" value="routine" style="width:15px;height:15px;"> Routine / paid every year</label>
+            <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:#2b3a4c;cursor:pointer;"><input type="checkbox" value="performance" style="width:15px;height:15px;"> Performance-based (regularly paid)</label>
+            <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:#2b3a4c;cursor:pointer;"><input type="checkbox" value="discretionary" style="width:15px;height:15px;"> Discretionary (employer's option)</label>
+            <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:#2b3a4c;cursor:pointer;"><input type="checkbox" value="onetime" style="width:15px;height:15px;"> One-time / non-recurring</label>
+            <label style="display:flex;align-items:center;gap:8px;font-size:13px;color:#2b3a4c;cursor:pointer;"><input type="checkbox" value="speculative" style="width:15px;height:15px;"> Speculative / uncertain</label>
+          </div>
+          <div id="bonusCharReco" style="margin-top:10px;padding:10px 12px;border-radius:8px;background:#f0f4fa;border:1px solid #dbe3ef;font-size:12.5px;color:#425c7f;line-height:1.5;">Select one or more characters to see whether the bonus should be counted.</div>
+        </div>
+      </div>
+
+      <!-- Supported Spouse Income Analysis -->
+      <div class="panel">
+        <div class="panel-head">
+          <h3>💰 Supported Spouse — Income Analysis</h3>
+          <span class="tag">Earning capacity vs. claimed $0</span>
+        </div>
+
+        <div class="income-group-title">Primary earned income (Helping Hearts)</div>
+        <p class="income-group-note">Select one HH basis. Use the tax/non-tax toggle on HH cards when you need tax-equivalent comparability.</p>
+        <div id="primaryEarnedCards" class="income-grid"></div>
+
+        <div class="income-group-title" style="margin-top:10px;">Secondary earned income (Fleet Feet)</div>
+        <p class="income-group-note">Select one Fleet Feet basis. Primary + secondary rolls into the earned-income total card below.</p>
+        <div id="secondaryEarnedCards" class="income-grid"></div>
+
+        <div class="income-group-title" style="margin-top:10px;">Total earned income comparison</div>
+        <p class="income-group-note">Compare the selected HH + FF total against expert/opposing/vocational positions, and choose the basis to roll to AFI, Spousal, and Child Support.</p>
+        <div id="earnedIncomeComparisonCards" class="income-compare-grid"></div>
+
+        <!-- Earning capacity issue -->
+        <div class="flag-box">
+          <div class="flag-title">⚖ ISSUE: Earning capacity vs. claimed $0</div>
+          <div class="flag-detail">Documented employment income is shown in the tables above. Even a conservative vocational floor supports higher earning capacity imputation. Documented employment records materially reduce spousal maintenance liability.</div>
+        </div>
+
+        <div class="note">
+          <strong>Imputation options (Supported Spouse):</strong><br>
+          • <strong>Vocational floor:</strong> $45,480 (Taft earning capacity)<br>
+          • <strong>Documented:</strong> $66,086 (2026 discovery paystubs)<br>
+          • <strong>Run-rate:</strong> $78,169 (bank-verified deposits)
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <h3>🧭 Shared income hub</h3>
+          <span class="tag">AFI · Spousal · Child support</span>
+        </div>
+        <div class="note" style="margin-top: 0;">
+          This page is the single source for the income positions, supporting exhibits, and estate/property-income context. AFI stays focused on the expense and need comparison, while spousal maintenance and child support consume these values rather than re-stating the full income narrative.
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <h3>🏛 Property / Investment Income <span style="font-weight:600;font-size:12px;color:#5b6472;">(supported spouse)</span></h3>
+          <span class="tag">§25-319(B) return on assets</span>
+        </div>
+        <p class="income-group-note">Property income is treated like any other income type — pick one basis to attribute a return on Constanza's assets (net of 25% tax). The "½ estate" options use her <strong>50% share of the net marital estate</strong> as valued on the <a href="equitable-distribution.html">Asset page ↗</a>. The selected figure rolls to Spousal &amp; AFI automatically. <span class="dim">Not legal advice — defer to Holly.</span></p>
+        <div id="estateIncomeCards" class="income-grid"></div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <h3>🔗 Master Income Rollout</h3>
+          <span class="tag">AFI · Spousal · Child support</span>
+        </div>
+        <div class="income-grid">
+          <div class="income-card">
+            <div class="income-card-head">
+              <div>
+                <div class="income-card-title">AFI bridge</div>
+                <div class="income-card-sub">Use the selected supported-spouse and paying-spouse numbers as the income basis for the AFI discrepancy analysis.</div>
+              </div>
+              <span class="income-card-badge">AFI</span>
+            </div>
+            <div class="income-card-value">$236,819 / $78,169</div>
+            <div class="income-card-meta">
+              <div class="income-card-row"><span>Paying spouse</span><strong>$236,819</strong></div>
+              <div class="income-card-row"><span>Supported spouse</span><strong>$78,169</strong></div>
+            </div>
+            <a class="income-card-foot" href="afi.html" target="_blank" rel="noopener">Open AFI module ↗</a>
+          </div>
+          <div class="income-card">
+            <div class="income-card-head">
+              <div>
+                <div class="income-card-title">Spousal maintenance bridge</div>
+                <div class="income-card-sub">The master-income values feed the income-gap formula and the live maintenance scenarios.</div>
+              </div>
+              <span class="income-card-badge">Spousal</span>
+            </div>
+            <div class="income-card-value">$236,819 / $66,086</div>
+            <div class="income-card-meta">
+              <div class="income-card-row"><span>Payor</span><strong>$236,819</strong></div>
+              <div class="income-card-row"><span>Recipient</span><strong>$66,086</strong></div>
+            </div>
+            <a class="income-card-foot" href="spousal.html" target="_blank" rel="noopener">Open spousal module ↗</a>
+          </div>
+          <div class="income-card">
+            <div class="income-card-head">
+              <div>
+                <div class="income-card-title">Child support bridge</div>
+                <div class="income-card-sub">The same income scenarios are used as the gross-income base for the child-support engine.</div>
+              </div>
+              <span class="income-card-badge">Child support</span>
+            </div>
+            <div class="income-card-value">$236,819 / $59,820</div>
+            <div class="income-card-meta">
+              <div class="income-card-row"><span>Payor</span><strong>$236,819</strong></div>
+              <div class="income-card-row"><span>Recipient (Miessner HH + FF)</span><strong>$59,820</strong></div>
+            </div>
+            <a class="income-card-foot" href="child-support.html" target="_blank" rel="noopener">Open child-support module ↗</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Imputation Methods -->
+      <div class="panel">
+        <div class="panel-head">
+          <h3>🎯 Imputation Methodologies</h3>
+          <span class="tag">When to use each approach</span>
+        </div>
+
+        <div class="imputation-method">
+          <div class="method-title">1. Documented Income Approach</div>
+          <div class="method-desc">Use tax returns, W-2s, paystubs, 1099s as filed. Most conservative. Used when income is clearly documented and verifiable.</div>
+        </div>
+
+        <div class="imputation-method">
+          <div class="method-title">2. Average Historical Income</div>
+          <div class="method-desc">Average last 2–3 years of tax returns or pay history. Accounts for variability in bonuses, commissions, self-employment. Often used for business owners & commission-based employees.</div>
+        </div>
+
+        <div class="imputation-method">
+          <div class="method-title">3. Earning Capacity / Vocational Expert</div>
+          <div class="method-desc">Used when party is voluntarily underemployed, unemployed, or claims limited earning capacity. Expert determines what they <em>could</em> earn (not what they claim).</div>
+        </div>
+
+        <div class="imputation-method">
+          <div class="method-title">4. Business Income Analysis</div>
+          <div class="method-desc">For self-employed: reconstruct from profit & loss statements, bank deposits, tax returns. Adjust for add-backs (depreciation, non-recurring expenses, perks).</div>
+        </div>
+
+        <div class="imputation-method">
+          <div class="method-title">5. Cash Flow / Bank Deposit Analysis</div>
+          <div class="method-desc">When documentation is poor: analyze bank deposits to identify undisclosed income. Used when party hides self-employment or informal income streams.</div>
+        </div>
+      </div>
+
+      <!-- Recommendation -->
+      <div class="panel">
+        <div class="panel-head">
+          <h3>📋 Recommended Imputation (This Case)</h3>
+          <span class="tag">Supported by documentation</span>
+        </div>
+
+        <table class="comparison-table" style="margin-top: 12px;">
+          <tr>
+            <th>Party</th>
+            <th class="amount">Conservative</th>
+            <th class="amount">Recommended</th>
+            <th class="amount">Aggressive</th>
+          </tr>
+          <tr>
+            <td><strong>Luis</strong></td>
+            <td class="amount">$236,819<br>(W-2 base)</td>
+            <td class="amount">$236,819<br>(bonus separate)</td>
+            <td class="amount">$336,819<br>(+$100k bonus)</td>
+          </tr>
+          <tr>
+            <td><strong>Coni</strong></td>
+            <td class="amount">$45,480<br>(vocational floor)</td>
+            <td class="amount">$66,086<br>(documented 2026)</td>
+            <td class="amount">$78,169<br>(run-rate)</td>
+          </tr>
+        </table>
+
+        <div class="note" style="margin-top: 16px;">
+          <strong>Rationale:</strong><br>
+          • <strong>Luis:</strong> Use the $236,819 W-2 base; the $100,000 bonus is contested (separate property, Memo 17) and layered in only for the aggressive case.<br>
+          • <strong>Coni:</strong> Impute at least her documented $66,086 (2026 paystubs) — opposing counsel's $0 is untenable against the pay records. The $45,480 vocational floor is the conservative minimum.
+        </div>
+      </div>
+
+      <!-- AI Missing Paystub Estimator -->
+      <div class="panel">
+        <div class="panel-head">
+          <h3>🤖 AI Paystub Gap Estimator</h3>
+          <span class="tag">Estimate missing periods · back into annual income · recon export</span>
+        </div>
+        <p class="panel-note">Enter known YTD checkpoints from available paystubs. The estimator infers missing-period amounts, reconstructs the full-year income, and exports a reconciliation table you can attach as a support exhibit.</p>
+
+        <style>
+          .gap-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; margin-bottom: 14px; }
+          .gap-card { background: #f7f9fc; border: 1px solid #d7e0ec; border-radius: 8px; padding: 14px; }
+          .gap-card h4 { font-size: 12px; font-weight: 700; color: #1c3f66; margin: 0 0 10px; }
+          .gap-input-row { display: grid; grid-template-columns: 1fr 130px; gap: 8px; align-items: center; margin-bottom: 8px; font-size: 12px; }
+          .gap-input-row label { color: #5b6472; }
+          .gap-input-row input { padding: 6px 8px; border: 1px solid #cdd8e7; border-radius: 5px; font-size: 12px; text-align: right; }
+          .gap-stub-table { width: 100%; border-collapse: collapse; font-size: 11px; margin: 10px 0; }
+          .gap-stub-table th { background: #f0f4fa; padding: 7px 8px; border: 1px solid #dbe3ef; text-align: left; }
+          .gap-stub-table td { padding: 7px 8px; border: 1px solid #e4eaf3; }
+          .gap-stub-table .num { text-align: right; font-variant-numeric: tabular-nums; }
+          .gap-stub-table .est { color: #856404; background: #fff9e6; }
+          .gap-stub-table .known { color: #1c6b52; }
+          .gap-result-box { background: linear-gradient(180deg, #f4fbf7 0%, #fff 100%); border: 1px solid rgba(28,107,82,.35); border-radius: 8px; padding: 12px; margin-top: 10px; font-size: 12px; }
+          .gap-result-box .big { font-family: 'Fraunces', serif; font-size: 28px; color: #12233b; }
+        </style>
+
+        <div class="gap-grid">
+          <div class="gap-card">
+            <h4>Employer — Primary Employment</h4>
+            <div class="gap-input-row"><label>Period covered (months)</label><input type="number" id="hhTotalMonths" value="12" min="1" max="24" /></div>
+            <div class="gap-input-row"><label>Paystubs on file (count)</label><input type="number" id="hhStubsOnFile" value="7" min="0" /></div>
+            <div class="gap-input-row"><label>Known YTD gross (sum)</label><input type="number" id="hhYtdKnown" value="54718" step="0.01" /></div>
+            <div class="gap-input-row"><label>Known months covered</label><input type="number" id="hhMonthsCovered" value="7" min="0" /></div>
+          </div>
+          <div class="gap-card">
+            <h4>Employer — Secondary Employment</h4>
+            <div class="gap-input-row"><label>Period covered (months)</label><input type="number" id="ffTotalMonths" value="12" min="1" max="24" /></div>
+            <div class="gap-input-row"><label>Paystubs on file (count)</label><input type="number" id="ffStubsOnFile" value="10" min="0" /></div>
+            <div class="gap-input-row"><label>Known YTD gross (sum)</label><input type="number" id="ffYtdKnown" value="11368" step="0.01" /></div>
+            <div class="gap-input-row"><label>Known months covered</label><input type="number" id="ffMonthsCovered" value="5" min="0" /></div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:8px;margin-bottom:12px;">
+          <button type="button" class="btn" id="gapEstimateBtn">Run estimation</button>
+          <button type="button" class="btn ghost" id="gapExportBtn" disabled>Export reconciliation CSV</button>
+        </div>
+
+        <div id="gapReconTable" style="overflow-x:auto;display:none;">
+          <table class="gap-stub-table" id="gapDetailTable">
+            <thead>
+              <tr>
+                <th>Employer</th><th>Month</th><th class="num">Monthly gross</th><th>Source</th><th>Note</th>
+              </tr>
+            </thead>
+            <tbody id="gapDetailBody"></tbody>
+          </table>
+        </div>
+
+        <div class="gap-result-box" id="gapResultBox" style="display:none;">
+          <div style="font-size:11px;font-weight:700;color:#1c6b52;text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px;">Reconstructed full-year income</div>
+          <div class="big" id="gapTotalIncome">$0</div>
+          <div id="gapResultDetail" style="margin-top:8px;color:#2f4563;line-height:1.6;font-size:11px;"></div>
+        </div>
+      </div>
+
+      <footer class="foot">
+        <span>Veritas · Income Imputation</span>
+        <span class="foot-dim">Methodologies for disputed/hidden income · supported by documentation</span>
+      </footer>
+    </div>
+  </main>
+
+  <!-- Recon Modal -->
+  <div id="reconModal" style="display:none;position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:1000;overflow:auto;padding:20px;">
+    <div style="background:white;border-radius:8px;max-width:1000px;margin:40px auto;padding:30px;box-shadow:0 4px 6px rgba(0,0,0,0.1);">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;border-bottom:1px solid #e0e7ff;padding-bottom:15px;">
+        <h2 id="reconTitle" style="margin:0;font-size:20px;color:#1a2f4f;font-weight:700;">Income Reconciliation</h2>
+        <button type="button" onclick="closeReconModal()" style="background:none;border:none;font-size:24px;cursor:pointer;color:#5b6472;">&times;</button>
+      </div>
+      <div id="reconContent" style="margin-bottom:20px;">
+        <!-- Populated by JavaScript -->
+      </div>
+      <div style="text-align:right;padding-top:15px;border-top:1px solid #e0e7ff;">
+        <button type="button" onclick="closeReconModal()" style="padding:8px 16px;background:#f0f5fb;border:1px solid #cdd8e7;border-radius:4px;cursor:pointer;color:#1c3f66;font-weight:700;">Close</button>
+        <button type="button" onclick="exportReconCsv()" style="padding:8px 16px;background:#e6f3ec;border:1px solid #6b9e88;border-radius:4px;cursor:pointer;color:#1c6b52;font-weight:700;margin-left:8px;">Export CSV</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="api-client.js"></script>
+  <script src="case-manager.js"></script>
+  <script src="safe-text.js"></script>
+  <script src="document-support-registry.js"></script>
+  <script src="document-support-integration.js"></script>
+  <script src="income-imputation.js"></script>
+  <script src="logo-handler.js"></script>
+  <script>
+    (function () {
+      var RECO = {
+        routine:       { verdict: 'INCLUDE', tone: '#2f7d5b', bg: '#e5f3ec', bd: '#bfe3d0', text: 'Bonuses paid routinely every year are generally treated as income for support. Lean toward the all-in $336,819 basis.' },
+        performance:   { verdict: 'INCLUDE', tone: '#2f7d5b', bg: '#e5f3ec', bd: '#bfe3d0', text: 'Regularly paid performance bonuses are typically counted, often averaged over 2–3 years. Lean toward all-in / a multi-year average.' },
+        discretionary: { verdict: 'LEAN EXCLUDE', tone: '#9a6b1e', bg: '#fbf1df', bd: '#f0dcb4', text: "Employer-discretionary bonuses are often excluded or averaged. Argue base-only $236,819; average only if there is a consistent history." },
+        onetime:       { verdict: 'EXCLUDE', tone: '#b3402f', bg: '#fbe9e6', bd: '#f0c9c2', text: 'Non-recurring, one-time bonuses are typically excluded from ongoing support. Use base-only $236,819.' },
+        speculative:   { verdict: 'EXCLUDE', tone: '#b3402f', bg: '#fbe9e6', bd: '#f0c9c2', text: 'Speculative or uncertain bonuses should not be imputed as ongoing income. Use base-only $236,819.' }
+      };
+      var box = document.getElementById('bonusCharReco');
+      var checks = Array.prototype.slice.call(document.querySelectorAll('#bonusCharChecks input[type=checkbox]'));
+      var LABELS = { routine: 'Routine', performance: 'Performance-based', discretionary: 'Discretionary', onetime: 'One-time', speculative: 'Speculative' };
+      function renderBonusReco() {
+        if (!box) return;
+        var selected = checks.filter(function (c) { return c.checked; }).map(function (c) { return c.value; });
+        if (!selected.length) {
+          box.style.background = '#f0f4fa'; box.style.borderColor = '#dbe3ef'; box.style.color = '#425c7f';
+          box.innerHTML = 'Select one or more characters to see whether the bonus should be counted.';
+          return;
+        }
+        var hasInclude = false, hasExclude = false;
+        var items = selected.map(function (k) {
+          var r = RECO[k];
+          if (r.verdict === 'INCLUDE') { hasInclude = true; } else { hasExclude = true; }
+          return '<li style="margin:3px 0;"><strong style="color:' + r.tone + '">' + LABELS[k] + ' → ' + r.verdict + '</strong> — ' + r.text + '</li>';
+        }).join('');
+        var combined, tone, bg, bd, note;
+        if (hasInclude && hasExclude) {
+          combined = 'MIXED — FACT-DEPENDENT'; tone = '#9a6b1e'; bg = '#fbf1df'; bd = '#f0dcb4';
+          note = 'The bonus shows both recurring and non-recurring traits. Courts commonly average the bonus over 2–3 years or count only the consistently recurring portion. Argue base-only $236,819 for the non-recurring part and an averaged add-back for the recurring part.';
+        } else if (hasInclude) {
+          combined = 'INCLUDE'; tone = '#2f7d5b'; bg = '#e5f3ec'; bd = '#bfe3d0';
+          note = 'Every selected trait supports counting the bonus. Lean toward the all-in $336,819 basis (or a 2–3 year average where a history exists).';
+        } else {
+          var anyHard = selected.some(function (k) { return RECO[k].verdict === 'EXCLUDE'; });
+          combined = anyHard ? 'EXCLUDE' : 'LEAN EXCLUDE'; tone = anyHard ? '#b3402f' : '#9a6b1e';
+          bg = anyHard ? '#fbe9e6' : '#fbf1df'; bd = anyHard ? '#f0c9c2' : '#f0dcb4';
+          note = 'The selected traits weigh against counting the bonus as ongoing income. Use the base-only $236,819 basis' + (anyHard ? '.' : '; average only if a consistent history exists.');
+        }
+        box.style.background = bg; box.style.borderColor = bd; box.style.color = '#2b3a4c';
+        box.innerHTML = '<strong style="color:' + tone + '">Combined recommendation: ' + combined + ' the bonus.</strong>' +
+          '<ul style="margin:6px 0 6px 18px;padding:0;">' + items + '</ul>' +
+          note + '<br><span style="color:#8a94a3">Not legal advice — defer to Holly.</span>';
+      }
+      if (checks.length && box) {
+        checks.forEach(function (c) { c.addEventListener('change', renderBonusReco); });
+      }
+    })();
+  </script>
+</body>
+</html>
+

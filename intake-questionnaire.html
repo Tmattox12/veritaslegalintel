@@ -1,0 +1,1348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AFI Intake Questionnaire</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: #f5f5f5;
+      color: #333;
+      line-height: 1.6;
+    }
+    .container { max-width: 900px; margin: 0 auto; padding: 0 18px; }
+    /* Header */
+    .header {
+      background: linear-gradient(135deg, #2e5b8a 0%, #1f5f9d 100%);
+      color: white;
+      padding: 36px 0;
+      margin-bottom: 36px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    .header-content { display: flex; align-items: center; gap: 18px; }
+    .header-logo {
+      width: 48px;
+      height: 48px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+    .header-text h1 { font-size: 24px; margin-bottom: 4px; font-weight: 700; }
+    .header-text p { font-size: 13.5px; opacity: 0.9; }
+    /* Navigation */
+    .nav-bar {
+      background: white;
+      padding: 12px 0;
+      border-bottom: 1px solid #e5e5e5;
+      margin-bottom: 27px;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+    .nav-bar a {
+      display: inline-block;
+      padding: 8px 16px;
+      color: #2e5b8a;
+      text-decoration: none;
+      font-size: 10.8px;
+      font-weight: 600;
+      border-radius: 4px;
+      transition: all 0.2s;
+      margin-right: 10px;
+    }
+    .nav-bar a:hover { background: #e8f3ff; color: #1f5f9d; }
+    /* Main content */
+    .form-section {
+      background: white;
+      margin-bottom: 27px;
+      border-radius: 7.2px;
+      overflow: hidden;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    }
+    .section-header {
+      background: #f0f4f8;
+      padding: 14.4px 18px;
+      border-bottom: 2px solid #2e5b8a;
+      cursor: pointer;
+      user-select: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      transition: all 0.2s;
+    }
+    .section-header:hover { background: #e8f0f7; }
+    .section-header h2 {
+      font-size: 13.5px;
+      font-weight: 700;
+      color: #2e5b8a;
+      margin: 0;
+    }
+    .section-toggle {
+      display: inline-block;
+      width: 20px;
+      height: 20px;
+      line-height: 20px;
+      text-align: center;
+      background: #2e5b8a;
+      color: white;
+      border-radius: 50%;
+      font-weight: 700;
+      font-size: 14px;
+      transition: transform 0.2s;
+    }
+    .section-toggle.closed { transform: rotate(-90deg); }
+    .section-content {
+      padding: 18px;
+      display: none;
+    }
+    .section-content.open { display: block; }
+    /* Form groups */
+    .form-group {
+      margin-bottom: 16px;
+      display: grid;
+      grid-template-columns: 200px 1fr;
+      gap: 12px;
+      align-items: start;
+    }
+    .form-group label {
+      font-size: 10.8px;
+      font-weight: 600;
+      color: #2e5b8a;
+      padding-top: 6px;
+    }
+    .form-group input[type="text"],
+    .form-group input[type="date"],
+    .form-group select,
+    .form-group textarea {
+      padding: 8px 10.8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 10.8px;
+      font-family: inherit;
+      transition: all 0.2s;
+    }
+    .form-group input:focus,
+    .form-group select:focus,
+    .form-group textarea:focus {
+      outline: none;
+      border-color: #2e5b8a;
+      box-shadow: 0 0 0 3px rgba(46, 91, 138, 0.1);
+    }
+    .form-group input[type="checkbox"],
+    .form-group input[type="radio"] {
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+      margin-right: 6px;
+    }
+    .radio-group, .checkbox-group {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .radio-group label, .checkbox-group label {
+      display: flex;
+      align-items: center;
+      font-weight: normal;
+      color: #333;
+      grid-column: 2;
+      margin: 0;
+    }
+    /* Conditional section styles */
+    .conditional-section {
+      display: none;
+      margin-left: 36px;
+      margin-top: 18px;
+      padding-top: 12px;
+      border-top: 1px solid #e5e0d5;
+      border-left: 3px solid #dde8f7;
+      padding-left: 18px;
+    }
+    .conditional-section.visible { display: block; }
+    .conditional-section-title {
+      font-size: 11.7px;
+      font-weight: 700;
+      color: #1f5f9d;
+      margin-bottom: 10px;
+      display: block;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+    /* Sub-sections */
+    .sub-section {
+      margin-top: 18px;
+      padding-top: 12px;
+      border-top: 1px solid #e5e5e5;
+    }
+    .sub-section-title {
+      font-size: 11.7px;
+      font-weight: 700;
+      color: #1f5f9d;
+      margin-bottom: 10px;
+      display: block;
+    }
+    /* Checklist */
+    .checklist-group {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .checklist-item {
+      display: flex;
+      align-items: flex-start;
+      gap: 8px;
+      padding: 8px;
+      background: #f9f9f9;
+      border-radius: 4px;
+      border: 1px solid #e5e5e5;
+    }
+    .checklist-item input[type="checkbox"] {
+      width: 16px;
+      height: 16px;
+      margin-top: 2px;
+      flex-shrink: 0;
+    }
+    .checklist-item label {
+      font-size: 10.8px;
+      color: #333;
+      margin: 0;
+      cursor: pointer;
+      flex: 1;
+    }
+    /* Document upload section */
+    .document-upload {
+      background: #e8f3ff;
+      border: 2px dashed #2e5b8a;
+      border-radius: 5.4px;
+      padding: 18px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .document-upload:hover {
+      background: #dde8f7;
+      border-color: #1f5f9d;
+    }
+    .document-upload-text {
+      font-size: 10.8px;
+      color: #2e5b8a;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+    .document-upload-sub {
+      font-size: 9.9px;
+      color: #666;
+    }
+    /* Actions */
+    .form-actions {
+      padding: 18px;
+      background: #f9f9f9;
+      border-top: 1px solid #e5e5e5;
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+    }
+    .btn {
+      padding: 10px 20px;
+      border-radius: 4px;
+      border: none;
+      font-size: 10.8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      text-decoration: none;
+      display: inline-block;
+    }
+    .btn-primary {
+      background: #2e5b8a;
+      color: white;
+    }
+    .btn-primary:hover { background: #1f5f9d; box-shadow: 0 2px 6px rgba(46, 91, 138, 0.3); }
+    .btn-secondary {
+      background: white;
+      color: #2e5b8a;
+      border: 1px solid #2e5b8a;
+    }
+    .btn-secondary:hover { background: #e8f3ff; }
+    .btn-back {
+      background: white;
+      color: #666;
+      border: 1px solid #ddd;
+    }
+    .btn-back:hover { background: #f5f5f5; }
+    /* Footer */
+    .footer {
+      background: white;
+      padding: 27px 0;
+      border-top: 1px solid #e5e5e5;
+      margin-top: 36px;
+      text-align: center;
+      color: #999;
+      font-size: 9.9px;
+    }
+    .footer-logo {
+      display: inline-block;
+      color: #2e5b8a;
+      font-weight: 700;
+      margin-bottom: 8px;
+      font-size: 12.6px;
+    }
+    /* Smooth transitions */
+    .conditional-section {
+      transition: opacity 0.2s ease-in-out;
+      opacity: 0;
+      pointer-events: none;
+    }
+    .conditional-section.visible {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    /* Responsive */
+    @media (max-width: 600px) {
+      .form-group {
+        grid-template-columns: 1fr;
+      }
+      .form-group label {
+        grid-column: 1;
+      }
+      .checklist-group {
+        grid-template-columns: 1fr;
+      }
+      .header-content {
+        flex-direction: column;
+        text-align: center;
+      }
+      .header-text h1 { font-size: 20px; }
+      .conditional-section {
+        margin-left: 18px;
+        padding-left: 12px;
+      }
+    }
+    /* Print styles */
+    @media print {
+      .nav-bar, .form-actions { display: none; }
+      .form-section { page-break-inside: avoid; }
+    }
+  </style>
+  <!-- Veritas AI Chat Widget -->
+  <link rel="stylesheet" href="ai-chat-widget.css" />
+  <!-- Reconciliation Modal -->
+  <link rel="stylesheet" href="reconciliation-modal.css" />
+</head>
+<body>
+  <!-- ===================== SIDEBAR ===================== -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">
+        <img src="logo-vfi.jpg" alt="VFI Logo" />
+        <span class="brand-mark-fallback">VFI</span>
+      </div>
+      <div class="brand-text">
+        <span class="brand-name">Veritas</span>
+        <span class="brand-sub">Financial Intelligence</span>
+      </div>
+    </div>
+    <nav class="nav">
+      <div class="nav-group-label">Workspace</div>
+      <a class="nav-item" href="index.html"><span class="nav-ico">◆</span> Dashboard</a>
+      <a class="nav-item" href="#"><span class="nav-ico">▤</span> Matters</a>
+      <a class="nav-item" href="schedules.html"><span class="nav-ico">◷</span> Calendar</a>
+      <a class="nav-item" href="#"><span class="nav-ico">☑</span> Tasks</a>
+      <a class="nav-item" href="discovery-intake.html"><span class="nav-ico">▦</span> Documents</a>
+      <a class="nav-item" href="document-hub-master.html" data-module="document-hub"><span class="nav-ico">📁</span> Document Hub</a>
+      <a class="nav-item" href="#"><span class="nav-ico">◍</span> Clients</a>
+
+      <div class="nav-group-label">Analysis Modules</div>
+      <a class="nav-item" href="income-imputation.html"><span class="nav-ico">💠</span> Income Engine</a>
+      <a class="nav-item" href="spousal.html"><span class="nav-ico">⚖</span> Support Calculator</a>
+      <a class="nav-item" href="child-support.html"><span class="nav-ico">◈</span> Child Support</a>
+      <a class="nav-item" href="equitable-distribution.html"><span class="nav-ico">⊟</span> Assets</a>
+      <a class="nav-item" data-module="discovery" href="discovery-intake.html"><span class="nav-ico">◎</span> Discovery</a>
+      <a class="nav-item" href="custody.html"><span class="nav-ico">⌘</span> Custody</a>
+      <a class="nav-item" href="afi.html"><span class="nav-ico">🧾</span> AFI Expenses</a>
+      <a class="nav-item" href="estate.html"><span class="nav-ico">▧</span> Reports</a>
+
+      <div class="nav-group-label">Tools</div>
+      <a class="nav-item" data-module="forensic" href="forensic-tracing.html"><span class="nav-ico">⌕</span> Forensic Tracing</a>
+      <a class="nav-item" href="settlement.html"><span class="nav-ico">⇄</span> Settlement Modeling</a>
+      <a class="nav-item" href="credits.html"><span class="nav-ico">⊕</span> Credits &amp; Adjustments</a>
+      <a class="nav-item" href="regulations.html"><span class="nav-ico">⚖</span> Regulations</a>
+      <a class="nav-item" href="equitable-distribution.html"><span class="nav-ico">§</span> Prenup Module</a>
+      <a class="nav-item" href="discovery-intake.html"><span class="nav-ico">⤓</span> Document Intake</a>
+      <a class="nav-item" href="discovery-intake.html"><span class="nav-ico">◉</span> Compliance</a>
+      <a class="nav-item" href="red-flags.html"><span class="nav-ico">🚩</span> Red-Flag Detection</a>
+    </nav>
+
+    <div class="sidebar-foot">
+      <div class="plan-chip"><span style="color:var(--green)">●</span> Secure Connection · encrypted &amp; confidential</div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div class="header">
+    <div class="container">
+      <div class="header-content">
+        <div class="header-logo">VFI</div>
+        <div class="header-text">
+          <h1>AFI Intake Questionnaire</h1>
+          <p>Prepare Supporting Documentation for Expense Affidavit</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="nav-bar">
+    <div class="container">
+      <a href="afi.html">← Back to AFI Template</a>
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- SECTION 1: PERSONAL INFORMATION -->
+    <div class="form-section">
+      <div class="section-header" onclick="this.nextElementSibling.classList.toggle('open'); this.querySelector('.section-toggle').classList.toggle('closed')">
+        <h2>1. PERSONAL INFORMATION</h2>
+        <span class="section-toggle">+</span>
+      </div>
+      <div class="section-content open">
+        <div class="form-group">
+          <label for="fullName">Full Name</label>
+          <input type="text" id="fullName" placeholder="Enter full name" />
+        </div>
+        <div class="form-group">
+          <label for="dob">Date of Birth</label>
+          <input type="date" id="dob" />
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 2: KEY DATES (Case Timeline) -->
+    <div class="form-section">
+      <div class="section-header" onclick="this.nextElementSibling.classList.toggle('open'); this.querySelector('.section-toggle').classList.toggle('closed')">
+        <h2>2. KEY DATES</h2>
+        <span class="section-toggle">+</span>
+      </div>
+      <div class="section-content">
+        <div style="background: #e8f3ff; padding: 10px; border-left: 3px solid #2e5b8a; margin-bottom: 16px; border-radius: 4px;">
+          <p style="font-size: 10.8px; color: #2e5b8a; margin: 0;">
+            <strong>Help:</strong> Important family law case dates are used to calculate asset division periods, support duration, and other critical determinations. All fields are optional.
+          </p>
+        </div>
+        <div class="form-group">
+          <label for="dateMarriage">Date of Marriage</label>
+          <input type="date" id="dateMarriage" />
+        </div>
+        <div class="form-group">
+          <label for="dateSeparation">Date of Separation</label>
+          <input type="date" id="dateSeparation" />
+        </div>
+        <div class="form-group">
+          <label for="dateStoppedLiving">Date Parties Stopped Living Together</label>
+          <input type="date" id="dateStoppedLiving" />
+        </div>
+        <div class="form-group">
+          <label for="dateMovedFromHome">Date of Move from Marital Home</label>
+          <input type="date" id="dateMovedFromHome" />
+        </div>
+        <div class="form-group">
+          <label for="dateService">Date of Service (formal service of papers)</label>
+          <input type="date" id="dateService" />
+        </div>
+        <div class="form-group">
+          <label for="dateDivorceFiled">Date Divorce/Dissolution Filed</label>
+          <input type="date" id="dateDivorceFiled" />
+        </div>
+        <div class="form-group">
+          <label for="dateTrialHearing">Date Trial/Hearing (if scheduled)</label>
+          <input type="date" id="dateTrialHearing" />
+        </div>
+        <div class="form-group">
+          <label for="currentDate">Current Date</label>
+          <input type="date" id="currentDate" />
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 3: EMPLOYMENT TYPE (Master Questions) -->
+    <div class="form-section">
+      <div class="section-header" onclick="this.nextElementSibling.classList.toggle('open'); this.querySelector('.section-toggle').classList.toggle('closed')">
+        <h2>3. EMPLOYMENT TYPE</h2>
+        <span class="section-toggle">+</span>
+      </div>
+      <div class="section-content open">
+        <div class="form-group">
+          <label>Are you employed by an employer?</label>
+          <div class="radio-group">
+            <label><input type="radio" name="employedByEmployer" value="yes" onchange="toggleEmploymentDetails(this)" /> Yes</label>
+            <label><input type="radio" name="employedByEmployer" value="no" onchange="toggleEmploymentDetails(this)" /> No</label>
+          </div>
+        </div>
+
+        <!-- EMPLOYMENT DETAILS - conditionally shown -->
+        <div id="employmentDetails" class="conditional-section">
+          <span class="conditional-section-title">Employment Details</span>
+          <div class="form-group">
+            <label for="employer">Current Employer Name</label>
+            <input type="text" id="employer" placeholder="Employer name" />
+          </div>
+          <div class="form-group">
+            <label for="jobTitle">Job Title</label>
+            <input type="text" id="jobTitle" placeholder="Job title" />
+          </div>
+          <div class="form-group">
+            <label for="startDate">Start Date</label>
+            <input type="date" id="startDate" />
+          </div>
+
+          <div class="form-group">
+            <label>Does your employer provide any non-cash benefits?</label>
+            <div class="radio-group">
+              <label><input type="radio" name="hasEmployerBenefits" value="yes" onchange="toggleEmployerBenefits(this)" /> Yes</label>
+              <label><input type="radio" name="hasEmployerBenefits" value="no" onchange="toggleEmployerBenefits(this)" /> No</label>
+            </div>
+          </div>
+
+          <!-- EMPLOYER BENEFITS - conditionally shown -->
+          <div id="employerBenefits" class="conditional-section">
+            <span class="conditional-section-title">Employer-Provided Benefits</span>
+            <div class="form-group">
+              <label>Which benefits are provided?</label>
+              <div class="checkbox-group">
+                <label><input type="checkbox" name="benefitType" value="auto" /> Automobile (use/allowance)</label>
+                <label><input type="checkbox" name="benefitType" value="housing" /> Housing/Lodging</label>
+                <label><input type="checkbox" name="benefitType" value="travel" /> Travel Expenses Paid</label>
+                <label><input type="checkbox" name="benefitType" value="meals" /> Meals</label>
+                <label><input type="checkbox" name="benefitType" value="other" /> Other</label>
+              </div>
+            </div>
+            <div class="form-group">
+              <label for="benefitDetails">Provide details of benefits (amounts, frequency)</label>
+              <textarea id="benefitDetails" placeholder="Describe each benefit provided" rows="3"></textarea>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Do you receive bonuses or commissions?</label>
+            <div class="radio-group">
+              <label><input type="radio" name="hasBonus" value="yes" onchange="toggleBonusDetails(this)" /> Yes</label>
+              <label><input type="radio" name="hasBonus" value="no" onchange="toggleBonusDetails(this)" /> No</label>
+            </div>
+          </div>
+
+          <!-- BONUS/COMMISSION DETAILS - conditionally shown -->
+          <div id="bonusDetails" class="conditional-section">
+            <span class="conditional-section-title">Bonus/Commission Details</span>
+            <div class="form-group">
+              <label for="bonusType">Type of Additional Compensation</label>
+              <input type="text" id="bonusType" placeholder="e.g., Annual bonus, commission, profit sharing" />
+            </div>
+            <div class="form-group">
+              <label for="bonusFrequency">Frequency</label>
+              <select id="bonusFrequency">
+                <option value="">Select frequency...</option>
+                <option value="quarterly">Quarterly</option>
+                <option value="annual">Annual</option>
+                <option value="monthly">Monthly</option>
+                <option value="irregular">Irregular</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="bonusAmount">Average Amount Per Period</label>
+              <input type="text" id="bonusAmount" placeholder="$" />
+            </div>
+            <div class="form-group">
+              <label for="bonusHistory">Last 2 Years of Amounts</label>
+              <textarea id="bonusHistory" placeholder="List amounts by date received" rows="3"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Are you self-employed?</label>
+          <div class="radio-group">
+            <label><input type="radio" name="selfEmployed" value="yes" onchange="toggleSelfEmploymentDetails(this)" /> Yes</label>
+            <label><input type="radio" name="selfEmployed" value="no" onchange="toggleSelfEmploymentDetails(this)" /> No</label>
+          </div>
+        </div>
+
+        <!-- SELF-EMPLOYMENT DETAILS - conditionally shown -->
+        <div id="selfEmploymentDetails" class="conditional-section">
+          <span class="conditional-section-title">Self-Employment Details</span>
+          <div class="form-group">
+            <label for="businessName">Business Name</label>
+            <input type="text" id="businessName" placeholder="Business name" />
+          </div>
+          <div class="form-group">
+            <label for="businessType">Business Type/Industry</label>
+            <input type="text" id="businessType" placeholder="Type of business" />
+          </div>
+          <div class="form-group">
+            <label for="businessStartDate">Business Start Date</label>
+            <input type="date" id="businessStartDate" />
+          </div>
+          <div class="form-group">
+            <label for="ownershipPct">Ownership Percentage</label>
+            <input type="text" id="ownershipPct" placeholder="%" />
+          </div>
+          <div class="form-group">
+            <label for="businessIncome">Average Annual Income (last 2 years)</label>
+            <input type="text" id="businessIncome" placeholder="$" />
+          </div>
+          <div class="form-group">
+            <label for="businessStructure">Business Structure</label>
+            <select id="businessStructure">
+              <option value="">Select...</option>
+              <option value="sole">Sole Proprietor</option>
+              <option value="llc">LLC</option>
+              <option value="s-corp">S-Corp</option>
+              <option value="c-corp">C-Corp</option>
+              <option value="partnership">Partnership</option>
+            </select>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 4: HOUSEHOLD -->
+    <div class="form-section">
+      <div class="section-header" onclick="this.nextElementSibling.classList.toggle('open'); this.querySelector('.section-toggle').classList.toggle('closed')">
+        <h2>4. HOUSEHOLD</h2>
+        <span class="section-toggle">+</span>
+      </div>
+      <div class="section-content">
+        <div class="form-group">
+          <label>Home Ownership Status</label>
+          <div class="radio-group">
+            <label><input type="radio" name="homeOwnershipStatus" value="owner" onchange="toggleHomeownershipDetails(this)" /> Own</label>
+            <label><input type="radio" name="homeOwnershipStatus" value="rent" onchange="toggleHomeownershipDetails(this)" /> Rent</label>
+            <label><input type="radio" name="homeOwnershipStatus" value="other" onchange="toggleHomeownershipDetails(this)" /> Other</label>
+          </div>
+        </div>
+
+        <!-- MORTGAGE DETAILS - conditionally shown for owners -->
+        <div id="mortgageDetails" class="conditional-section">
+          <span class="conditional-section-title">Mortgage Details</span>
+          <div class="form-group">
+            <label for="monthlyMortgage">Monthly Mortgage Payment</label>
+            <input type="text" id="monthlyMortgage" placeholder="$" />
+          </div>
+          <div class="form-group">
+            <label for="mortgageLender">Lender Name</label>
+            <input type="text" id="mortgageLender" placeholder="Bank/lender name" />
+          </div>
+          <div class="form-group">
+            <label for="propertyTaxes">Monthly Property Taxes (if separate from mortgage)</label>
+            <input type="text" id="propertyTaxes" placeholder="$" />
+          </div>
+          <div class="form-group">
+            <label for="homeInsurance">Monthly Home Insurance</label>
+            <input type="text" id="homeInsurance" placeholder="$" />
+          </div>
+          <div class="form-group">
+            <label for="hoa">Monthly HOA/Condo Fees (if applicable)</label>
+            <input type="text" id="hoa" placeholder="$" />
+          </div>
+        </div>
+
+        <!-- RENT DETAILS - conditionally shown for renters -->
+        <div id="rentDetails" class="conditional-section">
+          <span class="conditional-section-title">Rental Details</span>
+          <div class="form-group">
+            <label for="monthlyRent">Monthly Rent Payment</label>
+            <input type="text" id="monthlyRent" placeholder="$" />
+          </div>
+          <div class="form-group">
+            <label for="leaseStartDate">Lease Start Date</label>
+            <input type="date" id="leaseStartDate" />
+          </div>
+          <div class="form-group">
+            <label for="leaseEndDate">Lease End Date</label>
+            <input type="date" id="leaseEndDate" />
+          </div>
+          <div class="form-group">
+            <label for="rentersInsurance">Monthly Renters Insurance</label>
+            <input type="text" id="rentersInsurance" placeholder="$" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="householdMembers">Other Household Members and Income</label>
+          <textarea id="householdMembers" placeholder="List other household members and their approximate income" rows="3"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 5: CHILDREN -->
+    <div class="form-section">
+      <div class="section-header" onclick="this.nextElementSibling.classList.toggle('open'); this.querySelector('.section-toggle').classList.toggle('closed')">
+        <h2>5. CHILDREN</h2>
+        <span class="section-toggle">+</span>
+      </div>
+      <div class="section-content open">
+        <div class="form-group">
+          <label>Do you have children common to the parties?</label>
+          <div class="radio-group">
+            <label><input type="radio" name="hasCommonChildren" value="yes" onchange="toggleChildrenDetails(this)" /> Yes</label>
+            <label><input type="radio" name="hasCommonChildren" value="no" onchange="toggleChildrenDetails(this)" /> No</label>
+          </div>
+        </div>
+
+        <!-- CHILDREN DETAILS - conditionally shown -->
+        <div id="childrenDetails" class="conditional-section">
+          <span class="conditional-section-title">Children Information</span>
+          <div class="form-group">
+            <label for="childrenNames">Names and Ages of Common Children</label>
+            <textarea id="childrenNames" placeholder="Example: John (8), Sarah (5)" rows="2"></textarea>
+          </div>
+
+          <div class="form-group">
+            <label>Health Insurance for Children?</label>
+            <div class="radio-group">
+              <label><input type="radio" name="childrenHealthIns" value="yes" onchange="toggleChildHealthInsurance(this)" /> Yes</label>
+              <label><input type="radio" name="childrenHealthIns" value="no" onchange="toggleChildHealthInsurance(this)" /> No</label>
+            </div>
+          </div>
+
+          <!-- CHILD HEALTH INSURANCE - conditionally shown -->
+          <div id="childHealthInsurance" class="conditional-section">
+            <span class="conditional-section-title">Child Health Insurance</span>
+            <div style="background: #e8f3ff; border: 1px solid #2e5b8a; border-radius: 4px; padding: 12px; margin-bottom: 16px; font-size: 11px;">
+              💡 <strong>Tip:</strong> <a href="#" onclick="showImportModal(); return false;" style="color: #2e5b8a; font-weight: 600; text-decoration: underline;">Import insurance statements</a> to auto-populate this section
+            </div>
+            <div class="form-group">
+              <label for="childInsType">Type of Insurance</label>
+              <select id="childInsType">
+                <option value="">Select type...</option>
+                <option value="employer">Employer-Provided</option>
+                <option value="marketplace">Marketplace/ACA</option>
+                <option value="medicaid">Medicaid</option>
+                <option value="private">Private</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="childInsProvider">Insurance Provider</label>
+              <input type="text" id="childInsProvider" placeholder="Provider name" />
+            </div>
+            <div class="form-group">
+              <label for="childInsCost">Monthly Cost</label>
+              <input type="text" id="childInsCost" placeholder="$" />
+            </div>
+            <div class="form-group">
+              <label for="childInsPortion">Your Portion of Cost (if shared)</label>
+              <input type="text" id="childInsPortion" placeholder="$" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Child Care Costs?</label>
+            <div class="radio-group">
+              <label><input type="radio" name="childCare" value="yes" onchange="toggleChildCareDetails(this)" /> Yes</label>
+              <label><input type="radio" name="childCare" value="no" onchange="toggleChildCareDetails(this)" /> No</label>
+            </div>
+          </div>
+
+          <!-- CHILD CARE DETAILS - conditionally shown -->
+          <div id="childCareDetails" class="conditional-section">
+            <span class="conditional-section-title">Child Care Details</span>
+            <div class="form-group">
+              <label for="childCareType">Type of Care</label>
+              <input type="text" id="childCareType" placeholder="Daycare, nanny, preschool, etc." />
+            </div>
+            <div class="form-group">
+              <label for="childCareProvider">Provider Name/Facility</label>
+              <input type="text" id="childCareProvider" placeholder="Provider name" />
+            </div>
+            <div class="form-group">
+              <label for="childCareCost">Monthly Cost</label>
+              <input type="text" id="childCareCost" placeholder="$" />
+            </div>
+            <div class="form-group">
+              <label for="childCareSchedule">Schedule</label>
+              <input type="text" id="childCareSchedule" placeholder="e.g., Full-time, part-time" />
+            </div>
+            <div class="form-group">
+              <label for="childCareAges">Ages/Names of Children in Care</label>
+              <input type="text" id="childCareAges" placeholder="Which children use this care" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Child Support for Other Children?</label>
+            <div class="radio-group">
+              <label><input type="radio" name="otherChildSupport" value="yes" onchange="toggleOtherChildSupport(this)" /> Yes</label>
+              <label><input type="radio" name="otherChildSupport" value="no" onchange="toggleOtherChildSupport(this)" /> No</label>
+            </div>
+          </div>
+
+          <!-- OTHER CHILD SUPPORT - conditionally shown -->
+          <div id="otherChildSupport" class="conditional-section">
+            <span class="conditional-section-title">Child Support for Other Children</span>
+            <div class="form-group">
+              <label for="supportMonth">Monthly Amount Paid</label>
+              <input type="text" id="supportMonth" placeholder="$" />
+            </div>
+            <div class="form-group">
+              <label for="supportChildren">Number of Children Supported</label>
+              <input type="text" id="supportChildren" placeholder="Number" />
+            </div>
+            <div class="form-group">
+              <label for="courtOrderFile">Court Order File Number</label>
+              <input type="text" id="courtOrderFile" placeholder="Case number/reference" />
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Extraordinary Child Expenses (sports, tutoring, special needs)?</label>
+            <div class="radio-group">
+              <label><input type="radio" name="extraordinaryExpenses" value="yes" onchange="toggleExtraordinaryExpenses(this)" /> Yes</label>
+              <label><input type="radio" name="extraordinaryExpenses" value="no" onchange="toggleExtraordinaryExpenses(this)" /> No</label>
+            </div>
+          </div>
+
+          <!-- EXTRAORDINARY EXPENSES - conditionally shown -->
+          <div id="extraordinaryExpenses" class="conditional-section">
+            <span class="conditional-section-title">Extraordinary Expenses</span>
+            <div class="form-group">
+              <label for="extraordinaryList">List Expenses and Amounts</label>
+              <textarea id="extraordinaryList" placeholder="E.g., Soccer camp ($500/mo), Piano lessons ($100/mo), Therapist ($150/mo)" rows="3"></textarea>
+            </div>
+            <div class="form-group">
+              <label for="extraordinaryFrequency">Frequency/Duration</label>
+              <input type="text" id="extraordinaryFrequency" placeholder="e.g., Year-round, seasonal, one-time" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 6: MONTHLY EXPENSES -->
+    <div class="form-section">
+      <div class="section-header" onclick="this.nextElementSibling.classList.toggle('open'); this.querySelector('.section-toggle').classList.toggle('closed')">
+        <h2>6. MONTHLY EXPENSES</h2>
+        <span class="section-toggle">+</span>
+      </div>
+      <div class="section-content">
+        <div class="form-group">
+          <label>Housing Costs?</label>
+          <div class="radio-group">
+            <label><input type="radio" name="hasHousingCosts" value="yes" onchange="toggleHousingExpenses(this)" /> Yes</label>
+            <label><input type="radio" name="hasHousingCosts" value="no" onchange="toggleHousingExpenses(this)" /> No</label>
+          </div>
+        </div>
+
+        <!-- HOUSING EXPENSES - conditionally shown -->
+        <div id="housingExpenses" class="conditional-section">
+          <span class="conditional-section-title">Housing Expenses</span>
+          <div class="form-group">
+            <label for="housing">Mortgage/Rent Payment</label>
+            <input type="text" id="housing" placeholder="$" />
+          </div>
+          <div class="form-group">
+            <label for="maintenance">Maintenance & Repairs</label>
+            <input type="text" id="maintenance" placeholder="$" />
+          </div>
+          <div class="form-group">
+            <label for="taxes">Property Taxes</label>
+            <input type="text" id="taxes" placeholder="$" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Utilities?</label>
+          <div class="radio-group">
+            <label><input type="radio" name="hasUtilities" value="yes" onchange="toggleUtilityExpenses(this)" /> Yes</label>
+            <label><input type="radio" name="hasUtilities" value="no" onchange="toggleUtilityExpenses(this)" /> No</label>
+          </div>
+        </div>
+
+        <!-- UTILITY EXPENSES - conditionally shown -->
+        <div id="utilityExpenses" class="conditional-section">
+          <span class="conditional-section-title">Utility Expenses</span>
+          <div class="form-group">
+            <label for="electricity">Electricity</label>
+            <input type="text" id="electricity" placeholder="$" />
+          </div>
+          <div class="form-group">
+            <label for="gas">Gas/Heating</label>
+            <input type="text" id="gas" placeholder="$" />
+          </div>
+          <div class="form-group">
+            <label for="water">Water/Sewer/Trash</label>
+            <input type="text" id="water" placeholder="$" />
+          </div>
+          <div class="form-group">
+            <label for="internet">Internet/Cable/Phone</label>
+            <input type="text" id="internet" placeholder="$" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Transportation/Vehicle Expenses?</label>
+          <div class="radio-group">
+            <label><input type="radio" name="hasTransportation" value="yes" onchange="toggleTransportationExpenses(this)" /> Yes</label>
+            <label><input type="radio" name="hasTransportation" value="no" onchange="toggleTransportationExpenses(this)" /> No</label>
+          </div>
+        </div>
+
+        <!-- TRANSPORTATION EXPENSES - conditionally shown -->
+        <div id="transportationExpenses" class="conditional-section">
+          <span class="conditional-section-title">Transportation Expenses</span>
+          <div class="form-group">
+            <label for="carPayment">Car Payment</label>
+            <input type="text" id="carPayment" placeholder="$" />
+          </div>
+          <div class="form-group">
+            <label for="autoInsurance">Auto Insurance</label>
+            <input type="text" id="autoInsurance" placeholder="$" />
+          </div>
+          <div class="form-group">
+            <label for="carMaintenance">Maintenance & Repairs</label>
+            <input type="text" id="carMaintenance" placeholder="$" />
+          </div>
+          <div class="form-group">
+            <label for="fuel">Fuel/Gas</label>
+            <input type="text" id="fuel" placeholder="$" />
+          </div>
+          <div class="form-group">
+            <label for="parking">Parking/Tolls</label>
+            <input type="text" id="parking" placeholder="$" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label>Pet Expenses?</label>
+          <div class="radio-group">
+            <label><input type="radio" name="hasPets" value="yes" onchange="togglePetExpenses(this)" /> Yes</label>
+            <label><input type="radio" name="hasPets" value="no" onchange="togglePetExpenses(this)" /> No</label>
+          </div>
+        </div>
+
+        <!-- PET EXPENSES - conditionally shown -->
+        <div id="petExpenses" class="conditional-section">
+          <span class="conditional-section-title">Pet Expenses</span>
+          <div class="form-group">
+            <label for="petFood">Pet Food</label>
+            <input type="text" id="petFood" placeholder="$" />
+          </div>
+          <div class="form-group">
+            <label for="petVet">Veterinary Care/Medication</label>
+            <input type="text" id="petVet" placeholder="$" />
+          </div>
+          <div class="form-group">
+            <label for="petInsurance">Pet Insurance</label>
+            <input type="text" id="petInsurance" placeholder="$" />
+          </div>
+          <div class="form-group">
+            <label for="petOther">Grooming/Other Pet Expenses</label>
+            <input type="text" id="petOther" placeholder="$" />
+          </div>
+        </div>
+
+        <div class="sub-section">
+          <span class="sub-section-title">Other Regular Monthly Expenses</span>
+          <div class="form-group">
+            <label for="groceries">Groceries</label>
+            <input type="text" id="groceries" placeholder="$" />
+          </div>
+          <div class="form-group">
+            <label for="clothing">Clothing</label>
+            <input type="text" id="clothing" placeholder="$" />
+          </div>
+          <div class="form-group">
+            <label for="medications">Medications/Medical</label>
+            <input type="text" id="medications" placeholder="$" />
+          </div>
+          <div class="form-group">
+            <label for="miscellaneous">Miscellaneous (subscriptions, memberships, etc.)</label>
+            <textarea id="miscellaneous" placeholder="List any other recurring monthly expenses" rows="3"></textarea>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 7: SUPPORTING DOCUMENTS CHECKLIST -->
+    <div class="form-section">
+      <div class="section-header" onclick="this.nextElementSibling.classList.toggle('open'); this.querySelector('.section-toggle').classList.toggle('closed')">
+        <h2>7. SUPPORTING DOCUMENTS CHECKLIST</h2>
+        <span class="section-toggle">+</span>
+      </div>
+      <div class="section-content">
+        <div class="checklist-group">
+          <div class="checklist-item">
+            <input type="checkbox" id="payStubs" />
+            <label for="payStubs">Pay stubs (2 most recent)</label>
+          </div>
+          <div class="checklist-item">
+            <input type="checkbox" id="taxReturns" />
+            <label for="taxReturns">Tax returns (last 3 years)</label>
+          </div>
+          <div class="checklist-item">
+            <input type="checkbox" id="healthIns" />
+            <label for="healthIns">Health insurance statements</label>
+          </div>
+          <div class="checklist-item">
+            <input type="checkbox" id="mortgage" />
+            <label for="mortgage">Mortgage/lease agreement</label>
+          </div>
+          <div class="checklist-item">
+            <input type="checkbox" id="utilities" />
+            <label for="utilities">Utility bills (3 months)</label>
+          </div>
+          <div class="checklist-item">
+            <input type="checkbox" id="childCareChk" />
+            <label for="childCareChk">Child care invoices</label>
+          </div>
+          <div class="checklist-item">
+            <input type="checkbox" id="courtOrders" />
+            <label for="courtOrders">Court orders (if applicable)</label>
+          </div>
+          <div class="checklist-item">
+            <input type="checkbox" id="otherDocs" />
+            <label for="otherDocs">Other documentation</label>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SECTION 8: ADDITIONAL NOTES -->
+    <div class="form-section">
+      <div class="section-header" onclick="this.nextElementSibling.classList.toggle('open'); this.querySelector('.section-toggle').classList.toggle('closed')">
+        <h2>8. ADDITIONAL NOTES</h2>
+        <span class="section-toggle">+</span>
+      </div>
+      <div class="section-content">
+        <div class="form-group">
+          <label for="additionalNotes">Additional Information or Special Circumstances</label>
+          <textarea id="additionalNotes" placeholder="Any additional information about expenses, income changes, or special circumstances" rows="4"></textarea>
+        </div>
+      </div>
+    </div>
+
+    <!-- Form Actions -->
+    <div class="form-section" style="margin-bottom: 36px;">
+      <div class="form-actions">
+        <a href="afi.html" class="btn btn-back">← Back to AFI Template</a>
+        <button class="btn btn-secondary">Save as Draft</button>
+        <button class="btn btn-primary">Submit Questionnaire</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="footer-logo">Veritas Financial Intelligence</div>
+    <p>AFI Intake Questionnaire - Professional Edition</p>
+    <p>&copy; 2024 All rights reserved.</p>
+  </div>
+
+  </main>
+
+  <script>
+    // Toggle Employment Details
+    function toggleEmploymentDetails(radio) {
+      const section = document.getElementById('employmentDetails');
+      if (radio.value === 'yes') {
+        section.classList.add('visible');
+      } else {
+        section.classList.remove('visible');
+        // Clear sub-sections when hiding
+        document.getElementById('employerBenefits').classList.remove('visible');
+        document.getElementById('bonusDetails').classList.remove('visible');
+      }
+    }
+
+    // Toggle Employer Benefits
+    function toggleEmployerBenefits(radio) {
+      const section = document.getElementById('employerBenefits');
+      if (radio.value === 'yes') {
+        section.classList.add('visible');
+      } else {
+        section.classList.remove('visible');
+      }
+    }
+
+    // Toggle Bonus Details
+    function toggleBonusDetails(radio) {
+      const section = document.getElementById('bonusDetails');
+      if (radio.value === 'yes') {
+        section.classList.add('visible');
+      } else {
+        section.classList.remove('visible');
+      }
+    }
+
+    // Toggle Self-Employment Details
+    function toggleSelfEmploymentDetails(radio) {
+      const section = document.getElementById('selfEmploymentDetails');
+      if (radio.value === 'yes') {
+        section.classList.add('visible');
+      } else {
+        section.classList.remove('visible');
+      }
+    }
+
+    // Toggle Homeownership Details
+    function toggleHomeownershipDetails(radio) {
+      const mortgageSection = document.getElementById('mortgageDetails');
+      const rentSection = document.getElementById('rentDetails');
+
+      mortgageSection.classList.remove('visible');
+      rentSection.classList.remove('visible');
+
+      if (radio.value === 'owner') {
+        mortgageSection.classList.add('visible');
+      } else if (radio.value === 'rent') {
+        rentSection.classList.add('visible');
+      }
+    }
+
+    // Toggle Children Details
+    function toggleChildrenDetails(radio) {
+      const section = document.getElementById('childrenDetails');
+      if (radio.value === 'yes') {
+        section.classList.add('visible');
+      } else {
+        section.classList.remove('visible');
+        // Clear sub-sections
+        document.getElementById('childHealthInsurance').classList.remove('visible');
+        document.getElementById('childCareDetails').classList.remove('visible');
+        document.getElementById('otherChildSupport').classList.remove('visible');
+        document.getElementById('extraordinaryExpenses').classList.remove('visible');
+      }
+    }
+
+    // Toggle Child Health Insurance
+    function toggleChildHealthInsurance(radio) {
+      const section = document.getElementById('childHealthInsurance');
+      if (radio.value === 'yes') {
+        section.classList.add('visible');
+      } else {
+        section.classList.remove('visible');
+      }
+    }
+
+    // Toggle Child Care Details
+    function toggleChildCareDetails(radio) {
+      const section = document.getElementById('childCareDetails');
+      if (radio.value === 'yes') {
+        section.classList.add('visible');
+      } else {
+        section.classList.remove('visible');
+      }
+    }
+
+    // Toggle Other Child Support
+    function toggleOtherChildSupport(radio) {
+      const section = document.getElementById('otherChildSupport');
+      if (radio.value === 'yes') {
+        section.classList.add('visible');
+      } else {
+        section.classList.remove('visible');
+      }
+    }
+
+    // Toggle Extraordinary Expenses
+    function toggleExtraordinaryExpenses(radio) {
+      const section = document.getElementById('extraordinaryExpenses');
+      if (radio.value === 'yes') {
+        section.classList.add('visible');
+      } else {
+        section.classList.remove('visible');
+      }
+    }
+
+    // Toggle Housing Expenses
+    function toggleHousingExpenses(radio) {
+      const section = document.getElementById('housingExpenses');
+      if (radio.value === 'yes') {
+        section.classList.add('visible');
+      } else {
+        section.classList.remove('visible');
+      }
+    }
+
+    // Toggle Utility Expenses
+    function toggleUtilityExpenses(radio) {
+      const section = document.getElementById('utilityExpenses');
+      if (radio.value === 'yes') {
+        section.classList.add('visible');
+      } else {
+        section.classList.remove('visible');
+      }
+    }
+
+    // Toggle Transportation Expenses
+    function toggleTransportationExpenses(radio) {
+      const section = document.getElementById('transportationExpenses');
+      if (radio.value === 'yes') {
+        section.classList.add('visible');
+      } else {
+        section.classList.remove('visible');
+      }
+    }
+
+    // Toggle Pet Expenses
+    function togglePetExpenses(radio) {
+      const section = document.getElementById('petExpenses');
+      if (radio.value === 'yes') {
+        section.classList.add('visible');
+      } else {
+        section.classList.remove('visible');
+      }
+    }
+
+    // Import modal for expenses
+    function showImportModal() {
+      const modal = document.createElement('div');
+      modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+      `;
+
+      modal.innerHTML = `
+        <div style="
+          background: white;
+          border-radius: 8px;
+          padding: 30px;
+          max-width: 500px;
+          width: 90%;
+          box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        ">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2 style="margin: 0; font-size: 18px; color: #333;">📤 Upload Expense Document</h2>
+            <button onclick="this.closest('div').parentElement.remove()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #999;">×</button>
+          </div>
+
+          <div style="
+            border: 2px dashed #2e5b8a;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 20px;
+            background: #f8f9fa;
+          " id="uploadArea2" onclick="document.getElementById('fileInput2').click()">
+            <div style="font-size: 32px; margin-bottom: 10px;">📁</div>
+            <div style="font-size: 14px; font-weight: 600; color: #2e5b8a; margin-bottom: 6px;">Click to upload or drag & drop</div>
+            <div style="font-size: 12px; color: #666;">CSV, JSON, or TXT (up to 5MB)</div>
+            <input type="file" id="fileInput2" accept=".csv,.json,.txt" style="display: none;" />
+          </div>
+
+          <div style="font-size: 12px; background: #f0f4f8; border-left: 3px solid #2e5b8a; padding: 12px; border-radius: 4px; margin-bottom: 20px;">
+            <strong>Example:</strong> Date | Description | Amount<br>
+            2026-01-15 | Blue Cross Insurance | 450.00
+          </div>
+
+          <button onclick="document.getElementById('fileInput2').click()" style="
+            width: 100%;
+            padding: 12px;
+            background: #2e5b8a;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 10px;
+          ">Choose File</button>
+
+          <button onclick="this.closest('div').parentElement.remove()" style="
+            width: 100%;
+            padding: 12px;
+            background: white;
+            color: #2e5b8a;
+            border: 1px solid #2e5b8a;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+          ">Cancel</button>
+        </div>
+      `;
+
+      document.body.appendChild(modal);
+
+      const uploadArea = document.getElementById('uploadArea2');
+      const fileInput = document.getElementById('fileInput2');
+
+      uploadArea.ondragover = (e) => {
+        e.preventDefault();
+        uploadArea.style.background = '#e8f3ff';
+      };
+
+      uploadArea.ondragleave = () => {
+        uploadArea.style.background = '#f8f9fa';
+      };
+
+      uploadArea.ondrop = (e) => {
+        e.preventDefault();
+        uploadArea.style.background = '#f8f9fa';
+        if (e.dataTransfer.files.length > 0) {
+          fileInput.files = e.dataTransfer.files;
+          handleFileImport(e.dataTransfer.files[0]);
+        }
+      };
+
+      fileInput.onchange = (e) => {
+        if (e.target.files.length > 0) {
+          handleFileImport(e.target.files[0]);
+        }
+      };
+    }
+
+    function handleFileImport(file) {
+      const fileType = file.name.split('.').pop().toLowerCase();
+      if (!['csv', 'json', 'txt'].includes(fileType)) {
+        alert('Unsupported format. Use CSV, JSON, or TXT.');
+        return;
+      }
+
+      // Store for processing
+      sessionStorage.setItem('pendingImport', JSON.stringify({
+        fileName: file.name,
+        timestamp: new Date().toISOString()
+      }));
+
+      alert(`✅ File loaded!\n\nGoing to AFI Expenses for mapping and import...`);
+      window.location.href = 'afi.html#import-data';
+    }
+  </script>
+  <!-- Veritas AI Chat Widget -->
+  <script src="ai-chat-config.js"></script>
+  <script src="ai-chat-widget.js"></script>
+  <!-- Reconciliation Modal -->
+  <script src="reconciliation-modal.js"></script>
+  <script src="reconciliation-data-enhanced.js"></script>
+  <script>
+    function openRecon(category) {
+      const reconData = RECONCILIATION_DATA[category];
+      if (reconData) {
+        openReconciliation(reconData);
+      } else {
+        alert('No reconciliation data available for this category');
+      }
+    }
+  </script>
+</body>
+</html>

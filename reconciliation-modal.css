@@ -1,0 +1,536 @@
+/* ===== Veritas Reconciliation Modal Styles ===== */
+
+:root {
+  --recon-primary: #2e5b8a;
+  --recon-primary-dark: #1f5f9d;
+  --recon-border: #e4e8f0;
+  --recon-bg-light: #f5f7fb;
+  --recon-text: #1a2432;
+  --recon-text-light: #55637a;
+  --recon-status-doc: #10b981;
+  --recon-status-est: #f59e0b;
+  --recon-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+}
+
+/* ===== Modal Overlay ===== */
+.recon-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  padding: 20px;
+}
+
+.recon-modal-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* ===== Modal Container ===== */
+.recon-modal {
+  background: white;
+  border-radius: 12px;
+  box-shadow: var(--recon-shadow);
+  width: 100%;
+  max-width: 1000px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: recon-slide-in 0.3s ease;
+}
+
+@keyframes recon-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ===== Modal Header ===== */
+.recon-modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 24px;
+  border-bottom: 1px solid var(--recon-border);
+  background: white;
+}
+
+.recon-modal-header h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: var(--recon-text);
+}
+
+.recon-modal-close {
+  background: none;
+  border: none;
+  font-size: 28px;
+  color: var(--recon-text-light);
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+.recon-modal-close:hover {
+  color: var(--recon-text);
+  transform: scale(1.1);
+}
+
+/* ===== Modal Content ===== */
+.recon-modal-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 24px;
+  background: white;
+}
+
+/* ===== Controls ===== */
+.recon-controls {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+.recon-btn-print,
+.recon-btn-download,
+.recon-btn-close {
+  padding: 10px 16px;
+  border: 1px solid var(--recon-border);
+  background: white;
+  color: var(--recon-primary);
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.recon-btn-print:hover,
+.recon-btn-download:hover {
+  background: var(--recon-bg-light);
+  border-color: var(--recon-primary);
+}
+
+.recon-btn-download {
+  background: var(--recon-primary);
+  color: white;
+  border-color: var(--recon-primary);
+}
+
+.recon-btn-download:hover {
+  background: var(--recon-primary-dark);
+  border-color: var(--recon-primary-dark);
+}
+
+/* ===== Table Section ===== */
+.recon-table-section {
+  margin-bottom: 30px;
+}
+
+.recon-table-section h3 {
+  margin: 0 0 16px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--recon-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.recon-table-wrapper {
+  overflow-x: auto;
+  border: 1px solid var(--recon-border);
+  border-radius: 8px;
+}
+
+.recon-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.recon-table thead {
+  background: var(--recon-bg-light);
+  border-bottom: 2px solid var(--recon-border);
+}
+
+.recon-table th {
+  padding: 12px;
+  text-align: left;
+  font-weight: 600;
+  color: var(--recon-primary);
+  white-space: nowrap;
+  text-transform: uppercase;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+}
+
+.recon-table td {
+  padding: 12px;
+  border-bottom: 1px solid var(--recon-border);
+  color: var(--recon-text);
+}
+
+.recon-table tbody tr {
+  transition: all 0.2s ease;
+}
+
+.recon-table tbody tr:hover {
+  background: var(--recon-bg-light);
+}
+
+/* Status row highlighting */
+.recon-row.recon-status-est {
+  background-color: #fffbeb;
+}
+
+.recon-row.recon-status-doc {
+  background-color: #f0fdf4;
+}
+
+/* Status badges */
+.recon-status {
+  display: inline-block;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.3px;
+}
+
+.recon-status.doc {
+  background: #d1fae5;
+  color: #065f46;
+}
+
+.recon-status.est {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+/* Document links in table */
+.recon-doc-link {
+  color: var(--recon-primary);
+  text-decoration: none;
+  font-weight: 600;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.recon-doc-link:hover {
+  background: var(--recon-bg-light);
+  text-decoration: underline;
+}
+
+/* Empty state */
+.recon-empty {
+  text-align: center;
+  color: var(--recon-text-light);
+  font-style: italic;
+  padding: 40px 12px !important;
+}
+
+/* ===== Summary Section ===== */
+.recon-summary {
+  background: var(--recon-bg-light);
+  border-left: 4px solid var(--recon-primary);
+  padding: 20px;
+  border-radius: 6px;
+  margin-bottom: 30px;
+}
+
+.recon-summary h4 {
+  margin: 0 0 16px 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--recon-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.recon-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+}
+
+.recon-summary-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  background: white;
+  border-radius: 4px;
+  border: 1px solid var(--recon-border);
+}
+
+.recon-summary-label {
+  font-size: 12px;
+  color: var(--recon-text-light);
+  font-weight: 500;
+}
+
+.recon-summary-value {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--recon-primary);
+  text-align: right;
+}
+
+/* ===== Documents Section ===== */
+.recon-documents {
+  background: var(--recon-bg-light);
+  padding: 20px;
+  border-radius: 6px;
+  margin-bottom: 20px;
+}
+
+.recon-documents h4 {
+  margin: 0 0 16px 0;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--recon-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.recon-documents-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+.recon-doc-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  background: white;
+  border: 1px solid var(--recon-border);
+  border-radius: 6px;
+  text-decoration: none;
+  color: var(--recon-primary);
+  transition: all 0.2s ease;
+  font-size: 12px;
+}
+
+.recon-doc-item:hover {
+  border-color: var(--recon-primary);
+  box-shadow: 0 2px 8px rgba(46, 91, 138, 0.15);
+  transform: translateY(-2px);
+}
+
+.recon-doc-icon {
+  font-size: 16px;
+  flex-shrink: 0;
+}
+
+.recon-doc-name {
+  font-weight: 600;
+  color: var(--recon-primary);
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.recon-doc-type {
+  font-size: 10px;
+  color: var(--recon-text-light);
+  text-transform: uppercase;
+  letter-spacing: 0.2px;
+}
+
+/* ===== Modal Footer ===== */
+.recon-modal-footer {
+  padding: 16px 24px;
+  border-top: 1px solid var(--recon-border);
+  background: white;
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.recon-btn-close {
+  background: var(--recon-primary);
+  color: white;
+  border-color: var(--recon-primary);
+}
+
+.recon-btn-close:hover {
+  background: var(--recon-primary-dark);
+  border-color: var(--recon-primary-dark);
+}
+
+/* ===== Responsive Design ===== */
+@media (max-width: 768px) {
+  .recon-modal {
+    max-width: 95vw;
+    max-height: 95vh;
+  }
+
+  .recon-modal-content {
+    padding: 16px;
+  }
+
+  .recon-table-wrapper {
+    font-size: 11px;
+  }
+
+  .recon-table th,
+  .recon-table td {
+    padding: 8px;
+  }
+
+  .recon-summary-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .recon-documents-list {
+    grid-template-columns: 1fr;
+  }
+
+  .recon-controls {
+    flex-direction: column;
+  }
+
+  .recon-btn-print,
+  .recon-btn-download {
+    width: 100%;
+  }
+}
+
+/* ===== Print Styles ===== */
+@media print {
+  .recon-modal-overlay {
+    background: white;
+    position: static;
+    display: block;
+  }
+
+  .recon-modal {
+    box-shadow: none;
+    max-height: none;
+    max-width: 100%;
+    border-radius: 0;
+  }
+
+  .recon-modal-header,
+  .recon-modal-footer,
+  .recon-controls {
+    display: none;
+  }
+
+  .recon-table {
+    width: 100%;
+  }
+
+  .recon-summary-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+/* ===== Dark Mode Support ===== */
+@media (prefers-color-scheme: dark) {
+  .recon-modal-overlay {
+    background: rgba(0, 0, 0, 0.8);
+  }
+
+  .recon-modal {
+    background: #1e1e1e;
+    color: #e0e0e0;
+  }
+
+  .recon-modal-header {
+    border-bottom-color: #333;
+  }
+
+  .recon-modal-header h2 {
+    color: #e0e0e0;
+  }
+
+  .recon-modal-close {
+    color: #999;
+  }
+
+  .recon-modal-close:hover {
+    color: #e0e0e0;
+  }
+
+  .recon-table thead {
+    background: #2a2a2a;
+  }
+
+  .recon-table th {
+    color: #2e5b8a;
+    border-bottom-color: #333;
+  }
+
+  .recon-table td {
+    border-bottom-color: #333;
+    color: #ccc;
+  }
+
+  .recon-table tbody tr:hover {
+    background: #2a2a2a;
+  }
+
+  .recon-summary {
+    background: #2a2a2a;
+    border-left-color: #2e5b8a;
+  }
+
+  .recon-summary-item {
+    background: #1e1e1e;
+    border-color: #333;
+  }
+
+  .recon-documents {
+    background: #2a2a2a;
+  }
+
+  .recon-doc-item {
+    background: #1e1e1e;
+    border-color: #333;
+  }
+
+  .recon-btn-print,
+  .recon-btn-download {
+    background: #2a2a2a;
+    border-color: #333;
+    color: #2e5b8a;
+  }
+
+  .recon-btn-print:hover,
+  .recon-btn-download:hover {
+    background: #333;
+  }
+
+  .recon-modal-footer {
+    border-top-color: #333;
+  }
+}

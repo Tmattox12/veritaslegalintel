@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Export & Reports — Veritas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .export-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+    .export-card { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); border-top: 4px solid #2e5b8a; transition: all 0.3s; cursor: pointer; }
+    .export-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.12); }
+    .export-icon { font-size: 32px; margin-bottom: 12px; }
+    .export-title { font-weight: 700; color: #1c3f66; font-size: 14px; margin-bottom: 6px; }
+    .export-desc { font-size: 12px; color: #666; line-height: 1.5; }
+    .export-btn { display: inline-block; padding: 8px 14px; background: #2e5b8a; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 600; margin-top: 12px; transition: all 0.2s; }
+    .export-btn:hover { background: #1c3f66; }
+
+    .section-title { font-weight: 700; color: #1c3f66; font-size: 16px; margin: 24px 0 16px; }
+
+    .report-list { display: grid; gap: 12px; }
+    .report-item { background: white; border-radius: 6px; padding: 16px; display: grid; grid-template-columns: 1fr auto; gap: 16px; align-items: center; border: 1px solid #eee; }
+    .report-name { font-weight: 600; color: #1c3f66; font-size: 13px; }
+    .report-desc { font-size: 11px; color: #666; margin-top: 4px; }
+    .report-actions { display: flex; gap: 8px; }
+    .report-btn { padding: 6px 12px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: 600; transition: all 0.2s; }
+    .report-btn:hover { border-color: #2e5b8a; background: #f0f7ff; }
+    .report-btn.primary { background: #2e5b8a; color: white; border-color: #2e5b8a; }
+
+    .exhibit-checklist { background: white; border-radius: 8px; padding: 16px; margin-top: 12px; }
+    .checkbox-row { display: grid; grid-template-columns: auto 1fr; gap: 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid #eee; }
+    .checkbox-row:last-child { border-bottom: none; }
+    .checkbox-row input { cursor: pointer; }
+    .checkbox-label { font-size: 12px; color: #666; font-weight: 500; }
+
+    .note { font-size: 11px; color: #666; margin-top: 12px; padding: 12px; background: #f9f7f3; border-radius: 4px; line-height: 1.5; }
+  </style>
+</head>
+<body>
+  <!-- ===================== SIDEBAR ===================== -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">
+        <img src="logo-vfi.jpg" alt="VFI Logo" />
+        <span class="brand-mark-fallback">VFI</span>
+      </div>
+      <div class="brand-text">
+        <span class="brand-name">Veritas</span>
+        <span class="brand-sub">Financial Intelligence</span>
+      </div>
+    </div>
+    <nav class="nav">
+      <div class="nav-group-label">Workspace</div>
+      <a class="nav-item" href="index.html"><span class="nav-ico">◆</span> Dashboard</a>
+      <a class="nav-item" href="index.html"><span class="nav-ico">▤</span> Matters</a>
+      <div class="nav-group-label">Analysis Modules</div>
+      <a class="nav-item" href="discovery-intake.html"><span class="nav-ico">⤓</span> Discovery Intake</a>
+      <a class="nav-item" href="spousal.html"><span class="nav-ico">⚖</span> Spousal Maintenance</a>
+      <a class="nav-item" href="child-support.html"><span class="nav-ico">◈</span> Child Support</a>
+      <a class="nav-item" href="custody.html"><span class="nav-ico">⌘</span> Child Custody</a>
+      <a class="nav-item" href="schedules.html"><span class="nav-ico">◷</span> Schedules &amp; Calendar</a>
+      <a class="nav-item" href="afi.html"><span class="nav-ico">≠</span> AFI Discrepancy</a>
+      <a class="nav-item" href="forensic-tracing.html"><span class="nav-ico">⌕</span> Forensic Tracing</a>
+      <a class="nav-item" href="estate.html"><span class="nav-ico">⊟</span> Estate & Worksheets</a>
+      <a class="nav-item" href="settlement.html"><span class="nav-ico">⇄</span> Settlement Modeling</a>
+      <a class="nav-item" href="credits.html"><span class="nav-ico">⊕</span> Credits &amp; Adjustments</a>
+      <a class="nav-item" href="regulations.html"><span class="nav-ico">§</span> Regulations</a>
+    </nav>
+    <div class="sidebar-foot"><div class="plan-chip">Firm Plan · 12 seats</div></div>
+  </aside>
+
+  <!-- ===================== MAIN ===================== -->
+  <main class="main">
+    <header class="topbar">
+      <div class="matter-switcher">
+        <span class="matter-label">Active Matter</span>
+        <button class="matter-btn">
+          <strong>Ossandon v. Ossandon</strong>
+          <span class="case-no">No. D2024-1669 · Pima County, AZ</span>
+          <span class="chev">▾</span>
+        </button>
+      </div>
+      <div class="topbar-right">
+        <div class="user">
+          <div class="avatar">TH</div>
+          <div class="user-meta">
+            <span class="user-name">Workspace User</span>
+            <span class="user-role">Ossandon Matter</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="content">
+      <section class="page-head">
+        <div>
+          <h1>Export & Reports</h1>
+          <p class="sub">Generate trial exhibits, settlement packages, expert reports, and trial binders</p>
+        </div>
+      </section>
+
+      <!-- Live Data Quick Downloads -->
+      <div class="panel" style="border-left:5px solid #1c6b52;background:linear-gradient(180deg,#f3fbf7 0%,#fff 100%);margin-bottom:16px;">
+        <div class="panel-head">
+          <h3 style="color:#1c6b52;">⚡ Live Case Summary Download</h3>
+          <span class="tag" style="background:#e6f3ec;color:#1c6b52;">reads your active module sessions</span>
+        </div>
+        <p class="panel-note">These exports pull your current selections from Spousal, Child Support, Settlement, and AFI — no setup needed. Values reflect what you last worked on.</p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;">
+          <button type="button" class="btn" id="exportLiveSummaryTxt">Download summary (.txt)</button>
+          <button type="button" class="btn ghost" id="exportLiveSummaryCsv">Download summary (.csv)</button>
+          <button type="button" class="btn" id="exportReconWorkbookBtn" style="background:#1c3f66;">Download reconciliation workbook (.csv)</button>
+        </div>
+      </div>
+
+      <!-- Quick Export Templates -->
+      <h2 class="section-title">Quick Export</h2>
+      <div class="export-grid">
+        <div class="export-card" onclick="exportReport('trial-binder')">
+          <div class="export-icon">📚</div>
+          <div class="export-title">Trial Binder</div>
+          <div class="export-desc">Complete trial exhibit package with case summary, all exhibits, and index</div>
+          <button class="export-btn">Export as PDF</button>
+        </div>
+
+        <div class="export-card" onclick="exportReport('settlement-package')">
+          <div class="export-icon">⚖️</div>
+          <div class="export-title">Settlement Package</div>
+          <div class="export-desc">Offer letter, settlement analysis, and financial summary for negotiations</div>
+          <button class="export-btn">Export as DOCX</button>
+        </div>
+
+        <div class="export-card" onclick="exportReport('financial-summary')">
+          <div class="export-icon">💼</div>
+          <div class="export-title">Financial Summary</div>
+          <div class="export-desc">AFI analysis, discrepancies, and supporting calculations in presentation format</div>
+          <button class="export-btn">Export as PDF</button>
+        </div>
+
+        <div class="export-card" onclick="exportReport('expert-report')">
+          <div class="export-icon">👤</div>
+          <div class="export-title">Expert Report Draft</div>
+          <div class="export-desc">Formatted expert report template with case findings and methodology</div>
+          <button class="export-btn">Export as DOCX</button>
+        </div>
+
+        <div class="export-card" onclick="exportReport('discovery-index')">
+          <div class="export-icon">📑</div>
+          <div class="export-title">Discovery Index</div>
+          <div class="export-desc">Complete document index with bates numbering and organization by category</div>
+          <button class="export-btn">Export as XLSX</button>
+        </div>
+
+        <div class="export-card" onclick="exportReport('red-flags')">
+          <div class="export-icon">⚠️</div>
+          <div class="export-title">Red Flags Report</div>
+          <div class="export-desc">Summary of detected issues, missing documents, and litigation risks</div>
+          <button class="export-btn">Export as PDF</button>
+        </div>
+      </div>
+
+      <!-- Custom Reports -->
+      <h2 class="section-title">Custom Reports</h2>
+      <div class="panel">
+        <div class="panel-head">
+          <h3>📊 Build Custom Report</h3>
+          <span class="tag">Select sections</span>
+        </div>
+
+        <div style="margin: 16px 0;">
+          <div style="font-weight: 600; color: #1c3f66; margin-bottom: 12px; font-size: 13px;">Report Title:</div>
+          <input type="text" placeholder="e.g., Paying Spouse's Financial Position Summary" style="width: 100%; padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 12px; margin-bottom: 16px;">
+        </div>
+
+        <div style="font-weight: 600; color: #1c3f66; margin-bottom: 12px; font-size: 13px;">Sections to Include:</div>
+        <div class="exhibit-checklist">
+          <div class="checkbox-row">
+            <input type="checkbox" id="sec-exec" checked>
+            <label for="sec-exec" class="checkbox-label">Executive Summary</label>
+          </div>
+          <div class="checkbox-row">
+            <input type="checkbox" id="sec-afi" checked>
+            <label for="sec-afi" class="checkbox-label">AFI Discrepancy Analysis</label>
+          </div>
+          <div class="checkbox-row">
+            <input type="checkbox" id="sec-forensic">
+            <label for="sec-forensic" class="checkbox-label">Forensic Tracing Detail</label>
+          </div>
+          <div class="checkbox-row">
+            <input type="checkbox" id="sec-spousal">
+            <label for="sec-spousal" class="checkbox-label">Spousal Maintenance Calculation</label>
+          </div>
+          <div class="checkbox-row">
+            <input type="checkbox" id="sec-child">
+            <label for="sec-child" class="checkbox-label">Child Support Calculation</label>
+          </div>
+          <div class="checkbox-row">
+            <input type="checkbox" id="sec-estate">
+            <label for="sec-estate" class="checkbox-label">Estate & Asset Division</label>
+          </div>
+          <div class="checkbox-row">
+            <input type="checkbox" id="sec-red-flags">
+            <label for="sec-red-flags" class="checkbox-label">Red Flags & Litigation Risk</label>
+          </div>
+          <div class="checkbox-row">
+            <input type="checkbox" id="sec-settlement">
+            <label for="sec-settlement" class="checkbox-label">Settlement Modeling Scenarios</label>
+          </div>
+        </div>
+
+        <div style="display: flex; gap: 8px; margin-top: 16px;">
+          <button class="btn primary" onclick="generateCustomReport('pdf')">Generate PDF</button>
+          <button class="btn ghost" onclick="generateCustomReport('docx')">Generate Word</button>
+        </div>
+      </div>
+
+      <!-- Recent Exports -->
+      <h2 class="section-title">Recent Exports</h2>
+      <div class="report-list">
+        <div class="report-item">
+          <div>
+            <div class="report-name">Paying Spouse Financial Position Summary</div>
+            <div class="report-desc">Custom report · PDF · Generated 2026-07-15 16:42</div>
+          </div>
+          <div class="report-actions">
+            <button class="report-btn" onclick="downloadFile('Luis_Financial_Summary.pdf')">⤓ Download</button>
+            <button class="report-btn" onclick="alert('File deleted')">🗑 Delete</button>
+          </div>
+        </div>
+
+        <div class="report-item">
+          <div>
+            <div class="report-name">Settlement Position Comparison</div>
+            <div class="report-desc">Custom report · DOCX · Generated 2026-07-14 09:15</div>
+          </div>
+          <div class="report-actions">
+            <button class="report-btn" onclick="downloadFile('Settlement_Comparison.docx')">⤓ Download</button>
+            <button class="report-btn" onclick="alert('File deleted')">🗑 Delete</button>
+          </div>
+        </div>
+
+        <div class="report-item">
+          <div>
+            <div class="report-name">Trial Binder — Ossandon v. Ossandon</div>
+            <div class="report-desc">Trial Binder template · PDF · Generated 2026-07-10 14:30</div>
+          </div>
+          <div class="report-actions">
+            <button class="report-btn" onclick="downloadFile('Trial_Binder.pdf')">⤓ Download</button>
+            <button class="report-btn" onclick="alert('File deleted')">🗑 Delete</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Export Options -->
+      <h2 class="section-title">Export Options</h2>
+      <div class="panel">
+        <div class="panel-head">
+          <h3>⚙ Format & Metadata</h3>
+          <span class="tag">Customize output</span>
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 16px;">
+          <div>
+            <label style="font-size: 12px; font-weight: 600; color: #1c3f66; display: block; margin-bottom: 8px;">Include Confidentiality Notice</label>
+            <input type="checkbox" checked> <span style="font-size: 11px; color: #666;">Attorney work product, privileged & confidential</span>
+          </div>
+          <div>
+            <label style="font-size: 12px; font-weight: 600; color: #1c3f66; display: block; margin-bottom: 8px;">Include Exhibits</label>
+            <input type="checkbox" checked> <span style="font-size: 11px; color: #666;">Supporting documents & calculations</span>
+          </div>
+          <div>
+            <label style="font-size: 12px; font-weight: 600; color: #1c3f66; display: block; margin-bottom: 8px;">Blind Opponent Names</label>
+            <input type="checkbox"> <span style="font-size: 11px; color: #666;">Replace with Party A / Party B</span>
+          </div>
+          <div>
+            <label style="font-size: 12px; font-weight: 600; color: #1c3f66; display: block; margin-bottom: 8px;">Password Protect PDF</label>
+            <input type="checkbox"> <span style="font-size: 11px; color: #666;">Require password to open</span>
+          </div>
+        </div>
+      </div>
+
+      <footer class="foot">
+        <span>Veritas · Export & Reports</span>
+        <span class="foot-dim">Generate trial exhibits, settlement packages, expert reports, and discovery documents</span>
+      </footer>
+    </div>
+  </main>
+
+  <script src="api-client.js"></script>
+  <script src="case-manager.js"></script>
+  <script src="export.js"></script>
+  <script src="logo-handler.js"></script>
+</body>
+</html>
+

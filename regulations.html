@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Family Law Regulations — Veritas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .reg-hierarchy { display: grid; gap: 20px; }
+    .reg-tier { border-left: 6px solid #305496; padding: 16px; background: #f9f7f3; border-radius: 4px; }
+    .reg-tier.tier-primary { border-left-color: #1c3f66; background: #f0f7ff; }
+    .reg-tier.tier-secondary { border-left-color: #2e5b8a; background: #f5f0e8; }
+    .reg-tier.tier-tertiary { border-left-color: #7a8a9a; background: #f9f7f3; }
+    .reg-tier.tier-proposed { border-left-color: #f39c12; background: #fffaf0; }
+    .tier-label { display: inline-block; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 12px; margin-bottom: 8px; }
+    .tier-label.tier-primary { background: #1c3f66; color: #fff; }
+    .tier-label.tier-secondary { background: #2e5b8a; color: #fff; }
+    .tier-label.tier-tertiary { background: #7a8a9a; color: #fff; }
+    .tier-label.tier-proposed { background: #f39c12; color: #fff; }
+    .reg-item { margin: 12px 0; padding: 12px; background: white; border-radius: 4px; border-left: 3px solid #ddd; }
+    .reg-item:hover { border-left-color: #2e5b8a; background: #f9f7f3; }
+    .reg-statute { font-weight: 700; font-family: 'Courier New', monospace; color: #1c3f66; }
+    .reg-title { font-weight: 600; font-size: 13px; margin: 4px 0; color: #333; }
+    .reg-detail { font-size: 12px; color: #666; line-height: 1.5; margin: 6px 0; }
+    .reg-applies { display: inline-block; font-size: 10px; background: #e8f5e9; color: #2e7d32; padding: 2px 6px; border-radius: 3px; margin: 4px 0; }
+    .search-box { margin-bottom: 20px; display: flex; gap: 8px; }
+    .search-box input { flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 4px; }
+    .search-box button { padding: 10px 16px; background: #2e5b8a; color: white; border: none; border-radius: 4px; cursor: pointer; font-weight: 600; }
+    .filter-tabs { display: flex; gap: 8px; margin-bottom: 16px; flex-wrap: wrap; }
+    .filter-tabs button { padding: 6px 12px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 500; transition: all 0.2s; }
+    .filter-tabs button.active { background: #2e5b8a; color: white; border-color: #2e5b8a; }
+    .filter-tabs button:hover { border-color: #2e5b8a; }
+    .case-alert { padding: 12px; background: #fff3cd; border-left: 4px solid #f39c12; border-radius: 4px; margin-bottom: 16px; font-size: 12px; }
+    .case-alert strong { color: #856404; }
+    .reg-courtlistener { display: inline-block; margin-top: 10px; font-size: 11px; font-weight: 600; color: #2e5b8a; text-decoration: none; padding: 5px 10px; border: 1px solid #2e5b8a; border-radius: 4px; transition: all 0.15s; }
+    .reg-courtlistener:hover { background: #2e5b8a; color: #fff; }
+  </style>
+</head>
+<body>
+  <!-- ===================== SIDEBAR ===================== -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">
+        <img src="logo-vfi.jpg" alt="VFI Logo" />
+        <span class="brand-mark-fallback">VFI</span>
+      </div>
+      <div class="brand-text">
+        <span class="brand-name">Veritas</span>
+        <span class="brand-sub">Financial Intelligence</span>
+      </div>
+    </div>
+    <nav class="nav">
+      <div class="nav-group-label">Workspace</div>
+      <a class="nav-item" href="index.html"><span class="nav-ico">◆</span> Dashboard</a>
+      <a class="nav-item" href="index.html"><span class="nav-ico">▤</span> Matters</a>
+      <a class="nav-item" href="schedules.html"><span class="nav-ico">◷</span> Calendar</a>
+      <a class="nav-item" href="#"><span class="nav-ico">☑</span> Tasks</a>
+      <a class="nav-item" href="discovery-intake.html"><span class="nav-ico">▦</span> Documents</a>
+      <a class="nav-item" href="#"><span class="nav-ico">◍</span> Clients</a>
+
+      <div class="nav-group-label">Analysis Modules</div>
+      <a class="nav-item" href="income-imputation.html"><span class="nav-ico">💠</span> Income Engine</a>
+      <a class="nav-item" href="spousal.html"><span class="nav-ico">⚖</span> Support Calculator</a>
+      <a class="nav-item" href="child-support.html"><span class="nav-ico">◈</span> Child Support</a>
+      <a class="nav-item" href="equitable-distribution.html"><span class="nav-ico">⊟</span> Assets</a>
+      <a class="nav-item" data-module="discovery" href="discovery-intake.html"><span class="nav-ico">◎</span> Discovery</a>
+      <a class="nav-item" href="custody.html"><span class="nav-ico">⌘</span> Custody</a>
+      <a class="nav-item" href="afi.html"><span class="nav-ico">🧾</span> AFI Expenses</a>
+      <a class="nav-item" href="estate.html"><span class="nav-ico">▧</span> Reports</a>
+
+      <div class="nav-group-label">Tools</div>
+      <a class="nav-item" data-module="forensic" href="forensic-tracing.html"><span class="nav-ico">⌕</span> Forensic Tracing</a>
+      <a class="nav-item" href="settlement.html"><span class="nav-ico">⇄</span> Settlement Modeling</a>
+      <a class="nav-item" href="credits.html"><span class="nav-ico">⊕</span> Credits &amp; Adjustments</a>
+      <a class="nav-item active" href="regulations.html"><span class="nav-ico">⚖</span> Regulations</a>
+      <a class="nav-item" href="equitable-distribution.html"><span class="nav-ico">§</span> Prenup Module</a>
+      <a class="nav-item" href="discovery-intake.html"><span class="nav-ico">⤓</span> Document Intake</a>
+      <a class="nav-item" href="discovery-intake.html"><span class="nav-ico">◉</span> Compliance</a>
+      <a class="nav-item" href="red-flags.html"><span class="nav-ico">🚩</span> Red-Flag Detection</a>
+    </nav>
+
+    <div class="sidebar-foot">
+      <div class="plan-chip"><span style="color:var(--green)">●</span> Secure Connection · encrypted &amp; confidential</div>
+    </div>
+  </aside>
+
+  <!-- ===================== MAIN ===================== -->
+  <main class="main">
+    <header class="topbar">
+      <div class="matter-switcher">
+        <span class="matter-label">Active Matter</span>
+        <button class="matter-btn">
+          <strong>Ossandon v. Ossandon</strong>
+          <span class="case-no">Case No. D2024-1669 · Pima County, AZ</span>
+          <span class="chev">▾</span>
+        </button>
+      </div>
+      <div class="topbar-right">
+        <div class="user">
+          <div class="avatar">TH</div>
+          <div class="user-meta">
+            <span class="user-name">Workspace User</span>
+            <span class="user-role">Ossandon Matter</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="content">
+      <section class="page-head">
+        <div>
+          <h1>Family Law Regulations & Guidelines</h1>
+          <p class="sub">Arizona statutes, rules, and proposed regulations organized by authority level and relevance</p>
+        </div>
+      </section>
+
+      <!-- Case Alert -->
+      <div class="case-alert">
+        <strong>⚠ This case:</strong> Spousal maintenance threshold (§25-319), child support (§25-320 Guidelines), and disabled adult-child support (§25-320(E)) may apply. See highlighted regs below.
+      </div>
+
+      <!-- Search & Filter -->
+      <div style="padding: 16px; background: white; border-radius: 4px; margin-bottom: 20px;">
+        <div class="search-box">
+          <input type="text" id="regSearch" placeholder="Search by statute, keyword, or topic...">
+          <button onclick="filterRegulations()">Search</button>
+        </div>
+
+        <div class="filter-tabs">
+          <button class="active" onclick="filterByTier('all')">All Regulations</button>
+          <button onclick="filterByTier('primary')">Primary (Statutes)</button>
+          <button onclick="filterByTier('secondary')">Secondary (Supporting)</button>
+          <button onclick="filterByTier('proposed')">Proposed / Pending</button>
+        </div>
+      </div>
+
+      <!-- Regulations Container -->
+      <div id="regulationsContainer" class="reg-hierarchy"></div>
+
+      <footer class="foot">
+        <span>Veritas · Regulations & Guidelines</span>
+        <span class="foot-dim">Current as of 2026 · Arizona Revised Statutes (A.R.S.) · Non-binding reference only</span>
+      </footer>
+    </div>
+  </main>
+
+  <script src="regulations.js"></script>
+  <script src="logo-handler.js"></script>
+</body>
+</html>
+

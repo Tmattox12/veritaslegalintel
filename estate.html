@@ -1,0 +1,308 @@
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Estate & Worksheets — Veritas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="estate.css" />
+  <link rel="stylesheet" href="document-support.css" />
+</head>
+<body>
+  <!-- ===================== SIDEBAR ===================== -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">
+        <img src="logo-vfi.jpg" alt="VFI Logo" />
+        <span class="brand-mark-fallback">VFI</span>
+      </div>
+      <div class="brand-text">
+        <span class="brand-name">Veritas</span>
+        <span class="brand-sub">Financial Intelligence</span>
+      </div>
+    </div>
+    <nav class="nav">
+      <div class="nav-group-label">Workspace</div>
+      <a class="nav-item" href="index.html"><span class="nav-ico">◆</span> Dashboard</a>
+      <a class="nav-item" href="index.html"><span class="nav-ico">▤</span> Matters</a>
+      <a class="nav-item" href="schedules.html"><span class="nav-ico">◷</span> Calendar</a>
+      <a class="nav-item" href="#"><span class="nav-ico">☑</span> Tasks</a>
+      <a class="nav-item" href="discovery-intake.html"><span class="nav-ico">▦</span> Documents</a>
+      <a class="nav-item" href="#"><span class="nav-ico">◍</span> Clients</a>
+
+      <div class="nav-group-label">Analysis Modules</div>
+      <a class="nav-item" href="income-imputation.html"><span class="nav-ico">💠</span> Income Engine</a>
+      <a class="nav-item" href="spousal.html"><span class="nav-ico">⚖</span> Support Calculator</a>
+      <a class="nav-item" href="child-support.html"><span class="nav-ico">◈</span> Child Support</a>
+      <a class="nav-item" href="equitable-distribution.html"><span class="nav-ico">⊟</span> Assets</a>
+      <a class="nav-item" data-module="discovery" href="discovery-intake.html"><span class="nav-ico">◎</span> Discovery</a>
+      <a class="nav-item" href="custody.html"><span class="nav-ico">⌘</span> Custody</a>
+      <a class="nav-item" href="afi.html"><span class="nav-ico">🧾</span> AFI Expenses</a>
+      <a class="nav-item active" href="estate.html"><span class="nav-ico">▧</span> Reports</a>
+
+      <div class="nav-group-label">Tools</div>
+      <a class="nav-item" data-module="forensic" href="forensic-tracing.html"><span class="nav-ico">⌕</span> Forensic Tracing</a>
+      <a class="nav-item" href="settlement.html"><span class="nav-ico">⇄</span> Settlement Modeling</a>
+      <a class="nav-item" href="credits.html"><span class="nav-ico">⊕</span> Credits &amp; Adjustments</a>
+      <a class="nav-item" href="regulations.html"><span class="nav-ico">⚖</span> Regulations</a>
+      <a class="nav-item" href="equitable-distribution.html"><span class="nav-ico">§</span> Prenup Module</a>
+      <a class="nav-item" href="discovery-intake.html"><span class="nav-ico">⤓</span> Document Intake</a>
+      <a class="nav-item" href="discovery-intake.html"><span class="nav-ico">◉</span> Compliance</a>
+      <a class="nav-item" href="red-flags.html"><span class="nav-ico">🚩</span> Red-Flag Detection</a>
+    </nav>
+
+    <div class="sidebar-foot">
+      <div class="plan-chip"><span style="color:var(--green)">●</span> Secure Connection · encrypted &amp; confidential</div>
+    </div>
+  </aside>
+
+  <!-- ===================== MAIN ===================== -->
+  <main class="main">
+    <header class="topbar">
+      <div class="matter-switcher">
+        <span class="matter-label">Active Matter</span>
+        <button class="matter-btn">
+          <strong>Matter v. Case</strong>
+          <span class="case-no">No. [Case Number] · [Jurisdiction]</span>
+          <span class="chev">▾</span>
+        </button>
+      </div>
+      <div class="topbar-right">
+        <div class="user">
+          <div class="avatar">TH</div>
+          <div class="user-meta">
+            <span class="user-name">Workspace User</span>
+            <span class="user-role">Ossandon Matter</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="content">
+      <section class="page-head">
+        <div>
+          <h1>Estate &amp; Worksheets</h1>
+          <p class="sub">Date-of-service inventory (<strong>06/23/2024</strong>) · AZ guideline worksheets · document comparison</p>
+        </div>
+        <div class="head-actions">
+          <button class="btn ghost" id="printBtn">Export packet</button>
+        </div>
+      </section>
+
+      <!-- KPI strip -->
+      <section class="kpi-row" id="estKpis"></section>
+
+      <!-- Tabs -->
+      <nav class="est-tabs" id="estTabs">
+        <button class="est-tab active" data-tab="inventory">Date-of-Service Inventory</button>
+        <button class="est-tab" data-tab="worksheets">AZ Worksheets &amp; Comparison</button>
+        <button class="est-tab" data-tab="upload">Upload &amp; Compare</button>
+      </nav>
+
+      <!-- ============ TAB: INVENTORY ============ -->
+      <section class="est-panel active" id="tab-inventory">
+        <div class="inv-exportbar" style="display:flex;align-items:center;gap:10px;margin:0 0 14px;flex-wrap:wrap">
+          <span style="font-size:12.5px;color:#5b6472"><strong>Save the key inventory schedules:</strong></span>
+          <button class="btn ghost sm" id="invWordBtn">⤓ Word (.docx)</button>
+          <button class="btn ghost sm" id="invPdfBtn">⎙ PDF</button>
+          <span style="font-size:11.5px;color:#8a8f98">Rule 49 schedule · Marital estate · Supported Spouse disclosed · Supported Spouse DOS estimate · Paying Spouse liabilities</span>
+        </div>
+        <div class="est-grid">
+          <div class="est-col-main">
+            <div class="panel">
+              <div class="panel-head">
+                <h3>▤ Arizona Rule 49(f) Inventory — Summary Schedule</h3>
+                <span class="tag">Court-form format</span>
+              </div>
+              <p class="panel-note">The marital estate re-expressed in the mandatory <strong>Arizona Inventory of Property and Debts</strong> layout — <em>Description · Date Acquired · Value at Date of Service · Current Value · Contested Position [CP or SP] · Proposed Allocation</em>. Values are our recommended figures under §25-211 / §25-318.</p>
+              <div id="azSchedule"></div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-head">
+                <h3>★ Recommended Valuations (AZ Law) &amp; Source Comparison</h3>
+                <span class="tag">§25-211 · §25-318 · Nelson · Koelsch</span>
+              </div>
+              <p class="panel-note">The figure to <strong>use</strong> for each contested asset under Arizona law — character fixed at service (§25-211), community share valued to division with passive growth, post-DOS contributions/effort carved out as separate (§25-213) — with every source number compared to ours.</p>
+              <div id="assetVal"></div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-head">
+                <h3>⊟ Marital Estate — Liquid Assets at Date of Service</h3>
+                <span class="tag">06/23/2024</span>
+              </div>
+              <p class="panel-note">Per expert findings, from the case Inventory of Property and Debts and supporting statements. Community character fixed at service — <strong>A.R.S. §25-211</strong>.</p>
+              <table class="est-table" id="maritalAssets"></table>
+              <div id="capMarital"></div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-head">
+                <h3>⊟ Supported Spouse — Disclosed Liquid Assets</h3>
+                <span class="tag amber-tag">11/2025 · ~17 mo post-service · NOT DOS</span>
+              </div>
+              <p class="panel-note"><strong>These are end-November 2025 balances</strong> (the checking row is the 11/01/2025 opening) from Wife's April 2026 Rule 49 disclosure — roughly <strong>17 months after the 06/23/2024 date of service</strong>, not DOS figures. Wife produced <strong>no 06/23/2024 statements</strong>, so DOS positions are reconstructed in the panel below. Shown here for §25-319(A) "sufficient property" &amp; §25-319(B) income from property. <em>The BeachFleischman schedule does not value these personal accounts — its June-2024 schedule is the marital estate only.</em></p>
+              <table class="est-table" id="coniAssets"></table>
+              <div id="capConiDisc"></div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-head">
+                <h3>⊟ Supported Spouse — Estimated Balances at Date of Service</h3>
+                <span class="tag amber-tag">Reconstructed</span>
+              </div>
+              <p class="panel-note">Wife did <strong>not</strong> produce 06/23/2024 statements. These are our back-cast positions from the figures she did disclose — a provable floor, a working estimate, and an adverse-inference ceiling (<strong>Rule 49 · Rule 65</strong>).</p>
+              <div id="coniDosEst"></div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-head">
+                <h3>⊟ Luis — Liabilities at Date of Service</h3>
+                <span class="tag">Inventory §N · itemized</span>
+              </div>
+              <div id="luisLiab"></div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-head">
+                <h3>⊟ Supported Spouse — Liabilities at Date of Service</h3>
+                <span class="tag">Inventory §N · itemized</span>
+              </div>
+              <div id="coniLiab"></div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-head">
+                <h3>⊟ Household &amp; Personal Property</h3>
+                <span class="tag">Joint inventory · furniture &amp; household goods</span>
+              </div>
+              <div id="hhInv"></div>
+            </div>
+          </div>
+
+          <div class="est-col-rail">
+            <div class="panel spend-panel">
+              <div class="panel-head"><h3>◐ Spend-Down Analysis</h3></div>
+              <p class="panel-note">BeachFleischman "corpus + interest" spend-down of Coni's 50% share ($878,660.95), to age 100, net of 25% tax.</p>
+              <div id="spendDown"></div>
+            </div>
+            <div class="panel">
+              <div class="panel-head"><h3>⚑ Estate Flags</h3></div>
+              <ul class="flag-list" id="estFlags"></ul>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel purpose-panel">
+          <div class="panel-head">
+            <h3>◎ Why this balance sheet — the two purposes</h3>
+            <span class="tag">§25-318 · §25-319(B)</span>
+          </div>
+          <div id="dosPurpose" class="purpose-grid"></div>
+          <div id="equalization"></div>
+          <div id="purposeAsk"></div>
+        </div>
+
+        <div class="panel authority-panel">
+          <div class="panel-head">
+            <h3>§ Governing Authority — Arizona</h3>
+            <span class="tag">Assets · Liabilities · Non-production</span>
+          </div>
+          <p class="panel-note">The statutes and rules that govern how this estate is characterized, valued, and divided — and what happens when the other side does not produce balances for the correct date.</p>
+          <ul class="authority-list" id="azAuthority"></ul>
+        </div>
+
+        <div class="panel todo-panel">
+          <div class="panel-head">
+            <h3>☑ Open items &amp; discovery to-do</h3>
+            <span class="tag">Rule 49 · trial prep</span>
+          </div>
+          <p class="panel-note">Everything still outstanding to lock the date-of-service estate and the equalization math. Click an item to mark it done.</p>
+          <div id="todoList"></div>
+          <div id="todoAsk"></div>
+        </div>
+      </section>
+
+      <!-- ============ TAB: WORKSHEETS ============ -->
+      <section class="est-panel" id="tab-worksheets">
+        <div class="cmp-switch">
+          <button class="cmp-btn active" data-cmp="spousal">Spousal Maintenance</button>
+          <button class="cmp-btn" data-cmp="childsupport">Child Support</button>
+        </div>
+        <div id="cmpBody"></div>
+      </section>
+
+      <!-- ============ TAB: UPLOAD ============ -->
+      <section class="est-panel" id="tab-upload">
+        <div class="panel" id="masterReconPanel">
+          <div class="panel-head">
+            <h3>⚖ Master Reconciliation — every figure, ours vs. hers</h3>
+            <span class="tag">Printable · all sections</span>
+          </div>
+          <p class="panel-note">One consolidated view of every reconciled line across the estate — our recommended figure against Wife's disclosed number, with each variance quantified. Use <strong>Print</strong> to hand this to counsel.</p>
+          <div id="masterRecon"></div>
+        </div>
+        <div class="panel" id="owesLuisPanel">
+          <div class="panel-head">
+            <h3>↩ What Supported Spouse owes to Paying Spouse</h3>
+            <span class="tag">Printable · ours vs. her Inventory §L/M</span>
+          </div>
+          <p class="panel-note">Every dollar the paying spouse is owed back from the supported spouse — reimbursements (house-sale prep, auto & health premiums, the children's costs), the spousal overpayments, and the §25-324 fee claim. The supported figure sits beside the other party's Inventory §L/§M line — most of which was left "TBD."</p>
+          <div id="owesLuis"></div>
+        </div>
+        <div class="panel" id="currentValuePanel">
+          <div class="panel-head">
+            <h3>⧗ Current-Value comparison — our figures vs. her Inventory's "Current Value" box</h3>
+            <span class="tag">every line · both sides</span>
+          </div>
+          <p class="panel-note">Her Inventory of Property &amp; Debts carries a later-dated <strong>Current Value</strong> for most items. This lines up our most recent figure against hers — matches, variances, and anything one side left blank — so post-service movement (spend-downs, run-ups, unexplained jumps) is visible.</p>
+          <div id="currentValueRecon"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h3>⇪ Upload a document to compare against our numbers</h3></div>
+          <p class="panel-note">Drop an opposing worksheet, disclosure, or expert exhibit. Veritas extracts the figures and lines them up against your selected support so every variance is visible and sourced.</p>
+          <div class="dropzone" id="dropzone">
+            <input type="file" id="fileInput" accept=".pdf,.xlsx,.csv,.docx,.png,.jpg" hidden />
+            <div class="dz-inner">
+              <div class="dz-ico">⇪</div>
+              <p class="dz-title">Drag a file here or <button class="dz-browse" id="browseBtn">browse</button></p>
+              <p class="dz-sub">PDF · XLSX · CSV · DOCX · image — analyzed against your case support</p>
+            </div>
+          </div>
+          <div id="uploadQueue" class="upload-queue"></div>
+        </div>
+        <div class="panel">
+          <div class="panel-head"><h3>Already analyzed &amp; compared</h3></div>
+          <ul class="analyzed-list" id="analyzedList"></ul>
+        </div>
+      </section>
+
+      <div class="foot">
+        <span>Veritas — Family Law Financial Intelligence</span>
+        <span class="foot-dim">Figures traced to record.</span>
+      </div>
+      <div style="text-align:center;font-size:10.5px;font-weight:700;letter-spacing:.5px;color:#8a6d3b;background:#fbf6e9;border-top:1px solid #e6d9b8;padding:8px 10px;text-transform:uppercase">Attorney-Client Privileged · Attorney Work Product · Confidential</div>
+    </div>
+  </main>
+
+  <script src="api-client.js"></script>
+  <script src="case-manager.js"></script>
+  <script src="vendor/pdfjs/pdf.min.js"></script>
+  <script src="api-client.js"></script>
+  <script src="case-manager.js"></script>
+  <script src="safe-text.js"></script>
+  <script src="docexport.js"></script>
+  <script src="api-client.js"></script>
+  <script src="case-manager.js"></script>
+  <script src="estate.js"></script>
+  <script src="api-client.js"></script>
+  <script src="case-manager.js"></script>
+  <script src="owes.js"></script>
+  <script src="logo-handler.js"></script>
+</body>
+</html>
+run
+

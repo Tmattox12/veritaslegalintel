@@ -1,0 +1,656 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reset Test Data - Veritas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="ai-chat-widget.css" />
+  <style>
+    .reset-container {
+      max-width: 800px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+
+    .reset-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .reset-title {
+      font-size: 28px;
+      font-weight: 700;
+      color: #2e5b8a;
+      margin-bottom: 8px;
+    }
+
+    .reset-subtitle {
+      font-size: 14px;
+      color: #666;
+    }
+
+    .reset-card {
+      background: white;
+      border-radius: 8px;
+      padding: 30px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      border: 1px solid #e5e0d5;
+      margin-bottom: 24px;
+    }
+
+    .reset-section-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #e5e0d5;
+    }
+
+    .data-summary {
+      background: #f9f9f9;
+      border-radius: 6px;
+      padding: 20px;
+      margin-bottom: 20px;
+    }
+
+    .data-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 0;
+      border-bottom: 1px solid #e5e5e5;
+    }
+
+    .data-item:last-child {
+      border-bottom: none;
+    }
+
+    .data-label {
+      font-size: 13px;
+      color: #666;
+      font-weight: 500;
+    }
+
+    .data-value {
+      font-size: 13px;
+      color: #2e5b8a;
+      font-weight: 600;
+      background: #e8f3ff;
+      padding: 4px 12px;
+      border-radius: 12px;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 12px;
+      margin-top: 20px;
+    }
+
+    .btn-primary {
+      flex: 1;
+      padding: 12px 20px;
+      background: #2e5b8a;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-primary:hover {
+      background: #1f5f9d;
+    }
+
+    .btn-secondary {
+      flex: 1;
+      padding: 12px 20px;
+      background: white;
+      color: #2e5b8a;
+      border: 1px solid #2e5b8a;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-secondary:hover {
+      background: #f5f5f5;
+    }
+
+    .btn-danger {
+      flex: 1;
+      padding: 12px 20px;
+      background: #d32f2f;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-danger:hover {
+      background: #b71c1c;
+    }
+
+    .warning-box {
+      background: #fff3cd;
+      border-left: 4px solid #ffc107;
+      padding: 16px;
+      border-radius: 4px;
+      margin-bottom: 20px;
+      font-size: 13px;
+      color: #856404;
+    }
+
+    .success-message {
+      background: #d4edda;
+      border-left: 4px solid #28a745;
+      padding: 16px;
+      border-radius: 4px;
+      margin-bottom: 20px;
+      font-size: 13px;
+      color: #155724;
+      display: none;
+    }
+
+    .success-message.show {
+      display: block;
+      animation: slideIn 0.3s ease-out;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .info-text {
+      font-size: 12px;
+      color: #999;
+      margin-top: 12px;
+      line-height: 1.6;
+    }
+
+    .category-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .category-item {
+      background: #f5f5f5;
+      padding: 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      color: #666;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .category-item::before {
+      content: "•";
+      color: #2e5b8a;
+      font-weight: bold;
+    }
+
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal-overlay.show {
+      display: flex;
+    }
+
+    .modal-box {
+      background: white;
+      border-radius: 8px;
+      padding: 30px;
+      max-width: 500px;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+    }
+
+    .modal-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 12px;
+    }
+
+    .modal-message {
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 24px;
+      line-height: 1.6;
+    }
+
+    .modal-buttons {
+      display: flex;
+      gap: 12px;
+    }
+
+    .modal-buttons button {
+      flex: 1;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .modal-btn-cancel {
+      background: #f0f0f0;
+      color: #333;
+    }
+
+    .modal-btn-cancel:hover {
+      background: #e0e0e0;
+    }
+
+    .modal-btn-confirm {
+      background: #d32f2f;
+      color: white;
+    }
+
+    .modal-btn-confirm:hover {
+      background: #b71c1c;
+    }
+  </style>
+</head>
+<body>
+  <!-- ===================== SIDEBAR ===================== -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">
+        <img src="logo-vfi.jpg" alt="VFI Logo" />
+        <span class="brand-mark-fallback">VFI</span>
+      </div>
+      <div class="brand-text">
+        <span class="brand-name">Veritas</span>
+        <span class="brand-sub">Financial Intelligence</span>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <div class="nav-group-label">Tools</div>
+      <a class="nav-item" href="index.html"><span class="nav-ico">◆</span> Dashboard</a>
+      <a class="nav-item" href="document-hub-master.html"><span class="nav-ico">📁</span> Document Hub</a>
+      <a class="nav-item active" href="reset-data.html"><span class="nav-ico">🔄</span> Reset Data</a>
+    </nav>
+
+    <div class="sidebar-foot">
+      <div class="plan-chip"><span style="color:var(--green)">●</span> Test Utility</div>
+    </div>
+  </aside>
+
+  <!-- ===================== MAIN ===================== -->
+  <main class="main">
+    <div class="reset-container">
+      <!-- Header -->
+      <div class="reset-header">
+        <div class="reset-title">🔄 Reset Test Data</div>
+        <div class="reset-subtitle">Clear all Document Hub data and start fresh for testing</div>
+      </div>
+
+      <!-- Current Data Status -->
+      <div class="reset-card">
+        <div class="reset-section-title">Current Data Status</div>
+
+        <div class="data-summary" id="dataSummary">
+          <div class="data-item">
+            <span class="data-label">Total Documents</span>
+            <span class="data-value" id="totalDocsCount">0</span>
+          </div>
+          <div class="data-item">
+            <span class="data-label">Total Items Extracted</span>
+            <span class="data-value" id="totalItemsCount">0</span>
+          </div>
+          <div class="data-item">
+            <span class="data-label">Categories with Data</span>
+            <span class="data-value" id="categoriesCount">0</span>
+          </div>
+          <div class="data-item">
+            <span class="data-label">Last Updated</span>
+            <span class="data-value" id="lastUpdated">Never</span>
+          </div>
+        </div>
+
+        <div class="reset-section-title" style="margin-top: 24px;">Categories</div>
+        <div class="category-list" id="categoryList">
+          <div class="category-item">Expenses</div>
+          <div class="category-item">Income</div>
+          <div class="category-item">Assets</div>
+          <div class="category-item">Liabilities</div>
+          <div class="category-item">Investments</div>
+          <div class="category-item">Retirement</div>
+          <div class="category-item">Real Estate</div>
+          <div class="category-item">Business</div>
+          <div class="category-item">Tax</div>
+          <div class="category-item">Legal</div>
+        </div>
+      </div>
+
+      <!-- Reset Options -->
+      <div class="reset-card">
+        <div class="reset-section-title">Reset Options</div>
+
+        <div class="warning-box">
+          ⚠️ <strong>Warning:</strong> Resetting data is irreversible. Make sure you have backed up any important information before proceeding.
+        </div>
+
+        <div class="success-message" id="successMessage">
+          ✅ Data successfully cleared! All documents and extracted items have been removed. You can now start fresh with testing.
+        </div>
+
+        <!-- Option 1: Reset All Data -->
+        <div style="margin-bottom: 24px;">
+          <h3 style="font-size: 14px; font-weight: 600; color: #333; margin-bottom: 8px;">Reset All Data</h3>
+          <p class="info-text">Clears all documents, items, and mappings from all 10 categories. Recommended for fresh testing.</p>
+          <div class="action-buttons">
+            <button class="btn-danger" onclick="confirmResetAll()">Clear All Data</button>
+            <button class="btn-secondary" onclick="location.href='document-hub-master.html'">Cancel</button>
+          </div>
+        </div>
+
+        <!-- Option 2: Reset Specific Category -->
+        <div style="margin-bottom: 24px;">
+          <h3 style="font-size: 14px; font-weight: 600; color: #333; margin-bottom: 8px;">Reset Specific Category</h3>
+          <p class="info-text">Clear data from a single category only.</p>
+          <select id="categorySelect" style="width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 6px; font-size: 13px; margin-bottom: 12px;">
+            <option value="">-- Select Category --</option>
+            <option value="hub_expenses">Expenses</option>
+            <option value="hub_income">Income</option>
+            <option value="hub_assets">Assets</option>
+            <option value="hub_liabilities">Liabilities</option>
+            <option value="hub_investments">Investments</option>
+            <option value="hub_retirement">Retirement</option>
+            <option value="hub_realestate">Real Estate</option>
+            <option value="hub_business">Business</option>
+            <option value="hub_tax">Tax</option>
+            <option value="hub_legal">Legal</option>
+          </select>
+          <div class="action-buttons">
+            <button class="btn-primary" onclick="resetCategory()" style="background: #ff9800;">Clear Selected</button>
+            <button class="btn-secondary" onclick="document.getElementById('categorySelect').value = ''">Clear Selection</button>
+          </div>
+        </div>
+
+        <!-- Option 3: Export Data Before Reset -->
+        <div>
+          <h3 style="font-size: 14px; font-weight: 600; color: #333; margin-bottom: 8px;">Export Data First</h3>
+          <p class="info-text">Download all current data as JSON before resetting. Useful for backup or analysis.</p>
+          <div class="action-buttons">
+            <button class="btn-primary" onclick="exportData()" style="background: #4CAF50;">Export as JSON</button>
+            <button class="btn-secondary" onclick="exportSummary()" style="border-color: #4CAF50; color: #4CAF50;">Export Summary</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Help Section -->
+      <div class="reset-card">
+        <div class="reset-section-title">Help & Information</div>
+
+        <div style="font-size: 13px; line-height: 1.8; color: #666;">
+          <p><strong>What gets cleared?</strong></p>
+          <ul style="margin: 8px 0 16px 20px;">
+            <li>All uploaded documents</li>
+            <li>All extracted items and transactions</li>
+            <li>All categorization mappings</li>
+            <li>Document statistics and counts</li>
+            <li>Recent uploads list</li>
+          </ul>
+
+          <p><strong>What doesn't get cleared?</strong></p>
+          <ul style="margin: 8px 0 16px 20px;">
+            <li>Application settings and preferences</li>
+            <li>User interface configuration</li>
+            <li>Sidebar state</li>
+          </ul>
+
+          <p><strong>When should I reset?</strong></p>
+          <ul style="margin: 8px 0 16px 20px;">
+            <li>Before starting a new test cycle</li>
+            <li>When testing with new sample data</li>
+            <li>After completing a case review</li>
+            <li>To verify fresh upload functionality</li>
+          </ul>
+
+          <p style="margin-top: 16px; padding-top: 16px; border-top: 1px solid #e5e5e5;">
+            <strong>💡 Tip:</strong> Use "Export Data First" to save your current data before resetting, then you can reload it later if needed.
+          </p>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div style="text-align: center; padding: 20px 0; color: #999; font-size: 12px;">
+        Veritas Test Utility · Reset Data Tool v1.0
+      </div>
+    </div>
+  </main>
+
+  <!-- Confirmation Modal -->
+  <div class="modal-overlay" id="confirmModal">
+    <div class="modal-box">
+      <div class="modal-title">⚠️ Confirm Reset</div>
+      <div class="modal-message" id="confirmMessage">
+        Are you sure you want to clear all data? This action cannot be undone.
+      </div>
+      <div class="modal-buttons">
+        <button class="modal-btn-cancel" onclick="cancelReset()">Cancel</button>
+        <button class="modal-btn-confirm" onclick="performReset()">Clear Data</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Veritas AI Chat Widget -->
+  <script src="ai-chat-config.js"></script>
+  <script src="ai-chat-widget.js"></script>
+  <script src="logo-handler.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      updateDataSummary();
+    });
+
+    function updateDataSummary() {
+      let totalDocs = 0;
+      let totalItems = 0;
+      let categoriesWithData = 0;
+
+      const categories = [
+        'hub_expenses', 'hub_income', 'hub_assets', 'hub_liabilities',
+        'hub_investments', 'hub_retirement', 'hub_realestate', 'hub_business',
+        'hub_tax', 'hub_legal'
+      ];
+
+      categories.forEach(cat => {
+        const data = localStorage.getItem(cat);
+        if (data) {
+          try {
+            const parsed = JSON.parse(data);
+            if (Array.isArray(parsed)) {
+              totalDocs += parsed.length;
+              totalItems += parsed.length;
+              categoriesWithData++;
+            }
+          } catch (e) {}
+        }
+      });
+
+      const unmapped = localStorage.getItem('unmapped_expense_items');
+      const mapped = localStorage.getItem('reconciliation_imports');
+
+      if (unmapped) {
+        try {
+          totalItems += JSON.parse(unmapped).length;
+        } catch (e) {}
+      }
+      if (mapped) {
+        try {
+          totalItems += JSON.parse(mapped).length;
+        } catch (e) {}
+      }
+
+      document.getElementById('totalDocsCount').textContent = totalDocs;
+      document.getElementById('totalItemsCount').textContent = totalItems;
+      document.getElementById('categoriesCount').textContent = categoriesWithData + '/10';
+      document.getElementById('lastUpdated').textContent = localStorage.getItem('lastDataUpdate') || 'Never';
+    }
+
+    let resetMode = 'all';
+    let resetTarget = '';
+
+    function confirmResetAll() {
+      resetMode = 'all';
+      document.getElementById('confirmMessage').textContent =
+        'This will clear all documents, items, and mappings from all 10 categories. This action cannot be undone.';
+      document.getElementById('confirmModal').classList.add('show');
+    }
+
+    function resetCategory() {
+      const selected = document.getElementById('categorySelect').value;
+      if (!selected) {
+        alert('Please select a category first');
+        return;
+      }
+      resetMode = 'category';
+      resetTarget = selected;
+      const categoryName = document.getElementById('categorySelect').options[document.getElementById('categorySelect').selectedIndex].text;
+      document.getElementById('confirmMessage').textContent =
+        `This will clear all data from the "${categoryName}" category. This action cannot be undone.`;
+      document.getElementById('confirmModal').classList.add('show');
+    }
+
+    function cancelReset() {
+      document.getElementById('confirmModal').classList.remove('show');
+    }
+
+    function performReset() {
+      if (resetMode === 'all') {
+        const categories = [
+          'hub_expenses', 'hub_income', 'hub_assets', 'hub_liabilities',
+          'hub_investments', 'hub_retirement', 'hub_realestate', 'hub_business',
+          'hub_tax', 'hub_legal'
+        ];
+
+        categories.forEach(cat => {
+          localStorage.removeItem(cat);
+          localStorage.removeItem(cat + '_items');
+        });
+
+        localStorage.removeItem('unmapped_expense_items');
+        localStorage.removeItem('reconciliation_imports');
+        localStorage.removeItem('afv_case_data');
+
+      } else if (resetMode === 'category') {
+        localStorage.removeItem(resetTarget);
+      }
+
+      document.getElementById('confirmModal').classList.remove('show');
+      document.getElementById('successMessage').classList.add('show');
+      updateDataSummary();
+      document.getElementById('categorySelect').value = '';
+
+      setTimeout(() => {
+        location.href = 'document-hub-master.html';
+      }, 2000);
+    }
+
+    function exportData() {
+      const allData = {};
+      const categories = [
+        'hub_expenses', 'hub_income', 'hub_assets', 'hub_liabilities',
+        'hub_investments', 'hub_retirement', 'hub_realestate', 'hub_business',
+        'hub_tax', 'hub_legal'
+      ];
+
+      categories.forEach(cat => {
+        const data = localStorage.getItem(cat);
+        if (data) {
+          allData[cat] = JSON.parse(data);
+        }
+      });
+
+      const blob = new Blob([JSON.stringify(allData, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `veritas-backup-${new Date().toISOString().split('T')[0]}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+
+    function exportSummary() {
+      const summary = {
+        exportDate: new Date().toISOString(),
+        categories: {}
+      };
+
+      const categories = [
+        { key: 'hub_expenses', name: 'Expenses' },
+        { key: 'hub_income', name: 'Income' },
+        { key: 'hub_assets', name: 'Assets' },
+        { key: 'hub_liabilities', name: 'Liabilities' },
+        { key: 'hub_investments', name: 'Investments' },
+        { key: 'hub_retirement', name: 'Retirement' },
+        { key: 'hub_realestate', name: 'Real Estate' },
+        { key: 'hub_business', name: 'Business' },
+        { key: 'hub_tax', name: 'Tax' },
+        { key: 'hub_legal', name: 'Legal' }
+      ];
+
+      categories.forEach(cat => {
+        const data = localStorage.getItem(cat.key);
+        if (data) {
+          try {
+            const parsed = JSON.parse(data);
+            summary.categories[cat.name] = {
+              documentCount: Array.isArray(parsed) ? parsed.length : 0,
+              hasData: true
+            };
+          } catch (e) {
+            summary.categories[cat.name] = { documentCount: 0, hasData: false };
+          }
+        } else {
+          summary.categories[cat.name] = { documentCount: 0, hasData: false };
+        }
+      });
+
+      const blob = new Blob([JSON.stringify(summary, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `veritas-summary-${new Date().toISOString().split('T')[0]}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+  </script>
+</body>
+</html>

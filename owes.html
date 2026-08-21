@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Owes-To Analysis — Veritas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .owes-container { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+    @media (max-width: 1200px) { .owes-container { grid-template-columns: 1fr; } }
+
+    .owes-card { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    .owes-card.petitioner { border-left: 4px solid #2e5b8a; }
+    .owes-card.respondent { border-left: 4px solid #d4a574; }
+    .owes-card h3 { margin: 0 0 16px; font-size: 16px; color: #1c3f66; }
+
+    .owes-item { margin-bottom: 16px; padding-bottom: 16px; border-bottom: 1px solid #eee; }
+    .owes-item:last-child { border-bottom: none; margin-bottom: 0; }
+    .item-header { display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center; margin-bottom: 8px; }
+    .item-label { font-size: 13px; font-weight: 600; color: #1c3f66; }
+    .item-amount { font-size: 14px; font-weight: 600; color: #2e5b8a; text-align: right; }
+
+    .item-details { font-size: 12px; color: #666; margin-top: 8px; padding: 8px; background: #f9f9f9; border-radius: 4px; }
+    .detail-row { display: grid; grid-template-columns: 1fr auto; gap: 12px; margin-bottom: 4px; }
+    .detail-row:last-child { margin-bottom: 0; }
+
+    .form-group { margin-bottom: 16px; }
+    .form-group label { display: block; font-size: 12px; font-weight: 600; color: #1c3f66; margin-bottom: 6px; }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%;
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 13px;
+      font-family: inherit;
+    }
+    .form-group textarea { resize: vertical; min-height: 60px; }
+
+    .button-group { display: flex; gap: 8px; margin-top: 16px; }
+    .btn { padding: 8px 16px; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 600; transition: all 0.2s; }
+    .btn-primary { background: #2e5b8a; color: white; }
+    .btn-primary:hover { background: #1c3f66; }
+    .btn-secondary { background: #f0f0f0; color: #1c3f66; }
+    .btn-secondary:hover { background: #e0e0e0; }
+
+    .summary-section { background: #f9f7f3; border-radius: 8px; padding: 20px; margin-top: 20px; }
+    .summary-section h3 { margin: 0 0 16px; font-size: 16px; color: #1c3f66; }
+    .summary-row { display: grid; grid-template-columns: 1fr auto; gap: 12px; margin-bottom: 12px; font-size: 13px; }
+    .summary-row:last-child { margin-bottom: 0; }
+    .summary-label { color: #666; font-weight: 500; }
+    .summary-value { color: #1c3f66; font-weight: 600; text-align: right; }
+
+    .doc-link { cursor: pointer; color: #2e5b8a; text-decoration: underline; font-weight: 500; }
+    .doc-link:hover { text-decoration-line: underline; }
+  </style>
+</head>
+<body>
+  <!-- ===================== SIDEBAR ===================== -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">
+        <img src="logo-vfi.jpg" alt="VFI Logo" />
+        <span class="brand-mark-fallback">VFI</span>
+      </div>
+      <div class="brand-text">
+        <span class="brand-name">Veritas</span>
+        <span class="brand-sub">Financial Intelligence</span>
+      </div>
+    </div>
+    <nav class="nav">
+      <div class="nav-group-label">Workspace</div>
+      <a class="nav-item" href="dashboard.html"><span class="nav-ico">◆</span> Dashboard</a>
+      <a class="nav-item" href="cases.html"><span class="nav-ico">▤</span> Cases</a>
+      <div class="nav-group-label">Analysis Modules</div>
+      <a class="nav-item" href="discovery-intake.html"><span class="nav-ico">▤</span> Discovery Intake</a>
+      <a class="nav-item" href="spousal.html"><span class="nav-ico">⚖</span> Spousal Maintenance</a>
+      <a class="nav-item" href="child-support.html"><span class="nav-ico">■</span> Child Support</a>
+      <a class="nav-item" href="custody.html"><span class="nav-ico">⌘</span> Child Custody</a>
+      <a class="nav-item" href="schedules.html"><span class="nav-ico">◷</span> Schedules &amp; Calendar</a>
+      <a class="nav-item" href="afi.html"><span class="nav-ico">≠</span> AFI Discrepancy</a>
+      <a class="nav-item" href="forensic-tracing.html"><span class="nav-ico">⌕</span> Forensic Tracing</a>
+      <a class="nav-item" href="equitable-distribution.html"><span class="nav-ico">⊟</span> Equitable Distribution</a>
+      <a class="nav-item" href="income-imputation.html"><span class="nav-ico">💼</span> Income Imputation</a>
+      <a class="nav-item" href="estate.html"><span class="nav-ico">⊞</span> Estate Analysis</a>
+      <a class="nav-item active" href="owes.html"><span class="nav-ico">📝</span> Owes-To Analysis</a>
+      <a class="nav-item" href="settlement.html"><span class="nav-ico">⇄</span> Settlement Modeling</a>
+      <a class="nav-item" href="credits.html"><span class="nav-ico">⊕</span> Credits &amp; Adjustments</a>
+      <a class="nav-item" href="red-flags.html"><span class="nav-ico">🚩</span> Red-Flag Detection</a>
+      <a class="nav-item" href="export.html"><span class="nav-ico">📄</span> Export & Reports</a>
+    </nav>
+    <div class="sidebar-foot"><div class="plan-chip">Firm Plan · 12 seats</div></div>
+  </aside>
+
+  <!-- ===================== MAIN CONTENT ===================== -->
+  <main class="main-content">
+    <div class="header">
+      <h1>Owes-To Analysis</h1>
+      <p>Track money owed to and from third parties</p>
+    </div>
+
+    <div class="content">
+      <!-- ===== PETITIONER OWES-TO SECTION ===== -->
+      <div class="owes-container">
+        <div class="owes-card petitioner">
+          <h3>Petitioner Owes To</h3>
+          <div id="petitionerOwesList"></div>
+
+          <div style="border-top: 2px solid #eee; padding-top: 16px; margin-top: 16px;">
+            <h4 style="margin: 0 0 12px; font-size: 13px; color: #1c3f66;">Add New Obligation</h4>
+
+            <div class="form-group">
+              <label>Creditor / Party Name</label>
+              <input type="text" id="petitionerCreditor" placeholder="Name of creditor or party" />
+            </div>
+
+            <div class="form-group">
+              <label>Amount Owed</label>
+              <input type="number" id="petitionerAmount" placeholder="0.00" step="0.01" />
+            </div>
+
+            <div class="form-group">
+              <label>Nature of Debt</label>
+              <select id="petitionerDebtType">
+                <option value="">Select Type...</option>
+                <option value="personal-loan">Personal Loan</option>
+                <option value="family-loan">Family Loan</option>
+                <option value="credit-card">Credit Card</option>
+                <option value="vehicle-loan">Vehicle Loan</option>
+                <option value="student-loan">Student Loan</option>
+                <option value="business-debt">Business Debt</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Notes</label>
+              <textarea id="petitionerDebtNotes" placeholder="Additional details..."></textarea>
+            </div>
+
+            <div class="button-group">
+              <button class="btn btn-primary" onclick="addPetitionerOwes()">Add Obligation</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ===== RESPONDENT OWES-TO SECTION ===== -->
+        <div class="owes-card respondent">
+          <h3>Respondent Owes To</h3>
+          <div id="respondentOwesList"></div>
+
+          <div style="border-top: 2px solid #eee; padding-top: 16px; margin-top: 16px;">
+            <h4 style="margin: 0 0 12px; font-size: 13px; color: #1c3f66;">Add New Obligation</h4>
+
+            <div class="form-group">
+              <label>Creditor / Party Name</label>
+              <input type="text" id="respondentCreditor" placeholder="Name of creditor or party" />
+            </div>
+
+            <div class="form-group">
+              <label>Amount Owed</label>
+              <input type="number" id="respondentAmount" placeholder="0.00" step="0.01" />
+            </div>
+
+            <div class="form-group">
+              <label>Nature of Debt</label>
+              <select id="respondentDebtType">
+                <option value="">Select Type...</option>
+                <option value="personal-loan">Personal Loan</option>
+                <option value="family-loan">Family Loan</option>
+                <option value="credit-card">Credit Card</option>
+                <option value="vehicle-loan">Vehicle Loan</option>
+                <option value="student-loan">Student Loan</option>
+                <option value="business-debt">Business Debt</option>
+                <option value="other">Other</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Notes</label>
+              <textarea id="respondentDebtNotes" placeholder="Additional details..."></textarea>
+            </div>
+
+            <div class="button-group">
+              <button class="btn btn-primary" onclick="addRespondentOwes()">Add Obligation</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== SUMMARY SECTION ===== -->
+      <div class="summary-section">
+        <h3>Owes-To Summary</h3>
+        <div class="summary-row">
+          <span class="summary-label">Petitioner Total Owes</span>
+          <span class="summary-value" id="petitionerTotal">$0.00</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label">Respondent Total Owes</span>
+          <span class="summary-value" id="respondentTotal">$0.00</span>
+        </div>
+        <div class="summary-row" style="border-top: 1px solid rgba(0,0,0,0.1); padding-top: 12px; margin-top: 12px;">
+          <span class="summary-label"><strong>Net Difference</strong></span>
+          <span class="summary-value" id="netDifference" style="color: #2e7d32;">$0.00</span>
+        </div>
+      </div>
+
+      <!-- ===== SAVE SECTION ===== -->
+      <div style="margin-top: 20px; padding: 16px; background: white; border-radius: 8px;">
+        <button class="btn btn-primary" onclick="saveModuleData()">Save Analysis</button>
+        <button class="btn btn-secondary" onclick="exportData()">Export Data</button>
+      </div>
+    </div>
+  </main>
+
+  <script src="api-client.js"></script>
+  <script src="safe-text.js"></script>
+  <script src="doc-linking.js"></script>
+  <script src="owes.js"></script>
+  <script src="logo-handler.js"></script>
+</body>
+</html>

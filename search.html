@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Global Search — Veritas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .search-header { background: linear-gradient(135deg, #2e5b8a 0%, #1c3f66 100%); padding: 40px 20px; border-radius: 8px; margin-bottom: 24px; text-align: center; color: white; }
+    .search-header h1 { margin: 0 0 8px; font-size: 28px; font-weight: 700; }
+    .search-header p { margin: 0; font-size: 14px; opacity: 0.9; }
+
+    .search-box-large { display: grid; gap: 12px; margin-bottom: 24px; }
+    .search-input { padding: 14px 16px; border: 2px solid #ddd; border-radius: 6px; font-size: 14px; font-family: 'Courier New', monospace; }
+    .search-input:focus { outline: none; border-color: #2e5b8a; box-shadow: 0 0 0 3px rgba(46, 91, 138, 0.1); }
+
+    .search-filters { display: flex; gap: 8px; flex-wrap: wrap; }
+    .filter-chip { padding: 6px 12px; border: 1px solid #ddd; background: white; border-radius: 20px; cursor: pointer; font-size: 12px; transition: all 0.2s; }
+    .filter-chip:hover { border-color: #2e5b8a; }
+    .filter-chip.active { background: #2e5b8a; color: white; border-color: #2e5b8a; }
+
+    .search-results { display: grid; gap: 12px; }
+    .result-item { background: white; border-radius: 6px; padding: 16px; border-left: 4px solid #2e5b8a; cursor: pointer; transition: all 0.2s; }
+    .result-item:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.08); }
+    .result-title { font-weight: 700; color: #1c3f66; font-size: 14px; margin-bottom: 6px; }
+    .result-location { font-size: 11px; color: #999; margin-bottom: 6px; font-weight: 600; }
+    .result-preview { font-size: 12px; color: #666; line-height: 1.5; }
+    .result-highlight { background: #fff3cd; padding: 1px 4px; border-radius: 2px; font-weight: 600; }
+
+    .result-meta { display: flex; gap: 12px; margin-top: 8px; font-size: 10px; color: #999; }
+
+    .no-results { padding: 40px 20px; text-align: center; color: #666; }
+    .no-results-icon { font-size: 48px; margin-bottom: 12px; opacity: 0.5; }
+
+    .search-tips { background: #f0f7ff; border-left: 4px solid #2e5b8a; padding: 16px; border-radius: 4px; margin-top: 24px; font-size: 12px; color: #666; line-height: 1.6; }
+    .search-tips h4 { margin: 0 0 12px; color: #1c3f66; font-weight: 700; }
+    .search-tips p { margin: 6px 0; }
+    .search-tips code { background: white; padding: 2px 6px; border-radius: 3px; font-family: 'Courier New', monospace; color: #1c3f66; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <!-- ===================== SIDEBAR ===================== -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">
+        <img src="logo-vfi.jpg" alt="VFI Logo" />
+        <span class="brand-mark-fallback">VFI</span>
+      </div>
+      <div class="brand-text">
+        <span class="brand-name">Veritas</span>
+        <span class="brand-sub">Financial Intelligence</span>
+      </div>
+    </div>
+    <nav class="nav">
+      <div class="nav-group-label">Workspace</div>
+      <a class="nav-item" href="index.html"><span class="nav-ico">◆</span> Dashboard</a>
+      <a class="nav-item" href="index.html"><span class="nav-ico">▤</span> Matters</a>
+      <div class="nav-group-label">Analysis Modules</div>
+      <a class="nav-item" href="discovery-intake.html"><span class="nav-ico">⤓</span> Discovery Intake</a>
+      <a class="nav-item" href="spousal.html"><span class="nav-ico">⚖</span> Spousal Maintenance</a>
+      <a class="nav-item" href="child-support.html"><span class="nav-ico">◈</span> Child Support</a>
+      <a class="nav-item" href="custody.html"><span class="nav-ico">⌘</span> Child Custody</a>
+      <a class="nav-item" href="schedules.html"><span class="nav-ico">◷</span> Schedules &amp; Calendar</a>
+      <a class="nav-item" href="afi.html"><span class="nav-ico">≠</span> AFI Discrepancy</a>
+      <a class="nav-item" href="forensic-tracing.html"><span class="nav-ico">⌕</span> Forensic Tracing</a>
+      <a class="nav-item" href="estate.html"><span class="nav-ico">⊟</span> Estate & Worksheets</a>
+      <a class="nav-item" href="settlement.html"><span class="nav-ico">⇄</span> Settlement Modeling</a>
+      <a class="nav-item" href="credits.html"><span class="nav-ico">⊕</span> Credits &amp; Adjustments</a>
+      <a class="nav-item" href="regulations.html"><span class="nav-ico">§</span> Regulations</a>
+    </nav>
+    <div class="sidebar-foot"><div class="plan-chip">Firm Plan · 12 seats</div></div>
+  </aside>
+
+  <!-- ===================== MAIN ===================== -->
+  <main class="main">
+    <header class="topbar">
+      <div class="matter-switcher">
+        <span class="matter-label">Active Matter</span>
+        <button class="matter-btn">
+          <strong>Ossandon v. Ossandon</strong>
+          <span class="case-no">No. D2024-1669 · Pima County, AZ</span>
+          <span class="chev">▾</span>
+        </button>
+      </div>
+      <div class="topbar-right">
+        <div class="user">
+          <div class="avatar">TH</div>
+          <div class="user-meta">
+            <span class="user-name">Workspace User</span>
+            <span class="user-role">Ossandon Matter</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="content">
+      <div class="search-header">
+        <h1>Global Search</h1>
+        <p>Search across all case data, documents, and analysis</p>
+      </div>
+
+      <div class="search-box-large">
+        <input type="text" class="search-input" id="searchInput" placeholder="Search by name, amount, date, account number, transaction... (e.g., 'Chase 2285' or 'mortgage $4800' or 'June 2024')" onkeyup="performSearch(event)">
+        <div class="search-filters" id="filterChips"></div>
+      </div>
+
+      <div id="searchResultsContainer">
+        <div style="text-align: center; color: #999; padding: 40px 20px;">
+          <p>Start typing to search across all modules, transactions, and documents</p>
+        </div>
+      </div>
+
+      <!-- Search Tips -->
+      <div class="search-tips">
+        <h4>💡 Search Tips</h4>
+        <p><strong>Account numbers:</strong> <code>Chase 2285</code>, <code>...8531</code>, <code>Wells Fargo</code></p>
+        <p><strong>Amounts:</strong> <code>$6500</code>, <code>6500</code>, <code>amount:6500</code> — exact or approximate</p>
+        <p><strong>Dates:</strong> <code>June 2024</code>, <code>2024-06-01</code>, <code>6/1/24</code> — any format</p>
+        <p><strong>Parties:</strong> <code>Paying Spouse</code>, <code>Supported Spouse</code></p>
+        <p><strong>Modules:</strong> <code>AFI</code>, <code>forensic</code>, <code>child support</code>, <code>settlement</code></p>
+        <p><strong>Filters:</strong> Click filter chips above to narrow to specific data types (transactions, documents, calculations)</p>
+      </div>
+
+      <footer class="foot">
+        <span>Veritas · Global Search</span>
+        <span class="foot-dim">Instant search across all case modules and documents</span>
+      </footer>
+    </div>
+  </main>
+
+  <script src="api-client.js"></script>
+  <script src="case-manager.js"></script>
+  <script src="safe-text.js"></script>
+  <script src="search.js"></script>
+  <script src="logo-handler.js"></script>
+</body>
+</html>
+
