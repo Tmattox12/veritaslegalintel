@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Child Support Calculator — Veritas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="calculator.css" />
+  <link rel="stylesheet" href="document-support.css" />
+  <style>
+    .cs-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 20px; }
+    @media (max-width: 1200px) { .cs-grid { grid-template-columns: 1fr; } }
+    .party-card { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    .party-card h3 { margin: 0 0 16px; font-size: 16px; color: #1c3f66; }
+    .income-section { margin-bottom: 20px; padding-bottom: 20px; border-bottom: 1px solid #eee; }
+    .income-section:last-child { border-bottom: none; margin-bottom: 0; }
+    .income-row { display: grid; grid-template-columns: 1fr auto; gap: 12px; margin-bottom: 12px; align-items: center; }
+    .income-label { font-size: 13px; color: #666; font-weight: 500; }
+    .income-input { padding: 8px 12px; border: 1px solid #ddd; border-radius: 4px; font-size: 13px; font-family: 'Courier New', monospace; }
+    .income-value { font-size: 14px; font-weight: 600; color: #1c3f66; text-align: right; min-width: 120px; }
+    .total-income { background: #f0f7ff; padding: 12px; border-radius: 4px; border-left: 4px solid #2e5b8a; font-weight: 600; }
+    .calculation-panel { background: white; border-radius: 8px; padding: 20px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
+    .calc-step { display: grid; grid-template-columns: 2fr 1fr; gap: 12px; padding: 12px 0; border-bottom: 1px solid #eee; align-items: center; }
+    .calc-step:last-child { border-bottom: none; }
+    .calc-step-label { font-size: 13px; color: #666; }
+    .calc-step-value { font-size: 14px; font-weight: 600; text-align: right; color: #1c3f66; }
+    .calc-result { background: linear-gradient(135deg, #f0f7ff 0%, #e8f5e9 100%); padding: 20px; border-radius: 8px; margin-top: 20px; border-left: 6px solid #2e7d32; }
+    .result-title { font-size: 12px; color: #666; font-weight: 600; margin-bottom: 8px; }
+    .result-amount { font-size: 32px; font-weight: 700; color: #2e7d32; }
+    .result-label { font-size: 13px; color: #666; margin-top: 4px; }
+    .deviation-section { background: #fff9e6; padding: 16px; border-radius: 6px; border-left: 4px solid #f39c12; margin-top: 16px; }
+    .deviation-section h4 { margin: 0 0 12px; font-size: 13px; color: #856404; }
+    .slider-group { margin: 12px 0; }
+    .slider-label { display: flex; justify-content: space-between; font-size: 12px; color: #666; margin-bottom: 6px; }
+    .slider-input { width: 100%; }
+    .children-selector { display: flex; gap: 8px; margin-bottom: 12px; }
+    .child-btn { padding: 8px 12px; border: 1px solid #ddd; background: white; border-radius: 4px; cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.2s; }
+    .child-btn.active { background: #2e5b8a; color: white; border-color: #2e5b8a; }
+    .child-btn:hover { border-color: #2e5b8a; }
+    .guideline-table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 12px; }
+    .guideline-table th { background: #f5f0e8; padding: 10px; text-align: left; font-weight: 600; border: 1px solid #ddd; }
+    .guideline-table td { padding: 10px; border: 1px solid #ddd; }
+    .guideline-table .income { text-align: right; }
+    .guideline-table .amount { text-align: right; font-weight: 600; color: #1c3f66; }
+    .intake-table-wrap { overflow-x: auto; margin-top: 12px; }
+    .intake-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .intake-table th { background: #f0f4fa; padding: 8px; text-align: left; border: 1px solid #dbe3ef; color: #345; }
+    .intake-table td { padding: 8px; border: 1px solid #e4eaf3; vertical-align: middle; }
+    .intake-table input[type="text"], .intake-table input[type="number"], .intake-table select { width: 100%; padding: 6px 8px; border: 1px solid #ccd6e6; border-radius: 6px; font-size: 12px; }
+    .intake-chip { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 10px; font-weight: 700; }
+    .intake-chip.in { background: #e6f4ea; color: #1b6f3a; border: 1px solid #b7ddc4; }
+    .intake-chip.out { background: #f3f4f6; color: #6b7280; border: 1px solid #d5d8de; }
+    .note { font-size: 11px; color: #666; margin-top: 12px; padding: 12px; background: #f9f7f3; border-radius: 4px; line-height: 1.5; }
+    /* Income selector cards (shared pattern with the spousal calculator) */
+    .src-list { display: flex; flex-direction: column; gap: 9px; }
+    .src { display: grid; grid-template-columns: 22px 1fr auto; align-items: center; gap: 12px; border: 1px solid var(--line); border-radius: 11px; padding: 12px 14px; cursor: pointer; transition: border-color .15s, background .15s, box-shadow .15s; }
+    .src:hover { border-color: #cdd6e5; background: #fbfcfe; }
+    .src.selected { border-color: var(--gold); background: #fffdf8; box-shadow: 0 0 0 3px rgba(184,137,59,.12); }
+    .radio { width: 18px; height: 18px; border-radius: 50%; border: 2px solid #c3ccdb; display: grid; place-items: center; }
+    .src.selected .radio { border-color: var(--gold); }
+    .src.selected .radio::after { content: ''; width: 9px; height: 9px; border-radius: 50%; background: var(--gold); }
+    .src-info h5 { font-size: 13.5px; font-weight: 600; margin: 0 0 2px; color: #1c3f66; }
+    .src-info p { font-size: 11.5px; color: var(--slate); line-height: 1.35; margin: 0; }
+    .src-amt { display: flex; align-items: center; gap: 4px; }
+    .src-amt .dollar { color: var(--mute); font-weight: 600; }
+    .src-amt input { width: 92px; text-align: right; font-family: 'Fraunces', serif; font-size: 17px; font-weight: 600; color: var(--navy-900); border: 1px solid transparent; background: transparent; border-radius: 7px; padding: 3px 6px; }
+    .src-amt input:hover { border-color: var(--line); }
+    .src-amt input:focus { outline: none; border-color: var(--gold); background: #fff; }
+    .src-amt .per { font-size: 11px; color: var(--mute); }
+    .src-doc { display: inline-block; margin-top: 4px; font-size: 10.5px; color: #1c6b52; text-decoration: none; border-bottom: 1px dotted #9db; }
+    .src-doc:hover { color: #145; border-bottom-color: #145; }
+    .src-doc.muted { color: #a5660c; border-bottom: none; cursor: help; }
+    .advanced-toggle-row { margin: 8px 0 14px; }
+    .advanced-tools { margin-top: 12px; border-top: 1px solid #e8edf4; padding-top: 10px; }
+    .formula-note { margin-top: 12px; padding: 12px 14px; border: 1px solid #dce7f3; border-radius: 10px; background: #f8fbff; color: #31475f; }
+    .formula-pill { display: inline-block; margin-bottom: 6px; padding: 3px 8px; border-radius: 999px; background: #e6f2ff; color: #1c3f66; font-size: 10px; font-weight: 800; letter-spacing: .08em; text-transform: uppercase; }
+    .scenario-tip { margin-top: 8px; font-size: 11px; color: #5f6e7b; line-height: 1.45; }
+    .workpaper-tabs { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+    .workpaper-tabs button { padding: 8px 12px; border: 1px solid #d5dde8; background: #fff; border-radius: 999px; cursor: pointer; font-size: 12px; font-weight: 600; color: #456; transition: all .15s ease; }
+    .workpaper-tabs button.active { background: #1c3f66; border-color: #1c3f66; color: #fff; box-shadow: 0 4px 14px rgba(28,63,102,.18); }
+    .workpaper-tabs button:hover { border-color: #1c3f66; }
+    .workpaper-panel { border: 1px solid #e0e7f0; border-radius: 12px; background: #fbfcfe; padding: 14px; }
+    .workpaper-summary { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 12px; }
+    @media (max-width: 900px) { .workpaper-summary { grid-template-columns: 1fr; } }
+    .workpaper-card { border: 1px solid #dce5ef; border-radius: 10px; padding: 12px; background: #fff; }
+    .workpaper-card h5 { margin: 0 0 6px; font-size: 12px; color: #1c3f66; }
+    .workpaper-card .value { font-size: 24px; font-weight: 700; color: #1c3f66; line-height: 1.1; }
+    .workpaper-card .sub { margin-top: 4px; font-size: 11px; color: #627085; line-height: 1.4; }
+  </style>
+</head>
+<body>
+  <!-- ===================== SIDEBAR ===================== -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">
+        <img src="logo-vfi.jpg" alt="VFI Logo" />
+        <span class="brand-mark-fallback">VFI</span>
+      </div>
+      <div class="brand-text">
+        <span class="brand-name">Veritas</span>
+        <span class="brand-sub">Financial Intelligence</span>
+      </div>
+    </div>
+    <nav class="nav">
+      <div class="nav-group-label">Workspace</div>
+      <a class="nav-item" href="index.html"><span class="nav-ico">◆</span> Dashboard</a>
+      <a class="nav-item" href="index.html"><span class="nav-ico">▤</span> Matters</a>
+      <a class="nav-item" href="schedules.html"><span class="nav-ico">◷</span> Calendar</a>
+      <a class="nav-item" href="#"><span class="nav-ico">☑</span> Tasks</a>
+      <a class="nav-item" href="discovery-intake.html"><span class="nav-ico">▦</span> Documents</a>
+      <a class="nav-item" href="#"><span class="nav-ico">◍</span> Clients</a>
+
+      <div class="nav-group-label">Analysis Modules</div>
+      <a class="nav-item" href="income-imputation.html"><span class="nav-ico">💠</span> Income Engine</a>
+      <a class="nav-item" href="spousal.html"><span class="nav-ico">⚖</span> Support Calculator</a>
+      <a class="nav-item active" href="child-support.html"><span class="nav-ico">◈</span> Child Support</a>
+      <a class="nav-item" href="equitable-distribution.html"><span class="nav-ico">⊟</span> Assets</a>
+      <a class="nav-item" data-module="discovery" href="discovery-intake.html"><span class="nav-ico">◎</span> Discovery</a>
+      <a class="nav-item" href="custody.html"><span class="nav-ico">⌘</span> Custody</a>
+      <a class="nav-item" href="afi.html"><span class="nav-ico">🧾</span> AFI Expenses</a>
+      <a class="nav-item" href="estate.html"><span class="nav-ico">▧</span> Reports</a>
+
+      <div class="nav-group-label">Tools</div>
+      <a class="nav-item" data-module="forensic" href="forensic-tracing.html"><span class="nav-ico">⌕</span> Forensic Tracing</a>
+      <a class="nav-item" href="settlement.html"><span class="nav-ico">⇄</span> Settlement Modeling</a>
+      <a class="nav-item" href="credits.html"><span class="nav-ico">⊕</span> Credits &amp; Adjustments</a>
+      <a class="nav-item" href="regulations.html"><span class="nav-ico">⚖</span> Regulations</a>
+      <a class="nav-item" href="equitable-distribution.html"><span class="nav-ico">§</span> Prenup Module</a>
+      <a class="nav-item" href="discovery-intake.html"><span class="nav-ico">⤓</span> Document Intake</a>
+      <a class="nav-item" href="discovery-intake.html"><span class="nav-ico">◉</span> Compliance</a>
+      <a class="nav-item" href="red-flags.html"><span class="nav-ico">🚩</span> Red-Flag Detection</a>
+    </nav>
+
+    <div class="sidebar-foot">
+      <div class="plan-chip"><span style="color:var(--green)">●</span> Secure Connection · encrypted &amp; confidential</div>
+    </div>
+  </aside>
+
+  <!-- ===================== MAIN ===================== -->
+  <main class="main">
+    <header class="topbar">
+      <div class="matter-switcher">
+        <span class="matter-label">Active Matter</span>
+        <button class="matter-btn">
+          <strong>Matter v. Case</strong>
+          <span class="case-no">No. [Case Number] · [Jurisdiction]</span>
+          <span class="chev">▾</span>
+        </button>
+      </div>
+      <div class="topbar-right">
+        <div class="user">
+          <div class="avatar">TH</div>
+          <div class="user-meta">
+            <span class="user-name">Workspace User</span>
+            <span class="user-role">Ossandon Matter</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="content">
+      <section class="page-head">
+        <div>
+          <h1>Child Support Calculator</h1>
+          <p class="sub">AZ §25-320 Income-Shares Model · 2022 Guidelines · Presumptive Amount</p>
+        </div>
+        <div class="head-actions">
+          <a class="btn subtle" href="child-support-reimbursement.html">Open reimbursement claim page</a>
+        </div>
+      </section>
+
+      <!-- ★ RESULT HERO — top of page -->
+      <div class="panel" style="border-left:5px solid #2e7d32;background:linear-gradient(180deg,#f3fbf7 0%,#fff 100%);">
+        <div class="panel-head">
+          <h3 style="color:#2e7d32;">📊 Presumptive Child Support</h3>
+          <span class="tag" style="background:#e6f3ec;color:#2e7d32;">AZ §25-320 Income-Shares Model</span>
+          <a class="btn subtle" href="child-support-reimbursement.html">Reimbursement claim</a>
+          <button class="btn ghost" id="csResetBtn" type="button">Reset numbers</button>
+          <button class="btn ghost" id="csPrintBtn" type="button">Print / Export PDF</button>
+        </div>
+        <div id="csSnapshotLine" style="margin-bottom:10px;padding:8px 10px;border:1px solid #d7e0ec;border-radius:8px;background:#f7f9fc;color:#2f4563;font-size:11px;line-height:1.45"></div>
+        <div class="calculation-panel">
+          <div class="calc-result" style="margin-top:0">
+            <div class="result-title">PRESUMPTIVE CHILD SUPPORT</div>
+            <div class="result-amount" id="resultAmount">$0</div>
+            <div class="result-label" id="resultLabel">Parent A pays per month (3 children)</div>
+            <div id="csResultFormula" style="font-size:11px;color:#51617a;margin-top:6px;line-height:1.5"></div>
+            <div id="csSelectionSaveLine" style="margin-top:6px;font-size:11px;color:#4d5f78;">Selection status: waiting for first save.</div>
+            <div id="csTopIncomeBreakdown" style="margin-top:8px;padding:10px;border:1px solid #dce7f3;border-radius:10px;background:#f8fbff;color:#213b5a;font-size:12px;line-height:1.45;"></div>
+            <div class="note" style="margin-top:12px;background:transparent;padding:0;">
+              Presumptive amount under AZ §25-320 using the income-shares model for the Ossandon matter. This screen supports spousal-maintenance reallocation, other-child-support adjustments, child medical coverage, work-related child care, extraordinary child expenses, transportation / exchange costs, and direct-pay credits.
+            </div>
+          </div>
+        </div>
+        <div class="formula-note">
+          <div class="formula-pill">How this result is built</div>
+          <div id="csExplanationText" style="font-size:12px;line-height:1.55"></div>
+          <div class="scenario-tip" id="csScenarioTip">Both parties' income is set on the Income Engine. Adjust parenting time or the direct child-expense credits to see how the presumptive amount changes.</div>
+        </div>
+      </div>
+
+      <!-- Adjustments -->
+      <div class="panel">
+        <div class="panel-head">
+          <h3>⚙ Child Care Workpaper</h3>
+          <span class="tag">forward credit + reimbursement split</span>
+        </div>
+        <div class="workpaper-tabs" aria-label="Child care workpaper tabs">
+          <button type="button" class="active" data-cs-workpaper-tab="forward">Forward childcare credit</button>
+          <button type="button" data-cs-workpaper-tab="reimbursement">Prior reimbursement</button>
+        </div>
+        <div class="workpaper-panel" data-cs-workpaper-panel="forward">
+          <div class="income-row">
+            <span class="income-label">Work-related child care credit paid by Parent A ($/mo)<br><span style="font-size:11px;color:#999">credited against Parent A's support share; latest complete 12-month average from the new Chase3394 workbook</span><br><span style="font-size:10px;color:#1c6b52">Support: <a href="../recent%20luis%20child%20care%20and%20uber%20_%20Chase3394_Activity_20260810%20TAMARA.xlsx" target="_blank" rel="noopener">Chase3394 childcare/Uber workbook ↗</a></span></span>
+            <input type="number" id="nicoChildCare" class="income-input" placeholder="0">
+          </div>
+          <div class="income-row" style="align-items:flex-start;grid-template-columns:1fr;gap:8px;">
+            <span class="income-label">Nico caregiver credit controls</span>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <button id="applyNicoCaregiverWorkpaperBtn" class="btn ghost" type="button">Apply latest 12-month average credit</button>
+            </div>
+            <span id="nicoCaregiverWorkpaperStatus" style="font-size:11px;color:#5b6472"></span>
+          </div>
+          <div class="workpaper-summary">
+            <div class="workpaper-card">
+              <h5>Named caregiver total</h5>
+              <div class="value">$6,719.00</div>
+              <div class="sub">Named caregiver payments in the latest complete 12-month Chase3394 workbook window, Aug 2025-Jul 2026.</div>
+              <button type="button" class="recon-link" data-recon="named-caregiver" style="margin-top:8px;background:none;border:none;color:#4b7c99;font-size:11px;font-weight:600;cursor:pointer;padding:0;text-decoration:underline;">View reconciliation →</button>
+            </div>
+            <div class="workpaper-card">
+              <h5>Forward monthly credit</h5>
+              <div class="value">$559.92</div>
+              <div class="sub">Latest complete 12-month average, Aug 2025-Jul 2026.</div>
+            </div>
+            <div class="workpaper-card">
+              <h5>Temp-orders reimbursement</h5>
+              <div class="value">$2,015.70</div>
+              <div class="sub">Coni's 30% share of the latest 12-month named caregiver payments under the 70/30 order.</div>
+              <button type="button" class="recon-link" data-recon="caregiver-reimbursement" style="margin-top:8px;background:none;border:none;color:#4b7c99;font-size:11px;font-weight:600;cursor:pointer;padding:0;text-decoration:underline;">View reconciliation →</button>
+            </div>
+          </div>
+            <div class="workpaper-card" style="margin-top:12px;">
+              <h5>Raw workbook reconciliation</h5>
+              <div class="sub" style="margin-bottom:8px">The screenshot draft did not fully tie to the Luis raw personal account. Verified raw-payee totals are below; 6761/shared-account items are excluded for now.</div>
+              <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;font-size:12px;line-height:1.5;">
+                <div>Doreen Hatcher: <strong>$5,854.00</strong></div>
+                <div>Martha Grijalva: <strong>$240.00</strong></div>
+                <div>Edward Perez: <strong>$100.00</strong></div>
+                <div>Marcela Arenas: <strong>$340.00</strong></div>
+                <div>Shana Munch: <strong>$145.00</strong></div>
+                <div>Ilse Rojas: <strong>$40.00</strong></div>
+                <div>Care.com: <strong>not found</strong></div>
+                <div>Patricia Teran: <strong>not found</strong></div>
+              </div>
+            </div>
+          <p class="note" style="margin-bottom:0">This forward credit stays in the child-support calculator. The reimbursement amount is tracked separately so the prior Zelle payments do not blur into the ongoing support math.</p>
+        </div>
+        <div class="workpaper-panel" data-cs-workpaper-panel="reimbursement" hidden>
+          <div class="workpaper-summary" style="grid-template-columns: repeat(2, minmax(0, 1fr));">
+            <div class="workpaper-card">
+              <h5>Coni reimbursement due</h5>
+              <div class="value">$2,015.70</div>
+              <div class="sub">30% of the latest 12-month named caregiver payments under the temp-orders split.</div>
+            </div>
+            <div class="workpaper-card">
+              <h5>Phone-share estimate</h5>
+              <div class="value">$1,587.44</div>
+              <div class="sub">Current source-based estimate for children&apos;s phones using total AT&amp;T charges × 30%; confirm kids-only allocation later.</div>
+            </div>
+          </div>
+          <div class="workpaper-card" style="margin-top:12px;">
+            <h5>Dedicated reimbursement page</h5>
+            <div class="sub" style="margin-bottom:10px;">A standalone claim page now tracks the 30% claim from the Nov 2024 temp orders through the 08/18/2026 final hearing date, including the working phone-share estimate.</div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+              <a class="btn ghost" href="child-support-reimbursement.html">Open reimbursement claim</a>
+            </div>
+          </div>
+          <div class="workpaper-card" style="margin-top:12px;">
+            <h5>Why the draft total changed</h5>
+            <div class="sub">The latest Chase3394 workbook verifies $6,719.00 in named caregiver Zelle payments over Aug 2025-Jul 2026. The calculator uses this latest complete 12-month total for the forward credit.</div>
+          </div>
+          <div class="workpaper-summary" style="grid-template-columns: repeat(4, minmax(0, 1fr)); margin-top:12px;">
+            <div class="workpaper-card">
+              <h5>Anissa Ochoa</h5>
+              <div class="value">$1,868.50</div>
+              <div class="sub">Zelle payments in the raw Luis account workbook.</div>
+            </div>
+            <div class="workpaper-card">
+              <h5>Martha Grijalva</h5>
+              <div class="value">$240.00</div>
+              <div class="sub">Zelle payments in the raw Luis account workbook.</div>
+            </div>
+            <div class="workpaper-card">
+              <h5>Doreen Hatcher</h5>
+              <div class="value">$5,674.50</div>
+              <div class="sub">Zelle payments in the raw Luis account workbook.</div>
+            </div>
+            <div class="workpaper-card">
+              <h5>Edward Perez</h5>
+              <div class="value">$100.00</div>
+              <div class="sub">Zelle payments in the raw Luis account workbook.</div>
+            </div>
+          </div>
+          <div class="note" style="margin-bottom:0">Use this tab for the reimbursement claim only. The calculator's forward childcare line should stay at the 2025 average amount above, and the separate reimbursement claim page can hold the running child-care plus phone-share claim through the 08/18/2026 hearing.</div>
+        </div>
+        <div class="income-section" style="margin-top:16px">
+          <div class="income-row">
+            <span class="income-label">Child medical / dental / vision coverage ($/mo)<br><span style="font-size:11px;color:#999">included in total obligation; workbook-supported default $210/mo</span><br><span style="font-size:10px;color:#1c6b52">Support: <a href="../Child_Support_Worksheet_Full.xlsx" target="_blank" rel="noopener">Child_Support_Worksheet_Full.xlsx ↗</a> · HI Premium Detail tab</span></span>
+            <input type="number" id="monthlyMedical" class="income-input" placeholder="210">
+          </div>
+          <div class="income-row">
+            <span class="income-label">Education-related child expenses ($/mo)<br><span style="font-size:11px;color:#999">use only when documented school or activity costs belong on the worksheet</span></span>
+            <input type="number" id="youngerChildCare" class="income-input" placeholder="0">
+          </div>
+          <div class="income-row">
+            <span class="income-label">Extraordinary child expenses ($/mo)<br><span style="font-size:11px;color:#999">workbook-supported default $197.71/mo from documented reimbursements</span><br><span style="font-size:10px;color:#1c6b52">Support: <a href="../Child_Support_Worksheet_Full.xlsx" target="_blank" rel="noopener">Child_Support_Worksheet_Full.xlsx ↗</a> · Extraordinary Child Detail tab</span></span>
+            <input type="number" id="extraordinaryChildExpenses" class="income-input" placeholder="0">
+          </div>
+          <div class="income-row">
+            <span class="income-label">Children's transportation to/from school (Uber kid rides) ($/mo)<br><span style="font-size:11px;color:#999">direct-pay credit for the two younger boys; latest complete 12-month average $254.48/mo</span><br><span style="font-size:10px;color:#1c6b52">Support: <a href="../recent%20luis%20child%20care%20and%20uber%20_%20Chase3394_Activity_20260810%20TAMARA.xlsx" target="_blank" rel="noopener">Chase3394 childcare/Uber workbook ↗</a></span></span>
+            <input type="number" id="youngerTransport" class="income-input" placeholder="0">
+          </div>
+          <div class="income-row">
+            <span class="income-label">Children's cell phones / device costs paid directly by Parent A ($/mo)<br><span style="font-size:11px;color:#999">Joaquin $132 + Martin $76 = $208/mo base; future phone credit auto-applies at Constanza&apos;s selected income-share %</span><br><span style="font-size:10px;color:#1c6b52">Support: <a href="../LUIS_CHILD_CELL_PHONES_WORKPAPER_2026-08-10.md" target="_blank" rel="noopener">child phone workpaper ↗</a> · <button type="button" class="recon-link" data-recon="child-phones" style="background:none;border:none;color:#4b7c99;font-size:10px;font-weight:600;cursor:pointer;padding:0;text-decoration:underline;">View reconciliation →</button></span></span>
+            <input type="number" id="childPhones" class="income-input" placeholder="0">
+          </div>
+          <div class="income-row">
+            <span class="income-label">Other direct child-expense credit ($/mo)<br><span style="font-size:11px;color:#999">any documented direct-pay child cost not listed above</span></span>
+            <input type="number" id="otherDirectExpense" class="income-input" placeholder="0">
+          </div>
+          <div class="income-row" style="align-items:flex-start;grid-template-columns:1fr;gap:8px;">
+            <span class="income-label">Direct-expense preset controls</span>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;">
+              <button id="saveDirectPresetBtn" class="btn ghost" type="button">Save current values as preset</button>
+              <button id="applyDirectPresetBtn" class="btn ghost" type="button">Apply saved preset</button>
+              <button id="applySupportedDirectExpensesBtn" class="btn ghost" type="button">Apply supported caregiver + Uber + phone values</button>
+              <button id="clearDirectPresetBtn" class="btn ghost" type="button">Clear direct-expense values</button>
+            </div>
+            <span id="directPresetStatus" style="font-size:11px;color:#5b6472"></span>
+          </div>
+        </div>
+        <div class="cs-grid" style="margin-bottom:0;margin-top:16px;">
+          <div class="party-card">
+            <div class="income-row">
+              <span class="income-label">Spousal maintenance ($/mo)<br><span style="font-size:11px;color:#999">reallocated from Parent A to Parent B before income shares</span></span>
+              <input type="number" id="smMonthly" class="income-input" placeholder="0">
+            </div>
+            <div class="income-row">
+              <span class="income-label">Other-child support adjustment, Parent A ($/mo)<br><span style="font-size:11px;color:#999">reduces Parent A adjusted gross income if allowed</span></span>
+              <input type="number" id="parentAOtherSupport" class="income-input" placeholder="0">
+            </div>
+            <div class="income-row">
+              <span class="income-label">Other-child support adjustment, Parent B ($/mo)<br><span style="font-size:11px;color:#999">reduces Parent B adjusted gross income if allowed</span></span>
+              <input type="number" id="parentBOtherSupport" class="income-input" placeholder="0">
+            </div>
+          </div>
+          <div class="party-card">
+            <div class="income-row">
+              <span class="income-label">Parent A parenting days / yr<br><span style="font-size:11px;color:#999">183 = equal (50/50) time</span></span>
+              <input type="number" id="luisPtDays" class="income-input" placeholder="183" max="183" min="0">
+            </div>
+            <div class="income-row">
+              <span class="income-label">All children age 12+<br><span style="font-size:11px;color:#999">mandatory +10% BCSO</span></span>
+              <input type="checkbox" id="age12plus" checked style="width:20px;height:20px">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Intake Snapshot -->
+      <div class="panel">
+        <div class="panel-head">
+          <h3>🧭 Case Intake Snapshot</h3>
+          <span class="tag">Home-screen style key facts</span>
+        </div>
+        <div class="cs-grid" style="margin-bottom: 10px;">
+          <div class="party-card">
+            <div class="income-row">
+              <span class="income-label">Children ages (comma separated)<br><span style="font-size:11px;color:#999">Example: 20, 17, 14</span></span>
+              <input type="text" id="childAgesCsv" class="income-input" value="17, 14" />
+            </div>
+            <div class="income-row">
+              <span class="income-label">18–22 in full-time school count as supported</span>
+              <input type="checkbox" id="fullTimeSchoolUnder23" style="width:20px;height:20px" checked>
+            </div>
+            <div class="income-row">
+              <span class="income-label">Disabled adult dependent included</span>
+              <input type="checkbox" id="hasDisabledAdultDependent" style="width:20px;height:20px">
+            </div>
+            <div class="income-row">
+              <span class="income-label">Disabled dependent age</span>
+              <input type="number" id="disabledAdultAge" class="income-input" min="18" max="99" value="20">
+            </div>
+          </div>
+          <div class="party-card">
+            <div class="income-row">
+              <span class="income-label">Parents are co-guardians</span>
+              <input type="checkbox" id="coGuardianStatus" style="width:20px;height:20px" checked>
+            </div>
+            <div class="income-row">
+              <span class="income-label">Custody preset</span>
+              <select id="custodyPreset" class="income-input">
+                <option value="equal" selected>50/50 shared custody (183 days)</option>
+                <option value="luisPrimary">Parent A primary custody (~260 days)</option>
+                <option value="coniPrimary">Parent B primary custody (~105 days)</option>
+                <option value="custom">Custom days (use manual input below)</option>
+              </select>
+            </div>
+            <div class="income-row">
+              <button id="applyIntakeBtn" class="btn ghost" type="button">Apply intake to calculator</button>
+              <span id="intakeApplyStatus" style="font-size:11px;color:#5b6472"></span>
+            </div>
+            <div class="note" id="intakeSummary" style="margin-top:8px;">
+              Intake not yet applied.
+            </div>
+          </div>
+        </div>
+
+        <details style="margin-top:10px;">
+          <summary style="cursor:pointer;font-size:11px;color:#2e5b8a;font-weight:600;padding:4px 0;">Per-child audit detail (expand)</summary>
+          <div class="intake-table-wrap" style="margin-top:8px;">
+            <table class="intake-table" id="childProfileTable">
+              <thead>
+                <tr>
+                  <th style="width:18%">Child</th>
+                  <th style="width:8%">Age</th>
+                  <th style="width:14%">Full-time School</th>
+                  <th style="width:14%">Disabled Dependent</th>
+                  <th style="width:12%">Parent A Days</th>
+                  <th style="width:12%">Included</th>
+                  <th>Inclusion Basis</th>
+                </tr>
+              </thead>
+              <tbody id="childProfileRows"></tbody>
+            </table>
+          </div>
+          <p class="note" id="childProfileFootnote">Per-child inclusion is shown for audit. Calculator still uses AZ schedule with up to 4 children.</p>
+        </details>
+      </div>
+
+      <!-- Number of Children (compact, inline with intake) -->
+      <div style="padding:0 0 4px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <span style="font-size:12px;font-weight:600;color:#1c3f66;">Children in calculation:</span>
+        <div class="children-selector" id="childrenSelector" style="display:flex;gap:6px;margin:0;"></div>
+        <span style="font-size:11px;color:#666;">Override if needed — intake auto-sets this.</span>
+      </div>
+
+      <!-- Income Selection (spousal-style scenario cards) -->
+      <div class="cs-grid">
+        <!-- Luis -->
+        <div class="party-card">
+          <h3>💰 Parent A Income Selection</h3>
+          <p class="panel-note" style="margin:-4px 0 12px">Set on the Income Engine and flows here automatically.</p>
+          <div id="luisEngineBanner" style="margin:0 0 12px;padding:12px 14px;background:#f8f0f0;border-left:4px solid #7c4b4b;border-radius:8px;display:none;">
+            <div style="font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#7c4b4b;margin-bottom:4px;">Paying-parent income · from Income Engine</div>
+            <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;">
+              <span id="luisEngineLabel" style="font-size:13px;font-weight:600;color:#4f1a1a;">—</span>
+              <span style="font-size:13px;color:#4f1a1a;"><strong id="luisEngineAnnual">$0</strong>/yr · <span id="luisEngineMonthly">$0</span>/mo</span>
+            </div>
+            <div style="font-size:11px;color:#6b5b5b;margin-top:4px;">Set on the <a href="income-imputation.html" style="color:#7c4b4b;font-weight:600;">Income Engine</a>; the presumptive child support below updates from this selection.</div>
+          </div>
+          <div class="total-income" style="margin-top:14px">
+            <span class="income-label">Annual income used</span>
+            <span class="income-value" id="luisAGI">$0</span>
+          </div>
+          <input type="hidden" id="luisWages"><input type="hidden" id="luisSelfEmp"><input type="hidden" id="luisBonus">
+          <input type="hidden" id="luisInvestment"><input type="hidden" id="luisSS"><input type="hidden" id="luisUnemployment">
+        </div>
+
+        <!-- Coni -->
+        <div class="party-card">
+          <h3>💰 Parent B Income Selection</h3>
+          <p class="panel-note" style="margin:-4px 0 12px">Set on the Income Engine and flows here automatically.</p>
+          <div id="coniEngineBanner" style="margin:0 0 12px;padding:12px 14px;background:#f0f5fb;border-left:4px solid #4b7c99;border-radius:8px;display:none;">
+            <div style="font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:#4b7c99;margin-bottom:4px;">Supported-spouse income · from Income Engine</div>
+            <div style="display:flex;justify-content:space-between;align-items:baseline;gap:10px;flex-wrap:wrap;">
+              <span id="coniEngineLabel" style="font-size:13px;font-weight:600;color:#1a2f4f;">—</span>
+              <span style="font-size:13px;color:#1a2f4f;"><strong id="coniEngineAnnual">$0</strong>/yr · <span id="coniEngineMonthly">$0</span>/mo</span>
+            </div>
+            <div id="coniEngineCdRule" style="font-size:11px;color:#8a6a1f;margin-top:4px;display:none;"></div>
+            <div style="font-size:11px;color:#5b6472;margin-top:4px;">Set on the <a href="income-imputation.html" style="color:#4b7c99;font-weight:600;">Income Engine</a>; the presumptive child support below updates from this selection.</div>
+          </div>
+          <div class="total-income" style="margin-top:14px">
+            <span class="income-label">Annual income used</span>
+            <span class="income-value" id="coniAGI">$0</span>
+          </div>
+          <input type="hidden" id="coniWages"><input type="hidden" id="coniSelfEmp"><input type="hidden" id="coniBonus">
+          <input type="hidden" id="coniInvestment"><input type="hidden" id="coniSS"><input type="hidden" id="coniUnemployment">
+        </div>
+      </div>
+
+      <div class="advanced-toggle-row">
+        <button class="btn ghost" id="csAdvancedToggle" type="button" aria-expanded="false" aria-controls="csAdvancedPanel">Open advanced tools</button>
+      </div>
+
+      <section id="csAdvancedPanel" class="advanced-tools" hidden>
+      <div class="panel">
+        <div class="panel-head">
+          <h3>📊 Calculation Breakdown</h3>
+          <span class="tag">AZ §25-320 steps</span>
+        </div>
+        <div class="calculation-panel">
+          <div class="calc-step">
+            <span class="calc-step-label">Combined adjusted income (monthly, after SM)</span>
+            <span class="calc-step-value" id="calcCombinedAGI">$0</span>
+          </div>
+          <div class="calc-step">
+            <span class="calc-step-label">Basic Child Support Obligation (BCSO)</span>
+            <span class="calc-step-value" id="calcBasicObligation">$0</span>
+          </div>
+          <div class="calc-step">
+            <span class="calc-step-label">Older Child Adjustment (+10% for 12+)</span>
+            <span class="calc-step-value" id="calcOlderAdjust">$0</span>
+          </div>
+          <div class="calc-step">
+            <span class="calc-step-label">Child medical / dental / vision</span>
+            <span class="calc-step-value" id="calcMedical">$210</span>
+          </div>
+          <div class="calc-step">
+            <span class="calc-step-label">Work-related child care credit</span>
+            <span class="calc-step-value" id="calcWorkChildCare">$0</span>
+          </div>
+          <div class="calc-step">
+            <span class="calc-step-label">Education-related child expenses</span>
+            <span class="calc-step-value" id="calcEducationCosts">$0</span>
+          </div>
+          <div class="calc-step">
+            <span class="calc-step-label">Extraordinary child expenses</span>
+            <span class="calc-step-value" id="calcExtraordinaryCosts">$0</span>
+          </div>
+          <div class="calc-step">
+            <span class="calc-step-label">Total Obligation</span>
+            <span class="calc-step-value" id="calcTotalObligation">$0</span>
+          </div>
+          <div class="calc-step">
+            <span class="calc-step-label">Income shares (Parent A / Parent B)</span>
+            <span class="calc-step-value" id="calcLuisShare">—</span>
+          </div>
+          <div class="calc-step">
+            <span class="calc-step-label">Parenting-time credit (to Parent A)</span>
+            <span class="calc-step-value" id="calcPtCredit">—</span>
+          </div>
+          <div class="calc-step">
+            <span class="calc-step-label">Other direct child-expense credits (Parent A)</span>
+            <span class="calc-step-value" id="calcDirectCredits">—</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Guideline Table -->
+      <div class="panel">
+        <div class="panel-head">
+          <h3>⚖ 2022 AZ Child Support Schedule</h3>
+          <span class="tag">For reference</span>
+        </div>
+        <p class="panel-note">Basic Child Support Obligation (BCSO) anchors used by this calculator, taken from the parties' own 4/27/26 and 5/14/26 worksheets. The published AZ Schedule tops out at $30,000/mo combined income; above that ceiling the $30k row is presumptive. 2- and 1-child figures are extrapolated from the confirmed 3-child anchor (exact AZ Schedule values still to be verified).</p>
+        <div style="overflow-x: auto;">
+          <table class="guideline-table">
+            <thead>
+              <tr>
+                <th>Combined adjusted income /mo</th>
+                <th class="amount">3 Children</th>
+                <th class="amount">2 Children</th>
+                <th class="amount">1 Child</th>
+                <th>Source</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>$22,943.92 (confirmed point)</td>
+                <td class="amount">$3,774</td>
+                <td class="amount">$3,204</td>
+                <td class="amount">$2,087</td>
+                <td>4/27/26 worksheet</td>
+              </tr>
+              <tr>
+                <td>$30,000+ (schedule cap)</td>
+                <td class="amount">$4,723</td>
+                <td class="amount">$4,010</td>
+                <td class="amount">$2,612</td>
+                <td>5/14/26 worksheet ($30k row)</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="note">Between the confirmed point and the $30k cap the calculator interpolates the 3-child BCSO; the 2-child (×0.849) and 1-child (×0.553) columns scale from it. Above $30,000/mo combined the $30k row applies presumptively (the party seeking more carries the burden). Exact AZ Schedule values remain pending verification per case documentation.</p>
+      </div>
+      </section>
+
+      <footer class="foot">
+        <span>Veritas · Child Support Calculator</span>
+        <span class="foot-dim">AZ §25-320 Guidelines · 2022 Model · Non-binding reference only</span>
+      </footer>
+    </div>
+  </main>
+
+  <script src="api-client.js"></script>
+  <script src="case-manager.js"></script>
+  <script src="calculator.js"></script>
+  <script src="//cdn.socket.io/4.6.0/socket.io.min.js"></script>
+  <script src="socket-client.js"></script>
+  <script src="sync-handler.js"></script>
+  <script src="safe-text.js"></script>
+  <script src="recon-modal.js"></script>
+  <script src="document-support-registry.js"></script>
+  <script src="document-support-integration.js"></script>
+  <script src="source-tracker.js"></script>
+  <script src="child-support.js"></script>
+  <script src="logo-handler.js"></script>
+</body>
+</html>
+

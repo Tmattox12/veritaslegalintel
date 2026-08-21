@@ -1,0 +1,1293 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AFI Discrepancy Template</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="estate.css" />
+  <link rel="stylesheet" href="document-support.css" />
+  <!-- Veritas AI Chat Widget -->
+  <link rel="stylesheet" href="ai-chat-widget.css" />
+  <!-- Reconciliation Modal -->
+  <link rel="stylesheet" href="reconciliation-modal.css" />
+  <style>
+    /* AFI-specific */
+    .afi-source { display: grid; gap: 6px; margin-top: 4.5px; }
+    .afi-source .src-row { display: grid; grid-template-columns: 120px 1fr; gap: 7.5px; align-items: baseline; font-size: 9px; }
+    .afi-source .src-who { font-weight: 700; color: var(--ink); }
+    .afi-source .src-who.petitioner { color: #2e5b8a; }
+    .afi-source .src-who.respondent { color: #a24a2a; }
+    .afi-source .src-who.expert { color: #b4232a; }
+    .afi-source .src-desc { color: var(--mute); font-size: 8.7px; }
+    table.afi-table td.pct { color: var(--mute); font-size: 8.4px; }
+    .hi-pill { display: inline-block; font-size: 7.5px; font-weight: 700; padding: 0.8px 5.3px; border-radius: 9px; }
+    .hi-petitioner { color: #1f4a73; background: #dce8f5; }
+    .hi-respondent { color: #8a3a1e; background: #f7e2d8; }
+    .hi-even { color: var(--mute); background: #eee9df; }
+    .rc-dash { color: #c3bcae; }
+    .afi-points { margin: 3px 0 0; padding-left: 13.8px; }
+    .afi-points li { margin: 3.8px 0; font-size: 9.5px; color: var(--ink); line-height: 1.45; }
+    .afi-inflated li { font-size: 9px; }
+    .afi-sub { margin: 10.8px 0 3px; font-weight: 700; font-size: 9.5px; color: var(--ink); }
+    table.afi-table tbody tr.clickable-row:hover { background-color: #f5f0e8; cursor: pointer; }
+    table.afi-table td.clickable-amount { cursor: pointer; transition: all 0.2s; }
+    table.afi-table td.clickable-amount:hover { background-color: #e8f0f7; font-weight: 700; box-shadow: inset 0 0 0 1px #2e5b8a; }
+    .kpi-value { transition: all 0.2s; cursor: pointer; }
+    .kpi-value:hover { color: #2e5b8a; text-decoration: underline; font-weight: 700; }
+    .clickable-threshold { transition: all 0.2s !important; }
+    .clickable-threshold:hover { background-color: #e8f0f7 !important; font-weight: 700 !important; box-shadow: inset 0 0 0 1px #2e5b8a !important; }
+    .doc-icon { display: inline-block; opacity: 0.5; transition: opacity 0.2s; }
+    .doc-icon:hover { opacity: 1; color: #2e5b8a; font-weight: bold; }
+    /* Help icon tooltip */
+    .help-icon { display: inline-block; width: 16px; height: 16px; line-height: 16px; text-align: center; background: #0066cc; color: white; border-radius: 50%; font-size: 8.4px; font-weight: 700; margin-left: 4.5px; cursor: pointer; vertical-align: middle; position: relative; transition: all 0.2s; }
+    .help-icon:hover { background: #0052a3; box-shadow: 0 2px 6px rgba(0, 102, 204, 0.3); }
+    .help-tooltip { display: none; position: absolute; bottom: 18px; left: -120px; width: 250px; background: #fff; border: 1px solid #0066cc; border-radius: 4.5px; padding: 7.5px 9px; font-size: 8.4px; color: #333; line-height: 1.45; box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15); z-index: 1000; white-space: normal; font-weight: 400; }
+    .help-tooltip::after { content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 4.5px solid transparent; border-right: 4.5px solid transparent; border-top: 4.5px solid #fff; }
+    .help-tooltip::before { content: ''; position: absolute; top: 100%; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 5.3px solid transparent; border-right: 5.3px solid transparent; border-top: 5.3px solid #0066cc; }
+    .help-icon.active .help-tooltip { display: block; }
+    .support-badge {
+      display: inline-block;
+      margin-left: 4.5px;
+      padding: 0.8px 4.5px;
+      border-radius: 999px;
+      font-size: 6.9px;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      vertical-align: middle;
+      white-space: nowrap;
+    }
+    .support-badge.statement {
+      background: #e8f3ff;
+      color: #1f5f9d;
+      border: 1px solid #c5dbf3;
+    }
+    .support-badge.report {
+      background: #fff1f2;
+      color: #a61e2f;
+      border: 1px solid #f2c9cf;
+      display: block;
+      margin-left: 0;
+      margin-top: 2.7px;
+    }
+    /* Threshold analysis styling */
+    .threshold-table { margin-top: 9px; }
+    .threshold-table tbody tr.threshold-meets { background-color: #f1f8f6; }
+    .threshold-table tbody tr.threshold-gap { background-color: #fdf5f5; }
+    .threshold-table td.num { font-weight: 600; }
+    .threshold-table .scenario-desc { display: block; font-size: 8px; color: #666; margin-top: 1.5px; font-weight: 400; }
+    .threshold-table .gap-amt { color: #c62828; font-weight: 700; }
+    .threshold-table .surplus { color: #2e7d32; font-weight: 700; }
+    /* Threshold matrix styling */
+    .threshold-matrix { width: 100%; border-collapse: collapse; }
+    .threshold-matrix td, .threshold-matrix th { padding: 6px; border: 1px solid #ddd; }
+    .threshold-cell-meets { background-color: #e8f5e9 !important; color: #2e7d32; }
+    .threshold-cell-gap { background-color: #ffebee !important; color: #c62828; }
+    .threshold-cell-btn { cursor: pointer; text-decoration: underline; border-radius: 2.3px; transition: all 0.2s; }
+    .threshold-cell-btn:hover { opacity: 0.7; }
+    .threshold-cell-meets.threshold-cell-btn { border: 1px solid #4caf50; }
+    .threshold-cell-gap.threshold-cell-btn { border: 1px solid #f44336; }
+    /* Modal styling */
+    .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 9999; }
+    .modal-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.4); }
+    .modal-container { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border-radius: 6px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); max-width: 900px; width: 90%; max-height: 85vh; display: flex; flex-direction: column; }
+    .modal-head { display: flex; justify-content: space-between; align-items: center; padding: 15px 18px; border-bottom: 1px solid #e5e0d5; }
+    .modal-head h2 { margin: 0; font-size: 13.8px; }
+    .modal-close { background: none; border: none; font-size: 21.4px; cursor: pointer; color: #999; padding: 0; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; }
+    .modal-close:hover { color: #333; }
+    .modal-body { overflow-y: auto; padding: 15px 18px; flex: 1; }
+    .modal-foot { padding: 12px 18px; border-top: 1px solid #e5e0d5; display: flex; justify-content: flex-end; gap: 6px; }
+    .txn-group { margin-bottom: 18.3px; padding: 9px; background: #f9f7f3; border-radius: 4.5px; border-left: 4px solid #305496; }
+    .txn-group-title { font-weight: 700; color: #305496; margin-bottom: 6px; font-size: 10px; }
+    .txn-table { width: 100%; border-collapse: collapse; font-size: 9px; }
+    .txn-table th { background: #e5e0d5; padding: 6px; text-align: left; font-weight: 600; border: 1px solid #ddd; }
+    .txn-table td { padding: 6px; border: 1px solid #ddd; }
+    .txn-table .amt { text-align: right; font-family: 'Courier New', monospace; }
+    .calc-breakdown { margin: 15px 0; padding: 12px; background: #f5f5f5; border-radius: 4.5px; }
+    .calc-breakdown h4 { margin: 0 0 9px; font-size: 10px; color: #333; }
+    .calc-step { display: grid; grid-template-columns: 200px 1fr; gap: 6px; margin: 6px 0; font-size: 9px; align-items: center; }
+    .calc-step-label { font-weight: 600; color: #666; }
+    .calc-step-value { color: #333; }
+    .doc-links { margin: 15px 0; padding: 12px; background: #f0f7ff; border-radius: 4.5px; border-left: 4px solid #2e5b8a; }
+    .doc-links h4 { margin: 0 0 9px; font-size: 10px; color: #2e5b8a; }
+    .doc-link { display: block; margin: 4.5px 0; font-size: 9px; }
+    .doc-link a { color: #2e5b8a; text-decoration: none; }
+    .doc-link a:hover { text-decoration: underline; }
+    .doc-link-icon { display: inline-block; width: 16px; height: 16px; margin-right: 3px; }
+    .note-flag { display: inline-block; font-size: 7.5px; font-weight: 700; padding: 1.5px 4.5px; border-radius: 2.3px; margin-left: 4.5px; }
+    .note-flag.est { background: #fff3cd; color: #856404; }
+    .note-flag.inflated { background: #f8d7da; color: #721c24; }
+    /* AI Question Box styling */
+    .ai-question-box { margin: 9px 0; padding: 10.5px 12px; background: #e8f3ff; border-radius: 4.5px; border-left: 4px solid #2e5b8a; }
+    .ai-question-header { display: flex; align-items: center; gap: 9px; cursor: pointer; user-select: none; }
+    .ai-question-icon { font-size: 13.8px; flex-shrink: 0; }
+    .ai-question-title { flex: 1; font-size: 9px; font-weight: 600; color: #1f5f9d; }
+    .ai-question-link { display: inline-block; padding: 3.8px 9px; background: white; color: #0066cc; border: 1px solid #0066cc; border-radius: 3px; font-size: 8.4px; font-weight: 600; text-decoration: none; cursor: pointer; transition: all 0.2s; flex-shrink: 0; }
+    .ai-question-link:hover { background: #e8f3ff; font-weight: 700; }
+    .ai-question-content { display: none; margin-top: 9px; padding-top: 9px; border-top: 1px solid rgba(31, 95, 157, 0.3); }
+    .ai-question-content.open { display: block; }
+    .ai-question-content ul { margin: 0; padding: 0 0 0 15px; list-style: disc; }
+    .ai-question-content li { margin: 6px 0; font-size: 9px; color: #1f5f9d; line-height: 1.45; }
+    @media print {
+      aside, .topbar, .head-actions, .foot { display: none !important; }
+      .main, .content { margin: 0 !important; padding: 0 !important; }
+      .panel { break-inside: avoid; }
+      .modal { display: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <!-- ===================== SIDEBAR ===================== -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">
+        <img src="logo-vfi.jpg" alt="VFI Logo" />
+        <span class="brand-mark-fallback">VFI</span>
+      </div>
+      <div class="brand-text">
+        <span class="brand-name">Veritas</span>
+        <span class="brand-sub">Financial Intelligence</span>
+      </div>
+    </div>
+    <nav class="nav">
+      <div class="nav-group-label">Workspace</div>
+      <a class="nav-item" href="index.html"><span class="nav-ico">◆</span> Dashboard</a>
+      <a class="nav-item" href="#"><span class="nav-ico">▤</span> Matters</a>
+      <a class="nav-item" href="schedules.html"><span class="nav-ico">◷</span> Calendar</a>
+      <a class="nav-item" href="#"><span class="nav-ico">☑</span> Tasks</a>
+      <a class="nav-item" href="#"><span class="nav-ico">◍</span> Clients</a>
+
+      <div class="nav-group-label">Analysis Modules</div>
+      <a class="nav-item" href="income-imputation.html"><span class="nav-ico">💠</span> Income Engine</a>
+      <a class="nav-item" href="spousal.html"><span class="nav-ico">⚖</span> Support Calculator</a>
+      <a class="nav-item" href="child-support.html"><span class="nav-ico">◈</span> Child Support</a>
+      <a class="nav-item" href="equitable-distribution.html"><span class="nav-ico">⊟</span> Assets</a>
+      <a class="nav-item" href="custody.html"><span class="nav-ico">⌘</span> Custody</a>
+      <a class="nav-item" href="credits.html"><span class="nav-ico"></span> Credits &amp; Adjustments</a>
+
+      <div class="nav-group-label">Tools</div>
+      <a class="nav-item" href="document-hub-master.html"><span class="nav-ico">📁</span> Document Hub</a>
+      <a class="nav-item" href="estate.html"><span class="nav-ico">▧</span> Reports</a>
+      <a class="nav-item" href="forensic-tracing.html"><span class="nav-ico">⌕</span> Forensic Tracing</a>
+      <a class="nav-item" href="settlement.html"><span class="nav-ico">⇄</span> Settlement Modeling</a>
+      <a class="nav-item" href="regulations.html"><span class="nav-ico">⚖</span> Regulations</a>
+      <a class="nav-item" href="equitable-distribution.html"><span class="nav-ico">§</span> Prenup Module</a>
+      <a class="nav-item" href="discovery-intake.html"><span class="nav-ico">⤓</span> Document Intake</a>
+      <a class="nav-item" href="discovery-intake.html"><span class="nav-ico">◉</span> Compliance</a>
+      <a class="nav-item" href="red-flags.html"><span class="nav-ico">🚩</span> Red-Flag Detection</a>
+    </nav>
+
+    <div class="sidebar-foot">
+      <div class="plan-chip"><span style="color:var(--green)"></span> Secure Connection  encrypted &amp; confidential</div>
+    </div>
+  </aside>
+
+  <!-- ===================== MAIN ===================== -->
+  <main class="main">
+    <header class="topbar">
+      <div class="matter-switcher">
+        <span class="matter-label">Active Matter</span>
+        <button class="matter-btn">
+          <strong>Petitioner v. Respondent</strong>
+          <span class="case-no">No. [Case Number]  [Jurisdiction]</span>
+          <span class="chev"></span>
+        </button>
+      </div>
+      <div class="topbar-right">
+        <div class="user">
+          <div class="avatar">WU</div>
+          <div class="user-meta">
+            <span class="user-name">Workspace User</span>
+            <span class="user-role">Matter Name</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- INTAKE QUESTIONNAIRE LINK -->
+    <div style="background: #e8f3ff; padding: 12px 18px; border-bottom: 2px solid #1f5f9d; text-align: center; display: flex; gap: 12px; justify-content: center; align-items: center;">
+      <a href="intake-questionnaire.html" style="display: inline-block; padding: 9px 18px; background: #1f5f9d; color: white; text-decoration: none; border-radius: 5px; font-weight: 600; font-size: 11.7px; transition: background 0.2s;">📋 Link to Intake Questionnaire</a>
+      <a href="document-hub-expenses.html" style="display: inline-block; padding: 9px 18px; background: #2e7d32; color: white; text-decoration: none; border-radius: 5px; font-weight: 600; font-size: 11.7px; transition: background 0.2s;">📁 Upload Expense Documents</a>
+    </div>
+
+    <div class="content">
+      <section class="page-head">
+        <div>
+          <h1>AFI Discrepancy Analysis</h1>
+          <p class="sub">Affidavit of Financial Information reconciliation  supported-spouse spending comparison, comparative expert positions, and source-backed averaging shown line by line</p>
+          <div class="afi-active-method-line" id="afiActiveMethodLine"></div>
+          <div class="afi-saved-line" id="afiSavedSnapshotLine"></div>
+          <div class="afi-discovery-bridge-line" id="afiDiscoveryBridgeLine"></div>
+        </div>
+        <div class="head-actions">
+          <button class="btn ghost" id="afiExportOverridesBtn">Export Override Audit (CSV)</button>
+          <button class="btn ghost" id="afiJudgeReportBtn" title="Create a high-level Necessary, Discretionary, and Expert comparison report">Export Judge Summary</button>
+          <button class="btn ghost" id="afiPrintBtn">Print / Save PDF</button>
+        </div>
+      </section>
+
+      <!-- KPI strip -->
+      <section class="kpi-row" id="afiKpis"></section>
+
+      <!-- Support / methodology -->
+      <div class="panel">
+        <div class="panel-head">
+          <h3>Data Sources &amp; Calculation Methodology</h3>
+          <span class="tag">source-anchored</span>
+        </div>
+        <p class="panel-note" style="font-size: 10.5px;"><strong>Analysis Period:</strong> [Start Date]-[End Date]. Each category averaged over the actual documented month span available in supporting statements. <strong>Expert Reconciliation:</strong> Expert claims [Expert Total]/mo ([Necessary Amount] necessary + [Discretionary Amount] discretionary). Actual documented: [Respondent Total]/mo. <strong>Variance: [Difference]/mo ([Percentage]%)</strong></p>
+        <div class="afi-source">
+          <div class="src-row"><span class="src-who petitioner">Petitioner avg/mo</span><span class="src-desc" id="afiSourcePetitioner">[Data pending]</span></div>
+          <div class="src-row"><span class="src-who respondent">Respondent avg/mo</span><span class="src-desc" id="afiSourceRespondent">[Data pending]</span></div>
+          <div class="src-row"><span class="src-who expert">Comparative Expert /mo</span><span class="src-desc" id="afiSourceExpert">[Data pending]</span></div>
+        </div>
+      </div>
+
+      <!-- Necessary -->
+      <div class="panel">
+        <div class="panel-head">
+          <h3>Expense Reconciliation</h3>
+          <span class="tag">AFI submission comparison</span>
+        </div>
+        <p class="panel-note">The table below compares documented spending against expert claims. Rows flagged <span style="background: #fff3cd; color: #856404; padding: 1.5px 4.5px; border-radius: 2.3px; font-weight: 600; font-size: 9px;">Expert Inflated</span> indicate where expert claims exceed documented amounts; estimates are flagged separately when no direct statement support exists.</p>
+        <div id="afiNecessary"></div>
+
+        <!-- COMPREHENSIVE AFI TABLE -->
+        <div id="enhancedAFITable" style="margin-top: 30px; padding-top: 18.3px; border-top: 2px solid #d7e0ec;">
+          <h4 style="font-size: 10.5px; font-weight: 600; color: #12233b; margin-bottom: 6px;">Line-by-Line Expense Reconciliation</h4>
+          <p style="font-size: 9px; color: #666; margin-bottom: 14.4px;"><strong>Support Documents:</strong> All statements from [period]. Each mapped expense uses its own active statement-month denominator; classified, excluded, and unresolved labels remain visible in the full-period audit below.</p>
+          <div id="afiFullPeriodAudit" style="margin-bottom: 18.3px;"></div>
+          <div style="overflow-x: auto; border-radius: 6px; box-shadow: 0 0.8px 2.5px rgba(0,0,0,0.05); background: white;">
+            <table class="recon mr-table afi-table" style="width: 100%; border-collapse: collapse; font-size: 10px;">
+              <thead style="background: #f5f7fa;">
+                <tr>
+                  <th style="padding: 9px 11px; text-align: left; font-weight: 600; font-size: 9px; color: #12233b;">EXPENSE LINE</th>
+                  <th style="padding: 9px 11px; text-align: right; font-weight: 600; font-size: 9px; color: #12233b;">RESPONDENT AVG/MO</th>
+                  <th style="padding: 9px 11px; text-align: right; font-weight: 600; font-size: 9px; color: #12233b;">EXPERT /MO</th>
+                  <th style="padding: 9px 11px; text-align: right; font-weight: 600; font-size: 9px; color: #12233b;">DIFFERENCE</th>
+                  <th style="padding: 9px 11px; text-align: center; font-weight: 600; font-size: 9px; color: #12233b;">STATUS</th>
+                </tr>
+              </thead>
+              <tbody>
+
+
+
+              </tbody>
+            </table>
+          </div>
+
+      </div>
+
+      <!-- Discretionary -->
+      <div class="panel">
+        <div class="panel-head">
+          <h3>Discretionary Spending Analysis</h3>
+          <span class="tag">context only  not AFI need</span>
+        </div>
+        <p class="panel-note">Discretionary spending is shown for completeness and to test the expert's lifestyle claims. It is <em>not</em> part of the necessary-need figure submitted on the AFI.</p>
+        <div id="afiDiscretionary"></div>
+      </div>
+
+      <!-- Bottom line -->
+      <div class="panel">
+        <div class="panel-head">
+          <h3>Summary &amp; Conclusion</h3>
+          <span class="tag">for argument</span>
+        </div>
+        <div id="afiBottom"></div>
+      </div>
+
+      <!-- ============ SECTION 6: MONTHLY EXPENSES FOR CHILDREN ============ -->
+      <div class="panel">
+        <div class="panel-head">
+          <h3>Section 6: Monthly Expenses for Children</h3>
+          <span class="tag">child-related spending</span>
+        </div>
+        <div class="ai-question-box">
+          <div class="ai-question-header" onclick="this.parentElement.querySelector('.ai-question-content').classList.toggle('open')">
+            <span class="ai-question-icon">❓</span>
+            <span class="ai-question-title">Common Questions About Children Expenses</span>
+            <a href="intake-questionnaire.html" class="ai-question-link">[Link to Intake Questionnaire]</a>
+          </div>
+          <div class="ai-question-content">
+            <ul>
+              <li><strong>Do you have health insurance available?</strong> (Yes/No)</li>
+              <li><strong>Is the health insurance employer-provided, self-employed, or through the marketplace?</strong></li>
+              <li><strong>Who is responsible for child care costs?</strong> (You/Shared/Other parent)</li>
+              <li><strong>Are there court-ordered child support obligations from previous relationships?</strong></li>
+              <li><strong>Does your employer offer a pretax child care FSA/dependent care account?</strong></li>
+            </ul>
+          </div>
+        </div>
+        <p class="panel-note">This section reconciles monthly child-related expenses including health insurance, child care, court-ordered support, and extraordinary expenses. Each item is documented from supporting statements and compared against expert claims.</p>
+
+        <!-- CHILDREN EXPENSES TABLE -->
+        <div style="overflow-x: auto; border-radius: 6px; box-shadow: 0 0.8px 2.5px rgba(0,0,0,0.05); background: white; margin-top: 12px;">
+          <table class="recon mr-table afi-table" style="width: 100%; border-collapse: collapse; font-size: 10px;">
+            <thead style="background: #f5f7fa;">
+              <tr>
+                <th style="padding: 9px 11px; text-align: left; font-weight: 600; font-size: 9px; color: #12233b;">EXPENSE LINE</th>
+                <th style="padding: 9px 11px; text-align: right; font-weight: 600; font-size: 9px; color: #12233b;">PETITIONER /MO</th>
+                <th style="padding: 9px 11px; text-align: right; font-weight: 600; font-size: 9px; color: #12233b;">RESPONDENT /MO</th>
+                <th style="padding: 9px 11px; text-align: right; font-weight: 600; font-size: 9px; color: #12233b;">EXPERT /MO</th>
+                <th style="padding: 9px 11px; text-align: center; font-weight: 600; font-size: 9px; color: #12233b;">STATUS</th>
+              </tr>
+            </thead>
+            <tbody>
+
+              <!-- ============ SECTION 6: SCHEDULE OF ALL MONTHLY EXPENSES FOR CHILDREN (A-H) ============ -->
+              <tr style="background: #e8f0f7; font-weight: 700; border-bottom: 2px solid #4a7ba7; border-top: 2px solid #4a7ba7;">
+                <td colspan="5" style="padding: 9px 11px; color: #2e5b8a; font-size: 9px; font-weight: 700;">SECTION 6: SCHEDULE OF ALL MONTHLY EXPENSES FOR CHILDREN (A-H)</td>
+              </tr>
+
+              <!-- A. HEALTH INSURANCE -->
+              <tr style="border-bottom: 1px solid #e5e0d5; background: #fff; font-weight: 600; color: #333;">
+                <td colspan="5" style="padding: 9px 11px; font-size: 8.4px; font-weight: 600; background: #f0f4f8;">A. HEALTH INSURANCE</td>
+              </tr>
+              <tr style="border-bottom: 1px solid #e5e0d5; background: #fff;">
+                <td style="padding: 9px 11px; padding-left: 23px;">1. Self-Employed Health Insurance</td>
+                <td style="padding: 9px 11px; text-align: right; color: #2e5b8a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="ChildHealthIns_SelfEmp" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; color: #a24a2a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="ChildHealthIns_SelfEmp" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; font-weight: 600;">—</td>
+                <td style="padding: 9px 11px; text-align: center; font-size: 8.4px;"><span style="background: #e8f5e9; color: #2e7d32; padding: 1.5px 4.5px; border-radius: 2.3px; font-weight: 600; font-size: 9px;">Template</span></td>
+              </tr>
+              <tr style="border-bottom: 1px solid #e5e0d5; background: #fff;">
+                <td style="padding: 9px 11px; padding-left: 23px;">2. Employer-Provided Health Insurance</td>
+                <td style="padding: 9px 11px; text-align: right; color: #2e5b8a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="ChildHealthIns_Emp" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; color: #a24a2a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="ChildHealthIns_Emp" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; font-weight: 600;">—</td>
+                <td style="padding: 9px 11px; text-align: center; font-size: 8.4px;"><span style="background: #e8f5e9; color: #2e7d32; padding: 1.5px 4.5px; border-radius: 2.3px; font-weight: 600; font-size: 9px;">Template</span></td>
+              </tr>
+              <tr style="border-bottom: 2px solid #e5e0d5; background: #fff;">
+                <td style="padding: 9px 11px; padding-left: 23px;">3. Children's Portion (if shared plan)</td>
+                <td style="padding: 9px 11px; text-align: right; color: #2e5b8a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="ChildHealthIns_Share" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; color: #a24a2a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="ChildHealthIns_Share" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; font-weight: 600;">—</td>
+                <td style="padding: 9px 11px; text-align: center; font-size: 8.4px;"><span style="background: #e8f5e9; color: #2e7d32; padding: 1.5px 4.5px; border-radius: 2.3px; font-weight: 600; font-size: 9px;">Template</span></td>
+              </tr>
+
+              <!-- A. HEALTH INSURANCE SUBTOTAL -->
+              <tr style="background: #d4e6f1; font-weight: 700; border-bottom: 1px solid #4a7ba7;">
+                <td colspan="5" style="padding: 9px 11px; color: #2e5b8a; font-size: 9px; font-weight: 700;">A. SUBTOTAL - HEALTH INSURANCE: —/mo (Pet) | —/mo (Resp) | —/mo (Expert)</td>
+              </tr>
+
+              <!-- B. DENTAL/VISION INSURANCE -->
+              <tr style="border-bottom: 1px solid #e5e0d5; background: #fff; font-weight: 600; color: #333;">
+                <td colspan="5" style="padding: 9px 11px; font-size: 8.4px; font-weight: 600; background: #f0f4f8;">B. DENTAL/VISION INSURANCE</td>
+              </tr>
+              <tr style="border-bottom: 1px solid #e5e0d5; background: #fff;">
+                <td style="padding: 9px 11px; padding-left: 23px;">1. Dental Insurance</td>
+                <td style="padding: 9px 11px; text-align: right; color: #2e5b8a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="ChildDentalVision_Dental" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; color: #a24a2a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="ChildDentalVision_Dental" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; font-weight: 600;">—</td>
+                <td style="padding: 9px 11px; text-align: center; font-size: 8.4px;"><span style="background: #e8f5e9; color: #2e7d32; padding: 1.5px 4.5px; border-radius: 2.3px; font-weight: 600; font-size: 9px;">Template</span></td>
+              </tr>
+              <tr style="border-bottom: 2px solid #e5e0d5; background: #fff;">
+                <td style="padding: 9px 11px; padding-left: 23px;">2. Vision Insurance</td>
+                <td style="padding: 9px 11px; text-align: right; color: #2e5b8a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="ChildDentalVision_Vision" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; color: #a24a2a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="ChildDentalVision_Vision" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; font-weight: 600;">—</td>
+                <td style="padding: 9px 11px; text-align: center; font-size: 8.4px;"><span style="background: #e8f5e9; color: #2e7d32; padding: 1.5px 4.5px; border-radius: 2.3px; font-weight: 600; font-size: 9px;">Template</span></td>
+              </tr>
+
+              <!-- B. DENTAL/VISION SUBTOTAL -->
+              <tr style="background: #d4e6f1; font-weight: 700; border-bottom: 1px solid #4a7ba7;">
+                <td colspan="5" style="padding: 9px 11px; color: #2e5b8a; font-size: 9px; font-weight: 700;">B. SUBTOTAL - DENTAL/VISION INSURANCE: —/mo (Pet) | —/mo (Resp) | —/mo (Expert)</td>
+              </tr>
+
+              <!-- C. UNREIMBURSED MEDICAL AND DENTAL EXPENSES -->
+              <tr style="border-bottom: 1px solid #e5e0d5; background: #fff; font-weight: 600; color: #333;">
+                <td colspan="5" style="padding: 9px 11px; font-size: 8.4px; font-weight: 600; background: #f0f4f8;">C. UNREIMBURSED MEDICAL AND DENTAL EXPENSES</td>
+              </tr>
+              <tr style="border-bottom: 1px solid #e5e0d5; background: #fff;">
+                <td style="padding: 9px 11px; padding-left: 23px;">1. Drugs and Medical Supplies</td>
+                <td style="padding: 9px 11px; text-align: right; color: #2e5b8a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="ChildUnreimbMed_Drugs" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; color: #a24a2a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="ChildUnreimbMed_Drugs" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; font-weight: 600;">—</td>
+                <td style="padding: 9px 11px; text-align: center; font-size: 8.4px;"><span style="background: #e8f5e9; color: #2e7d32; padding: 1.5px 4.5px; border-radius: 2.3px; font-weight: 600; font-size: 9px;">Template</span></td>
+              </tr>
+              <tr style="border-bottom: 2px solid #e5e0d5; background: #fff;">
+                <td style="padding: 9px 11px; padding-left: 23px;">2. Other Medical/Dental</td>
+                <td style="padding: 9px 11px; text-align: right; color: #2e5b8a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="ChildUnreimbMed_Other" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; color: #a24a2a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="ChildUnreimbMed_Other" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; font-weight: 600;">—</td>
+                <td style="padding: 9px 11px; text-align: center; font-size: 8.4px;"><span style="background: #e8f5e9; color: #2e7d32; padding: 1.5px 4.5px; border-radius: 2.3px; font-weight: 600; font-size: 9px;">Template</span></td>
+              </tr>
+
+              <!-- C. UNREIMBURSED MEDICAL SUBTOTAL -->
+              <tr style="background: #d4e6f1; font-weight: 700; border-bottom: 1px solid #4a7ba7;">
+                <td colspan="5" style="padding: 9px 11px; color: #2e5b8a; font-size: 9px; font-weight: 700;">C. SUBTOTAL - UNREIMBURSED MEDICAL/DENTAL: —/mo (Pet) | —/mo (Resp) | —/mo (Expert)</td>
+              </tr>
+
+              <!-- D. CHILD CARE COSTS -->
+              <tr style="border-bottom: 1px solid #e5e0d5; background: #fff; font-weight: 600; color: #333;">
+                <td colspan="5" style="padding: 9px 11px; font-size: 8.4px; font-weight: 600; background: #f0f4f8;">D. CHILD CARE COSTS</td>
+              </tr>
+              <tr style="border-bottom: 1px solid #e5e0d5; background: #fff;">
+                <td style="padding: 9px 11px; padding-left: 23px;">1. Daycare/After-school Care</td>
+                <td style="padding: 9px 11px; text-align: right; color: #2e5b8a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="ChildCare_Daycare" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; color: #a24a2a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="ChildCare_Daycare" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; font-weight: 600;">—</td>
+                <td style="padding: 9px 11px; text-align: center; font-size: 8.4px;"><span style="background: #e8f5e9; color: #2e7d32; padding: 1.5px 4.5px; border-radius: 2.3px; font-weight: 600; font-size: 9px;">Template</span></td>
+              </tr>
+              <tr style="border-bottom: 2px solid #e5e0d5; background: #fff;">
+                <td style="padding: 9px 11px; padding-left: 23px;">2. School-related Care (camps, etc.)</td>
+                <td style="padding: 9px 11px; text-align: right; color: #2e5b8a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="ChildCare_School" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; color: #a24a2a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="ChildCare_School" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; font-weight: 600;">—</td>
+                <td style="padding: 9px 11px; text-align: center; font-size: 8.4px;"><span style="background: #e8f5e9; color: #2e7d32; padding: 1.5px 4.5px; border-radius: 2.3px; font-weight: 600; font-size: 9px;">Template</span></td>
+              </tr>
+
+              <!-- D. CHILD CARE COSTS SUBTOTAL -->
+              <tr style="background: #d4e6f1; font-weight: 700; border-bottom: 1px solid #4a7ba7;">
+                <td colspan="5" style="padding: 9px 11px; color: #2e5b8a; font-size: 9px; font-weight: 700;">D. SUBTOTAL - CHILD CARE COSTS: —/mo (Pet) | —/mo (Resp) | —/mo (Expert)</td>
+              </tr>
+
+              <!-- E. EMPLOYER PRETAX PROGRAM -->
+              <tr style="border-bottom: 1px solid #e5e0d5; background: #fff; font-weight: 600; color: #333;">
+                <td colspan="5" style="padding: 9px 11px; font-size: 8.4px; font-weight: 600; background: #f0f4f8;">E. EMPLOYER PRETAX PROGRAM</td>
+              </tr>
+              <tr style="border-bottom: 2px solid #e5e0d5; background: #fff;">
+                <td style="padding: 9px 11px; padding-left: 23px;">1. Pretax Child Care Enrollment (Yes/No)</td>
+                <td style="padding: 9px 11px; text-align: right; color: #2e5b8a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="ChildPretax_Enrollment" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; color: #a24a2a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="ChildPretax_Enrollment" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; font-weight: 600;">—</td>
+                <td style="padding: 9px 11px; text-align: center; font-size: 8.4px;"><span style="background: #e8f5e9; color: #2e7d32; padding: 1.5px 4.5px; border-radius: 2.3px; font-weight: 600; font-size: 9px;">Template</span></td>
+              </tr>
+
+              <!-- E. EMPLOYER PRETAX PROGRAM SUBTOTAL -->
+              <tr style="background: #d4e6f1; font-weight: 700; border-bottom: 1px solid #4a7ba7;">
+                <td colspan="5" style="padding: 9px 11px; color: #2e5b8a; font-size: 9px; font-weight: 700;">E. SUBTOTAL - EMPLOYER PRETAX PROGRAM: —/mo (Pet) | —/mo (Resp) | —/mo (Expert)</td>
+              </tr>
+
+              <!-- F. COURT ORDERED CHILD SUPPORT -->
+              <tr style="border-bottom: 1px solid #e5e0d5; background: #fff; font-weight: 600; color: #333;">
+                <td colspan="5" style="padding: 9px 11px; font-size: 8.4px; font-weight: 600; background: #f0f4f8;">F. COURT ORDERED CHILD SUPPORT</td>
+              </tr>
+              <tr style="border-bottom: 2px solid #e5e0d5; background: #fff;">
+                <td style="padding: 9px 11px; padding-left: 23px;">1. Child Support for Other Children</td>
+                <td style="padding: 9px 11px; text-align: right; color: #2e5b8a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="ChildSupport_Other" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; color: #a24a2a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="ChildSupport_Other" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; font-weight: 600;">—</td>
+                <td style="padding: 9px 11px; text-align: center; font-size: 8.4px;"><span style="background: #e8f5e9; color: #2e7d32; padding: 1.5px 4.5px; border-radius: 2.3px; font-weight: 600; font-size: 9px;">Template</span></td>
+              </tr>
+
+              <!-- F. COURT ORDERED CHILD SUPPORT SUBTOTAL -->
+              <tr style="background: #d4e6f1; font-weight: 700; border-bottom: 1px solid #4a7ba7;">
+                <td colspan="5" style="padding: 9px 11px; color: #2e5b8a; font-size: 9px; font-weight: 700;">F. SUBTOTAL - COURT ORDERED CHILD SUPPORT: —/mo (Pet) | —/mo (Resp) | —/mo (Expert)</td>
+              </tr>
+
+              <!-- G. COURT ORDERED SPOUSAL MAINTENANCE/SUPPORT (Alimony) -->
+              <tr style="border-bottom: 1px solid #e5e0d5; background: #fff; font-weight: 600; color: #333;">
+                <td colspan="5" style="padding: 9px 11px; font-size: 8.4px; font-weight: 600; background: #f0f4f8;">G. COURT ORDERED SPOUSAL MAINTENANCE/SUPPORT (Alimony)</td>
+              </tr>
+              <tr style="border-bottom: 2px solid #e5e0d5; background: #fff;">
+                <td style="padding: 9px 11px; padding-left: 23px;">1. Spousal Support to Previous Spouse</td>
+                <td style="padding: 9px 11px; text-align: right; color: #2e5b8a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="SpousalSupport_Previous" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; color: #a24a2a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="SpousalSupport_Previous" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; font-weight: 600;">—</td>
+                <td style="padding: 9px 11px; text-align: center; font-size: 8.4px;"><span style="background: #e8f5e9; color: #2e7d32; padding: 1.5px 4.5px; border-radius: 2.3px; font-weight: 600; font-size: 9px;">Template</span></td>
+              </tr>
+
+              <!-- G. COURT ORDERED SPOUSAL MAINTENANCE/SUPPORT SUBTOTAL -->
+              <tr style="background: #d4e6f1; font-weight: 700; border-bottom: 1px solid #4a7ba7;">
+                <td colspan="5" style="padding: 9px 11px; color: #2e5b8a; font-size: 9px; font-weight: 700;">G. SUBTOTAL - COURT ORDERED SPOUSAL MAINTENANCE/SUPPORT: —/mo (Pet) | —/mo (Resp) | —/mo (Expert)</td>
+              </tr>
+
+              <!-- H. EXTRAORDINARY EXPENSES -->
+              <tr style="border-bottom: 1px solid #e5e0d5; background: #fff; font-weight: 600; color: #333;">
+                <td colspan="5" style="padding: 9px 11px; font-size: 8.4px; font-weight: 600; background: #f0f4f8;">H. EXTRAORDINARY EXPENSES</td>
+              </tr>
+              <tr style="border-bottom: 1px solid #e5e0d5; background: #fff;">
+                <td style="padding: 9px 11px; padding-left: 23px;">1. For Children (Educational/Special Needs)</td>
+                <td style="padding: 9px 11px; text-align: right; color: #2e5b8a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="ExtraordinaryExp_Children" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; color: #a24a2a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="ExtraordinaryExp_Children" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; font-weight: 600;">—</td>
+                <td style="padding: 9px 11px; text-align: center; font-size: 8.4px;"><span style="background: #e8f5e9; color: #2e7d32; padding: 1.5px 4.5px; border-radius: 2.3px; font-weight: 600; font-size: 9px;">Template</span></td>
+              </tr>
+              <tr style="border-bottom: 2px solid #e5e0d5; background: #fff;">
+                <td style="padding: 9px 11px; padding-left: 23px;">2. For Self</td>
+                <td style="padding: 9px 11px; text-align: right; color: #2e5b8a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="ExtraordinaryExp_Self" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; color: #a24a2a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="ExtraordinaryExp_Self" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; font-weight: 600;">—</td>
+                <td style="padding: 9px 11px; text-align: center; font-size: 8.4px;"><span style="background: #e8f5e9; color: #2e7d32; padding: 1.5px 4.5px; border-radius: 2.3px; font-weight: 600; font-size: 9px;">Template</span></td>
+              </tr>
+
+              <!-- H. EXTRAORDINARY EXPENSES SUBTOTAL -->
+              <tr style="background: #d4e6f1; font-weight: 700; border-bottom: 1px solid #4a7ba7;">
+                <td colspan="5" style="padding: 9px 11px; color: #2e5b8a; font-size: 9px; font-weight: 700;">H. SUBTOTAL - EXTRAORDINARY EXPENSES: —/mo (Pet) | —/mo (Resp) | —/mo (Expert)</td>
+              </tr>
+
+              <!-- SECTION 6 GRAND TOTAL -->
+              <tr style="background: #c8d9e8; font-weight: 700; border-bottom: 2px solid #2e5b8a; border-top: 2px solid #2e5b8a;">
+                <td colspan="5" style="padding: 9px 11px; color: #2e5b8a; font-size: 10px; font-weight: 700;">SECTION 6 TOTAL - MONTHLY EXPENSES FOR CHILDREN (A-H): —/mo (Pet) | —/mo (Resp) | —/mo (Expert)</td>
+              </tr>
+
+            </tbody>
+          </table>
+        </div>
+
+        <!-- CHILDREN EXPENSES SUMMARY TOTALS -->
+        <div style="margin-top: 15px; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 9px;">
+          <div style="padding: 9px; background: #d4e6f1; border-radius: 4.5px; border-left: 4px solid #2e5b8a;">
+            <div style="font-size: 8.4px; color: #2e5b8a; font-weight: 700; text-transform: uppercase;">PETITIONER CHILD EXPENSES</div>
+            <div style="font-size: 13.8px; font-weight: 700; color: #12233b;">—/mo</div>
+            <div style="font-size: 9px; color: #666; margin-top: 3px;">Combined documented children expenses</div>
+          </div>
+          <div style="padding: 9px; background: #f7e2d8; border-radius: 4.5px; border-left: 4px solid #a24a2a;">
+            <div style="font-size: 8.4px; color: #a24a2a; font-weight: 700; text-transform: uppercase;">RESPONDENT CHILD EXPENSES</div>
+            <div style="font-size: 13.8px; font-weight: 700; color: #12233b;">—/mo</div>
+            <div style="font-size: 9px; color: #666; margin-top: 3px;">Combined documented children expenses</div>
+          </div>
+          <div style="padding: 9px; background: #ffebee; border-radius: 4.5px; border-left: 4px solid #b4232a;">
+            <div style="font-size: 8.4px; color: #b4232a; font-weight: 700; text-transform: uppercase;">EXPERT CLAIM</div>
+            <div style="font-size: 13.8px; font-weight: 700; color: #12233b;">—/mo</div>
+            <div style="font-size: 9px; color: #666; margin-top: 3px;">Expert-estimated children expenses</div>
+          </div>
+        </div>
+
+        <div style="margin-top: 12px; padding: 9px; background: #f0f7ff; border-radius: 4.5px; border-left: 4px solid #2e5b8a; font-size: 9px; color: #0063b1;">
+          <strong>CHILDREN EXPENSE RECONCILIATION:</strong> Each party's documented child-related expenses averaged over active statement months. Extraordinary expenses (sports, tutoring, etc.) are marked as estimated due to discretionary nature and should be reconciled against supporting receipts and enrollment documentation.
+        </div>
+
+      </div>
+
+      <!-- ============ SECTION 7: SCHEDULE OF ALL MONTHLY EXPENSES (A-F) ============ -->
+      <div class="panel">
+        <div class="panel-head">
+          <h3>Section 7: Schedule of All Monthly Expenses</h3>
+          <span class="tag">expense categorization</span>
+        </div>
+        <div class="ai-question-box">
+          <div class="ai-question-header" onclick="this.parentElement.querySelector('.ai-question-content').classList.toggle('open')">
+            <span class="ai-question-icon">❓</span>
+            <span class="ai-question-title">Common Questions About Monthly Expenses</span>
+            <a href="intake-questionnaire.html" class="ai-question-link">[Link to Intake Questionnaire]</a>
+          </div>
+          <div class="ai-question-content">
+            <ul>
+              <li><strong>Are you self-employed or a salaried employee?</strong></li>
+              <li><strong>Do you own or rent your home?</strong></li>
+              <li><strong>Are any utilities bundled in your mortgage/rent?</strong></li>
+              <li><strong>Do you have employer-provided transportation or vehicle allowances?</strong></li>
+              <li><strong>Does your employer offer any FSA or pre-tax benefits for health/dependent care?</strong></li>
+              <li><strong>Are there any recurring expenses not listed here?</strong> (e.g., loan payments, memberships)</li>
+            </ul>
+          </div>
+        </div>
+        <p class="panel-note">This section organizes monthly personal and household expenses by category (A-F). Each expense is documented from supporting statements and compared across petitioner, respondent, and expert positions.</p>
+
+        <!-- SECTION 7 EXPENSES TABLE -->
+        <div style="overflow-x: auto; border-radius: 6px; box-shadow: 0 0.8px 2.5px rgba(0,0,0,0.05); background: white; margin-top: 12px;">
+          <table class="recon mr-table afi-table" style="width: 100%; border-collapse: collapse; font-size: 10px;">
+            <thead style="background: #f5f7fa;">
+              <tr>
+                <th style="padding: 9px 11px; text-align: left; font-weight: 600; font-size: 9px; color: #12233b;">EXPENSE LINE</th>
+                <th style="padding: 9px 11px; text-align: right; font-weight: 600; font-size: 9px; color: #12233b;">PETITIONER /MO</th>
+                <th style="padding: 9px 11px; text-align: right; font-weight: 600; font-size: 9px; color: #12233b;">RESPONDENT /MO</th>
+                <th style="padding: 9px 11px; text-align: right; font-weight: 600; font-size: 9px; color: #12233b;">EXPERT /MO</th>
+                <th style="padding: 9px 11px; text-align: center; font-weight: 600; font-size: 9px; color: #12233b;">STATUS</th>
+              </tr>
+            </thead>
+            <tbody>
+
+              <!-- ============ SECTION 7: SCHEDULE OF ALL MONTHLY EXPENSES (A-F) ============ -->
+              <tr style="background: #e8f3ff; font-weight: 700; border-bottom: 2px solid #1f5f9d; border-top: 2px solid #1f5f9d;">
+                <td colspan="5" style="padding: 9px 11px; color: #1f5f9d; font-size: 9px; font-weight: 700;">SECTION 7: SCHEDULE OF ALL MONTHLY EXPENSES (A-F)</td>
+              </tr>
+
+              <!-- A. HOUSING EXPENSES -->
+              <tr style="border-bottom: 1px solid #e5e0d5; background: #fff; font-weight: 600; color: #333;">
+                <td colspan="5" style="padding: 9px 11px; font-size: 8.4px; font-weight: 600; background: #f0f4f8;"><strong>A. HOUSING EXPENSES</strong></td>
+              </tr>
+              <tr style="border-bottom: 1px solid #e5e0d5; background: #fff;">
+                <td style="padding: 9px 11px; padding-left: 23px;">1. House payment - First Mortgage</td>
+                <td style="padding: 9px 11px; text-align: right; color: #2e5b8a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Housing_FirstMortgage" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; color: #a24a2a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Housing_FirstMortgage" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; font-weight: 600;">—</td>
+                <td style="padding: 9px 11px; text-align: center; font-size: 8.4px;"><span style="background: #e8f5e9; color: #2e7d32; padding: 1.5px 4.5px; border-radius: 2.3px; font-weight: 600; font-size: 9px;">Template</span></td>
+              </tr>
+              <tr style="border-bottom: 1px solid #e5e0d5; background: #fff;">
+                <td style="padding: 9px 11px; padding-left: 23px;">2. House payment - Second Mortgage</td>
+                <td style="padding: 9px 11px; text-align: right; color: #2e5b8a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Housing_SecondMortgage" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; color: #a24a2a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Housing_SecondMortgage" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; font-weight: 600;">—</td>
+                <td style="padding: 9px 11px; text-align: center; font-size: 8.4px;"><span style="background: #e8f5e9; color: #2e7d32; padding: 1.5px 4.5px; border-radius: 2.3px; font-weight: 600; font-size: 9px;">Template</span></td>
+              </tr>
+              <tr style="border-bottom: 1px solid #e5e0d5; background: #fff;">
+                <td style="padding: 9px 11px; padding-left: 23px;">3. House payment - Homeowners Association Fee</td>
+                <td style="padding: 9px 11px; text-align: right; color: #2e5b8a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Housing_HOA" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; color: #a24a2a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Housing_HOA" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; font-weight: 600;">—</td>
+                <td style="padding: 9px 11px; text-align: center; font-size: 8.4px;"><span style="background: #e8f5e9; color: #2e7d32; padding: 1.5px 4.5px; border-radius: 2.3px; font-weight: 600; font-size: 9px;">Template</span></td>
+              </tr>
+              <tr style="border-bottom: 1px solid #e5e0d5; background: #fff;">
+                <td style="padding: 9px 11px; padding-left: 23px;">4. House payment - Rent</td>
+                <td style="padding: 9px 11px; text-align: right; color: #2e5b8a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Housing_Rent" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; color: #a24a2a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Housing_Rent" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; font-weight: 600;">—</td>
+                <td style="padding: 9px 11px; text-align: center; font-size: 8.4px;"><span style="background: #e8f5e9; color: #2e7d32; padding: 1.5px 4.5px; border-radius: 2.3px; font-weight: 600; font-size: 9px;">Template</span></td>
+              </tr>
+              <tr style="border-bottom: 1px solid #e5e0d5; background: #fff;">
+                <td style="padding: 9px 11px; padding-left: 23px;">5. Repair &amp; upkeep</td>
+                <td style="padding: 9px 11px; text-align: right; color: #2e5b8a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Housing_Repair" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; color: #a24a2a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Housing_Repair" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; font-weight: 600;">—</td>
+                <td style="padding: 9px 11px; text-align: center; font-size: 8.4px;"><span style="background: #e8f5e9; color: #2e7d32; padding: 1.5px 4.5px; border-radius: 2.3px; font-weight: 600; font-size: 9px;">Template</span></td>
+              </tr>
+              <tr style="border-bottom: 1px solid #e5e0d5; background: #fff;">
+                <td style="padding: 9px 11px; padding-left: 23px;">6. Yard work/Pool/Pest Control</td>
+                <td style="padding: 9px 11px; text-align: right; color: #2e5b8a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Housing_YardPool" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; color: #a24a2a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Housing_YardPool" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; font-weight: 600;">—</td>
+                <td style="padding: 9px 11px; text-align: center; font-size: 8.4px;"><span style="background: #e8f5e9; color: #2e7d32; padding: 1.5px 4.5px; border-radius: 2.3px; font-weight: 600; font-size: 9px;">Template</span></td>
+              </tr>
+              <tr style="border-bottom: 1px solid #e5e0d5; background: #fff;">
+                <td style="padding: 9px 11px; padding-left: 23px;">7. Insurance &amp; taxes not included in house payment</td>
+                <td style="padding: 9px 11px; text-align: right; color: #2e5b8a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Housing_InsTax" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; color: #a24a2a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Housing_InsTax" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; font-weight: 600;">—</td>
+                <td style="padding: 9px 11px; text-align: center; font-size: 8.4px;"><span style="background: #e8f5e9; color: #2e7d32; padding: 1.5px 4.5px; border-radius: 2.3px; font-weight: 600; font-size: 9px;">Template</span></td>
+              </tr>
+              <tr style="border-bottom: 2px solid #e5e0d5; background: #fff;">
+                <td style="padding: 9px 11px; padding-left: 23px;">8. Other (Explain)</td>
+                <td style="padding: 9px 11px; text-align: right; color: #2e5b8a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Housing_Other" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; color: #a24a2a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Housing_Other" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; font-weight: 600;">—</td>
+                <td style="padding: 9px 11px; text-align: center; font-size: 8.4px;"><span style="background: #e8f5e9; color: #2e7d32; padding: 1.5px 4.5px; border-radius: 2.3px; font-weight: 600; font-size: 9px;">Template</span></td>
+              </tr>
+
+              <!-- A. HOUSING SUBTOTAL -->
+              <tr style="background: #c8e6c9; font-weight: 700; border-bottom: 1px solid #2e7d32;">
+                <td colspan="5" style="padding: 9px 11px; color: #2e7d32; font-size: 9px; font-weight: 700;">A. SUBTOTAL - HOUSING EXPENSES: —/mo (Pet) | —/mo (Resp) | —/mo (Expert)</td>
+              </tr>
+
+              <!-- B. UTILITIES -->
+              <tr style="border-bottom: 1px solid #e5e0d5; background: #fff; font-weight: 600; color: #333;">
+                <td colspan="5" style="padding: 9px 11px; font-size: 8.4px; font-weight: 600; background: #f0f4f8;"><strong>B. UTILITIES</strong></td>
+              </tr>
+              <tr style="border-bottom: 1px solid #e5e0d5; background: #fff;">
+                <td style="padding: 9px 11px; padding-left: 23px;">1. Water, sewer, and garbage</td>
+                <td style="padding: 9px 11px; text-align: right; color: #2e5b8a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Utilities_Water" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; color: #a24a2a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Utilities_Water" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; font-weight: 600;">—</td>
+                <td style="padding: 9px 11px; text-align: center; font-size: 8.4px;"><span style="background: #e8f5e9; color: #2e7d32; padding: 1.5px 4.5px; border-radius: 2.3px; font-weight: 600; font-size: 9px;">Template</span></td>
+              </tr>
+              <tr style="border-bottom: 1px solid #e5e0d5; background: #fff;">
+                <td style="padding: 9px 11px; padding-left: 23px;">2. Electricity</td>
+                <td style="padding: 9px 11px; text-align: right; color: #2e5b8a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Utilities_Electric" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; color: #a24a2a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Utilities_Electric" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; font-weight: 600;">—</td>
+                <td style="padding: 9px 11px; text-align: center; font-size: 8.4px;"><span style="background: #e8f5e9; color: #2e7d32; padding: 1.5px 4.5px; border-radius: 2.3px; font-weight: 600; font-size: 9px;">Template</span></td>
+              </tr>
+              <tr style="border-bottom: 1px solid #e5e0d5; background: #fff;">
+                <td style="padding: 9px 11px; padding-left: 23px;">3. Gas</td>
+                <td style="padding: 9px 11px; text-align: right; color: #2e5b8a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Utilities_Gas" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; color: #a24a2a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Utilities_Gas" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; font-weight: 600;">—</td>
+                <td style="padding: 9px 11px; text-align: center; font-size: 8.4px;"><span style="background: #e8f5e9; color: #2e7d32; padding: 1.5px 4.5px; border-radius: 2.3px; font-weight: 600; font-size: 9px;">Template</span></td>
+              </tr>
+              <tr style="border-bottom: 1px solid #e5e0d5; background: #fff;">
+                <td style="padding: 9px 11px; padding-left: 23px;">4. Telephone</td>
+                <td style="padding: 9px 11px; text-align: right; color: #2e5b8a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Utilities_Telephone" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; color: #a24a2a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Utilities_Telephone" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; font-weight: 600;">—</td>
+                <td style="padding: 9px 11px; text-align: center; font-size: 8.4px;"><span style="background: #e8f5e9; color: #2e7d32; padding: 1.5px 4.5px; border-radius: 2.3px; font-weight: 600; font-size: 9px;">Template</span></td>
+              </tr>
+              <tr style="border-bottom: 1px solid #e5e0d5; background: #fff;">
+                <td style="padding: 9px 11px; padding-left: 23px;">5. Mobile phone/pager</td>
+                <td style="padding: 9px 11px; text-align: right; color: #2e5b8a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Utilities_Mobile" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; color: #a24a2a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Utilities_Mobile" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; font-weight: 600;">—</td>
+                <td style="padding: 9px 11px; text-align: center; font-size: 8.4px;"><span style="background: #e8f5e9; color: #2e7d32; padding: 1.5px 4.5px; border-radius: 2.3px; font-weight: 600; font-size: 9px;">Template</span></td>
+              </tr>
+              <tr style="border-bottom: 1px solid #e5e0d5; background: #fff;">
+                <td style="padding: 9px 11px; padding-left: 23px;">6. Internet Provider</td>
+                <td style="padding: 9px 11px; text-align: right; color: #2e5b8a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Utilities_Internet" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; color: #a24a2a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Utilities_Internet" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; font-weight: 600;">—</td>
+                <td style="padding: 9px 11px; text-align: center; font-size: 8.4px;"><span style="background: #e8f5e9; color: #2e7d32; padding: 1.5px 4.5px; border-radius: 2.3px; font-weight: 600; font-size: 9px;">Template</span></td>
+              </tr>
+              <tr style="border-bottom: 2px solid #e5e0d5; background: #fff;">
+                <td style="padding: 9px 11px; padding-left: 23px;">7. Cable/Satellite television</td>
+                <td style="padding: 9px 11px; text-align: right; color: #2e5b8a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Utilities_Cable" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; color: #a24a2a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Utilities_Cable" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; font-weight: 600;">—</td>
+                <td style="padding: 9px 11px; text-align: center; font-size: 8.4px;"><span style="background: #e8f5e9; color: #2e7d32; padding: 1.5px 4.5px; border-radius: 2.3px; font-weight: 600; font-size: 9px;">Template</span></td>
+              </tr>
+              <tr style="border-bottom: 2px solid #e5e0d5; background: #fff;">
+                <td style="padding: 9px 11px; padding-left: 23px;">8. Other (Explain)</td>
+                <td style="padding: 9px 11px; text-align: right; color: #2e5b8a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Utilities_Other" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; color: #a24a2a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Utilities_Other" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; font-weight: 600;">—</td>
+                <td style="padding: 9px 11px; text-align: center; font-size: 8.4px;"><span style="background: #e8f5e9; color: #2e7d32; padding: 1.5px 4.5px; border-radius: 2.3px; font-weight: 600; font-size: 9px;">Template</span></td>
+              </tr>
+
+              <!-- B. UTILITIES SUBTOTAL -->
+              <tr style="background: #c8e6c9; font-weight: 700; border-bottom: 1px solid #2e7d32;">
+                <td colspan="5" style="padding: 9px 11px; color: #2e7d32; font-size: 9px; font-weight: 700;">B. SUBTOTAL - UTILITIES: —/mo (Pet) | —/mo (Resp) | —/mo (Expert)</td>
+              </tr>
+
+              <!-- C. FOOD -->
+              <tr style="border-bottom: 1px solid #e5e0d5; background: #fff; font-weight: 600; color: #333;">
+                <td colspan="5" style="padding: 9px 11px; font-size: 8.4px; font-weight: 600; background: #f0f4f8;"><strong>C. FOOD</strong></td>
+              </tr>
+              <tr style="border-bottom: 1px solid #e5e0d5; background: #fff;">
+                <td style="padding: 9px 11px; padding-left: 23px;">1. Food, milk, and household supplies</td>
+                <td style="padding: 9px 11px; text-align: right; color: #2e5b8a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Food_Groceries" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; color: #a24a2a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Food_Groceries" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; font-weight: 600;">—</td>
+                <td style="padding: 9px 11px; text-align: center; font-size: 8.4px;"><span style="background: #e8f5e9; color: #2e7d32; padding: 1.5px 4.5px; border-radius: 2.3px; font-weight: 600; font-size: 9px;">Template</span></td>
+              </tr>
+              <tr style="border-bottom: 1px solid #e5e0d5; background: #fff;">
+                <td style="padding: 9px 11px; padding-left: 23px;">2. School lunches</td>
+                <td style="padding: 9px 11px; text-align: right; color: #2e5b8a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Food_SchoolLunch" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; color: #a24a2a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Food_SchoolLunch" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; font-weight: 600;">—</td>
+                <td style="padding: 9px 11px; text-align: center; font-size: 8.4px;"><span style="background: #e8f5e9; color: #2e7d32; padding: 1.5px 4.5px; border-radius: 2.3px; font-weight: 600; font-size: 9px;">Template</span></td>
+              </tr>
+              <tr style="border-bottom: 2px solid #e5e0d5; background: #fff;">
+                <td style="padding: 9px 11px; padding-left: 23px;">3. Meals outside home</td>
+                <td style="padding: 9px 11px; text-align: right; color: #2e5b8a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Food_DiningOut" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; color: #a24a2a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Food_DiningOut" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; font-weight: 600;">—</td>
+                <td style="padding: 9px 11px; text-align: center; font-size: 8.4px;"><span style="background: #e8f5e9; color: #2e7d32; padding: 1.5px 4.5px; border-radius: 2.3px; font-weight: 600; font-size: 9px;">Template</span></td>
+              </tr>
+
+              <!-- C. FOOD SUBTOTAL -->
+              <tr style="background: #c8e6c9; font-weight: 700; border-bottom: 1px solid #2e7d32;">
+                <td colspan="5" style="padding: 9px 11px; color: #2e7d32; font-size: 9px; font-weight: 700;">C. SUBTOTAL - FOOD: —/mo (Pet) | —/mo (Resp) | —/mo (Expert)</td>
+              </tr>
+
+              <!-- D. CLOTHING -->
+              <tr style="border-bottom: 1px solid #e5e0d5; background: #fff; font-weight: 600; color: #333;">
+                <td colspan="5" style="padding: 9px 11px; font-size: 8.4px; font-weight: 600; background: #f0f4f8;"><strong>D. CLOTHING</strong></td>
+              </tr>
+              <tr style="border-bottom: 1px solid #e5e0d5; background: #fff;">
+                <td style="padding: 9px 11px; padding-left: 23px;">1. Clothing for you</td>
+                <td style="padding: 9px 11px; text-align: right; color: #2e5b8a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Clothing_Personal" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; color: #a24a2a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Clothing_Personal" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; font-weight: 600;">—</td>
+                <td style="padding: 9px 11px; text-align: center; font-size: 8.4px;"><span style="background: #e8f5e9; color: #2e7d32; padding: 1.5px 4.5px; border-radius: 2.3px; font-weight: 600; font-size: 9px;">Template</span></td>
+              </tr>
+              <tr style="border-bottom: 1px solid #e5e0d5; background: #fff;">
+                <td style="padding: 9px 11px; padding-left: 23px;">2. Uniforms or special work clothes</td>
+                <td style="padding: 9px 11px; text-align: right; color: #2e5b8a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Clothing_Uniforms" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; color: #a24a2a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Clothing_Uniforms" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; font-weight: 600;">—</td>
+                <td style="padding: 9px 11px; text-align: center; font-size: 8.4px;"><span style="background: #e8f5e9; color: #2e7d32; padding: 1.5px 4.5px; border-radius: 2.3px; font-weight: 600; font-size: 9px;">Template</span></td>
+              </tr>
+              <tr style="border-bottom: 1px solid #e5e0d5; background: #fff;">
+                <td style="padding: 9px 11px; padding-left: 23px;">3. Clothing for children living with you</td>
+                <td style="padding: 9px 11px; text-align: right; color: #2e5b8a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Clothing_Children" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; color: #a24a2a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Clothing_Children" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; font-weight: 600;">—</td>
+                <td style="padding: 9px 11px; text-align: center; font-size: 8.4px;"><span style="background: #e8f5e9; color: #2e7d32; padding: 1.5px 4.5px; border-radius: 2.3px; font-weight: 600; font-size: 9px;">Template</span></td>
+              </tr>
+              <tr style="border-bottom: 2px solid #e5e0d5; background: #fff;">
+                <td style="padding: 9px 11px; padding-left: 23px;">4. Laundry and cleaning</td>
+                <td style="padding: 9px 11px; text-align: right; color: #2e5b8a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Clothing_Laundry" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; color: #a24a2a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Clothing_Laundry" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; font-weight: 600;">—</td>
+                <td style="padding: 9px 11px; text-align: center; font-size: 8.4px;"><span style="background: #e8f5e9; color: #2e7d32; padding: 1.5px 4.5px; border-radius: 2.3px; font-weight: 600; font-size: 9px;">Template</span></td>
+              </tr>
+
+              <!-- D. CLOTHING SUBTOTAL -->
+              <tr style="background: #c8e6c9; font-weight: 700; border-bottom: 1px solid #2e7d32;">
+                <td colspan="5" style="padding: 9px 11px; color: #2e7d32; font-size: 9px; font-weight: 700;">D. SUBTOTAL - CLOTHING: —/mo (Pet) | —/mo (Resp) | —/mo (Expert)</td>
+              </tr>
+
+              <!-- E. TRANSPORTATION OR AUTOMOBILE EXPENSES -->
+              <tr style="border-bottom: 1px solid #e5e0d5; background: #fff; font-weight: 600; color: #333;">
+                <td colspan="5" style="padding: 9px 11px; font-size: 8.4px; font-weight: 600; background: #f0f4f8;"><strong>E. TRANSPORTATION OR AUTOMOBILE EXPENSES</strong></td>
+              </tr>
+              <tr style="border-bottom: 1px solid #e5e0d5; background: #fff;">
+                <td style="padding: 9px 11px; padding-left: 23px;">1. Car insurance</td>
+                <td style="padding: 9px 11px; text-align: right; color: #2e5b8a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Transport_CarInsurance" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; color: #a24a2a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Transport_CarInsurance" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; font-weight: 600;">—</td>
+                <td style="padding: 9px 11px; text-align: center; font-size: 8.4px;"><span style="background: #e8f5e9; color: #2e7d32; padding: 1.5px 4.5px; border-radius: 2.3px; font-weight: 600; font-size: 9px;">Template</span></td>
+              </tr>
+              <tr style="border-bottom: 1px solid #e5e0d5; background: #fff;">
+                <td style="padding: 9px 11px; padding-left: 23px;">2. List all cars and individuals covered</td>
+                <td style="padding: 9px 11px; text-align: right; color: #2e5b8a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Transport_CarList" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; color: #a24a2a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Transport_CarList" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; font-weight: 600;">—</td>
+                <td style="padding: 9px 11px; text-align: center; font-size: 8.4px;"><span style="background: #e8f5e9; color: #2e7d32; padding: 1.5px 4.5px; border-radius: 2.3px; font-weight: 600; font-size: 9px;">Template</span></td>
+              </tr>
+              <tr style="border-bottom: 1px solid #e5e0d5; background: #fff;">
+                <td style="padding: 9px 11px; padding-left: 23px;">3. Car payment, if any</td>
+                <td style="padding: 9px 11px; text-align: right; color: #2e5b8a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Transport_CarPayment" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; color: #a24a2a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Transport_CarPayment" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; font-weight: 600;">—</td>
+                <td style="padding: 9px 11px; text-align: center; font-size: 8.4px;"><span style="background: #e8f5e9; color: #2e7d32; padding: 1.5px 4.5px; border-radius: 2.3px; font-weight: 600; font-size: 9px;">Template</span></td>
+              </tr>
+              <tr style="border-bottom: 1px solid #e5e0d5; background: #fff;">
+                <td style="padding: 9px 11px; padding-left: 23px;">4. Car repair and maintenance</td>
+                <td style="padding: 9px 11px; text-align: right; color: #2e5b8a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Transport_CarMaint" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; color: #a24a2a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Transport_CarMaint" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; font-weight: 600;">—</td>
+                <td style="padding: 9px 11px; text-align: center; font-size: 8.4px;"><span style="background: #e8f5e9; color: #2e7d32; padding: 1.5px 4.5px; border-radius: 2.3px; font-weight: 600; font-size: 9px;">Template</span></td>
+              </tr>
+              <tr style="border-bottom: 1px solid #e5e0d5; background: #fff;">
+                <td style="padding: 9px 11px; padding-left: 23px;">5. Gas and oil</td>
+                <td style="padding: 9px 11px; text-align: right; color: #2e5b8a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Transport_Gas" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; color: #a24a2a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Transport_Gas" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; font-weight: 600;">—</td>
+                <td style="padding: 9px 11px; text-align: center; font-size: 8.4px;"><span style="background: #e8f5e9; color: #2e7d32; padding: 1.5px 4.5px; border-radius: 2.3px; font-weight: 600; font-size: 9px;">Template</span></td>
+              </tr>
+              <tr style="border-bottom: 2px solid #e5e0d5; background: #fff;">
+                <td style="padding: 9px 11px; padding-left: 23px;">6. Bus fare/parking fees</td>
+                <td style="padding: 9px 11px; text-align: right; color: #2e5b8a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Transport_Bus" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; color: #a24a2a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Transport_Bus" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; font-weight: 600;">—</td>
+                <td style="padding: 9px 11px; text-align: center; font-size: 8.4px;"><span style="background: #e8f5e9; color: #2e7d32; padding: 1.5px 4.5px; border-radius: 2.3px; font-weight: 600; font-size: 9px;">Template</span></td>
+              </tr>
+              <tr style="border-bottom: 2px solid #e5e0d5; background: #fff;">
+                <td style="padding: 9px 11px; padding-left: 23px;">7. Other (explain)</td>
+                <td style="padding: 9px 11px; text-align: right; color: #2e5b8a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Transport_Other" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; color: #a24a2a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Transport_Other" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; font-weight: 600;">—</td>
+                <td style="padding: 9px 11px; text-align: center; font-size: 8.4px;"><span style="background: #e8f5e9; color: #2e7d32; padding: 1.5px 4.5px; border-radius: 2.3px; font-weight: 600; font-size: 9px;">Template</span></td>
+              </tr>
+
+              <!-- E. TRANSPORTATION SUBTOTAL -->
+              <tr style="background: #c8e6c9; font-weight: 700; border-bottom: 1px solid #2e7d32;">
+                <td colspan="5" style="padding: 9px 11px; color: #2e7d32; font-size: 9px; font-weight: 700;">E. SUBTOTAL - TRANSPORTATION OR AUTOMOBILE EXPENSES: —/mo (Pet) | —/mo (Resp) | —/mo (Expert)</td>
+              </tr>
+
+              <!-- F. MISCELLANEOUS -->
+              <tr style="border-bottom: 1px solid #e5e0d5; background: #fff; font-weight: 600; color: #333;">
+                <td colspan="5" style="padding: 9px 11px; font-size: 8.4px; font-weight: 600; background: #f0f4f8;"><strong>F. MISCELLANEOUS</strong></td>
+              </tr>
+              <tr style="border-bottom: 1px solid #e5e0d5; background: #fff;">
+                <td style="padding: 9px 11px; padding-left: 23px;">1. School and school supplies</td>
+                <td style="padding: 9px 11px; text-align: right; color: #2e5b8a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Misc_SchoolSupplies" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; color: #a24a2a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Misc_SchoolSupplies" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; font-weight: 600;">—</td>
+                <td style="padding: 9px 11px; text-align: center; font-size: 8.4px;"><span style="background: #e8f5e9; color: #2e7d32; padding: 1.5px 4.5px; border-radius: 2.3px; font-weight: 600; font-size: 9px;">Template</span></td>
+              </tr>
+              <tr style="border-bottom: 1px solid #e5e0d5; background: #fff;">
+                <td style="padding: 9px 11px; padding-left: 23px;">2. School activities or fees</td>
+                <td style="padding: 9px 11px; text-align: right; color: #2e5b8a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Misc_SchoolActivities" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; color: #a24a2a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Misc_SchoolActivities" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; font-weight: 600;">—</td>
+                <td style="padding: 9px 11px; text-align: center; font-size: 8.4px;"><span style="background: #e8f5e9; color: #2e7d32; padding: 1.5px 4.5px; border-radius: 2.3px; font-weight: 600; font-size: 9px;">Template</span></td>
+              </tr>
+              <tr style="border-bottom: 1px solid #e5e0d5; background: #fff;">
+                <td style="padding: 9px 11px; padding-left: 23px;">3. Extracurricular activities of child(ren)</td>
+                <td style="padding: 9px 11px; text-align: right; color: #2e5b8a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Misc_Extracurricular" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; color: #a24a2a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Misc_Extracurricular" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; font-weight: 600;">—</td>
+                <td style="padding: 9px 11px; text-align: center; font-size: 8.4px;"><span style="background: #e8f5e9; color: #2e7d32; padding: 1.5px 4.5px; border-radius: 2.3px; font-weight: 600; font-size: 9px;">Template</span></td>
+              </tr>
+              <tr style="border-bottom: 1px solid #e5e0d5; background: #fff;">
+                <td style="padding: 9px 11px; padding-left: 23px;">4. Church/contributions</td>
+                <td style="padding: 9px 11px; text-align: right; color: #2e5b8a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Misc_Church" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; color: #a24a2a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Misc_Church" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; font-weight: 600;">—</td>
+                <td style="padding: 9px 11px; text-align: center; font-size: 8.4px;"><span style="background: #e8f5e9; color: #2e7d32; padding: 1.5px 4.5px; border-radius: 2.3px; font-weight: 600; font-size: 9px;">Template</span></td>
+              </tr>
+              <tr style="border-bottom: 1px solid #e5e0d5; background: #fff;">
+                <td style="padding: 9px 11px; padding-left: 23px;">5. Newspapers, magazines and books</td>
+                <td style="padding: 9px 11px; text-align: right; color: #2e5b8a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Misc_Publications" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; color: #a24a2a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Misc_Publications" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; font-weight: 600;">—</td>
+                <td style="padding: 9px 11px; text-align: center; font-size: 8.4px;"><span style="background: #e8f5e9; color: #2e7d32; padding: 1.5px 4.5px; border-radius: 2.3px; font-weight: 600; font-size: 9px;">Template</span></td>
+              </tr>
+              <tr style="border-bottom: 1px solid #e5e0d5; background: #fff;">
+                <td style="padding: 9px 11px; padding-left: 23px;">6. Barber and beauty shop</td>
+                <td style="padding: 9px 11px; text-align: right; color: #2e5b8a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Misc_Barber" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; color: #a24a2a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Misc_Barber" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; font-weight: 600;">—</td>
+                <td style="padding: 9px 11px; text-align: center; font-size: 8.4px;"><span style="background: #e8f5e9; color: #2e7d32; padding: 1.5px 4.5px; border-radius: 2.3px; font-weight: 600; font-size: 9px;">Template</span></td>
+              </tr>
+              <tr style="border-bottom: 1px solid #e5e0d5; background: #fff;">
+                <td style="padding: 9px 11px; padding-left: 23px;">7. Life insurance (beneficiary:___)</td>
+                <td style="padding: 9px 11px; text-align: right; color: #2e5b8a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Misc_LifeIns" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; color: #a24a2a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Misc_LifeIns" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; font-weight: 600;">—</td>
+                <td style="padding: 9px 11px; text-align: center; font-size: 8.4px;"><span style="background: #e8f5e9; color: #2e7d32; padding: 1.5px 4.5px; border-radius: 2.3px; font-weight: 600; font-size: 9px;">Template</span></td>
+              </tr>
+              <tr style="border-bottom: 1px solid #e5e0d5; background: #fff;">
+                <td style="padding: 9px 11px; padding-left: 23px;">8. Disability insurance</td>
+                <td style="padding: 9px 11px; text-align: right; color: #2e5b8a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Misc_DisabilityIns" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; color: #a24a2a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Misc_DisabilityIns" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; font-weight: 600;">—</td>
+                <td style="padding: 9px 11px; text-align: center; font-size: 8.4px;"><span style="background: #e8f5e9; color: #2e7d32; padding: 1.5px 4.5px; border-radius: 2.3px; font-weight: 600; font-size: 9px;">Template</span></td>
+              </tr>
+              <tr style="border-bottom: 1px solid #e5e0d5; background: #fff;">
+                <td style="padding: 9px 11px; padding-left: 23px;">9. Recreation/entertainment</td>
+                <td style="padding: 9px 11px; text-align: right; color: #2e5b8a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Misc_Recreation" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; color: #a24a2a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Misc_Recreation" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; font-weight: 600;">—</td>
+                <td style="padding: 9px 11px; text-align: center; font-size: 8.4px;"><span style="background: #e8f5e9; color: #2e7d32; padding: 1.5px 4.5px; border-radius: 2.3px; font-weight: 600; font-size: 9px;">Template</span></td>
+              </tr>
+              <tr style="border-bottom: 1px solid #e5e0d5; background: #fff;">
+                <td style="padding: 9px 11px; padding-left: 23px;">10. Child(ren)'s allowance(s)</td>
+                <td style="padding: 9px 11px; text-align: right; color: #2e5b8a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Misc_Allowance" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; color: #a24a2a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Misc_Allowance" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; font-weight: 600;">—</td>
+                <td style="padding: 9px 11px; text-align: center; font-size: 8.4px;"><span style="background: #e8f5e9; color: #2e7d32; padding: 1.5px 4.5px; border-radius: 2.3px; font-weight: 600; font-size: 9px;">Template</span></td>
+              </tr>
+              <tr style="border-bottom: 1px solid #e5e0d5; background: #fff;">
+                <td style="padding: 9px 11px; padding-left: 23px;">11. Union/Professional dues</td>
+                <td style="padding: 9px 11px; text-align: right; color: #2e5b8a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Misc_UnionDues" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; color: #a24a2a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Misc_UnionDues" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; font-weight: 600;">—</td>
+                <td style="padding: 9px 11px; text-align: center; font-size: 8.4px;"><span style="background: #e8f5e9; color: #2e7d32; padding: 1.5px 4.5px; border-radius: 2.3px; font-weight: 600; font-size: 9px;">Template</span></td>
+              </tr>
+              <tr style="border-bottom: 1px solid #e5e0d5; background: #fff;">
+                <td style="padding: 9px 11px; padding-left: 23px;">12. Voluntary retirement contributions and savings deductions</td>
+                <td style="padding: 9px 11px; text-align: right; color: #2e5b8a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Misc_Retirement" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; color: #a24a2a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Misc_Retirement" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; font-weight: 600;">—</td>
+                <td style="padding: 9px 11px; text-align: center; font-size: 8.4px;"><span style="background: #e8f5e9; color: #2e7d32; padding: 1.5px 4.5px; border-radius: 2.3px; font-weight: 600; font-size: 9px;">Template</span></td>
+              </tr>
+              <tr style="border-bottom: 1px solid #e5e0d5; background: #fff;">
+                <td style="padding: 9px 11px; padding-left: 23px;">13. Family gifts</td>
+                <td style="padding: 9px 11px; text-align: right; color: #2e5b8a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Misc_Gifts" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; color: #a24a2a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Misc_Gifts" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; font-weight: 600;">—</td>
+                <td style="padding: 9px 11px; text-align: center; font-size: 8.4px;"><span style="background: #e8f5e9; color: #2e7d32; padding: 1.5px 4.5px; border-radius: 2.3px; font-weight: 600; font-size: 9px;">Template</span></td>
+              </tr>
+              <tr style="border-bottom: 1px solid #e5e0d5; background: #fff;">
+                <td style="padding: 9px 11px; padding-left: 23px;">14. Pet Expenses</td>
+                <td style="padding: 9px 11px; text-align: right; color: #2e5b8a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Misc_Pets" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; color: #a24a2a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Misc_Pets" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; font-weight: 600;">—</td>
+                <td style="padding: 9px 11px; text-align: center; font-size: 8.4px;"><span style="background: #e8f5e9; color: #2e7d32; padding: 1.5px 4.5px; border-radius: 2.3px; font-weight: 600; font-size: 9px;">Template</span></td>
+              </tr>
+              <tr style="border-bottom: 1px solid #e5e0d5; background: #fff;">
+                <td style="padding: 9px 11px; padding-left: 23px;">15. Cigarettes</td>
+                <td style="padding: 9px 11px; text-align: right; color: #2e5b8a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Misc_Cigarettes" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; color: #a24a2a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Misc_Cigarettes" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; font-weight: 600;">—</td>
+                <td style="padding: 9px 11px; text-align: center; font-size: 8.4px;"><span style="background: #e8f5e9; color: #2e7d32; padding: 1.5px 4.5px; border-radius: 2.3px; font-weight: 600; font-size: 9px;">Template</span></td>
+              </tr>
+              <tr style="border-bottom: 1px solid #e5e0d5; background: #fff;">
+                <td style="padding: 9px 11px; padding-left: 23px;">16. Alcohol</td>
+                <td style="padding: 9px 11px; text-align: right; color: #2e5b8a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Misc_Alcohol" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; color: #a24a2a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Misc_Alcohol" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; font-weight: 600;">—</td>
+                <td style="padding: 9px 11px; text-align: center; font-size: 8.4px;"><span style="background: #e8f5e9; color: #2e7d32; padding: 1.5px 4.5px; border-radius: 2.3px; font-weight: 600; font-size: 9px;">Template</span></td>
+              </tr>
+              <tr style="border-bottom: 2px solid #e5e0d5; background: #fff;">
+                <td style="padding: 9px 11px; padding-left: 23px;">17. Other (explain)</td>
+                <td style="padding: 9px 11px; text-align: right; color: #2e5b8a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Misc_Other" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; color: #a24a2a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="Misc_Other" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; font-weight: 600;">—</td>
+                <td style="padding: 9px 11px; text-align: center; font-size: 8.4px;"><span style="background: #e8f5e9; color: #2e7d32; padding: 1.5px 4.5px; border-radius: 2.3px; font-weight: 600; font-size: 9px;">Template</span></td>
+              </tr>
+
+              <!-- F. MISCELLANEOUS SUBTOTAL -->
+              <tr style="background: #c8e6c9; font-weight: 700; border-bottom: 2px solid #2e7d32; border-top: 2px solid #2e7d32;">
+                <td colspan="5" style="padding: 9px 11px; color: #2e7d32; font-size: 9px; font-weight: 700;">F. SUBTOTAL - MISCELLANEOUS: —/mo (Pet) | —/mo (Resp) | —/mo (Expert)</td>
+              </tr>
+
+              <!-- SECTION 7 GRAND TOTAL -->
+              <tr style="background: #e8f3ff; font-weight: 700; border-bottom: 2px solid #1f5f9d; border-top: 2px solid #1f5f9d;">
+                <td style="padding: 12px 12.8px; color: #1f5f9d; font-size: 10px;"><strong>SECTION 7 TOTAL - SCHEDULE OF ALL MONTHLY EXPENSES (A-F)</strong></td>
+                <td style="padding: 12px 12.8px; text-align: right; color: #2e5b8a; font-size: 10.5px; font-weight: 700;">—/mo</td>
+                <td style="padding: 12px 12.8px; text-align: right; color: #a24a2a; font-size: 10.5px; font-weight: 700;">—/mo</td>
+                <td style="padding: 12px 12.8px; text-align: right; color: #b4232a; font-size: 10.5px; font-weight: 700;">—/mo</td>
+                <td style="padding: 12px 12.8px; text-align: center;"><span style="background: #e8f5e9; color: #2e7d32; padding: 2.3px 6px; border-radius: 2.3px; font-weight: 700; font-size: 7.5px;">Complete</span></td>
+              </tr>
+
+            </tbody>
+          </table>
+        </div>
+
+        <!-- SECTION 7 SUMMARY TOTALS -->
+        <div style="margin-top: 15px; display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 9px;">
+          <div style="padding: 9px; background: #d4e6f1; border-radius: 4.5px; border-left: 4px solid #2e5b8a;">
+            <div style="font-size: 8.4px; color: #2e5b8a; font-weight: 700; text-transform: uppercase;">PETITIONER TOTAL</div>
+            <div style="font-size: 13.8px; font-weight: 700; color: #12233b;">—/mo</div>
+            <div style="font-size: 7.5px; color: #666; margin-top: 3px;">All personal/household expenses (A-F)</div>
+          </div>
+          <div style="padding: 9px; background: #f7e2d8; border-radius: 4.5px; border-left: 4px solid #a24a2a;">
+            <div style="font-size: 8.4px; color: #a24a2a; font-weight: 700; text-transform: uppercase;">RESPONDENT TOTAL</div>
+            <div style="font-size: 13.8px; font-weight: 700; color: #12233b;">—/mo</div>
+            <div style="font-size: 7.5px; color: #666; margin-top: 3px;">All personal/household expenses (A-F)</div>
+          </div>
+          <div style="padding: 9px; background: #ffebee; border-radius: 4.5px; border-left: 4px solid #b4232a;">
+            <div style="font-size: 8.4px; color: #b4232a; font-weight: 700; text-transform: uppercase;">EXPERT CLAIM</div>
+            <div style="font-size: 13.8px; font-weight: 700; color: #12233b;">—/mo</div>
+            <div style="font-size: 7.5px; color: #666; margin-top: 3px;">Expert-estimated total expenses</div>
+          </div>
+        </div>
+
+        <div style="margin-top: 12px; padding: 9px; background: #f0f7ff; border-radius: 4.5px; border-left: 4px solid #1f5f9d; font-size: 9px; color: #0063b1;">
+          <strong>SCHEDULE OF ALL MONTHLY EXPENSES:</strong> Section 7 organizes all documented personal and household expenses across six major categories (Housing, Utilities, Food, Clothing, Transportation, and Miscellaneous). Each category is broken down into specific line items with subcategories. All amounts are supported by bank statements, credit card statements, and other financial documents for the analysis period.
+        </div>
+
+      </div>
+
+      <!-- ============ SECTION 4.B: EXPENSES PAID FOR BY YOUR EMPLOYER ============ -->
+      <div class="panel">
+        <div class="panel-head">
+          <h3>Section 4.B: Expenses Paid For By Your Employer</h3>
+          <span class="tag">non-cash benefits</span>
+        </div>
+        <div class="ai-question-box">
+          <div class="ai-question-header" onclick="this.parentElement.querySelector('.ai-question-content').classList.toggle('open')">
+            <span class="ai-question-icon">❓</span>
+            <span class="ai-question-title">Common Questions About Employer Benefits</span>
+            <a href="intake-questionnaire.html" class="ai-question-link">[Link to Intake Questionnaire]</a>
+          </div>
+          <div class="ai-question-content">
+            <ul>
+              <li><strong>Does your employer provide any non-cash benefits (vehicle, housing, etc.)?</strong></li>
+              <li><strong>Are these benefits taxable income?</strong></li>
+              <li><strong>How are these benefits valued for financial disclosure?</strong></li>
+              <li><strong>Are there any other employer-paid expenses not listed?</strong></li>
+            </ul>
+          </div>
+        </div>
+        <p class="panel-note">This section reconciles non-cash employer benefits including provided vehicles, housing, travel allowances, and other employer-paid expenses. These benefits are documented and compared as part of the complete financial picture.</p>
+
+        <!-- SECTION 4.B EXPENSES TABLE -->
+        <div style="overflow-x: auto; border-radius: 4.5px; box-shadow: 0 0.8px 2.5px rgba(0,0,0,0.05); background: white; margin-top: 12px;">
+          <table class="recon mr-table afi-table" style="width: 100%; border-collapse: collapse; font-size: 10px;">
+            <thead style="background: #f5f7fa;">
+              <tr>
+                <th style="padding: 9px 11px; text-align: left; font-weight: 600; font-size: 9px; color: #12233b;">BENEFIT LINE</th>
+                <th style="padding: 9px 11px; text-align: right; font-weight: 600; font-size: 9px; color: #12233b;">RESPONDENT /MO</th>
+                <th style="padding: 9px 11px; text-align: right; font-weight: 600; font-size: 9px; color: #12233b;">EXPERT /MO</th>
+                <th style="padding: 9px 11px; text-align: right; font-weight: 600; font-size: 9px; color: #12233b;">DIFFERENCE</th>
+                <th style="padding: 9px 11px; text-align: center; font-weight: 600; font-size: 9px; color: #12233b;">STATUS</th>
+              </tr>
+            </thead>
+            <tbody>
+
+              <!-- ============ SECTION 4.B: EXPENSES PAID FOR BY YOUR EMPLOYER ============ -->
+              <tr style="background: #e0f2f1; font-weight: 700; border-bottom: 2px solid #00897b; border-top: 2px solid #00897b;">
+                <td colspan="5" style="padding: 9px 11px; color: #00897b; font-size: 9px; font-weight: 700;">SECTION 4.B: EXPENSES PAID FOR BY YOUR EMPLOYER (Non-Cash Compensation)</td>
+              </tr>
+
+              <!-- A. Automobile -->
+              <tr style="border-bottom: 1px solid #e5e0d5; background: #fff; font-weight: 600; color: #333;">
+                <td colspan="5" style="padding: 9px 11px; font-size: 8.4px; font-weight: 600; background: #f0f7f7;">A. Automobile</td>
+              </tr>
+              <tr style="border-bottom: 1px solid #e5e0d5; background: #fff;">
+                <td style="padding: 9px 11px; padding-left: 23px;">1. Employer-provided vehicle <span style="display: inline-block; background: #00897b; color: white; padding: 1.5px 6px; border-radius: 2.3px; font-size: 6.9px; font-weight: 700; margin-left: 4.5px;">BENEFIT</span></td>
+                <td style="padding: 9px 11px; text-align: right; color: #a24a2a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="EmployerAuto_Vehicle" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; font-weight: 600;">—</td>
+                <td style="padding: 9px 11px; text-align: right; color: #333;">—</td>
+                <td style="padding: 9px 11px; text-align: center; font-size: 8.4px;"><span style="background: #c8e6c9; color: #2e7d32; padding: 1.5px 4.5px; border-radius: 2.3px; font-weight: 600; font-size: 7.5px;">Benefit</span></td>
+              </tr>
+
+              <!-- B. Auto Expenses -->
+              <tr style="border-bottom: 1px solid #e5e0d5; background: #fff; font-weight: 600; color: #333;">
+                <td colspan="5" style="padding: 9px 11px; font-size: 8.4px; font-weight: 600; background: #f0f7f7;">B. Auto Expenses (Gas, Repairs, Insurance)</td>
+              </tr>
+              <tr style="border-bottom: 1px solid #e5e0d5; background: #fff;">
+                <td style="padding: 9px 11px; padding-left: 23px;">1. Gas <span style="display: inline-block; background: #00897b; color: white; padding: 1.5px 6px; border-radius: 2.3px; font-size: 7.5px; font-weight: 700; margin-left: 4.5px;">BENEFIT</span></td>
+                <td style="padding: 9px 11px; text-align: right; color: #a24a2a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="EmployerAutoExp_Gas" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; font-weight: 600;">—</td>
+                <td style="padding: 9px 11px; text-align: right; color: #333;">—</td>
+                <td style="padding: 9px 11px; text-align: center; font-size: 8.4px;"><span style="background: #c8e6c9; color: #2e7d32; padding: 1.5px 4.5px; border-radius: 2.3px; font-weight: 600; font-size: 7.5px;">Benefit</span></td>
+              </tr>
+              <tr style="border-bottom: 1px solid #e5e0d5; background: #fff;">
+                <td style="padding: 9px 11px; padding-left: 23px;">2. Repairs &amp; Maintenance <span style="display: inline-block; background: #00897b; color: white; padding: 1.5px 6px; border-radius: 2.3px; font-size: 7.5px; font-weight: 700; margin-left: 4.5px;">BENEFIT</span></td>
+                <td style="padding: 9px 11px; text-align: right; color: #a24a2a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="EmployerAutoExp_Repairs" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; font-weight: 600;">—</td>
+                <td style="padding: 9px 11px; text-align: right; color: #333;">—</td>
+                <td style="padding: 9px 11px; text-align: center; font-size: 8.4px;"><span style="background: #c8e6c9; color: #2e7d32; padding: 1.5px 4.5px; border-radius: 2.3px; font-weight: 600; font-size: 7.5px;">Benefit</span></td>
+              </tr>
+              <tr style="border-bottom: 1px solid #e5e0d5; background: #fff;">
+                <td style="padding: 9px 11px; padding-left: 23px;">3. Insurance <span style="display: inline-block; background: #00897b; color: white; padding: 1.5px 6px; border-radius: 2.3px; font-size: 7.5px; font-weight: 700; margin-left: 4.5px;">BENEFIT</span></td>
+                <td style="padding: 9px 11px; text-align: right; color: #a24a2a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="EmployerAutoExp_Insurance" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; font-weight: 600;">—</td>
+                <td style="padding: 9px 11px; text-align: right; color: #333;">—</td>
+                <td style="padding: 9px 11px; text-align: center; font-size: 8.4px;"><span style="background: #c8e6c9; color: #2e7d32; padding: 1.5px 4.5px; border-radius: 2.3px; font-weight: 600; font-size: 7.5px;">Benefit</span></td>
+              </tr>
+
+              <!-- C. Lodging -->
+              <tr style="border-bottom: 1px solid #e5e0d5; background: #fff; font-weight: 600; color: #333;">
+                <td colspan="5" style="padding: 9px 11px; font-size: 8.4px; font-weight: 600; background: #f0f7f7;">C. Lodging</td>
+              </tr>
+              <tr style="border-bottom: 1px solid #e5e0d5; background: #fff;">
+                <td style="padding: 9px 11px; padding-left: 23px;">1. Employer-provided housing <span style="display: inline-block; background: #00897b; color: white; padding: 1.5px 6px; border-radius: 2.3px; font-size: 7.5px; font-weight: 700; margin-left: 4.5px;">BENEFIT</span></td>
+                <td style="padding: 9px 11px; text-align: right; color: #a24a2a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="EmployerLodging_Housing" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; font-weight: 600;">—</td>
+                <td style="padding: 9px 11px; text-align: right; color: #333;">—</td>
+                <td style="padding: 9px 11px; text-align: center; font-size: 8.4px;"><span style="background: #c8e6c9; color: #2e7d32; padding: 1.5px 4.5px; border-radius: 2.3px; font-weight: 600; font-size: 7.5px;">Benefit</span></td>
+              </tr>
+              <tr style="border-bottom: 1px solid #e5e0d5; background: #fff;">
+                <td style="padding: 9px 11px; padding-left: 23px;">2. Travel/Lodging expenses <span style="display: inline-block; background: #00897b; color: white; padding: 1.5px 6px; border-radius: 2.3px; font-size: 7.5px; font-weight: 700; margin-left: 4.5px;">BENEFIT</span></td>
+                <td style="padding: 9px 11px; text-align: right; color: #a24a2a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="EmployerLodging_Travel" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; font-weight: 600;">—</td>
+                <td style="padding: 9px 11px; text-align: right; color: #333;">—</td>
+                <td style="padding: 9px 11px; text-align: center; font-size: 8.4px;"><span style="background: #c8e6c9; color: #2e7d32; padding: 1.5px 4.5px; border-radius: 2.3px; font-weight: 600; font-size: 7.5px;">Benefit</span></td>
+              </tr>
+
+              <!-- D. Other -->
+              <tr style="border-bottom: 1px solid #e5e0d5; background: #fff; font-weight: 600; color: #333;">
+                <td colspan="5" style="padding: 9px 11px; font-size: 8.4px; font-weight: 600; background: #f0f7f7;">D. Other (Explain)</td>
+              </tr>
+              <tr style="border-bottom: 2px solid #e5e0d5; background: #fff;">
+                <td style="padding: 9px 11px; padding-left: 23px;">1. Other employer-paid expenses <span style="display: inline-block; background: #00897b; color: white; padding: 1.5px 6px; border-radius: 2.3px; font-size: 7.5px; font-weight: 700; margin-left: 4.5px;">BENEFIT</span></td>
+                <td style="padding: 9px 11px; text-align: right; color: #a24a2a; font-weight: 600;">— <span style="margin-left: 6px;"><a href="#" data-cat="EmployerOther_Expenses" onclick="openRecon(this.dataset.cat); return false;" style="color: #0066cc; text-decoration: none; font-size: 8.4px; cursor: pointer;">[View Recon]</a></span></td>
+                <td style="padding: 9px 11px; text-align: right; font-weight: 600;">—</td>
+                <td style="padding: 9px 11px; text-align: right; color: #333;">—</td>
+                <td style="padding: 9px 11px; text-align: center; font-size: 8.4px;"><span style="background: #c8e6c9; color: #2e7d32; padding: 1.5px 4.5px; border-radius: 2.3px; font-weight: 600; font-size: 7.5px;">Benefit</span></td>
+              </tr>
+
+              <!-- SECTION 4.B SUBTOTAL -->
+              <tr style="background: #b2dfdb; font-weight: 700; border-bottom: 2px solid #00897b; border-top: 2px solid #00897b;">
+                <td colspan="5" style="padding: 9px 11px; color: #00897b; font-size: 10px; font-weight: 700;">SECTION 4.B SUBTOTAL - EMPLOYER-PAID EXPENSES: —/mo</td>
+              </tr>
+
+            </tbody>
+          </table>
+        </div>
+
+        <div style="margin-top: 12px; padding: 9px; background: #f0f7ff; border-radius: 4.5px; border-left: 4px solid #1f5f9d; font-size: 9px; color: #0063b1;">
+          <strong>NON-CASH BENEFITS:</strong> Section 4.B documents employer-provided benefits and non-cash compensation including vehicles, housing, travel allowances, and other benefits that may have taxable value for financial disclosure purposes.
+        </div>
+
+      </div>
+
+      <footer class="foot">
+        <span>Veritas  AFI Discrepancy Analysis</span>
+        <span class="foot-dim">Figures from documented statements  work product </span>
+      </footer>
+    </div>
+
+    <!-- RECONCILIATION DETAIL MODAL -->
+    <div id="reconModal" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; overflow-y: auto;">
+      <div style="background: white; max-width: 800px; margin: 36px auto; border-radius: 6px; box-shadow: 0 4px 20px rgba(0,0,0,0.15); padding: 21.6px;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+          <h2 id="reconTitle" style="margin: 0; font-size: 13.8px; font-weight: 700; color: #12233b;">Reconciliation Detail</h2>
+          <button onclick="closeReconModal()" style="background: none; border: none; font-size: 25.2px; cursor: pointer; color: #999; padding: 0; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;">&times;</button>
+        </div>
+
+        <div id="reconBody" style="margin-bottom: 18px;">
+          <!-- Populated by JavaScript -->
+        </div>
+
+        <div style="text-align: center; padding-top: 14.4px; border-top: 1px solid #e5e0d5;">
+          <button onclick="closeReconModal()" style="padding: 7.2px 14.4px; background: #0066cc; color: white; border: none; border-radius: 4.5px; font-size: 9px; font-weight: 600; cursor: pointer;">Close</button>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    // Document registry - configure with actual matter documents
+    const docRegistry = {
+      'respondent-statements': { name: 'Respondent AFI statements', path: 'support-pdfs/statements.pdf' },
+      'expert-report': { name: 'Expert Report', path: 'support-pdfs/expert-report.pdf' }
+    };
+
+    function openDoc(docId) {
+      const doc = docRegistry[docId] || docRegistry['respondent-statements'];
+      if (doc) {
+        const link = document.createElement('a');
+        link.href = doc.path;
+        link.target = '_blank';
+        link.click();
+      } else {
+        alert('Document link not yet configured for: ' + docId);
+      }
+    }
+
+    function closeReconModal() {
+      document.getElementById('reconModal').style.display = 'none';
+    }
+
+    // Toggle tooltip visibility for help icons
+    function toggleTooltip(e) {
+      e.stopPropagation();
+      const helpIcon = e.currentTarget;
+      const isActive = helpIcon.classList.contains('active');
+
+      // Close all other open tooltips
+      document.querySelectorAll('.help-icon.active').forEach(icon => {
+        if (icon !== helpIcon) {
+          icon.classList.remove('active');
+        }
+      });
+
+      // Toggle current tooltip
+      if (isActive) {
+        helpIcon.classList.remove('active');
+      } else {
+        helpIcon.classList.add('active');
+      }
+    }
+
+    // Close tooltip when clicking outside
+    document.addEventListener('click', function(e) {
+      if (!e.target.closest('.help-icon')) {
+        document.querySelectorAll('.help-icon.active').forEach(icon => {
+          icon.classList.remove('active');
+        });
+      }
+      const modal = document.getElementById('reconModal');
+      if (e.target === modal) {
+        modal.style.display = 'none';
+      }
+    });
+  </script>
+
+  <!-- ===================== DETAIL MODAL ===================== -->
+  <div id="expenseDetailModal" class="modal" style="display: none;">
+    <div class="modal-overlay"></div>
+    <div class="modal-container">
+      <div class="modal-head">
+        <h2 id="detailTitle">Expense Detail</h2>
+        <button id="detailCloseBtn" class="modal-close" aria-label="Close">&times;</button>
+      </div>
+      <div class="modal-body" id="detailContent"></div>
+      <div class="modal-foot">
+        <button id="detailDoneBtn" class="btn ghost">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== CALCULATION DETAIL MODAL ===================== -->
+  <div id="calculationDetailModal" class="modal" style="display: none;">
+    <div class="modal-overlay"></div>
+    <div class="modal-container">
+      <div class="modal-head">
+        <h2 id="calcTitle">Calculation Detail</h2>
+        <button id="calcCloseBtn" class="modal-close" aria-label="Close">&times;</button>
+      </div>
+      <div class="modal-body" id="calcContent"></div>
+      <div class="modal-foot">
+        <button id="calcDoneBtn" class="btn ghost">Done</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="logo-handler.js"></script>
+  <!-- Veritas AI Chat Widget -->
+  <script src="ai-chat-config.js"></script>
+  <script src="ai-chat-widget.js"></script>
+  <!-- Reconciliation Modal -->
+  <script src="reconciliation-modal.js"></script>
+  <script src="reconciliation-data-enhanced.js"></script>
+  <!-- Document Management -->
+  <script src="document-parser.js"></script>
+  <script src="document-upload-ui.js"></script>
+  <script src="reconciliation-upload-integration.js"></script>
+  <script>
+    // Open reconciliation modal for expense categories
+    function openRecon(category) {
+      const reconData = RECONCILIATION_DATA[category];
+      if (reconData) {
+        openReconciliation(reconData);
+      } else {
+        alert('No reconciliation data available for this category');
+      }
+    }
+  </script>
+</body>
+</html>
+

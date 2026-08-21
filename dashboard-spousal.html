@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Spousal Maintenance Analysis Dashboard — Veritas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="dashboard-spousal.css" />
+  <link rel="stylesheet" href="document-support.css" />
+</head>
+<body>
+  <!-- ===================== SIDEBAR ===================== -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">
+        <img src="logo-vfi.jpg" alt="VFI Logo" />
+        <span class="brand-mark-fallback">VFI</span>
+      </div>
+      <div class="brand-text">
+        <span class="brand-name">Veritas</span>
+        <span class="brand-sub">Financial Intelligence</span>
+      </div>
+    </div>
+    <nav class="nav">
+      <div class="nav-group-label">Workspace</div>
+      <a class="nav-item" href="index.html"><span class="nav-ico">◆</span> Dashboard</a>
+      <a class="nav-item" href="index.html"><span class="nav-ico">▤</span> Matters</a>
+      <div class="nav-group-label">Analysis Modules</div>
+      <a class="nav-item" href="discovery-intake.html"><span class="nav-ico">⤓</span> Discovery Intake</a>
+      <a class="nav-item active" href="spousal.html"><span class="nav-ico">⚖</span> Spousal Maintenance</a>
+      <a class="nav-item" href="child-support.html"><span class="nav-ico">◈</span> Child Support</a>
+      <a class="nav-item" href="custody.html"><span class="nav-ico">⌘</span> Child Custody</a>
+      <a class="nav-item" href="schedules.html"><span class="nav-ico">◷</span> Schedules &amp; Calendar</a>
+      <a class="nav-item" href="afi.html"><span class="nav-ico">≠</span> AFI Discrepancy</a>
+      <a class="nav-item" href="forensic-tracing.html"><span class="nav-ico">⌕</span> Forensic Tracing</a>
+      <a class="nav-item" href="settlement.html"><span class="nav-ico">⇄</span> Settlement Modeling</a>
+      <a class="nav-item" href="credits.html"><span class="nav-ico">⊕</span> Credits &amp; Adjustments</a>
+      <a class="nav-item" href="regulations.html"><span class="nav-ico">⚖</span> Regulations</a>
+    </nav>
+    <div class="sidebar-foot"><div class="plan-chip">Firm Plan · 12 seats</div></div>
+  </aside>
+
+  <!-- ===================== MAIN ===================== -->
+  <main class="main">
+    <header class="topbar">
+      <div class="matter-switcher">
+        <span class="matter-label">Active Matter</span>
+        <button class="matter-btn">
+          <strong>Ossandon v. Ossandon</strong>
+          <span class="case-no">No. D2024-1669 · Pima County, AZ</span>
+          <span class="chev">▾</span>
+        </button>
+      </div>
+      <div class="topbar-right">
+        <div class="user">
+          <div class="avatar">TH</div>
+          <div class="user-meta">
+            <span class="user-name">Workspace User</span>
+            <span class="user-role">Ossandon Matter</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="content">
+      <section class="page-head">
+        <div>
+          <h1>Spousal Maintenance Analysis Dashboard</h1>
+          <p class="sub">Consolidated view of all calculation methods · AZ §25-319(B) · supported-spouse analysis dashboard</p>
+        </div>
+        <div class="head-actions">
+          <a href="spousal.html" class="btn ghost">← Calculator</a>
+          <a href="matrix-spousal.html" class="btn ghost">📈 Matrix</a>
+          <button class="btn ghost" id="exportBtn">⤓ Export Summary</button>
+          <button class="btn primary" id="refreshBtn">Refresh Analysis</button>
+        </div>
+      </section>
+
+      <!-- ===== EXECUTIVE SUMMARY ===== -->
+      <section class="dashboard-section">
+        <h2>Executive Summary</h2>
+        <div class="summary-row">
+          <div class="summary-card high">
+            <span class="label">Highest Maintenance (AFI-Based)</span>
+            <span class="value" id="highestMaint">$0</span>
+            <span class="detail">Using actual marital standard of living ($7,500/mo)</span>
+          </div>
+          <div class="summary-card mid">
+            <span class="label">Master Position (Income Gap)</span>
+            <span class="value" id="masterMaint">$0</span>
+            <span class="detail">Income selections from the calculator feed</span>
+          </div>
+          <div class="summary-card low">
+            <span class="label">Lowest Maintenance (w/ Property Income)</span>
+            <span class="value" id="lowestMaint">$0</span>
+            <span class="detail">With $3,670/mo property income reduction</span>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== METHODOLOGY COMPARISON ===== -->
+      <section class="dashboard-section">
+        <h2>Analysis Method Comparison</h2>
+        <div class="methods-grid" id="methodsComparison"></div>
+      </section>
+
+      <!-- ===== SCENARIO RANGE ===== -->
+      <section class="dashboard-section">
+        <h2>Maintenance Range Across All Scenarios</h2>
+        <div class="range-viz" id="rangeVisualization"></div>
+      </section>
+
+      <!-- ===== STATUTORY FACTORS HEATMAP ===== -->
+      <section class="dashboard-section">
+        <h2>Statutory Factors Heat Map (§25-319(B))</h2>
+        <div class="heatmap-container" id="factorsHeatmap"></div>
+      </section>
+
+      <!-- ===== PROPERTY INCOME SENSITIVITY ===== -->
+      <section class="dashboard-section">
+        <h2>Property Income Sensitivity Analysis</h2>
+        <div class="sensitivity-grid" id="propertySensitivity"></div>
+      </section>
+
+      <!-- ===== RECOMMENDED STRATEGY ===== -->
+      <section class="dashboard-section strategy-section">
+        <h2>Recommended Strategy</h2>
+        <div class="strategy-card" id="recommendedStrategy"></div>
+      </section>
+
+      <!-- ===== ARGUMENT STRENGTH SCORECARD ===== -->
+      <section class="dashboard-section">
+        <h2>Argument Strength Scorecard</h2>
+        <div class="scorecard" id="argumentScorecard"></div>
+      </section>
+
+      <!-- ===== EXPERT REPORT CRITIQUE ===== -->
+      <section class="dashboard-section">
+        <h2>Comparative Expert Report Analysis</h2>
+        <div class="expert-critique" id="expertCritique"></div>
+      </section>
+
+      <!-- ===== DURATION ANALYSIS ===== -->
+      <section class="dashboard-section">
+        <h2>Maintenance Duration & Total Exposure</h2>
+        <div class="duration-analysis" id="durationAnalysis"></div>
+      </section>
+
+      <!-- ===== DETAILED TABS LINK ===== -->
+      <section class="dashboard-section">
+        <div class="cta-banner">
+          <h3>Dive Deeper</h3>
+          <p>Click below to explore detailed analysis for each methodology:</p>
+          <div class="cta-buttons">
+            <a href="spousal.html#tab-afi-based" class="btn ghost">AFI-Based Analysis</a>
+            <a href="spousal.html#tab-discretionary" class="btn ghost">Discretionary Factors</a>
+            <a href="spousal.html#tab-property-income" class="btn ghost">Property Income Impact</a>
+            <a href="spousal.html#tab-income-matrix" class="btn ghost">Income Scenarios</a>
+            <a href="spousal.html#tab-deviation" class="btn ghost">Deviation Arguments</a>
+            <a href="spousal.html#tab-expert-compare" class="btn ghost">Expert Comparison</a>
+          </div>
+        </div>
+      </section>
+
+      <footer class="foot">
+        <span>Veritas · Spousal Maintenance Analysis Dashboard</span>
+        <span class="foot-dim">All figures illustrative · work product — privileged</span>
+      </footer>
+    </div>
+  </main>
+
+  <script src="api-client.js"></script>
+  <script src="case-manager.js"></script>
+  <script src="safe-text.js"></script>
+  <script src="spousal.js"></script>
+  <script src="dashboard-spousal.js"></script>
+  <script src="logo-handler.js"></script>
+</body>
+</html>

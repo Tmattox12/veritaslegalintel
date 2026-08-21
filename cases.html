@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Case Management — Veritas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="cases.css" />
+</head>
+<body>
+  <!-- ===================== SIDEBAR ===================== -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">
+        <img src="logo-vfi.jpg" alt="VFI Logo" />
+        <span class="brand-mark-fallback">VFI</span>
+      </div>
+      <div class="brand-text">
+        <span class="brand-name">Veritas</span>
+        <span class="brand-sub">Financial Intelligence</span>
+      </div>
+    </div>
+    <nav class="nav">
+      <div class="nav-group-label">Workspace</div>
+      <a class="nav-item active" href="cases.html"><span class="nav-ico">📋</span> Cases</a>
+      <a class="nav-item" href="index.html"><span class="nav-ico">◆</span> Dashboard</a>
+      <div class="nav-group-label">Analysis Modules</div>
+      <a class="nav-item" href="discovery-intake.html"><span class="nav-ico">🔍</span> Discovery Intake</a>
+      <a class="nav-item" href="spousal.html"><span class="nav-ico">⚖</span> Spousal Maintenance</a>
+      <a class="nav-item" href="child-support.html"><span class="nav-ico">◈</span> Child Support</a>
+      <a class="nav-item" href="custody.html"><span class="nav-ico">⌘</span> Child Custody</a>
+      <a class="nav-item" href="schedules.html"><span class="nav-ico">◷</span> Schedules &amp; Calendar</a>
+      <a class="nav-item" href="afi.html"><span class="nav-ico">≠</span> AFI Discrepancy</a>
+      <a class="nav-item" href="forensic-tracing.html"><span class="nav-ico">⌕</span> Forensic Tracing</a>
+      <a class="nav-item" href="equitable-distribution.html"><span class="nav-ico">📊</span> Equitable Distribution</a>
+      <a class="nav-item" href="regulations.html"><span class="nav-ico">§</span> Regulations</a>
+    </nav>
+    <div class="sidebar-foot"><div class="plan-chip">Firm Plan · 12 seats</div></div>
+  </aside>
+
+  <!-- ===================== MAIN ===================== -->
+  <main class="main">
+    <header class="topbar">
+      <div style="display: flex; align-items: center; gap: 20px;">
+        <div>
+          <h2 style="margin: 0; font-size: 18px; color: #1c3f66;">Case Management</h2>
+          <p style="margin: 4px 0 0; font-size: 12px; color: #666;">Create, manage, and switch between cases</p>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <button class="btn primary" onclick="showNewCaseModal()">+ New Case</button>
+        <button class="btn secondary" onclick="handleLogout()" style="margin-left: 8px;">Logout</button>
+      </div>
+    </header>
+
+    <div class="content">
+      <section class="page-head">
+        <div>
+          <h1>Your Cases</h1>
+          <p class="sub" id="caseCountText">Loading cases...</p>
+        </div>
+        <div class="head-actions">
+          <div class="view-toggle">
+            <button class="view-btn active" data-view="grid" title="Grid view">⊞</button>
+            <button class="view-btn" data-view="list" title="List view">≡</button>
+          </div>
+          <div class="search-box">
+            <input type="text" id="searchInput" placeholder="Search cases..." />
+          </div>
+        </div>
+      </section>
+
+      <!-- Case Grid -->
+      <div class="case-grid" id="caseGrid"></div>
+
+      <!-- Empty State -->
+      <div id="emptyState" class="empty-state">
+        <div class="empty-icon">📁</div>
+        <div class="empty-title">No cases yet</div>
+        <div class="empty-desc">Create your first case to begin financial analysis and discovery tracking.</div>
+        <button class="btn primary" onclick="showNewCaseModal()">Create New Case</button>
+      </div>
+
+      <footer class="foot">
+        <span>Veritas · Case Management</span>
+        <span class="foot-dim">Multi-case support with real-time sync · Cloud persistence</span>
+      </footer>
+    </div>
+  </main>
+
+  <!-- ===================== NEW CASE MODAL ===================== -->
+  <div class="modal-overlay" id="newCaseModal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <div class="modal-title">Create New Case</div>
+        <button class="modal-close" onclick="hideNewCaseModal()">×</button>
+      </div>
+      <form id="newCaseForm" onsubmit="createNewCase(event)">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Case Name *</label>
+            <input type="text" id="caseName" class="form-input" placeholder="e.g., Party A v. Party B" required>
+            <span class="form-hint">Name that identifies the case parties</span>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <label class="form-label">Case Number *</label>
+              <input type="text" id="caseNumber" class="form-input" placeholder="e.g., 2024-12345" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Court / Jurisdiction *</label>
+              <input type="text" id="court" class="form-input" placeholder="e.g., County Court" required>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Petitioner / Party A Name</label>
+            <input type="text" id="petitioner" class="form-input" placeholder="e.g., Paying Spouse">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Respondent / Party B Name</label>
+            <input type="text" id="respondent" class="form-input" placeholder="e.g., Supported Spouse">
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn secondary" onclick="hideNewCaseModal()">Cancel</button>
+          <button type="submit" class="btn primary">Create Case</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===================== CASE DETAILS MODAL ===================== -->
+  <div class="modal-overlay" id="caseDetailsModal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <div class="modal-title" id="detailsTitle">Case Details</div>
+        <button class="modal-close" onclick="hideCaseDetailsModal()">×</button>
+      </div>
+      <div class="modal-body" id="caseDetailsContent">
+        <!-- Will be populated dynamically -->
+      </div>
+    </div>
+  </div>
+
+  <!-- ===================== SHARE CASE MODAL ===================== -->
+  <div class="modal-overlay" id="shareCaseModal">
+    <div class="modal-container">
+      <div class="modal-header">
+        <div class="modal-title">Share Case</div>
+        <button class="modal-close" onclick="hideShareModal()">×</button>
+      </div>
+      <form id="shareCaseForm" onsubmit="handleShareCase(event)">
+        <div class="modal-body">
+          <div class="form-group">
+            <label class="form-label">Collaborator Email *</label>
+            <input type="email" id="shareEmail" class="form-input" placeholder="attorney@firm.com" required>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Role *</label>
+            <select id="shareRole" class="form-input" required>
+              <option value="viewer">Viewer (read-only access)</option>
+              <option value="editor">Editor (can edit case data)</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn secondary" onclick="hideShareModal()">Cancel</button>
+          <button type="submit" class="btn primary">Share Case</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ===================== LOADING SPINNER ===================== -->
+  <div class="loading-spinner" id="loadingSpinner">
+    <div class="spinner"></div>
+  </div>
+
+  <script src="api-client.js"></script>
+  <script src="case-manager.js"></script>
+  <script src="safe-text.js"></script>
+  <script src="cases.js"></script>
+  <script src="logo-handler.js"></script>
+</body>
+</html>

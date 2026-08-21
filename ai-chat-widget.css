@@ -1,0 +1,641 @@
+/* ===== Veritas AI Chat Widget Styles ===== */
+
+:root {
+  --veritas-primary: #2e5b8a;
+  --veritas-primary-dark: #1f5f9d;
+  --veritas-accent: #1f5f9d;
+  --veritas-light-bg: #f5f7fb;
+  --veritas-user-msg: #e8f0f7;
+  --veritas-ai-msg: #f0f0f0;
+  --veritas-border: #e4e8f0;
+  --veritas-text: #1a2432;
+  --veritas-text-light: #55637a;
+  --veritas-shadow: 0 1px 2px rgba(16, 27, 44, 0.04), 0 8px 24px rgba(16, 27, 44, 0.06);
+  --veritas-shadow-lg: 0 12px 40px rgba(16, 27, 44, 0.12);
+}
+
+/* ===== Main Widget Container ===== */
+.veritas-ai-chat-widget {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 9999;
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+}
+
+/* ===== Toggle Button ===== */
+.veritas-chat-toggle {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: var(--veritas-primary);
+  border: none;
+  color: white;
+  font-size: 28px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: var(--veritas-shadow-lg);
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.veritas-chat-toggle:hover {
+  background: var(--veritas-primary-dark);
+  transform: scale(1.1);
+  box-shadow: 0 16px 48px rgba(46, 91, 138, 0.2);
+}
+
+.veritas-chat-toggle:active {
+  transform: scale(0.95);
+}
+
+.veritas-ai-chat-widget.open .veritas-chat-toggle {
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0);
+}
+
+/* ===== Chat Panel ===== */
+.veritas-chat-panel {
+  position: absolute;
+  bottom: 80px;
+  right: 50px;
+  width: 600px;
+  height: 600px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: var(--veritas-shadow-lg);
+  display: flex;
+  flex-direction: column;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(20px) translateX(20px);
+  transition: all 0.3s ease;
+  overflow: hidden;
+  border: 1px solid var(--veritas-border);
+}
+
+.veritas-ai-chat-widget.open .veritas-chat-panel {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0) translateX(0);
+}
+
+/* ===== Chat Header ===== */
+.veritas-chat-header {
+  background: linear-gradient(135deg, var(--veritas-primary) 0%, var(--veritas-primary-dark) 100%);
+  color: white;
+  padding: 16px 18px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid var(--veritas-border);
+  flex-shrink: 0;
+}
+
+.veritas-chat-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex: 1;
+}
+
+.veritas-chat-title .chat-icon-large {
+  font-size: 24px;
+  display: block;
+  flex-shrink: 0;
+}
+
+.veritas-chat-title h3 {
+  font-size: 14.5px;
+  font-weight: 600;
+  margin: 0;
+  line-height: 1.2;
+}
+
+.veritas-chat-title p {
+  font-size: 11.5px;
+  opacity: 0.9;
+  margin: 3px 0 0 0;
+  line-height: 1.2;
+}
+
+.veritas-chat-close {
+  background: rgba(255, 255, 255, 0.15);
+  border: none;
+  color: white;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.veritas-chat-close:hover {
+  background: rgba(255, 255, 255, 0.25);
+}
+
+/* ===== Chat Messages Container ===== */
+.veritas-chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: white;
+}
+
+/* ===== Chat Messages ===== */
+.veritas-chat-message {
+  display: flex;
+  margin-bottom: 8px;
+  animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.veritas-chat-message.user {
+  justify-content: flex-end;
+}
+
+.veritas-chat-message.assistant {
+  justify-content: flex-start;
+}
+
+.veritas-chat-message .message-content {
+  display: flex;
+  gap: 8px;
+  align-items: flex-end;
+  max-width: 80%;
+}
+
+.veritas-chat-message.user .message-content {
+  flex-direction: row-reverse;
+}
+
+.message-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+  display: block;
+}
+
+.message-text {
+  background: var(--veritas-user-msg);
+  color: var(--veritas-text);
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 13.5px;
+  line-height: 1.4;
+  word-wrap: break-word;
+  white-space: pre-wrap;
+}
+
+.veritas-chat-message.assistant .message-text {
+  background: var(--veritas-ai-msg);
+  color: var(--veritas-text);
+}
+
+.message-time {
+  font-size: 10px;
+  color: var(--veritas-text-light);
+  margin: 0 4px;
+  flex-shrink: 0;
+}
+
+/* ===== Thinking Indicator ===== */
+.veritas-chat-message.thinking .message-text {
+  padding: 10px 12px;
+}
+
+.typing-indicator {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.typing-indicator span {
+  width: 4px;
+  height: 4px;
+  background: var(--veritas-text-light);
+  border-radius: 50%;
+  animation: typing 1.4s infinite;
+}
+
+.typing-indicator span:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.typing-indicator span:nth-child(3) {
+  animation-delay: 0.4s;
+}
+
+@keyframes typing {
+  0%,
+  60%,
+  100% {
+    opacity: 0.3;
+    transform: translateY(0);
+  }
+  30% {
+    opacity: 1;
+    transform: translateY(-8px);
+  }
+}
+
+/* ===== Suggested Questions ===== */
+.veritas-chat-suggestions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 16px;
+  background: var(--veritas-light-bg);
+  border-bottom: 1px solid var(--veritas-border);
+  flex-shrink: 0;
+  min-height: auto;
+}
+
+.veritas-chat-suggestions.hidden {
+  display: none;
+}
+
+.suggestion-btn {
+  background: white;
+  border: 1px solid var(--veritas-border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  font-size: 12.5px;
+  color: var(--veritas-text);
+  cursor: pointer;
+  text-align: left;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.suggestion-btn:hover {
+  background: var(--veritas-user-msg);
+  border-color: var(--veritas-primary);
+  color: var(--veritas-primary);
+  transform: translateX(-2px);
+}
+
+.suggestion-icon {
+  color: var(--veritas-primary);
+  font-weight: 600;
+  opacity: 0.6;
+  transition: opacity 0.2s ease;
+}
+
+.suggestion-btn:hover .suggestion-icon {
+  opacity: 1;
+}
+
+/* ===== Input Area ===== */
+.veritas-chat-input-area {
+  padding: 12px 14px;
+  border-top: 1px solid var(--veritas-border);
+  background: white;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  flex-shrink: 0;
+}
+
+.veritas-chat-input-wrapper {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.veritas-chat-input {
+  flex: 1;
+  border: 1px solid var(--veritas-border);
+  border-radius: 8px;
+  padding: 9px 12px;
+  font-size: 13px;
+  font-family: inherit;
+  color: var(--veritas-text);
+  transition: all 0.2s ease;
+}
+
+.veritas-chat-input:focus {
+  outline: none;
+  border-color: var(--veritas-primary);
+  box-shadow: 0 0 0 3px rgba(46, 91, 138, 0.1);
+}
+
+.veritas-chat-send {
+  width: 32px;
+  height: 32px;
+  background: var(--veritas-primary);
+  color: white;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  flex-shrink: 0;
+}
+
+.veritas-chat-send:hover {
+  background: var(--veritas-primary-dark);
+  transform: translateX(2px);
+}
+
+.veritas-chat-send:active {
+  transform: scale(0.95);
+}
+
+.veritas-chat-clear-btn {
+  background: transparent;
+  border: 1px solid var(--veritas-border);
+  color: var(--veritas-text-light);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  width: 100%;
+}
+
+.veritas-chat-clear-btn:hover {
+  background: var(--veritas-ai-msg);
+  border-color: var(--veritas-primary);
+  color: var(--veritas-primary);
+}
+
+/* ===== Mobile Responsiveness ===== */
+@media (max-width: 768px) {
+  .veritas-chat-panel {
+    width: 100vw;
+    height: 100vh;
+    max-height: 100vh;
+    max-width: 100vw;
+    bottom: 0;
+    right: 0;
+    border-radius: 0;
+  }
+
+  .veritas-ai-chat-widget.open .veritas-chat-panel {
+    transform: translateY(0) translateX(0);
+    bottom: 0;
+  }
+
+  .veritas-chat-message .message-content {
+    max-width: 90%;
+  }
+}
+
+@media (max-width: 480px) {
+  .veritas-ai-chat-widget {
+    bottom: 10px;
+    right: 10px;
+  }
+
+  .veritas-chat-toggle {
+    width: 52px;
+    height: 52px;
+    font-size: 24px;
+  }
+
+  .veritas-chat-panel {
+    width: 100vw;
+    height: 100vh;
+    bottom: -100vh;
+    right: 0;
+  }
+
+  .veritas-ai-chat-widget.open .veritas-chat-panel {
+    bottom: 0;
+  }
+
+  .message-text {
+    font-size: 13px;
+  }
+
+  .veritas-chat-title h3 {
+    font-size: 13px;
+  }
+
+  .veritas-chat-title p {
+    font-size: 11px;
+  }
+}
+
+/* ===== Dark Mode Support ===== */
+@media (prefers-color-scheme: dark) {
+  .veritas-chat-panel {
+    background: #1e1e1e;
+    border-color: #333;
+  }
+
+  .veritas-chat-messages {
+    background: #1e1e1e;
+  }
+
+  .message-text {
+    background: #2a2a2a;
+    color: #e0e0e0;
+  }
+
+  .veritas-chat-message.user .message-text {
+    background: #1f4a73;
+    color: white;
+  }
+
+  .veritas-chat-input {
+    background: #2a2a2a;
+    color: #e0e0e0;
+    border-color: #333;
+  }
+
+  .veritas-chat-input:focus {
+    box-shadow: 0 0 0 3px rgba(46, 91, 138, 0.2);
+  }
+
+  .veritas-chat-input::placeholder {
+    color: #666;
+  }
+
+  .veritas-chat-suggestions {
+    background: #252525;
+    border-color: #333;
+  }
+
+  .suggestion-btn {
+    background: #2a2a2a;
+    color: #e0e0e0;
+    border-color: #333;
+  }
+
+  .suggestion-btn:hover {
+    background: #1f4a73;
+    border-color: #1f5f9d;
+  }
+
+  .veritas-chat-input-area {
+    background: #1e1e1e;
+    border-color: #333;
+  }
+
+  .veritas-chat-clear-btn {
+    color: #888;
+    border-color: #333;
+  }
+
+  .veritas-chat-clear-btn:hover {
+    background: #2a2a2a;
+    color: var(--veritas-primary);
+  }
+}
+
+/* ===== Chat Tabs ===== */
+.veritas-chat-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 1px solid var(--veritas-border);
+  background: white;
+  flex-shrink: 0;
+}
+
+.veritas-tab-btn {
+  flex: 1;
+  padding: 12px 14px;
+  border: none;
+  background: transparent;
+  color: var(--veritas-text-light);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.veritas-tab-btn:hover {
+  color: var(--veritas-text);
+  background: var(--veritas-light-bg);
+}
+
+.veritas-tab-btn.active {
+  color: var(--veritas-primary);
+  border-bottom-color: var(--veritas-primary);
+}
+
+.veritas-tab-content {
+  display: none;
+  overflow-y: auto;
+  flex: 1;
+  padding-left: 15px;
+}
+
+.veritas-tab-content.active {
+  display: block;
+}
+
+.veritas-regulations-item {
+  padding: 12px 14px 12px 20px;
+  border-bottom: 1px solid var(--veritas-border);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.veritas-regulations-item:hover {
+  background: var(--veritas-light-bg);
+}
+
+.veritas-regulations-item-title {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--veritas-primary);
+  margin-bottom: 4px;
+  text-decoration: none;
+  display: block;
+}
+
+.veritas-regulations-item-snippet {
+  font-size: 11px;
+  color: var(--veritas-text-light);
+  line-height: 1.4;
+  margin-bottom: 6px;
+}
+
+.veritas-regulations-item-meta {
+  font-size: 10px;
+  color: #999;
+}
+
+.veritas-regulations-section-title {
+  padding: 10px 14px 10px 20px;
+  background: var(--veritas-light-bg);
+  font-size: 11px;
+  font-weight: 700;
+  color: var(--veritas-primary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--veritas-border);
+}
+
+.veritas-regulations-empty {
+  padding: 20px 14px;
+  text-align: center;
+  font-size: 12px;
+  color: var(--veritas-text-light);
+}
+
+@media (prefers-color-scheme: dark) {
+  .veritas-chat-tabs {
+    background: #1e1e1e;
+    border-color: #333;
+  }
+
+  .veritas-tab-btn {
+    color: #888;
+  }
+
+  .veritas-tab-btn:hover {
+    background: #2a2a2a;
+    color: #aaa;
+  }
+
+  .veritas-tab-btn.active {
+    color: var(--veritas-primary);
+  }
+
+  .veritas-regulations-item {
+    border-color: #333;
+  }
+
+  .veritas-regulations-item:hover {
+    background: #2a2a2a;
+  }
+
+  .veritas-regulations-section-title {
+    background: #252525;
+    border-color: #333;
+  }
+}

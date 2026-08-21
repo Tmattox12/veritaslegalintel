@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dashboard — Veritas</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f5f7fa;
+      padding: 20px;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 12px;
+      padding: 40px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+    h1 {
+      color: #1c3f66;
+      margin-bottom: 8px;
+    }
+    .user-info {
+      background: #f0f7ff;
+      border: 1px solid #d0e0f0;
+      border-radius: 8px;
+      padding: 16px;
+      margin: 24px 0;
+      font-size: 14px;
+      color: #333;
+    }
+    .btn {
+      background: #2e5b8a;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 14px;
+      margin-top: 20px;
+    }
+    .btn:hover { background: #1c3f66; }
+    .success { color: #2d7a3e; font-weight: 600; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="brand-logo" style="width:64px;height:64px;margin:0 auto 16px;background:#fff;border-radius:12px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(184,137,59,.2);border:2px solid #f4ead6;overflow:hidden;">
+      <img src="logo-vfi.jpg" alt="VFI Logo" style="width:90%;height:90%;object-fit:contain;" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />
+      <span style="display:none;align-items:center;justify-content:center;width:100%;height:100%;font-family:serif;font-weight:700;color:#b8893b;font-size:22px;">VFI</span>
+    </div>
+    <h1>✅ Welcome to Veritas</h1>
+    <p>You're logged in! The authentication system is working.</p>
+
+    <div class="user-info" id="userInfo">
+      Loading user info...
+    </div>
+
+    <div style="display: flex; gap: 12px; margin-top: 20px; flex-wrap: wrap;">
+      <button class="btn" onclick="window.location.href='cases.html'">View Cases</button>
+      <button class="btn" onclick="window.location.href='case-intake.html'" style="background: #b8893b;">New Case Intake</button>
+      <button class="btn" onclick="logout()" style="background: #999;">Log Out</button>
+    </div>
+  </div>
+
+  <script src="api-client.js"></script>
+  <script>
+    async function loadUserInfo() {
+      try {
+        if (!api.isAuthenticated()) {
+          window.location.href = 'auth.html';
+          return;
+        }
+
+        const user = api.user;
+        document.getElementById('userInfo').innerHTML = `
+          <div>
+            <strong>Name:</strong> ${user.name}<br>
+            <strong>Email:</strong> ${user.email}<br>
+            <strong>Firm:</strong> ${user.firm || '(not set)'}
+          </div>
+          <p style="margin-top: 12px; color: #2d7a3e;">✓ Authentication verified</p>
+        `;
+      } catch (err) {
+        console.error('Error loading user:', err);
+        document.getElementById('userInfo').innerHTML = '<p style="color: red;">Error loading user info</p>';
+      }
+    }
+
+    function logout() {
+      api.logout();
+      window.location.href = 'auth.html';
+    }
+
+    document.addEventListener('DOMContentLoaded', loadUserInfo);
+  </script>
+  <script src="logo-handler.js"></script>
+</body>
+</html>
+

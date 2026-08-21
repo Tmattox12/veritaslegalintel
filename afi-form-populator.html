@@ -1,0 +1,944 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AFI Form Populator - Veritas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="ai-chat-widget.css" />
+  <style>
+    .populator-container {
+      max-width: 1200px;
+      margin: 40px auto;
+      padding: 0 20px;
+    }
+
+    .populator-header {
+      background: linear-gradient(135deg, #2e5b8a 0%, #1f5f9d 100%);
+      color: white;
+      padding: 40px 0;
+      margin: 0 -20px 40px -20px;
+      padding-left: 20px;
+      padding-right: 20px;
+    }
+
+    .populator-title {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .populator-subtitle {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    .populator-card {
+      background: white;
+      border-radius: 8px;
+      padding: 24px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      border: 1px solid #e5e0d5;
+      margin-bottom: 24px;
+    }
+
+    .card-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #e5e0d5;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .import-section {
+      background: #f9f9f9;
+      padding: 16px;
+      border-radius: 6px;
+      margin-bottom: 16px;
+    }
+
+    .import-status {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px 0;
+      border-bottom: 1px solid #e5e5e5;
+    }
+
+    .import-status:last-child {
+      border-bottom: none;
+    }
+
+    .status-label {
+      font-size: 13px;
+      color: #666;
+      font-weight: 500;
+    }
+
+    .status-value {
+      font-size: 13px;
+      font-weight: 600;
+    }
+
+    .status-success {
+      color: #28a745;
+      background: #d4edda;
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+
+    .status-pending {
+      color: #ff9800;
+      background: #fff3cd;
+      padding: 4px 8px;
+      border-radius: 4px;
+    }
+
+    .status-empty {
+      color: #999;
+    }
+
+    .form-section {
+      margin-bottom: 24px;
+      padding: 20px;
+      background: #fafafa;
+      border-radius: 6px;
+      border-left: 4px solid #2e5b8a;
+    }
+
+    .form-section-title {
+      font-size: 14px;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #e5e5e5;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 16px;
+    }
+
+    .form-field {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-label {
+      font-size: 11px;
+      color: #999;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+      font-weight: 600;
+    }
+
+    .form-input {
+      font-size: 13px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-weight: 500;
+      color: #333;
+    }
+
+    .form-input.verified {
+      background: #d4edda;
+      border-color: #28a745;
+    }
+
+    .form-input.pending {
+      background: #fff3cd;
+      border-color: #ffc107;
+    }
+
+    .form-input.readonly {
+      background: #e8e8e8;
+      color: #666;
+      cursor: not-allowed;
+    }
+
+    .verification-badge {
+      display: inline-block;
+      font-size: 11px;
+      padding: 2px 6px;
+      border-radius: 3px;
+      margin-top: 4px;
+      font-weight: 600;
+    }
+
+    .badge-verified {
+      background: #d4edda;
+      color: #155724;
+    }
+
+    .badge-pending {
+      background: #fff3cd;
+      color: #856404;
+    }
+
+    .line-item {
+      display: grid;
+      grid-template-columns: 2fr 1fr 1fr;
+      gap: 12px;
+      align-items: end;
+      padding: 12px 0;
+      border-bottom: 1px solid #e5e5e5;
+    }
+
+    .line-item:last-child {
+      border-bottom: none;
+    }
+
+    .line-description {
+      font-size: 13px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .line-amount {
+      font-size: 13px;
+      font-weight: 600;
+      color: #2e5b8a;
+    }
+
+    .line-verify-btn {
+      padding: 6px 12px;
+      background: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .line-verify-btn:hover {
+      background: #45a049;
+    }
+
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .summary-box {
+      background: #f9f9f9;
+      padding: 16px;
+      border-radius: 6px;
+      border-left: 4px solid #2e5b8a;
+    }
+
+    .summary-label {
+      font-size: 11px;
+      color: #999;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+      font-weight: 600;
+    }
+
+    .summary-value {
+      font-size: 20px;
+      font-weight: 700;
+      color: #2e5b8a;
+    }
+
+    .summary-note {
+      font-size: 11px;
+      color: #999;
+      margin-top: 6px;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .btn-primary {
+      padding: 12px 20px;
+      background: #2e5b8a;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-primary:hover {
+      background: #1f5f9d;
+    }
+
+    .btn-secondary {
+      padding: 12px 20px;
+      background: white;
+      color: #2e5b8a;
+      border: 1px solid #2e5b8a;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-secondary:hover {
+      background: #f5f5f5;
+    }
+
+    .btn-success {
+      padding: 12px 20px;
+      background: #4CAF50;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .btn-success:hover {
+      background: #45a049;
+    }
+
+    .info-box {
+      background: #e3f2fd;
+      border-left: 4px solid #2e5b8a;
+      padding: 16px;
+      border-radius: 4px;
+      margin-bottom: 20px;
+      font-size: 13px;
+      color: #1565c0;
+      line-height: 1.6;
+    }
+
+    .monthly-calc {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      font-size: 12px;
+      color: #666;
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid #e5e5e5;
+    }
+
+    .note-section {
+      margin-top: 24px;
+      padding: 16px;
+      background: #f9f9f9;
+      border-radius: 6px;
+      border-left: 4px solid #ff9800;
+    }
+
+    .note-title {
+      font-size: 12px;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 8px;
+    }
+
+    .note-textarea {
+      width: 100%;
+      min-height: 80px;
+      padding: 10px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      font-size: 12px;
+      font-family: 'Inter', sans-serif;
+      resize: vertical;
+    }
+
+    @media (max-width: 768px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .summary-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .line-item {
+        grid-template-columns: 1fr;
+        gap: 8px;
+      }
+    }
+
+    @media print {
+      .sidebar,
+      .action-buttons,
+      .note-section {
+        display: none;
+      }
+
+      .populator-card {
+        page-break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- ===================== SIDEBAR ===================== -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">
+        <img src="logo-vfi.jpg" alt="VFI Logo" />
+        <span class="brand-mark-fallback">VFI</span>
+      </div>
+      <div class="brand-text">
+        <span class="brand-name">Veritas</span>
+        <span class="brand-sub">Financial Intelligence</span>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <div class="nav-group-label">Tools</div>
+      <a class="nav-item" href="index.html"><span class="nav-ico">◆</span> Dashboard</a>
+      <a class="nav-item" href="afi.html"><span class="nav-ico">🧾</span> AFI Expenses</a>
+      <a class="nav-item active" href="afi-form-populator.html"><span class="nav-ico">📝</span> Form Populator</a>
+      <a class="nav-item" href="income-reconciliation.html"><span class="nav-ico">💰</span> Income Reconciliation</a>
+      <a class="nav-item" href="document-hub-master.html"><span class="nav-ico">📁</span> Document Hub</a>
+    </nav>
+
+    <div class="sidebar-foot">
+      <div class="plan-chip"><span style="color:var(--green)">●</span> AFI Tool</div>
+    </div>
+  </aside>
+
+  <!-- ===================== MAIN ===================== -->
+  <main class="main">
+    <!-- Header -->
+    <div class="populator-header">
+      <div class="populator-container">
+        <div class="populator-title">📝 AFI Form Populator</div>
+        <div class="populator-subtitle">Auto-populate AFI form with verified income and expense data</div>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="populator-container">
+      <!-- Info Box -->
+      <div class="info-box">
+        ℹ️ This tool imports verified expense data from the Document Hub and income data from the Income Reconciliation tool to auto-populate AFI form lines. All amounts are form-ready for attorney review.
+      </div>
+
+      <!-- Data Import Status -->
+      <div class="populator-card">
+        <div class="card-title">📥 Data Import Status</div>
+
+        <div class="import-section">
+          <div class="import-status">
+            <span class="status-label">AFI Expense Data</span>
+            <span class="status-value">
+              <span id="expenseStatus" class="status-pending">Pending Import</span>
+            </span>
+          </div>
+
+          <div class="import-status">
+            <span class="status-label">Income Data (W-2)</span>
+            <span class="status-value">
+              <span id="w2Status" class="status-pending">Pending</span>
+            </span>
+          </div>
+
+          <div class="import-status">
+            <span class="status-label">Income Data (Social Security)</span>
+            <span class="status-value">
+              <span id="ssStatus" class="status-pending">Pending</span>
+            </span>
+          </div>
+
+          <div class="import-status">
+            <span class="status-label">Other Income (Verified)</span>
+            <span class="status-value">
+              <span class="status-success">✓ Ready</span>
+            </span>
+          </div>
+        </div>
+
+        <div class="action-buttons" style="margin-top: 16px;">
+          <button class="btn-primary" onclick="importFromHub()">📥 Import Expense Data</button>
+          <button class="btn-primary" onclick="importFromReconciliation()">📥 Import Income Data</button>
+          <button class="btn-secondary" onclick="clearAllData()">Clear Form</button>
+        </div>
+      </div>
+
+      <!-- AFI FORM SECTION -->
+      <div class="populator-card">
+        <div class="card-title">🧾 AFI FORM - EXPENSE LINES</div>
+
+        <div class="form-section">
+          <div class="form-section-title">AFI Lines 1-8: Expenses</div>
+
+          <!-- Line 1: Health Insurance -->
+          <div class="line-item">
+            <div>
+              <div class="line-description">1. Health Insurance Premium</div>
+              <span class="verification-badge badge-pending" id="badge1">Pending</span>
+            </div>
+            <input type="number" id="line1" class="form-input pending" placeholder="$0.00" step="0.01" />
+            <button class="line-verify-btn" onclick="verifyLine(1)">Verify</button>
+          </div>
+
+          <!-- Line 2: Childcare -->
+          <div class="line-item">
+            <div>
+              <div class="line-description">2. Childcare/Dependent Care</div>
+              <span class="verification-badge badge-pending" id="badge2">Pending</span>
+            </div>
+            <input type="number" id="line2" class="form-input pending" placeholder="$0.00" step="0.01" />
+            <button class="line-verify-btn" onclick="verifyLine(2)">Verify</button>
+          </div>
+
+          <!-- Line 3: Medical/Dental -->
+          <div class="line-item">
+            <div>
+              <div class="line-description">3. Medical/Dental (Out-of-Pocket)</div>
+              <span class="verification-badge badge-pending" id="badge3">Pending</span>
+            </div>
+            <input type="number" id="line3" class="form-input pending" placeholder="$0.00" step="0.01" />
+            <button class="line-verify-btn" onclick="verifyLine(3)">Verify</button>
+          </div>
+
+          <!-- Line 4: Education -->
+          <div class="line-item">
+            <div>
+              <div class="line-description">4. Education/Books/Supplies</div>
+              <span class="verification-badge badge-pending" id="badge4">Pending</span>
+            </div>
+            <input type="number" id="line4" class="form-input pending" placeholder="$0.00" step="0.01" />
+            <button class="line-verify-btn" onclick="verifyLine(4)">Verify</button>
+          </div>
+
+          <!-- Line 5: Housing -->
+          <div class="line-item">
+            <div>
+              <div class="line-description">5. Housing (Mortgage/Rent/Utilities)</div>
+              <span class="verification-badge badge-pending" id="badge5">Pending</span>
+            </div>
+            <input type="number" id="line5" class="form-input pending" placeholder="$0.00" step="0.01" />
+            <button class="line-verify-btn" onclick="verifyLine(5)">Verify</button>
+          </div>
+
+          <!-- Line 6: Utilities -->
+          <div class="line-item">
+            <div>
+              <div class="line-description">6. Utilities (Phone/Internet/Cable)</div>
+              <span class="verification-badge badge-pending" id="badge6">Pending</span>
+            </div>
+            <input type="number" id="line6" class="form-input pending" placeholder="$0.00" step="0.01" />
+            <button class="line-verify-btn" onclick="verifyLine(6)">Verify</button>
+          </div>
+
+          <!-- Line 7: Transportation -->
+          <div class="line-item">
+            <div>
+              <div class="line-description">7. Transportation (Car/Gas/Insurance)</div>
+              <span class="verification-badge badge-pending" id="badge7">Pending</span>
+            </div>
+            <input type="number" id="line7" class="form-input pending" placeholder="$0.00" step="0.01" />
+            <button class="line-verify-btn" onclick="verifyLine(7)">Verify</button>
+          </div>
+
+          <!-- Line 8: Food -->
+          <div class="line-item">
+            <div>
+              <div class="line-description">8. Food/Groceries</div>
+              <span class="verification-badge badge-pending" id="badge8">Pending</span>
+            </div>
+            <input type="number" id="line8" class="form-input pending" placeholder="$0.00" step="0.01" />
+            <button class="line-verify-btn" onclick="verifyLine(8)">Verify</button>
+          </div>
+        </div>
+
+        <!-- Monthly Expense Calculation -->
+        <div style="background: #e8f3ff; padding: 16px; border-radius: 6px; margin-top: 16px;">
+          <div class="form-label" style="color: #2e5b8a;">Monthly Expenses (Average)</div>
+          <div style="font-size: 24px; font-weight: 700; color: #2e5b8a; margin-top: 8px;">
+            $<span id="monthlyTotal">0.00</span>
+          </div>
+          <div class="monthly-calc">
+            <span>Annual Total ÷ 12 months</span>
+            <span>= $<span id="monthlyCalc">0.00</span>/month</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- INCOME SECTION -->
+      <div class="populator-card">
+        <div class="card-title">💰 INCOME SECTION</div>
+
+        <div class="form-section">
+          <div class="form-section-title">Income Sources & Totals</div>
+
+          <div class="form-grid">
+            <div class="form-field">
+              <label class="form-label">W-2 Employment Income (Annual)</label>
+              <input type="number" id="incomeW2" class="form-input pending" placeholder="$0.00" step="0.01" />
+              <span class="verification-badge badge-pending" id="w2Badge">Pending</span>
+            </div>
+
+            <div class="form-field">
+              <label class="form-label">Social Security (Annual)</label>
+              <input type="number" id="incomeSS" class="form-input pending" placeholder="$0.00" step="0.01" />
+              <span class="verification-badge badge-pending" id="ssBadge">Pending</span>
+            </div>
+
+            <div class="form-field">
+              <label class="form-label">Other Income (Annual)</label>
+              <input type="number" id="incomeOther" class="form-input verified" value="821913.50" step="0.01" readonly />
+              <span class="verification-badge badge-verified">✓ Verified</span>
+            </div>
+
+            <div class="form-field">
+              <label class="form-label">TOTAL ANNUAL INCOME</label>
+              <input type="number" id="incomeTotalAnnual" class="form-input readonly" value="821913.50" step="0.01" readonly />
+              <span class="verification-badge" style="background: #d4edda; color: #155724;">Total</span>
+            </div>
+          </div>
+
+          <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid #e5e5e5;">
+            <div class="form-label" style="color: #2e5b8a;">Monthly Income (Average)</div>
+            <div style="font-size: 20px; font-weight: 700; color: #2e5b8a; margin-top: 8px;">
+              $<span id="monthlyIncome">68492.79</span>/month
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- RECONCILIATION SUMMARY -->
+      <div class="populator-card">
+        <div class="card-title">📊 AFI RECONCILIATION SUMMARY</div>
+
+        <div class="summary-grid">
+          <div class="summary-box">
+            <div class="summary-label">Total Annual Expenses</div>
+            <div class="summary-value">$<span id="summaryExpenses">0.00</span></div>
+            <div class="summary-note">8 AFI expense categories</div>
+          </div>
+
+          <div class="summary-box">
+            <div class="summary-label">Total Annual Income</div>
+            <div class="summary-value">$<span id="summaryIncome">821913.50</span></div>
+            <div class="summary-note">All income sources</div>
+          </div>
+
+          <div class="summary-box" style="border-left-color: #28a745;">
+            <div class="summary-label">Net Annual Income</div>
+            <div class="summary-value" style="color: #28a745;">$<span id="summaryNet">821913.50</span></div>
+            <div class="summary-note">Income - Expenses</div>
+          </div>
+
+          <div class="summary-box" style="border-left-color: #ff9800;">
+            <div class="summary-label">Monthly Net Income</div>
+            <div class="summary-value" style="color: #ff9800;">$<span id="summaryMonthlyNet">68492.79</span></div>
+            <div class="summary-note">÷ 12 months</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- NOTES & ATTESTATION -->
+      <div class="populator-card">
+        <div class="card-title">📝 NOTES & VERIFICATION</div>
+
+        <div class="note-section">
+          <div class="note-title">Reconciliation Notes (For Attorney):</div>
+          <textarea id="notes" class="note-textarea" placeholder="Add notes, caveats, or explanations for the AFI form...&#10;&#10;Example: W-2 amount from 2025 Fleet Feet statement. Social Security verified from November 2024 document. All expenses verified against Chase Freedom CC statements, Sept 2024 - Aug 2025."></textarea>
+        </div>
+
+        <div style="margin-top: 16px; padding: 16px; background: #d4edda; border-radius: 6px; border-left: 4px solid #28a745;">
+          <div style="font-size: 12px; font-weight: 600; color: #155724; margin-bottom: 8px;">✓ Data Verification Checklist</div>
+          <div style="font-size: 12px; color: #155724; line-height: 1.6;">
+            <div><input type="checkbox" id="check1" /> W-2 income verified against source document</div>
+            <div><input type="checkbox" id="check2" /> Social Security income verified</div>
+            <div><input type="checkbox" id="check3" /> Other income verified against payment records</div>
+            <div><input type="checkbox" id="check4" /> All AFI expenses reconciled to source documents</div>
+            <div><input type="checkbox" id="check5" /> All amounts cross-checked for accuracy</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ACTION BUTTONS -->
+      <div class="populator-card">
+        <div class="card-title">Actions</div>
+
+        <div class="action-buttons">
+          <button class="btn-success" onclick="saveDraft()">💾 Save Draft</button>
+          <button class="btn-primary" onclick="exportToPDF()">📄 Export to PDF</button>
+          <button class="btn-secondary" onclick="printForm()">🖨️ Print Form</button>
+          <button class="btn-secondary" onclick="exportAsJSON()">📥 Export as JSON</button>
+        </div>
+
+        <div style="margin-top: 16px; padding: 16px; background: #f9f9f9; border-radius: 6px; font-size: 12px; color: #666; line-height: 1.6;">
+          <p><strong>Next Steps:</strong></p>
+          <ol style="margin: 8px 0 0 20px;">
+            <li>Import expense data from Document Hub</li>
+            <li>Import income data from Income Reconciliation</li>
+            <li>Review all line items and verify amounts</li>
+            <li>Add any necessary notes or explanations</li>
+            <li>Check verification checkboxes</li>
+            <li>Export as PDF or print for attorney signature</li>
+          </ol>
+        </div>
+      </div>
+
+      <!-- Footer -->
+      <div style="text-align: center; padding: 20px 0; color: #999; font-size: 12px;">
+        Veritas Financial Intelligence · AFI Form Populator v1.0<br>
+        Form-ready data for family law proceedings
+      </div>
+    </div>
+  </main>
+
+  <!-- Veritas AI Chat Widget -->
+  <script src="ai-chat-config.js"></script>
+  <script src="ai-chat-widget.js"></script>
+  <script src="logo-handler.js"></script>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      loadSavedData();
+      updateCalculations();
+    });
+
+    function importFromHub() {
+      const expenseData = localStorage.getItem('hub_expenses');
+      if (!expenseData) {
+        alert('No expense data found in Document Hub. Please upload documents first.');
+        return;
+      }
+
+      try {
+        const expenses = JSON.parse(expenseData);
+        const categories = {
+          'healthInsurance': 1,
+          'childcare': 2,
+          'medicalDental': 3,
+          'education': 4,
+          'housing': 5,
+          'utilities': 6,
+          'transportation': 7,
+          'food': 8
+        };
+
+        // Sum by category
+        const totals = {};
+        expenses.forEach(item => {
+          const cat = item.category || item.categoryName;
+          if (!totals[cat]) totals[cat] = 0;
+          totals[cat] += parseFloat(item.amount) || 0;
+        });
+
+        // Populate form lines
+        Object.keys(categories).forEach(key => {
+          const lineNum = categories[key];
+          const amount = totals[key] || 0;
+          document.getElementById('line' + lineNum).value = amount.toFixed(2);
+          verifyLine(lineNum);
+        });
+
+        document.getElementById('expenseStatus').innerHTML = '<span class="status-success">✓ Imported</span>';
+        updateCalculations();
+        alert('✓ Expense data imported successfully!');
+      } catch (e) {
+        alert('Error importing data: ' + e.message);
+      }
+    }
+
+    function importFromReconciliation() {
+      const reconcilData = localStorage.getItem('income_reconciliation_data');
+      if (!reconcilData) {
+        alert('No income reconciliation data found. Please fill out Income Reconciliation form first.');
+        return;
+      }
+
+      try {
+        const data = JSON.parse(reconcilData);
+        document.getElementById('incomeW2').value = (data.w2Gross || 0).toFixed(2);
+        document.getElementById('incomeSS').value = (data.ssAnnual || 0).toFixed(2);
+        verifyIncomeW2();
+        verifyIncomeSS();
+        updateCalculations();
+        alert('✓ Income data imported successfully!');
+      } catch (e) {
+        alert('Error importing income data: ' + e.message);
+      }
+    }
+
+    function verifyLine(lineNum) {
+      const input = document.getElementById('line' + lineNum);
+      const badge = document.getElementById('badge' + lineNum);
+
+      if (input.value && parseFloat(input.value) > 0) {
+        input.classList.add('verified');
+        input.classList.remove('pending');
+        badge.className = 'verification-badge badge-verified';
+        badge.textContent = '✓ Verified';
+      }
+
+      updateCalculations();
+    }
+
+    function verifyIncomeW2() {
+      const input = document.getElementById('incomeW2');
+      if (input.value && parseFloat(input.value) > 0) {
+        input.classList.add('verified');
+        input.classList.remove('pending');
+        document.getElementById('w2Badge').className = 'verification-badge badge-verified';
+        document.getElementById('w2Badge').textContent = '✓ Verified';
+        document.getElementById('w2Status').innerHTML = '<span class="status-success">✓ Ready</span>';
+      }
+      updateCalculations();
+    }
+
+    function verifyIncomeSS() {
+      const input = document.getElementById('incomeSS');
+      if (input.value && parseFloat(input.value) > 0) {
+        input.classList.add('verified');
+        input.classList.remove('pending');
+        document.getElementById('ssBadge').className = 'verification-badge badge-verified';
+        document.getElementById('ssBadge').textContent = '✓ Verified';
+        document.getElementById('ssStatus').innerHTML = '<span class="status-success">✓ Ready</span>';
+      }
+      updateCalculations();
+    }
+
+    function updateCalculations() {
+      // Calculate annual expenses
+      let annualExpenses = 0;
+      for (let i = 1; i <= 8; i++) {
+        annualExpenses += parseFloat(document.getElementById('line' + i).value) || 0;
+      }
+
+      // Calculate income
+      const w2 = parseFloat(document.getElementById('incomeW2').value) || 0;
+      const ss = parseFloat(document.getElementById('incomeSS').value) || 0;
+      const other = parseFloat(document.getElementById('incomeOther').value) || 0;
+      const totalIncome = w2 + ss + other;
+
+      // Update displays
+      document.getElementById('monthlyTotal').textContent = (annualExpenses / 12).toFixed(2);
+      document.getElementById('monthlyCalc').textContent = (annualExpenses / 12).toFixed(2);
+
+      document.getElementById('incomeTotalAnnual').value = totalIncome.toFixed(2);
+      document.getElementById('monthlyIncome').textContent = (totalIncome / 12).toFixed(2);
+
+      document.getElementById('summaryExpenses').textContent = annualExpenses.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      document.getElementById('summaryIncome').textContent = totalIncome.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+      const netIncome = totalIncome - annualExpenses;
+      document.getElementById('summaryNet').textContent = netIncome.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+      document.getElementById('summaryMonthlyNet').textContent = (netIncome / 12).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function saveDraft() {
+      const formData = {
+        expenses: [],
+        income: {
+          w2: parseFloat(document.getElementById('incomeW2').value) || 0,
+          ss: parseFloat(document.getElementById('incomeSS').value) || 0,
+          other: parseFloat(document.getElementById('incomeOther').value) || 0
+        },
+        notes: document.getElementById('notes').value,
+        savedDate: new Date().toISOString()
+      };
+
+      for (let i = 1; i <= 8; i++) {
+        formData.expenses.push(parseFloat(document.getElementById('line' + i).value) || 0);
+      }
+
+      localStorage.setItem('afi_form_draft', JSON.stringify(formData));
+      alert('✓ Draft saved successfully!');
+    }
+
+    function loadSavedData() {
+      const saved = localStorage.getItem('afi_form_draft');
+      if (saved) {
+        try {
+          const data = JSON.parse(saved);
+          data.expenses.forEach((amount, i) => {
+            if (amount > 0) {
+              document.getElementById('line' + (i + 1)).value = amount.toFixed(2);
+              verifyLine(i + 1);
+            }
+          });
+
+          if (data.income.w2) {
+            document.getElementById('incomeW2').value = data.income.w2.toFixed(2);
+            verifyIncomeW2();
+          }
+          if (data.income.ss) {
+            document.getElementById('incomeSS').value = data.income.ss.toFixed(2);
+            verifyIncomeSS();
+          }
+          if (data.notes) {
+            document.getElementById('notes').value = data.notes;
+          }
+
+          updateCalculations();
+        } catch (e) {}
+      }
+    }
+
+    function clearAllData() {
+      if (confirm('Are you sure? This will clear all form data.')) {
+        for (let i = 1; i <= 8; i++) {
+          document.getElementById('line' + i).value = '';
+        }
+        document.getElementById('incomeW2').value = '';
+        document.getElementById('incomeSS').value = '';
+        document.getElementById('notes').value = '';
+        updateCalculations();
+        alert('Form cleared.');
+      }
+    }
+
+    function exportToPDF() {
+      alert('PDF export: This functionality opens the print dialog to save as PDF (Ctrl+P → Save as PDF)');
+      window.print();
+    }
+
+    function printForm() {
+      window.print();
+    }
+
+    function exportAsJSON() {
+      const formData = {
+        title: 'AFI Form - Financial Declaration',
+        caseDate: new Date().toISOString(),
+        expenses: [],
+        income: {}
+      };
+
+      for (let i = 1; i <= 8; i++) {
+        formData.expenses.push(parseFloat(document.getElementById('line' + i).value) || 0);
+      }
+
+      formData.income.w2 = parseFloat(document.getElementById('incomeW2').value) || 0;
+      formData.income.ss = parseFloat(document.getElementById('incomeSS').value) || 0;
+      formData.income.other = parseFloat(document.getElementById('incomeOther').value) || 0;
+      formData.notes = document.getElementById('notes').value;
+
+      const blob = new Blob([JSON.stringify(formData, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `AFI-Form-${new Date().toISOString().split('T')[0]}.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+    }
+  </script>
+</body>
+</html>

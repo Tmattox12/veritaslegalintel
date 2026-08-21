@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Veritas — Login</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', sans-serif;
+      background: linear-gradient(135deg, #1c3f66 0%, #2e5b8a 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 20px;
+    }
+
+    .auth-container {
+      width: 100%;
+      max-width: 420px;
+      background: white;
+      border-radius: 12px;
+      padding: 40px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+    }
+
+    .auth-header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    .auth-logo {
+      width: 120px;
+      height: 120px;
+      margin: 0 auto 24px;
+      background: white;
+      border-radius: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+      border: none;
+      overflow: hidden;
+    }
+
+    .auth-logo img {
+      width: 90%;
+      height: 90%;
+      object-fit: contain;
+    }
+
+    .auth-logo-fallback {
+      display: none;
+      font-family: 'Fraunces', serif;
+      font-weight: 700;
+      color: #b8893b;
+      font-size: 24px;
+    }
+
+    .auth-logo.error img {
+      display: none;
+    }
+
+    .auth-logo.error .auth-logo-fallback {
+      display: block;
+    }
+
+    .auth-header h1 {
+      font-size: 24px;
+      font-weight: 700;
+      color: #1c3f66;
+      margin-bottom: 8px;
+    }
+
+    .auth-header p {
+      font-size: 13px;
+      color: #666;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+    }
+
+    .form-label {
+      display: block;
+      font-size: 12px;
+      font-weight: 600;
+      color: #1c3f66;
+      margin-bottom: 6px;
+    }
+
+    .form-input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 13px;
+      transition: all 0.2s;
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: #2e5b8a;
+      box-shadow: 0 0 0 3px rgba(46, 91, 138, 0.1);
+    }
+
+    .password-wrapper {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .password-wrapper .form-input {
+      flex: 1;
+      padding-right: 40px;
+    }
+
+    .toggle-password {
+      position: absolute;
+      right: 12px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #666;
+      font-size: 18px;
+      padding: 4px 8px;
+      transition: color 0.2s;
+    }
+
+    .toggle-password:hover {
+      color: #2e5b8a;
+    }
+
+    .form-button {
+      width: 100%;
+      padding: 11px;
+      background: #2e5b8a;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      margin-top: 8px;
+    }
+
+    .form-button:hover {
+      background: #1c3f66;
+    }
+
+    .form-button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+
+    .form-toggle {
+      text-align: center;
+      margin-top: 20px;
+      font-size: 12px;
+      color: #666;
+    }
+
+    .form-toggle a {
+      color: #2e5b8a;
+      text-decoration: none;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .form-toggle a:hover {
+      text-decoration: underline;
+    }
+
+    .auth-form {
+      display: none;
+    }
+
+    .auth-form.active {
+      display: block;
+    }
+
+    .error-message {
+      background: #ffebee;
+      border: 1px solid #ef5350;
+      border-radius: 6px;
+      padding: 12px;
+      margin-bottom: 16px;
+      font-size: 12px;
+      color: #c62828;
+      display: none;
+    }
+
+    .error-message.show {
+      display: block;
+    }
+
+    .loading {
+      display: none;
+      text-align: center;
+      color: #666;
+      font-size: 13px;
+      margin: 16px 0;
+    }
+
+    .loading.show {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <div class="auth-container">
+    <!-- LOGIN FORM -->
+    <div class="auth-form active" id="loginForm">
+      <div class="auth-header">
+        <div class="auth-logo" id="logoLogin" onerror="handleLogoError('logoLogin')">
+          <img src="logo-vfi.jpg" alt="VFI Logo" />
+          <span class="auth-logo-fallback">VFI</span>
+        </div>
+        <h1>Welcome Back</h1>
+        <p>Sign in to Veritas Financial Intelligence</p>
+      </div>
+
+      <div class="error-message" id="loginError"></div>
+
+      <form onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label class="form-label">Email Address</label>
+          <input type="email" class="form-input" id="loginEmail" placeholder="you@firm.com" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <div class="password-wrapper">
+            <input type="password" class="form-input" id="loginPassword" placeholder="••••••••" required>
+            <button type="button" class="toggle-password" onclick="togglePassword('loginPassword')">👁️</button>
+          </div>
+        </div>
+
+        <button type="submit" class="form-button" id="loginBtn">Sign In</button>
+        <div class="loading" id="loginLoading">Signing in...</div>
+      </form>
+
+      <div class="form-toggle">
+        Don't have an account? <a onclick="switchForm()">Create one</a>
+      </div>
+    </div>
+
+    <!-- REGISTER FORM -->
+    <div class="auth-form" id="registerForm">
+      <div class="auth-header">
+        <div class="auth-logo" id="logoRegister" onerror="handleLogoError('logoRegister')">
+          <img src="logo-vfi.jpg" alt="VFI Logo" />
+          <span class="auth-logo-fallback">VFI</span>
+        </div>
+        <h1>Get Started</h1>
+        <p>Create your Veritas account</p>
+      </div>
+
+      <div class="error-message" id="registerError"></div>
+
+      <form onsubmit="handleRegister(event)">
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input type="text" class="form-input" id="registerName" placeholder="John Doe" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Email Address</label>
+          <input type="email" class="form-input" id="registerEmail" placeholder="you@firm.com" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Law Firm / Organization</label>
+          <input type="text" class="form-input" id="registerFirm" placeholder="Smith & Associates" required>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Password (8+ characters)</label>
+          <div class="password-wrapper">
+            <input type="password" class="form-input" id="registerPassword" placeholder="••••••••" minlength="8" required>
+            <button type="button" class="toggle-password" onclick="togglePassword('registerPassword')">👁️</button>
+          </div>
+        </div>
+
+        <button type="submit" class="form-button" id="registerBtn">Create Account</button>
+        <div class="loading" id="registerLoading">Creating account...</div>
+      </form>
+
+      <div class="form-toggle">
+        Already have an account? <a onclick="switchForm()">Sign in</a>
+      </div>
+    </div>
+  </div>
+
+  <script src="api-client.js"></script>
+  <script src="auth.js"></script>
+  <script src="logo-handler.js"></script>
+</body>
+</html>

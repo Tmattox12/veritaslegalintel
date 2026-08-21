@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Debt Payoff Analysis - Veritas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="ai-chat-widget.css" />
+  <style>
+    .debt-container { max-width: 1400px; margin: 0 auto; padding: 20px; }
+    .debt-header { background: linear-gradient(135deg, #d32f2f 0%, #c62828 100%); color: white; padding: 40px 20px; margin: -20px -20px 40px -20px; }
+    .debt-title { font-size: 32px; font-weight: 700; margin-bottom: 8px; }
+    .debt-subtitle { font-size: 14px; opacity: 0.9; }
+    .input-panel { background: white; border-radius: 8px; padding: 24px; border: 1px solid #e5e0d5; margin-bottom: 20px; }
+    .panel-title { font-size: 16px; font-weight: 700; color: #333; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 2px solid #e5e0d5; }
+    .form-group { margin-bottom: 16px; display: flex; flex-direction: column; }
+    .form-label { font-size: 12px; font-weight: 600; color: #666; margin-bottom: 6px; }
+    .form-input, .form-select { border: 1px solid #ddd; border-radius: 4px; padding: 10px; font-size: 14px; font-family: 'Inter', sans-serif; }
+    .form-select { cursor: pointer; background: white; }
+    .kpi-row { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; margin-bottom: 30px; }
+    .kpi-card { background: white; border-radius: 8px; padding: 20px; border: 1px solid #e5e0d5; text-align: center; }
+    .kpi-value { font-size: 28px; font-weight: 700; color: #d32f2f; margin-bottom: 8px; }
+    .kpi-label { font-size: 12px; color: #666; font-weight: 600; }
+    .debt-table { width: 100%; border-collapse: collapse; background: white; border-radius: 8px; overflow: hidden; box-shadow: 0 1px 3px rgba(0,0,0,0.05); margin-bottom: 30px; }
+    .debt-table th { background: #f5f7fa; padding: 12px; text-align: left; font-weight: 600; font-size: 13px; color: #666; border-bottom: 2px solid #e5e0d5; }
+    .debt-table td { padding: 12px; border-bottom: 1px solid #f0f0f0; font-size: 13px; }
+    .debt-table tr:hover { background: #f9f9f9; }
+    .button-group { display: flex; gap: 12px; margin-bottom: 30px; }
+    .btn { flex: 1; padding: 12px 20px; border: none; border-radius: 6px; font-weight: 600; font-size: 14px; cursor: pointer; transition: all 0.2s; }
+    .btn-primary { background: #d32f2f; color: white; }
+    .btn-primary:hover { background: #c62828; }
+    .btn-secondary { background: #f0f0f0; color: #333; border: 1px solid #ddd; }
+    .btn-secondary:hover { background: #e5e5e5; }
+    .scenario-card { background: white; border-radius: 8px; padding: 20px; border: 2px solid #d32f2f; margin-bottom: 20px; }
+    .scenario-title { font-size: 16px; font-weight: 700; color: #d32f2f; margin-bottom: 16px; }
+    .scenario-row { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 12px; }
+    .scenario-item { padding: 12px; background: #f9f9f9; border-radius: 4px; }
+    .scenario-label { font-size: 11px; color: #999; font-weight: 600; }
+    .scenario-value { font-size: 16px; font-weight: 700; color: #333; margin-top: 4px; }
+    @media (max-width: 1024px) {
+      .kpi-row { grid-template-columns: repeat(2, 1fr); }
+      .scenario-row { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <div class="logo-section">
+        <span class="logo-text">⚖️ VERITAS</span>
+        <span class="logo-sub">Legal Intelligence</span>
+      </div>
+    </div>
+    <nav class="nav">
+      <div class="nav-group-label">Analysis Modules</div>
+      <a class="nav-item" href="asset-division-valuation.html"><span class="nav-ico">💰</span> Asset Division</a>
+      <a class="nav-item" href="child-support-calculator.html"><span class="nav-ico">🧒</span> Child Support</a>
+      <a class="nav-item" href="debt-payoff-calculator.html" class="active"><span class="nav-ico">💳</span> Debt Payoff</a>
+      <a class="nav-item" href="settlement.html"><span class="nav-ico">⇄</span> Settlement Modeling</a>
+      <a class="nav-item" href="spousal.html"><span class="nav-ico">👥</span> Spousal Support</a>
+    </nav>
+    <div class="sidebar-foot">
+      <div class="plan-chip"><span style="color:var(--green)">●</span> Secure Connection</div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div class="matter-switcher">
+        <span class="matter-label">Analysis Tool</span>
+        <button class="matter-btn">
+          <strong>Debt Payoff Analysis</strong>
+          <span class="case-no">Comparative Scenarios</span>
+          <span class="chev"></span>
+        </button>
+      </div>
+      <div class="topbar-right">
+        <div class="user">
+          <div class="avatar">WU</div>
+          <div class="user-meta">
+            <span class="user-name">Workspace User</span>
+            <span class="user-role">Matter Name</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="debt-container">
+      <div class="debt-header">
+        <h1 class="debt-title">💳 Debt Payoff Analysis</h1>
+        <p class="debt-subtitle">Analyze which party pays debts faster, interest implications, and division impact on cash flow</p>
+      </div>
+
+      <div class="button-group">
+        <button class="btn btn-primary" onclick="calculatePayoff()">📊 Calculate Payoff Scenarios</button>
+        <button class="btn btn-secondary" onclick="exportResults()">📋 Export Analysis</button>
+        <button class="btn btn-secondary" onclick="printReport()">🖨️ Print Report</button>
+      </div>
+
+      <div class="kpi-row">
+        <div class="kpi-card">
+          <div class="kpi-value" id="totalDebtKPI">$0</div>
+          <div class="kpi-label">Total Shared Debt</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-value" id="totalInterestKPI">$0</div>
+          <div class="kpi-label">Potential Interest</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-value" id="avgRateKPI">0%</div>
+          <div class="kpi-label">Average Interest Rate</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-value" id="payoffMonthsKPI">0</div>
+          <div class="kpi-label">Months to Payoff</div>
+        </div>
+      </div>
+
+      <div class="input-panel">
+        <div class="panel-title">➕ Add Debt</div>
+
+        <div class="form-group">
+          <label class="form-label">Debt Name</label>
+          <input type="text" class="form-input" id="debtName" placeholder="e.g., Chase Credit Card">
+        </div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;">
+          <div class="form-group">
+            <label class="form-label">Current Balance</label>
+            <input type="number" class="form-input" id="debtBalance" placeholder="0.00" step="0.01">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Interest Rate %</label>
+            <input type="number" class="form-input" id="debtRate" placeholder="0.00" step="0.01">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Assigned To</label>
+            <select class="form-select" id="debtOwner">
+              <option value="joint">Joint/Community</option>
+              <option value="party1">Party A</option>
+              <option value="party2">Party B</option>
+            </select>
+          </div>
+        </div>
+
+        <button class="btn btn-primary" style="margin-top: 12px;" onclick="addDebt()">✓ Add Debt</button>
+      </div>
+
+      <div id="debtTable" style="margin-bottom: 30px;"></div>
+
+      <div class="input-panel">
+        <div class="panel-title">💰 Payment Assumptions</div>
+
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px;">
+          <div class="form-group">
+            <label class="form-label">Party A Monthly Payment Capacity</label>
+            <input type="number" class="form-input" id="party1Payment" placeholder="500" step="50">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Party B Monthly Payment Capacity</label>
+            <input type="number" class="form-input" id="party2Payment" placeholder="500" step="50">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Payment Strategy</label>
+            <select class="form-select" id="strategy">
+              <option value="equal">Equal Split</option>
+              <option value="income-proportional">Income Proportional</option>
+              <option value="snowball">Debt Snowball (Smallest First)</option>
+              <option value="avalanche">Debt Avalanche (Highest Rate)</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <div id="scenariosContainer"></div>
+
+      <div class="input-panel">
+        <div class="panel-title">⚠️ Settlement Considerations</div>
+        <div style="font-size: 13px; color: #666; line-height: 1.6;">
+          <strong>Who Pays What:</strong><br>
+          • Each debt assigned to responsible party<br>
+          • Community debts may be split 50/50 or proportionally<br>
+          • Payment capacity affects division feasibility<br><br>
+          <strong>Interest Impact:</strong><br>
+          • High-interest debts (credit cards) cost most over time<br>
+          • Fast payoff reduces total interest paid<br>
+          • Consider debt payoff vs. other settlement terms<br><br>
+          <strong>Credit Impact:</strong><br>
+          • Joint account holders remain liable if not discharged<br>
+          • Support obligation with refinancing important<br>
+          • Monitor each party's assigned accounts post-divorce
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    let debts = [];
+
+    function addDebt() {
+      const debt = {
+        id: Date.now(),
+        name: document.getElementById('debtName').value,
+        balance: parseFloat(document.getElementById('debtBalance').value) || 0,
+        rate: parseFloat(document.getElementById('debtRate').value) || 0,
+        owner: document.getElementById('debtOwner').value
+      };
+
+      if (!debt.name || debt.balance <= 0) {
+        alert('Enter debt name and balance');
+        return;
+      }
+
+      debts.push(debt);
+      renderDebts();
+      calculatePayoff();
+      document.getElementById('debtName').value = '';
+      document.getElementById('debtBalance').value = '';
+      document.getElementById('debtRate').value = '';
+    }
+
+    function renderDebts() {
+      let html = '<table class="debt-table"><thead><tr><th>Debt</th><th>Balance</th><th>Rate</th><th>Owner</th><th></th></tr></thead><tbody>';
+
+      debts.forEach(debt => {
+        html += `<tr>
+          <td>${debt.name}</td>
+          <td>$${debt.balance.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
+          <td>${debt.rate}%</td>
+          <td>${debt.owner === 'party1' ? 'Party A' : debt.owner === 'party2' ? 'Party B' : 'Joint'}</td>
+          <td><button class="btn btn-secondary" style="width: 60px; padding: 4px;" onclick="removeDebt(${debt.id})">Delete</button></td>
+        </tr>`;
+      });
+
+      html += '</tbody></table>';
+      document.getElementById('debtTable').innerHTML = html;
+      updateKPIs();
+    }
+
+    function removeDebt(id) {
+      debts = debts.filter(d => d.id !== id);
+      renderDebts();
+    }
+
+    function updateKPIs() {
+      const total = debts.reduce((sum, d) => sum + d.balance, 0);
+      const avgRate = debts.length > 0 ? (debts.reduce((sum, d) => sum + d.rate, 0) / debts.length).toFixed(2) : 0;
+      const monthlyPayment = parseFloat(document.getElementById('party1Payment').value) + parseFloat(document.getElementById('party2Payment').value) || 1000;
+      const months = monthlyPayment > 0 ? Math.ceil(total / (monthlyPayment * 0.5)) : 0;
+
+      // Rough interest calc
+      let totalInterest = 0;
+      debts.forEach(d => {
+        const monthlyRate = d.rate / 100 / 12;
+        if (monthlyRate > 0) {
+          let balance = d.balance;
+          let interest = 0;
+          for (let i = 0; i < months; i++) {
+            interest += balance * monthlyRate;
+            balance -= (monthlyPayment / debts.length * 0.7); // 70% principal
+            if (balance <= 0) break;
+          }
+          totalInterest += interest;
+        }
+      });
+
+      document.getElementById('totalDebtKPI').textContent = '$' + total.toLocaleString('en-US', {minimumFractionDigits: 2});
+      document.getElementById('totalInterestKPI').textContent = '$' + totalInterest.toLocaleString('en-US', {minimumFractionDigits: 2});
+      document.getElementById('avgRateKPI').textContent = avgRate + '%';
+      document.getElementById('payoffMonthsKPI').textContent = months;
+    }
+
+    function calculatePayoff() {
+      if (debts.length === 0) {
+        alert('Add debts first');
+        return;
+      }
+
+      const party1Payment = parseFloat(document.getElementById('party1Payment').value) || 500;
+      const party2Payment = parseFloat(document.getElementById('party2Payment').value) || 500;
+
+      let scenarios = [];
+
+      // Scenario 1: Equal Split
+      scenarios.push({
+        name: 'Equal 50/50 Split',
+        party1Total: debts.filter(d => d.owner === 'joint' || d.owner === 'party1').reduce((sum, d) => sum + d.balance, 0) * 0.5,
+        party2Total: debts.filter(d => d.owner === 'joint' || d.owner === 'party2').reduce((sum, d) => sum + d.balance, 0) * 0.5,
+        payment1: party1Payment,
+        payment2: party2Payment
+      });
+
+      // Scenario 2: Income Proportional (assume example ratios)
+      scenarios.push({
+        name: 'Income Proportional (60/40)',
+        party1Total: debts.filter(d => d.owner === 'joint' || d.owner === 'party1').reduce((sum, d) => sum + d.balance, 0) * 0.6,
+        party2Total: debts.filter(d => d.owner === 'joint' || d.owner === 'party2').reduce((sum, d) => sum + d.balance, 0) * 0.4,
+        payment1: party1Payment,
+        payment2: party2Payment
+      });
+
+      let html = '';
+      scenarios.forEach((scenario, idx) => {
+        const totalDebt = scenario.party1Total + scenario.party2Total;
+        const months1 = scenario.payment1 > 0 ? Math.ceil(scenario.party1Total / scenario.payment1) : 0;
+        const months2 = scenario.payment2 > 0 ? Math.ceil(scenario.party2Total / scenario.payment2) : 0;
+
+        html += `<div class="scenario-card">
+          <div class="scenario-title">${scenario.name}</div>
+          <div class="scenario-row">
+            <div class="scenario-item">
+              <div class="scenario-label">Party A Debt</div>
+              <div class="scenario-value">$${scenario.party1Total.toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+            </div>
+            <div class="scenario-item">
+              <div class="scenario-label">Party B Debt</div>
+              <div class="scenario-value">$${scenario.party2Total.toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+            </div>
+          </div>
+          <div class="scenario-row">
+            <div class="scenario-item">
+              <div class="scenario-label">Party A Payoff Time</div>
+              <div class="scenario-value">${months1} months (${(months1/12).toFixed(1)} years)</div>
+            </div>
+            <div class="scenario-item">
+              <div class="scenario-label">Party B Payoff Time</div>
+              <div class="scenario-value">${months2} months (${(months2/12).toFixed(1)} years)</div>
+            </div>
+          </div>
+        </div>`;
+      });
+
+      document.getElementById('scenariosContainer').innerHTML = html;
+    }
+
+    function exportResults() {
+      const data = { debts, timestamp: new Date().toISOString() };
+      const json = JSON.stringify(data, null, 2);
+      const blob = new Blob([json], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `debt-payoff-${new Date().toISOString().split('T')[0]}.json`;
+      link.click();
+    }
+
+    function printReport() {
+      window.print();
+    }
+  </script>
+</body>
+</html>

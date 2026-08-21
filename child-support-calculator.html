@@ -1,0 +1,1083 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Child Support Calculator - Veritas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="ai-chat-widget.css" />
+  <style>
+    .calc-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .calc-header {
+      background: linear-gradient(135deg, #2e5b8a 0%, #1f5f9d 100%);
+      color: white;
+      padding: 40px 20px;
+      margin: -20px -20px 40px -20px;
+    }
+
+    .calc-title {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .calc-subtitle {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    .input-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      margin-bottom: 40px;
+    }
+
+    .input-panel {
+      background: white;
+      border-radius: 8px;
+      padding: 24px;
+      border: 1px solid #e5e0d5;
+    }
+
+    .panel-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #e5e0d5;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #666;
+      margin-bottom: 6px;
+    }
+
+    .form-input, .form-select {
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 10px;
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .form-select {
+      cursor: pointer;
+      background: white;
+    }
+
+    .form-input:focus, .form-select:focus {
+      outline: none;
+      border-color: #2e5b8a;
+      box-shadow: 0 0 0 3px rgba(46, 91, 138, 0.1);
+    }
+
+    .help-text {
+      font-size: 11px;
+      color: #999;
+      margin-top: 4px;
+    }
+
+    .results-panel {
+      background: linear-gradient(135deg, #f0f4f8 0%, #e8f0f7 100%);
+      border-radius: 8px;
+      padding: 24px;
+      border: 2px solid #2e5b8a;
+      margin-bottom: 30px;
+    }
+
+    .result-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #2e5b8a;
+      margin-bottom: 20px;
+    }
+
+    .result-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 16px;
+      padding: 12px;
+      background: white;
+      border-radius: 6px;
+      border-left: 4px solid #2e5b8a;
+    }
+
+    .result-label {
+      font-size: 12px;
+      color: #666;
+      font-weight: 600;
+    }
+
+    .result-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: #2e5b8a;
+    }
+
+    .custody-section {
+      background: white;
+      border-radius: 8px;
+      padding: 24px;
+      border: 1px solid #e5e0d5;
+      margin-bottom: 30px;
+    }
+
+    .custody-options {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 12px;
+    }
+
+    .custody-option {
+      border: 2px solid #ddd;
+      border-radius: 6px;
+      padding: 16px;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .custody-option:hover {
+      border-color: #2e5b8a;
+      background: #f9f9f9;
+    }
+
+    .custody-option.selected {
+      border-color: #2e5b8a;
+      background: #f0f4f8;
+      font-weight: 600;
+      color: #2e5b8a;
+    }
+
+    .custody-label {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 8px;
+    }
+
+    .custody-desc {
+      font-size: 11px;
+      color: #999;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 30px;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: #2e5b8a;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #1f5f9d;
+    }
+
+    .btn-secondary {
+      background: #f0f0f0;
+      color: #333;
+      border: 1px solid #ddd;
+    }
+
+    .btn-secondary:hover {
+      background: #e5e5e5;
+    }
+
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .party-summary {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      border: 2px solid #e5e0d5;
+    }
+
+    .party-name {
+      font-size: 16px;
+      font-weight: 700;
+      color: #2e5b8a;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #e5e0d5;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 13px;
+    }
+
+    .summary-row.total {
+      font-weight: 700;
+      border-bottom: 2px solid #2e5b8a;
+      margin-top: 8px;
+      padding-top: 8px;
+      color: #2e5b8a;
+    }
+
+    .summary-label {
+      color: #666;
+    }
+
+    .summary-value {
+      font-weight: 600;
+      color: #333;
+    }
+
+    .guideline-info {
+      background: #e3f2fd;
+      border-left: 4px solid #2196f3;
+      padding: 16px;
+      margin-bottom: 20px;
+      border-radius: 4px;
+    }
+
+    .guideline-title {
+      font-weight: 700;
+      color: #1565c0;
+      margin-bottom: 8px;
+    }
+
+    .guideline-text {
+      font-size: 13px;
+      color: #666;
+      line-height: 1.6;
+    }
+
+    .warning-box {
+      background: #fff3cd;
+      border-left: 4px solid #ffc107;
+      padding: 16px;
+      margin-bottom: 20px;
+      border-radius: 4px;
+    }
+
+    .warning-title {
+      font-weight: 700;
+      color: #856404;
+      margin-bottom: 8px;
+    }
+
+    .warning-text {
+      font-size: 13px;
+      color: #666;
+    }
+
+    .tab-section {
+      background: white;
+      border-radius: 8px;
+      border: 1px solid #e5e0d5;
+      margin-bottom: 30px;
+      overflow: hidden;
+    }
+
+    .tab-buttons {
+      display: flex;
+      background: #f9f9f9;
+      border-bottom: 2px solid #e5e0d5;
+    }
+
+    .tab-button {
+      flex: 1;
+      padding: 16px;
+      border: none;
+      background: #f9f9f9;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 13px;
+      color: #666;
+      border-bottom: 3px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .tab-button.active {
+      color: #2e5b8a;
+      border-bottom-color: #2e5b8a;
+      background: white;
+    }
+
+    .tab-content {
+      padding: 24px;
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .kpi-card {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      border: 1px solid #e5e0d5;
+      text-align: center;
+    }
+
+    .kpi-value {
+      font-size: 28px;
+      font-weight: 700;
+      color: #2e5b8a;
+      margin-bottom: 8px;
+    }
+
+    .kpi-label {
+      font-size: 12px;
+      color: #666;
+      font-weight: 600;
+    }
+
+    .note-box {
+      background: #f5f5f5;
+      border-radius: 6px;
+      padding: 12px;
+      font-size: 12px;
+      color: #666;
+      line-height: 1.6;
+    }
+
+    .export-buttons {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 30px;
+    }
+
+    @media (max-width: 1024px) {
+      .input-grid {
+        grid-template-columns: 1fr;
+      }
+      .custody-options {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .comparison-grid {
+        grid-template-columns: 1fr;
+      }
+      .kpi-row {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .result-row {
+        grid-template-columns: 1fr;
+      }
+      .kpi-row {
+        grid-template-columns: 1fr;
+      }
+      .custody-options {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- ===================== SIDEBAR ===================== -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <div class="logo-section">
+        <span class="logo-text">⚖️ VERITAS</span>
+        <span class="logo-sub">Legal Intelligence</span>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <div class="nav-group-label">Workspace</div>
+      <a class="nav-item" href="index.html"><span class="nav-ico">📊</span> Dashboard</a>
+      <a class="nav-item" href="document-hub-master.html"><span class="nav-ico">📁</span> Document Hub</a>
+
+      <div class="nav-group-label">Analysis Modules</div>
+      <a class="nav-item" href="afi.html"><span class="nav-ico">📋</span> AFI Discrepancy</a>
+      <a class="nav-item" href="asset-division-valuation.html"><span class="nav-ico">💰</span> Asset Division</a>
+      <a class="nav-item" href="spousal.html"><span class="nav-ico">👥</span> Spousal Support</a>
+      <a class="nav-item" href="child-support-calculator.html" class="active"><span class="nav-ico">🧒</span> Child Support</a>
+      <a class="nav-item" href="credits.html"><span class="nav-ico">✏️</span> Credits & Adjustments</a>
+
+      <div class="nav-group-label">Tools</div>
+      <a class="nav-item" href="document-hub-master.html" data-module="document-hub"><span class="nav-ico">📁</span> Document Hub</a>
+      <a class="nav-item" href="estate.html"><span class="nav-ico">▧</span> Reports</a>
+      <a class="nav-item" href="forensic-tracing.html"><span class="nav-ico">⌕</span> Forensic Tracing</a>
+      <a class="nav-item" href="settlement.html"><span class="nav-ico">⇄</span> Settlement Modeling</a>
+      <a class="nav-item" href="regulations.html"><span class="nav-ico">⚖</span> Regulations</a>
+      <a class="nav-item" href="equitable-distribution.html"><span class="nav-ico">§</span> Prenup Module</a>
+      <a class="nav-item" href="discovery-intake.html"><span class="nav-ico">⤓</span> Document Intake</a>
+      <a class="nav-item" href="discovery-intake.html"><span class="nav-ico">◉</span> Compliance</a>
+      <a class="nav-item" href="red-flags.html"><span class="nav-ico">🚩</span> Red-Flag Detection</a>
+    </nav>
+
+    <div class="sidebar-foot">
+      <div class="plan-chip"><span style="color:var(--green)">●</span> Secure Connection · encrypted &amp; confidential</div>
+    </div>
+  </aside>
+
+  <!-- ===================== MAIN ===================== -->
+  <main class="main">
+    <header class="topbar">
+      <div class="matter-switcher">
+        <span class="matter-label">Active Matter</span>
+        <button class="matter-btn">
+          <strong>Matter v. Case</strong>
+          <span class="case-no">Child Support Calculation</span>
+          <span class="chev"></span>
+        </button>
+      </div>
+      <div class="topbar-right">
+        <div class="user">
+          <div class="avatar">WU</div>
+          <div class="user-meta">
+            <span class="user-name">Workspace User</span>
+            <span class="user-role">Matter Name</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="calc-container">
+      <!-- Header -->
+      <div class="calc-header">
+        <div>
+          <h1 class="calc-title">🧒 Child Support Calculator</h1>
+          <p class="calc-subtitle">Calculate child support obligations based on state guidelines, income, and custody arrangement</p>
+        </div>
+      </div>
+
+      <!-- Export & Actions -->
+      <div class="export-buttons">
+        <button class="btn btn-primary" onclick="calculateSupport()">📊 Calculate Support</button>
+        <button class="btn btn-secondary" onclick="exportToJSON()">📋 Export Data</button>
+        <button class="btn btn-secondary" onclick="printReport()">🖨️ Print Report</button>
+        <button class="btn btn-secondary" onclick="resetCalculator()">🔄 Clear All</button>
+      </div>
+
+      <!-- KPI Summary -->
+      <div class="kpi-row" id="kpiRow">
+        <div class="kpi-card">
+          <div class="kpi-value" id="parentAIncomeKPI">$0</div>
+          <div class="kpi-label">Parent A Gross Income</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-value" id="parentBIncomeKPI">$0</div>
+          <div class="kpi-label">Parent B Gross Income</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-value" id="combinedIncomeKPI">$0</div>
+          <div class="kpi-label">Combined Income</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-value" id="supportAmountKPI">$0</div>
+          <div class="kpi-label">Monthly Support</div>
+        </div>
+      </div>
+
+      <!-- Warning & Guideline Info -->
+      <div class="warning-box">
+        <div class="warning-title">⚠️ Important: Professional Review Recommended</div>
+        <div class="warning-text">
+          Child support calculations vary significantly by state and depend on specific guidelines, deviations, and circumstances. This calculator provides estimates based on general income shares model. Always verify with your state's specific guidelines and consult with a family law attorney for accuracy. Results should be reviewed and confirmed by a legal professional.
+        </div>
+      </div>
+
+      <!-- State Selection & Guidelines -->
+      <div class="input-panel" style="margin-bottom: 30px;">
+        <div class="panel-title">Select State & Guidelines</div>
+
+        <div class="form-group">
+          <label class="form-label">State (for specific guidelines)</label>
+          <select class="form-select" id="stateSelect" onchange="updateGuidelines()">
+            <option value="">-- Select State --</option>
+            <option value="ca">California</option>
+            <option value="tx">Texas</option>
+            <option value="ny">New York</option>
+            <option value="fl">Florida</option>
+            <option value="pa">Pennsylvania</option>
+            <option value="il">Illinois</option>
+            <option value="oh">Ohio</option>
+            <option value="mi">Michigan</option>
+            <option value="nc">North Carolina</option>
+            <option value="va">Virginia</option>
+            <option value="wa">Washington</option>
+            <option value="co">Colorado</option>
+            <option value="az">Arizona</option>
+            <option value="nv">Nevada</option>
+            <option value="or">Oregon</option>
+            <option value="utc">Utah</option>
+            <option value="other">Other State / Generic Model</option>
+          </select>
+          <div class="help-text">Each state has different formulas. Select to see state-specific guidelines.</div>
+        </div>
+
+        <div id="guidelineInfo"></div>
+      </div>
+
+      <!-- Main Input Grid -->
+      <div class="input-grid">
+        <!-- Parent A Section -->
+        <div class="input-panel">
+          <div class="panel-title">💼 Parent A Information</div>
+
+          <div class="form-group">
+            <label class="form-label">Parent A Name (Optional)</label>
+            <input type="text" class="form-input" id="parentAName" placeholder="e.g., Sarah">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Gross Monthly Income</label>
+            <input type="number" class="form-input" id="parentAIncome" placeholder="0.00" step="0.01" onchange="updateKPIs()">
+            <div class="help-text">W-2, self-employment, Social Security, disability, etc.</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Child Daycare Expenses</label>
+            <input type="number" class="form-input" id="parentADaycare" placeholder="0.00" step="0.01">
+            <div class="help-text">Work-related childcare only</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Health Insurance Premium (Monthly)</label>
+            <input type="number" class="form-input" id="parentAHealth" placeholder="0.00" step="0.01">
+            <div class="help-text">For child coverage</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Parenting Time %</label>
+            <input type="number" class="form-input" id="parentATimePercent" placeholder="50" min="0" max="100" step="0.5">
+            <div class="help-text">Percentage of overnights per year</div>
+          </div>
+        </div>
+
+        <!-- Parent B Section -->
+        <div class="input-panel">
+          <div class="panel-title">💼 Parent B Information</div>
+
+          <div class="form-group">
+            <label class="form-label">Parent B Name (Optional)</label>
+            <input type="text" class="form-input" id="parentBName" placeholder="e.g., David">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Gross Monthly Income</label>
+            <input type="number" class="form-input" id="parentBIncome" placeholder="0.00" step="0.01" onchange="updateKPIs()">
+            <div class="help-text">W-2, self-employment, Social Security, disability, etc.</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Child Daycare Expenses</label>
+            <input type="number" class="form-input" id="parentBDaycare" placeholder="0.00" step="0.01">
+            <div class="help-text">Work-related childcare only</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Health Insurance Premium (Monthly)</label>
+            <input type="number" class="form-input" id="parentBHealth" placeholder="0.00" step="0.01">
+            <div class="help-text">For child coverage</div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Parenting Time %</label>
+            <input type="number" class="form-input" id="parentBTimePercent" placeholder="50" min="0" max="100" step="0.5">
+            <div class="help-text">Percentage of overnights per year</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Custody Arrangement -->
+      <div class="custody-section">
+        <div class="panel-title">👨‍👩‍👧 Custody Arrangement</div>
+
+        <div class="custody-options">
+          <div class="custody-option" onclick="selectCustody('joint', this)" data-custody="joint">
+            <div class="custody-label">Joint/Shared</div>
+            <div class="custody-desc">50/50 or close to equal parenting time</div>
+          </div>
+          <div class="custody-option" onclick="selectCustody('primary-a', this)" data-custody="primary-a">
+            <div class="custody-label">Primary: Parent A</div>
+            <div class="custody-desc">Parent B has limited parenting time</div>
+          </div>
+          <div class="custody-option" onclick="selectCustody('primary-b', this)" data-custody="primary-b">
+            <div class="custody-label">Primary: Parent B</div>
+            <div class="custody-desc">Parent A has limited parenting time</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Number of Children -->
+      <div class="input-panel" style="margin-bottom: 30px;">
+        <div class="panel-title">👶 Child Information</div>
+
+        <div class="form-group">
+          <label class="form-label">Number of Children</label>
+          <input type="number" class="form-input" id="numChildren" placeholder="1" min="1" step="1">
+          <div class="help-text">Support amount may vary by number of children in guideline</div>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label">Ages of Children (Optional)</label>
+          <input type="text" class="form-input" id="childAges" placeholder="e.g., 8, 11, 14">
+          <div class="help-text">Some states adjust for child age</div>
+        </div>
+      </div>
+
+      <!-- Results Panel -->
+      <div class="results-panel" id="resultsPanel" style="display:none;">
+        <div class="result-title">💰 Child Support Calculation Results</div>
+
+        <div class="result-row">
+          <div>
+            <div class="result-label">Payor (Obligor)</div>
+            <div class="result-value" id="payorName">Parent B</div>
+          </div>
+          <div>
+            <div class="result-label">Monthly Support Obligation</div>
+            <div class="result-value" id="supportAmount">$0</div>
+          </div>
+        </div>
+
+        <div class="result-row">
+          <div>
+            <div class="result-label">Annual Support Obligation</div>
+            <div class="result-value" id="annualSupport">$0</div>
+          </div>
+          <div>
+            <div class="result-label">Payor's Income Share %</div>
+            <div class="result-value" id="payorPercent">0%</div>
+          </div>
+        </div>
+
+        <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid rgba(255,255,255,0.3);">
+          <div class="guideline-info">
+            <div class="guideline-title">Calculation Method</div>
+            <div class="guideline-text" id="calculationMethod">
+              Based on Income Shares Model (used by most states). Each parent's share of support is proportional to their income.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Comparison Grid -->
+      <div class="comparison-grid" id="comparisonGrid" style="display:none;">
+        <div class="party-summary">
+          <div class="party-name" id="partyALabel">Parent A</div>
+          <div class="summary-row">
+            <span class="summary-label">Gross Income</span>
+            <span class="summary-value" id="partyAIncome">$0</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">% of Combined</span>
+            <span class="summary-value" id="partyAPercent">0%</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Daycare + Insurance</span>
+            <span class="summary-value" id="partyADeductions">$0</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Parenting Time</span>
+            <span class="summary-value" id="partyATime">0%</span>
+          </div>
+          <div class="summary-row total">
+            <span class="summary-label">Calculated Support</span>
+            <span class="summary-value" id="partyASupport">$0</span>
+          </div>
+        </div>
+
+        <div class="party-summary">
+          <div class="party-name" id="partyBLabel">Parent B</div>
+          <div class="summary-row">
+            <span class="summary-label">Gross Income</span>
+            <span class="summary-value" id="partyBIncome">$0</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">% of Combined</span>
+            <span class="summary-value" id="partyBPercent">0%</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Daycare + Insurance</span>
+            <span class="summary-value" id="partyBDeductions">$0</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Parenting Time</span>
+            <span class="summary-value" id="partyBTime">0%</span>
+          </div>
+          <div class="summary-row total">
+            <span class="summary-label">Calculated Support</span>
+            <span class="summary-value" id="partyBSupport">$0</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tabs for Additional Info -->
+      <div class="tab-section">
+        <div class="tab-buttons">
+          <button class="tab-button active" onclick="switchTab('guidelines')">📖 State Guidelines</button>
+          <button class="tab-button" onclick="switchTab('adjustments')">⚙️ Adjustments & Deviations</button>
+          <button class="tab-button" onclick="switchTab('scenarios')">📊 Scenarios</button>
+          <button class="tab-button" onclick="switchTab('resources')">📚 Resources</button>
+        </div>
+
+        <!-- Guidelines Tab -->
+        <div id="guidelines" class="tab-content active">
+          <div class="panel-title">State Guideline Information</div>
+
+          <div class="guideline-info">
+            <div class="guideline-title">Income Shares Model (Most Common)</div>
+            <div class="guideline-text">
+              <strong>How it works:</strong><br>
+              1. Calculate combined parental income<br>
+              2. Determine each parent's percentage share<br>
+              3. Apply guideline percentage to combined income<br>
+              4. Each parent pays their share based on income %<br>
+              5. Adjust for childcare, health insurance, parenting time<br><br>
+              <strong>Example:</strong> Combined income $6,000/month, guideline 20% = $1,200 support<br>
+              Parent A earns 60% ($3,600) → pays 60% of $1,200 = $720<br>
+              Parent B earns 40% ($2,400) → pays 40% of $1,200 = $480
+            </div>
+          </div>
+
+          <div class="guideline-info">
+            <div class="guideline-title">State-Specific Variations</div>
+            <div class="guideline-text">
+              <strong>California:</strong> Guideline percentage increases with more children (20% → 25% → 30% → 35%)<br>
+              <strong>Texas:</strong> Cap on guideline calculations (~$310k combined income) with percentage-based model<br>
+              <strong>Florida:</strong> Percentage varies; mandatory review if 3+ years or substantial change<br>
+              <strong>New York:</strong> Guideline applied to combined parental income; can deviate for shared custody<br>
+              <strong>Most States:</strong> Similar income shares model with state-specific adjustments
+            </div>
+          </div>
+
+          <div class="note-box">
+            <strong>Note:</strong> Select your state above to see specific percentage guidelines. This calculator uses general income shares model; state-specific formulas may differ.
+          </div>
+        </div>
+
+        <!-- Adjustments Tab -->
+        <div id="adjustments" class="tab-content">
+          <div class="panel-title">Common Adjustments & Deviations</div>
+
+          <div class="guideline-info">
+            <div class="guideline-title">Mandatory Adjustments (Included in Calculation)</div>
+            <div class="guideline-text">
+              ✓ <strong>Childcare:</strong> Work-related daycare expenses (added to guideline)<br>
+              ✓ <strong>Health Insurance:</strong> Cost of child's health/dental insurance (added to guideline)<br>
+              ✓ <strong>Parenting Time Adjustments:</strong> Custody arrangement and overnights<br>
+              ✓ <strong>Income Calculation:</strong> Varies by state (gross wages, self-employment, bonuses, etc.)<br>
+            </div>
+          </div>
+
+          <div class="guideline-info">
+            <div class="guideline-title">Discretionary Deviations (Court Can Order)</div>
+            <div class="guideline-text">
+              • <strong>Financial Resources:</strong> Standard of living, assets, debts<br>
+              • <strong>Earning Ability:</strong> Age, health, education, job market<br>
+              • <strong>Substantial Shared Custody:</strong> Reduction if parenting time is equal/near-equal<br>
+              • <strong>Other Support Obligations:</strong> Spousal support, prior children support<br>
+              • <strong>Tax Benefits:</strong> Dependent exemptions, child tax credit<br>
+              • <strong>Special Needs:</strong> Medical, educational, mental health costs<br>
+              • <strong>Independent Income of Child:</strong> If child has own earnings<br>
+              • <strong>Educational Expenses:</strong> College education goals<br>
+            </div>
+          </div>
+
+          <div class="warning-box">
+            <div class="warning-title">Important: Guideline Presumed Correct Unless Unjust</div>
+            <div class="warning-text">
+              Most state laws presume the guideline amount is correct and appropriate. Courts can only deviate if they make specific findings that application would be "unjust and inappropriate." Deviation must be documented in writing with specific reasoning.
+            </div>
+          </div>
+        </div>
+
+        <!-- Scenarios Tab -->
+        <div id="scenarios" class="tab-content">
+          <div class="panel-title">Scenario Comparison</div>
+
+          <div class="note-box">
+            <strong>How to use:</strong> Enter different income scenarios to see how support changes. Useful for determining impact of:
+            <ul style="margin-top: 8px; margin-left: 20px;">
+              <li>Job changes or raises</li>
+              <li>Different custody arrangements</li>
+              <li>Additional childcare costs</li>
+              <li>Insurance premium changes</li>
+            </ul>
+          </div>
+
+          <div id="scenarioResults" style="margin-top: 20px;"></div>
+        </div>
+
+        <!-- Resources Tab -->
+        <div id="resources" class="tab-content">
+          <div class="panel-title">Additional Resources & Information</div>
+
+          <div class="guideline-info">
+            <div class="guideline-title">Court Modifications</div>
+            <div class="guideline-text">
+              • <strong>Substantial Change:</strong> Support can be modified if circumstances change substantially (usually 10%+ income change)<br>
+              • <strong>Periodic Review:</strong> Most states allow review every 3 years or upon request<br>
+              • <strong>Emancipation:</strong> Support terminates when child reaches age of majority (18-21 depending on state)<br>
+              • <strong>College Support:</strong> Some states extend obligation through college if parent is able<br>
+            </div>
+          </div>
+
+          <div class="guideline-info">
+            <div class="guideline-title">Related Considerations</div>
+            <div class="guideline-text">
+              • <strong>Tax Filing Status:</strong> Dependent exemption / child tax credit allocation<br>
+              • <strong>Medical Insurance:</strong> Who carries coverage & pays premiums<br>
+              • <strong>Parenting Plan:</strong> Custody type affects support calculation significantly<br>
+              • <strong>College Expenses:</strong> Some states have provisions for post-secondary education<br>
+              • <strong>Spousal Support:</strong> May affect income available for child support<br>
+            </div>
+          </div>
+
+          <div class="warning-box">
+            <div class="warning-title">⚠️ Consult an Attorney</div>
+            <div class="warning-text">
+              This calculator provides general estimates based on common guidelines. Child support laws vary significantly by state and depend on specific circumstances. Always consult with a family law attorney licensed in your state to ensure accuracy and compliance with your specific situation and state law.
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    let calculatorData = {
+      parentAName: 'Parent A',
+      parentBName: 'Parent B',
+      parentAIncome: 0,
+      parentBIncome: 0,
+      custody: 'joint',
+      numChildren: 1,
+      state: ''
+    };
+
+    // Load from localStorage
+    function loadData() {
+      const saved = localStorage.getItem('childSupportData');
+      if (saved) {
+        calculatorData = JSON.parse(saved);
+        populateForm();
+      }
+    }
+
+    // Save to localStorage
+    function saveData() {
+      localStorage.setItem('childSupportData', JSON.stringify(calculatorData));
+    }
+
+    // Update KPIs
+    function updateKPIs() {
+      const parentAIncome = parseFloat(document.getElementById('parentAIncome').value) || 0;
+      const parentBIncome = parseFloat(document.getElementById('parentBIncome').value) || 0;
+      const combined = parentAIncome + parentBIncome;
+
+      document.getElementById('parentAIncomeKPI').textContent = '$' + parentAIncome.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+      document.getElementById('parentBIncomeKPI').textContent = '$' + parentBIncome.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+      document.getElementById('combinedIncomeKPI').textContent = '$' + combined.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+    }
+
+    // Select custody
+    function selectCustody(type, element) {
+      document.querySelectorAll('.custody-option').forEach(el => el.classList.remove('selected'));
+      element.classList.add('selected');
+      calculatorData.custody = type;
+    }
+
+    // Calculate support
+    function calculateSupport() {
+      const parentAIncome = parseFloat(document.getElementById('parentAIncome').value) || 0;
+      const parentBIncome = parseFloat(document.getElementById('parentBIncome').value) || 0;
+      const parentAName = document.getElementById('parentAName').value || 'Parent A';
+      const parentBName = document.getElementById('parentBName').value || 'Parent B';
+      const combined = parentAIncome + parentBIncome;
+      const numChildren = parseInt(document.getElementById('numChildren').value) || 1;
+
+      if (combined <= 0) {
+        alert('Please enter valid income amounts');
+        return;
+      }
+
+      // Generic guideline percentages (vary by state)
+      const guidelinePercentages = {
+        1: 0.20, // 20% for 1 child
+        2: 0.25, // 25% for 2 children
+        3: 0.30, // 30% for 3 children
+        4: 0.35, // 35% for 4+ children
+      };
+
+      const guideline = guidelinePercentages[Math.min(numChildren, 4)] || 0.20;
+      const baseSupport = combined * guideline;
+
+      // Add childcare and health insurance
+      const parentADaycare = parseFloat(document.getElementById('parentADaycare').value) || 0;
+      const parentAHealth = parseFloat(document.getElementById('parentAHealth').value) || 0;
+      const parentBDaycare = parseFloat(document.getElementById('parentBDaycare').value) || 0;
+      const parentBHealth = parseFloat(document.getElementById('parentBHealth').value) || 0;
+
+      const totalDaycare = parentADaycare + parentBDaycare;
+      const totalHealth = parentAHealth + parentBHealth;
+      const totalAdjustments = totalDaycare + totalHealth;
+
+      // Calculate each parent's share
+      const parentAPercent = parentAIncome / combined;
+      const parentBPercent = parentBIncome / combined;
+
+      const parentAShare = (baseSupport + totalAdjustments) * parentAPercent;
+      const parentBShare = (baseSupport + totalAdjustments) * parentBPercent;
+
+      // Determine payor (usually higher income parent)
+      let payor, payorAmount, payorPercent;
+      if (parentAIncome > parentBIncome) {
+        payor = parentAName;
+        payorAmount = parentAShare;
+        payorPercent = (parentAPercent * 100).toFixed(1);
+      } else {
+        payor = parentBName;
+        payorAmount = parentBShare;
+        payorPercent = (parentBPercent * 100).toFixed(1);
+      }
+
+      // Display results
+      document.getElementById('resultsPanel').style.display = 'block';
+      document.getElementById('comparisonGrid').style.display = 'grid';
+      document.getElementById('supportAmount').textContent = '$' + payorAmount.toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+      document.getElementById('annualSupport').textContent = '$' + (payorAmount * 12).toLocaleString('en-US', {minimumFractionDigits: 2, maximumFractionDigits: 2});
+      document.getElementById('payorName').textContent = payor;
+      document.getElementById('payorPercent').textContent = payorPercent + '%';
+
+      // Update comparison grid
+      document.getElementById('partyALabel').textContent = parentAName;
+      document.getElementById('partyBLabel').textContent = parentBName;
+      document.getElementById('partyAIncome').textContent = '$' + parentAIncome.toLocaleString('en-US', {minimumFractionDigits: 2});
+      document.getElementById('partyBIncome').textContent = '$' + parentBIncome.toLocaleString('en-US', {minimumFractionDigits: 2});
+      document.getElementById('partyAPercent').textContent = (parentAPercent * 100).toFixed(1) + '%';
+      document.getElementById('partyBPercent').textContent = (parentBPercent * 100).toFixed(1) + '%';
+      document.getElementById('partyADeductions').textContent = '$' + (parentADaycare + parentAHealth).toLocaleString('en-US', {minimumFractionDigits: 2});
+      document.getElementById('partyBDeductions').textContent = '$' + (parentBDaycare + parentBHealth).toLocaleString('en-US', {minimumFractionDigits: 2});
+      document.getElementById('partyATime').textContent = (document.getElementById('parentATimePercent').value || '50') + '%';
+      document.getElementById('partyBTime').textContent = (document.getElementById('parentBTimePercent').value || '50') + '%';
+      document.getElementById('partyASupport').textContent = '$' + parentAShare.toLocaleString('en-US', {minimumFractionDigits: 2});
+      document.getElementById('partyBSupport').textContent = '$' + parentBShare.toLocaleString('en-US', {minimumFractionDigits: 2});
+
+      // Update KPI
+      document.getElementById('supportAmountKPI').textContent = '$' + payorAmount.toLocaleString('en-US', {minimumFractionDigits: 2});
+
+      saveData();
+    }
+
+    // Tab switching
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+      document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+      document.getElementById(tabName).classList.add('active');
+      event.target.classList.add('active');
+    }
+
+    // Update guidelines based on state
+    function updateGuidelines() {
+      const state = document.getElementById('stateSelect').value;
+      const guidelinesInfo = {
+        'ca': '<div class="guideline-title">California Child Support Guidelines</div><div class="guideline-text"><strong>Formula:</strong> Percentage based on combined parental income<br><strong>Percentage:</strong> Increases by number of children (20% → 25% → 30% → 35%)<br><strong>Special:</strong> Includes hardship deduction, tax considerations<br><strong>Review:</strong> Every 3 years or material change of 10%+</div>',
+        'tx': '<div class="guideline-title">Texas Child Support Guidelines</div><div class="guideline-text"><strong>Formula:</strong> Percentage of obligor income<br><strong>Percentage:</strong> 20% (1 child) to 40% (6+ children)<br><strong>Cap:</strong> Applies to first $310k of combined income (2024)<br><strong>Deviation:</strong> Requires specific findings if different</div>',
+        'ny': '<div class="guideline-title">New York Child Support Guidelines</div><div class="guideline-text"><strong>Formula:</strong> Percentage of combined parental income<br><strong>Percentage:</strong> 17-25% depending on income level<br><strong>Cap:</strong> $184k combined income (2024)<br><strong>Shared Custody:</strong> Significant deviation if 50%+ overnights</div>',
+        'fl': '<div class="guideline-title">Florida Child Support Guidelines</div><div class="guideline-text"><strong>Formula:</strong> Percentage of combined parental income<br><strong>Percentage:</strong> 20% (1 child) to 50% (5+ children)<br><strong>Adjustment:</strong> For parental time-sharing<br><strong>Review:</strong> Mandatory every 3 years</div>',
+        'other': '<div class="guideline-title">Income Shares Model (General)</div><div class="guideline-text"><strong>Formula:</strong> Percentage of combined parental income<br><strong>Typical Percentage:</strong> 20-35% depending on children<br><strong>Adjustments:</strong> Childcare, health insurance, custody<br><strong>Note:</strong> Most states use this or similar model</div>'
+      };
+
+      document.getElementById('guidelineInfo').innerHTML = guidelinesInfo[state] || '';
+    }
+
+    // Export to JSON
+    function exportToJSON() {
+      const data = {
+        parentAName: document.getElementById('parentAName').value,
+        parentBName: document.getElementById('parentBName').value,
+        parentAIncome: parseFloat(document.getElementById('parentAIncome').value),
+        parentBIncome: parseFloat(document.getElementById('parentBIncome').value),
+        numChildren: parseInt(document.getElementById('numChildren').value),
+        custody: calculatorData.custody,
+        state: document.getElementById('stateSelect').value,
+        exportDate: new Date().toISOString()
+      };
+
+      const json = JSON.stringify(data, null, 2);
+      const blob = new Blob([json], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `child-support-calculation-${new Date().toISOString().split('T')[0]}.json`;
+      link.click();
+    }
+
+    // Print report
+    function printReport() {
+      window.print();
+    }
+
+    // Reset calculator
+    function resetCalculator() {
+      if (confirm('Clear all data?')) {
+        document.getElementById('childSupportForm').reset();
+        document.getElementById('resultsPanel').style.display = 'none';
+        document.getElementById('comparisonGrid').style.display = 'none';
+        calculatorData = {};
+        localStorage.removeItem('childSupportData');
+      }
+    }
+
+    // Populate form from saved data
+    function populateForm() {
+      if (calculatorData.parentAName) document.getElementById('parentAName').value = calculatorData.parentAName;
+      if (calculatorData.parentBName) document.getElementById('parentBName').value = calculatorData.parentBName;
+      if (calculatorData.parentAIncome) document.getElementById('parentAIncome').value = calculatorData.parentAIncome;
+      if (calculatorData.parentBIncome) document.getElementById('parentBIncome').value = calculatorData.parentBIncome;
+    }
+
+    // Initialize
+    loadData();
+    updateKPIs();
+  </script>
+</body>
+</html>

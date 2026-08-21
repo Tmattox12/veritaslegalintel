@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Expense Documents - Document Hub - Veritas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <!-- Veritas AI Chat Widget -->
+  <link rel="stylesheet" href="ai-chat-widget.css" />
+  <!-- Reconciliation Modal -->
+  <link rel="stylesheet" href="reconciliation-modal.css" />
+  <style>
+    .doc-mgmt-header {
+      background: linear-gradient(135deg, #2e5b8a 0%, #1f5f9d 100%);
+      color: white;
+      padding: 36px 0;
+      margin-bottom: 36px;
+    }
+
+    .doc-mgmt-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 18px;
+    }
+
+    .doc-mgmt-title {
+      font-size: 28px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .doc-mgmt-subtitle {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    .doc-mgmt-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+      margin-bottom: 36px;
+    }
+
+    .doc-mgmt-card {
+      background: white;
+      border-radius: 8px;
+      padding: 24px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      border: 1px solid #e5e0d5;
+      transition: all 0.3s;
+    }
+
+    .doc-mgmt-card:hover {
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      transform: translateY(-2px);
+    }
+
+    .doc-mgmt-card-icon {
+      font-size: 32px;
+      margin-bottom: 12px;
+    }
+
+    .doc-mgmt-card-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 8px;
+    }
+
+    .doc-mgmt-card-desc {
+      font-size: 13px;
+      color: #666;
+      line-height: 1.5;
+      margin-bottom: 16px;
+    }
+
+    .doc-mgmt-card-btn {
+      padding: 10px 18px;
+      background: #2e5b8a;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+      font-weight: 600;
+      transition: all 0.2s;
+      width: 100%;
+      text-align: center;
+      text-decoration: none;
+      display: inline-block;
+    }
+
+    .doc-mgmt-card-btn:hover {
+      background: #1f5f9d;
+    }
+
+    .doc-mgmt-section {
+      background: white;
+      border-radius: 8px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+      border: 1px solid #e5e0d5;
+    }
+
+    .doc-mgmt-section-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 18px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #e5e0d5;
+    }
+
+    .doc-mgmt-list {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .doc-mgmt-list-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px;
+      background: #f9f9f9;
+      border-radius: 6px;
+      border-left: 3px solid #2e5b8a;
+    }
+
+    .doc-mgmt-list-item-info {
+      flex: 1;
+    }
+
+    .doc-mgmt-list-item-name {
+      font-size: 13px;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .doc-mgmt-list-item-meta {
+      font-size: 11px;
+      color: #999;
+      margin-top: 4px;
+    }
+
+    .doc-mgmt-list-item-stat {
+      background: #e8f3ff;
+      color: #2e5b8a;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 48px 24px;
+      color: #999;
+    }
+
+    .empty-state-icon {
+      font-size: 48px;
+      margin-bottom: 12px;
+    }
+
+    .empty-state-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 6px;
+    }
+
+    .empty-state-text {
+      font-size: 13px;
+      color: #999;
+    }
+
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .stat-box {
+      background: #f0f4f8;
+      border-left: 4px solid #2e5b8a;
+      padding: 16px;
+      border-radius: 6px;
+    }
+
+    .stat-label {
+      font-size: 11px;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+
+    .stat-value {
+      font-size: 24px;
+      font-weight: 700;
+      color: #2e5b8a;
+    }
+
+    @media (max-width: 768px) {
+      .doc-mgmt-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .doc-mgmt-title {
+        font-size: 22px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- ===================== SIDEBAR ===================== -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">
+        <img src="logo-vfi.jpg" alt="VFI Logo" />
+        <span class="brand-mark-fallback">VFI</span>
+      </div>
+      <div class="brand-text">
+        <span class="brand-name">Veritas</span>
+        <span class="brand-sub">Financial Intelligence</span>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <div class="nav-group-label">Workspace</div>
+      <a class="nav-item" href="#"><span class="nav-ico">▤</span> Matters</a>
+      <a class="nav-item" href="schedules.html"><span class="nav-ico">◷</span> Calendar</a>
+      <a class="nav-item" href="#"><span class="nav-ico">☑</span> Tasks</a>
+      <a class="nav-item" href="discovery-intake.html"><span class="nav-ico">▦</span> Documents</a>
+      <a class="nav-item" href="#"><span class="nav-ico">◍</span> Clients</a>
+
+      <div class="nav-group-label">Analysis Modules</div>
+      <a class="nav-item" href="income-imputation.html"><span class="nav-ico">💠</span> Income Engine</a>
+      <a class="nav-item" href="spousal.html"><span class="nav-ico">⚖</span> Support Calculator</a>
+      <a class="nav-item" href="child-support.html"><span class="nav-ico">◈</span> Child Support</a>
+      <a class="nav-item" href="equitable-distribution.html"><span class="nav-ico">⊟</span> Assets</a>
+      <a class="nav-item" href="discovery-intake.html"><span class="nav-ico">◎</span> Discovery</a>
+      <a class="nav-item" href="custody.html"><span class="nav-ico">⌘</span> Custody</a>
+      <a class="nav-item" href="afi.html"><span class="nav-ico">🧾</span> AFI Expenses</a>
+      <a class="nav-item" href="estate.html"><span class="nav-ico">▧</span> Reports</a>
+
+      <div class="nav-group-label">Tools</div>
+      <a class="nav-item" href="index.html"><span class="nav-ico">◆</span> Dashboard</a>
+      <a class="nav-item" href="document-hub-master.html" data-module="document-hub"><span class="nav-ico">📁</span> Document Hub</a>
+
+      <div class="nav-group-label">Tools</div>
+      <a class="nav-item" href="forensic-tracing.html"><span class="nav-ico">⌕</span> Forensic Tracing</a>
+      <a class="nav-item" href="settlement.html"><span class="nav-ico">⇄</span> Settlement Modeling</a>
+      <a class="nav-item" href="credits.html"><span class="nav-ico">⊕</span> Credits &amp; Adjustments</a>
+      <a class="nav-item" href="regulations.html"><span class="nav-ico">⚖</span> Regulations</a>
+      <a class="nav-item" href="equitable-distribution.html"><span class="nav-ico">§</span> Prenup Module</a>
+      <a class="nav-item" href="discovery-intake.html"><span class="nav-ico">⤓</span> Document Intake</a>
+      <a class="nav-item" href="discovery-intake.html"><span class="nav-ico">◉</span> Compliance</a>
+      <a class="nav-item" href="red-flags.html"><span class="nav-ico">🚩</span> Red-Flag Detection</a>
+    </nav>
+
+    <div class="sidebar-foot">
+      <div class="plan-chip"><span style="color:var(--green)">●</span> Secure Connection · encrypted &amp; confidential</div>
+    </div>
+  </aside>
+
+  <!-- ===================== MAIN ===================== -->
+  <main class="main">
+    <!-- Header -->
+    <div class="doc-mgmt-header">
+      <div class="doc-mgmt-container">
+        <div class="doc-mgmt-title">💰 Expense Documents</div>
+        <div class="doc-mgmt-subtitle">Import, map, and manage expense documents with automatic categorization</div>
+        <div style="font-size: 12px; opacity: 0.8; margin-top: 12px;">
+          <a href="document-hub-master.html" style="color: white; text-decoration: none; font-weight: 600;">← Back to Document Hub</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Content -->
+    <div class="doc-mgmt-container">
+      <!-- Quick Stats -->
+      <div class="stats-row">
+        <div class="stat-box">
+          <div class="stat-label">Total Imports</div>
+          <div class="stat-value" id="totalImports">0</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Total Items Imported</div>
+          <div class="stat-value" id="totalItems">0</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-label">Avg Mapping Rate</div>
+          <div class="stat-value" id="avgMappingRate">0%</div>
+        </div>
+      </div>
+
+      <!-- Quick Actions -->
+      <div class="doc-mgmt-grid">
+        <div class="doc-mgmt-card">
+          <div class="doc-mgmt-card-icon">📤</div>
+          <div class="doc-mgmt-card-title">Import Expenses</div>
+          <div class="doc-mgmt-card-desc">Upload bank statements, receipts, and financial documents (PDF, Excel, Word, Images) with automatic parsing and categorization.</div>
+          <button class="doc-mgmt-card-btn" onclick="showUploadModal()">Upload File →</button>
+        </div>
+
+        <div class="doc-mgmt-card">
+          <div class="doc-mgmt-card-icon">📋</div>
+          <div class="doc-mgmt-card-title">View Reconciliations</div>
+          <div class="doc-mgmt-card-desc">Review all expense reconciliations across categories with auto-mapped and manually mapped items.</div>
+          <a href="afi.html" class="doc-mgmt-card-btn">View All →</a>
+        </div>
+
+        <div class="doc-mgmt-card">
+          <div class="doc-mgmt-card-icon">📖</div>
+          <div class="doc-mgmt-card-title">Learn More</div>
+          <div class="doc-mgmt-card-desc">Read the complete document management guide with file format examples, workflow steps, and troubleshooting.</div>
+          <button class="doc-mgmt-card-btn" onclick="showGuide()">Open Guide →</button>
+        </div>
+      </div>
+
+      <!-- Recent Imports -->
+      <div class="doc-mgmt-section">
+        <div class="doc-mgmt-section-title">📊 Recent Imports</div>
+        <div id="recentImportsList">
+          <div class="empty-state">
+            <div class="empty-state-icon">📭</div>
+            <div class="empty-state-title">No Imports Yet</div>
+            <div class="empty-state-text">Start by uploading a financial document to AFI Expenses → Import Data</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Supported Categories -->
+      <div class="doc-mgmt-section">
+        <div class="doc-mgmt-section-title">🏷️ Supported Expense Categories</div>
+        <div class="doc-mgmt-list">
+          <div class="doc-mgmt-list-item">
+            <div class="doc-mgmt-list-item-info">
+              <div class="doc-mgmt-list-item-name">🏥 Health Insurance</div>
+              <div class="doc-mgmt-list-item-meta">Premiums, coverage, medical insurance ($50-$2,000)</div>
+            </div>
+            <div class="doc-mgmt-list-item-stat">Auto-Mapping: 95%</div>
+          </div>
+
+          <div class="doc-mgmt-list-item">
+            <div class="doc-mgmt-list-item-info">
+              <div class="doc-mgmt-list-item-name">👶 Childcare</div>
+              <div class="doc-mgmt-list-item-meta">Daycare, preschool, babysitter, nanny ($500-$3,000)</div>
+            </div>
+            <div class="doc-mgmt-list-item-stat">Auto-Mapping: 92%</div>
+          </div>
+
+          <div class="doc-mgmt-list-item">
+            <div class="doc-mgmt-list-item-info">
+              <div class="doc-mgmt-list-item-name">🦷 Medical/Dental</div>
+              <div class="doc-mgmt-list-item-meta">Doctor, dental, pharmacy, medical visits ($20-$1,000)</div>
+            </div>
+            <div class="doc-mgmt-list-item-stat">Auto-Mapping: 88%</div>
+          </div>
+
+          <div class="doc-mgmt-list-item">
+            <div class="doc-mgmt-list-item-info">
+              <div class="doc-mgmt-list-item-name">📚 Education</div>
+              <div class="doc-mgmt-list-item-meta">School tuition, supplies, books ($100-$2,000)</div>
+            </div>
+            <div class="doc-mgmt-list-item-stat">Auto-Mapping: 90%</div>
+          </div>
+
+          <div class="doc-mgmt-list-item">
+            <div class="doc-mgmt-list-item-info">
+              <div class="doc-mgmt-list-item-name">🏠 Housing</div>
+              <div class="doc-mgmt-list-item-meta">Mortgage, rent, property tax, maintenance ($500-$5,000)</div>
+            </div>
+            <div class="doc-mgmt-list-item-stat">Auto-Mapping: 93%</div>
+          </div>
+
+          <div class="doc-mgmt-list-item">
+            <div class="doc-mgmt-list-item-info">
+              <div class="doc-mgmt-list-item-name">⚡ Utilities</div>
+              <div class="doc-mgmt-list-item-meta">Electric, gas, water, internet, phone ($20-$500)</div>
+            </div>
+            <div class="doc-mgmt-list-item-stat">Auto-Mapping: 89%</div>
+          </div>
+
+          <div class="doc-mgmt-list-item">
+            <div class="doc-mgmt-list-item-info">
+              <div class="doc-mgmt-list-item-name">🚗 Transportation</div>
+              <div class="doc-mgmt-list-item-meta">Car payment, fuel, insurance, maintenance ($50-$1,500)</div>
+            </div>
+            <div class="doc-mgmt-list-item-stat">Auto-Mapping: 87%</div>
+          </div>
+
+          <div class="doc-mgmt-list-item">
+            <div class="doc-mgmt-list-item-info">
+              <div class="doc-mgmt-list-item-name">🍔 Food</div>
+              <div class="doc-mgmt-list-item-meta">Groceries, restaurants, dining ($20-$800)</div>
+            </div>
+            <div class="doc-mgmt-list-item-stat">Auto-Mapping: 85%</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- File Formats -->
+      <div class="doc-mgmt-section">
+        <div class="doc-mgmt-section-title">📄 Supported File Formats</div>
+        <div class="doc-mgmt-list">
+          <div class="doc-mgmt-list-item">
+            <div class="doc-mgmt-list-item-info">
+              <div class="doc-mgmt-list-item-name">🔴 PDF (Portable Document Format)</div>
+              <div class="doc-mgmt-list-item-meta">Bank statements, invoices, receipts | Auto-extract text & tables</div>
+            </div>
+            <div class="doc-mgmt-list-item-stat">⭐ Most Used</div>
+          </div>
+
+          <div class="doc-mgmt-list-item">
+            <div class="doc-mgmt-list-item-info">
+              <div class="doc-mgmt-list-item-name">🖼️ Images (JPG, PNG)</div>
+              <div class="doc-mgmt-list-item-meta">Receipts, screenshots, scanned documents | OCR text extraction</div>
+            </div>
+            <div class="doc-mgmt-list-item-stat">⭐ Important</div>
+          </div>
+
+          <div class="doc-mgmt-list-item">
+            <div class="doc-mgmt-list-item-info">
+              <div class="doc-mgmt-list-item-name">📊 Excel (XLSX, XLS)</div>
+              <div class="doc-mgmt-list-item-meta">Spreadsheets, financial data | Multi-sheet support</div>
+            </div>
+            <div class="doc-mgmt-list-item-stat">⭐ Recommended</div>
+          </div>
+
+          <div class="doc-mgmt-list-item">
+            <div class="doc-mgmt-list-item-info">
+              <div class="doc-mgmt-list-item-name">📝 Word (DOCX, DOC)</div>
+              <div class="doc-mgmt-list-item-meta">Documents, reports, statements | Text & table extraction</div>
+            </div>
+            <div class="doc-mgmt-list-item-stat">⭐ Recommended</div>
+          </div>
+
+          <div class="doc-mgmt-list-item">
+            <div class="doc-mgmt-list-item-info">
+              <div class="doc-mgmt-list-item-name">TXT (Plain Text)</div>
+              <div class="doc-mgmt-list-item-meta">Simple format | Date | Description | Amount</div>
+            </div>
+            <div class="doc-mgmt-list-item-stat">Simple</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Unmapped Items Section (populated dynamically) -->
+      <div id="unmappedSection"></div>
+    </div>
+
+    <footer class="foot" style="margin-top: 48px;">
+      <span>Veritas · Expense Documents</span>
+      <span class="foot-dim">Part of Master Document Hub</span>
+    </footer>
+  </main>
+
+  <!-- Veritas AI Chat Widget -->
+  <script src="ai-chat-config.js"></script>
+  <script src="ai-chat-widget.js"></script>
+  <!-- Reconciliation Modal -->
+  <script src="reconciliation-modal.js"></script>
+  <script src="reconciliation-data-enhanced.js"></script>
+  <!-- Document Management -->
+  <script src="document-parser.js"></script>
+  <script src="document-upload-ui.js"></script>
+  <script src="reconciliation-upload-integration.js"></script>
+  <!-- New Parsing Engine -->
+  <script src="document-parser-engine.js"></script>
+  <script src="expense-mapping-ui.js"></script>
+  <!-- Notification System -->
+  <script src="notification-system.js"></script>
+
+  <script>
+    function showGuide() {
+      NotificationSystem.info(
+        'Document Management Guide',
+        'Open DOCUMENT-MANAGEMENT-GUIDE.md in your project folder for the complete guide.\n\nIncludes:\n• File format examples\n• Step-by-step workflows\n• Troubleshooting\n• API reference'
+      );
+    }
+
+    // Load and display recent imports from localStorage
+    function loadRecentImports() {
+      const imports = JSON.parse(localStorage.getItem('reconciliation_imports') || '[]');
+      const list = document.getElementById('recentImportsList');
+
+      if (imports.length === 0) {
+        list.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">📭</div>
+            <div class="empty-state-title">No Imports Yet</div>
+            <div class="empty-state-text">Start by uploading a financial document to AFI Expenses → Import Data</div>
+          </div>
+        `;
+        return;
+      }
+
+      // Show last 5 imports
+      const recent = imports.slice(-5).reverse();
+      list.innerHTML = recent.map((imp, idx) => `
+        <div class="doc-mgmt-list-item">
+          <div class="doc-mgmt-list-item-info">
+            <div class="doc-mgmt-list-item-name">${imp.fileName}</div>
+            <div class="doc-mgmt-list-item-meta">${new Date(imp.timestamp).toLocaleDateString()} · ${imp.count} items</div>
+          </div>
+          <div class="doc-mgmt-list-item-stat">${Math.round((imp.items.filter(i => i.status !== 'unmapped').length / imp.count) * 100)}% mapped</div>
+        </div>
+      `).join('');
+
+      // Update stats
+      const totalCount = imports.length;
+      const totalItems = imports.reduce((sum, i) => sum + i.count, 0);
+      const avgRate = Math.round(
+        imports.reduce((sum, i) => {
+          const mapped = i.items.filter(it => it.status !== 'unmapped').length;
+          return sum + (mapped / i.count) * 100;
+        }, 0) / imports.length
+      );
+
+      document.getElementById('totalImports').textContent = totalCount;
+      document.getElementById('totalItems').textContent = totalItems.toLocaleString();
+      document.getElementById('avgMappingRate').textContent = avgRate + '%';
+    }
+
+    // Load on page load
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', loadRecentImports);
+    } else {
+      loadRecentImports();
+    }
+
+    // Listen for import events
+    window.addEventListener('reconciliationDataImported', loadRecentImports);
+
+    // Upload modal functionality
+    function showUploadModal() {
+      const modal = document.createElement('div');
+      modal.id = 'uploadModal';
+      modal.style.cssText = `
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+      `;
+
+      modal.innerHTML = `
+        <div style="
+          background: white;
+          border-radius: 8px;
+          padding: 30px;
+          max-width: 500px;
+          width: 90%;
+          box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        ">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2 style="margin: 0; font-size: 18px; color: #333;">📤 Upload Expense Document</h2>
+            <button onclick="document.getElementById('uploadModal').remove()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #999;">×</button>
+          </div>
+
+          <div style="
+            border: 2px dashed #2e5b8a;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 20px;
+            background: #f8f9fa;
+          " id="uploadArea">
+            <div style="font-size: 32px; margin-bottom: 10px;">📁</div>
+            <div style="font-size: 14px; font-weight: 600; color: #2e5b8a; margin-bottom: 6px;">Click to upload or drag & drop</div>
+            <div style="font-size: 12px; color: #666;">
+              <strong>Select multiple files:</strong> Use Ctrl+Click or Shift+Click to select multiple documents
+              <br style="margin: 6px 0;">
+              <strong>Supported:</strong> PDF | Images (JPG, PNG) | Excel (XLSX, XLS) | Word (DOCX, DOC) | TXT
+              <br style="margin: 3px 0;">
+              Up to 10MB per file • Batch processing enabled
+            </div>
+            <input type="file" id="uploadInput" accept=".pdf,.jpg,.jpeg,.png,.txt,.xlsx,.xls,.docx,.doc" multiple style="display: none;" />
+          </div>
+
+          <div style="font-size: 12px; background: #f0f4f8; border-left: 3px solid #2e5b8a; padding: 12px; border-radius: 4px; margin-bottom: 20px;">
+            <strong>📄 Supported:</strong> PDF (auto-extract text) | Excel sheets | Word docs | Bank statements | Receipts (JPG/PNG) | Text files<br>
+            <strong>🔄 Auto-parsing:</strong> Dates, amounts, descriptions, categories
+          </div>
+
+          <button onclick="document.getElementById('uploadInput').click()" style="
+            width: 100%;
+            padding: 12px;
+            background: #2e5b8a;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 10px;
+          ">Select Documents (Multiple OK)</button>
+
+          <button onclick="document.getElementById('uploadModal').remove()" style="
+            width: 100%;
+            padding: 12px;
+            background: white;
+            color: #2e5b8a;
+            border: 1px solid #2e5b8a;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 600;
+          ">Cancel</button>
+        </div>
+      `;
+
+      document.body.appendChild(modal);
+
+      const uploadArea = document.getElementById('uploadArea');
+      const uploadInput = document.getElementById('uploadInput');
+
+      uploadArea.onclick = () => uploadInput.click();
+
+      uploadArea.ondragover = (e) => {
+        e.preventDefault();
+        uploadArea.style.background = '#e8f3ff';
+      };
+
+      uploadArea.ondragleave = () => {
+        uploadArea.style.background = '#f8f9fa';
+      };
+
+      uploadArea.ondrop = (e) => {
+        e.preventDefault();
+        uploadArea.style.background = '#f8f9fa';
+        if (e.dataTransfer.files.length > 0) {
+          uploadInput.files = e.dataTransfer.files;
+          handleMultipleUploads(e.dataTransfer.files);
+        }
+      };
+
+      uploadInput.onchange = (e) => {
+        if (e.target.files.length > 0) {
+          handleMultipleUploads(e.target.files);
+        }
+      };
+    }
+
+    function handleMultipleUploads(files) {
+      if (files.length === 0) return;
+
+      // Show processing message
+      const processingModal = NotificationSystem.processing(
+        'Processing Files...',
+        'Analyzing and categorizing expenses with AI confidence scoring',
+        30 // 30 second timeout
+      );
+
+      // Use the new parser engine to process files
+      documentParser.processBatch(Array.from(files), (step) => {
+        processingModal.updateProgress(step);
+      }).then(results => {
+        processingModal.remove();
+        if (results.total === 0) {
+          NotificationSystem.error('No Data Found', 'No valid expense data found in files. Please check your files and try again.');
+          return;
+        }
+
+        // Categorize all items
+        const categorizedMapped = documentParser.categorizeItems(results.mappedItems);
+        const categorizedUnmapped = documentParser.categorizeItems(results.unmappedItems);
+
+        // Save categorized items to hub_expenses
+        const existingItems = JSON.parse(localStorage.getItem('hub_expenses') || '[]');
+        const allCategorized = [...categorizedMapped, ...categorizedUnmapped];
+
+        allCategorized.forEach(item => {
+          existingItems.push(item);
+        });
+        localStorage.setItem('hub_expenses', JSON.stringify(existingItems));
+
+        // Save auto-mapped items to reconciliation_imports for AFI
+        const reconciliations = JSON.parse(localStorage.getItem('reconciliation_imports') || '[]');
+        categorizedMapped.forEach(item => {
+          if (item.status === 'mapped') {
+            reconciliations.push({
+              ...item,
+              mappedBy: 'auto',
+              mappedAt: new Date().toISOString()
+            });
+          }
+        });
+        localStorage.setItem('reconciliation_imports', JSON.stringify(reconciliations));
+
+        document.getElementById('uploadModal').remove();
+
+        // Show summary
+        const summaryMessage = `Total Items: ${results.total}
+Auto-Mapped: ${categorizedMapped.length} (sent to AFI Expenses)
+Needs Mapping: ${categorizedUnmapped.length} (in Document Hub)
+
+The auto-mapped items with high confidence (75%+) have been sent to AFI Expenses.
+Items that need manual review are available in the Document Hub.`;
+
+        NotificationSystem.success('Processing Complete!', summaryMessage);
+
+        // Trigger hub update
+        window.dispatchEvent(new Event('hubDataUpdated'));
+
+        // Display unmapped section
+        if (categorizedUnmapped.length > 0) {
+          displayUnmappedItems();
+        } else {
+          NotificationSystem.success('All Items Categorized!', 'All items have been successfully categorized and sent to AFI Expenses.\n\nRedirecting...');
+          setTimeout(() => window.location.href = 'afi.html', 2000);
+        }
+      }).catch(error => {
+        if (processingModal && processingModal.cleanup) {
+          processingModal.cleanup();
+        }
+        processingModal.remove();
+        NotificationSystem.error('Processing Error', `Error processing files: ${error.message}`);
+      });
+    }
+
+    function displayUnmappedItems() {
+      const section = document.getElementById('unmappedSection');
+      const html = expenseMappingUI.createUnmappedSection();
+      section.innerHTML = html;
+
+      // Scroll to unmapped section
+      setTimeout(() => {
+        section.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }, 500);
+    }
+
+    function handleUploadSingle(file, callback) {
+      const fileType = file.name.split('.').pop().toLowerCase();
+      const supportedFormats = ['pdf', 'jpg', 'jpeg', 'png', 'txt', 'xlsx', 'xls', 'docx', 'doc', 'csv', 'json'];
+
+      if (!supportedFormats.includes(fileType)) {
+        callback([], false, 'Unsupported format');
+        return;
+      }
+
+      // Parse and process
+      const reader = new FileReader();
+
+      const isTextFormat = ['csv', 'json', 'txt'].includes(fileType);
+      const isBinaryFormat = ['pdf', 'xlsx', 'xls', 'docx', 'doc'].includes(fileType);
+      const isImageFormat = ['jpg', 'jpeg', 'png'].includes(fileType);
+
+      reader.onload = (e) => {
+        try {
+          let items = [];
+
+          if (fileType === 'csv') {
+            const lines = e.target.result.split('\n');
+            const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+            for (let i = 1; i < lines.length; i++) {
+              if (lines[i].trim() === '') continue;
+              const values = lines[i].split(',').map(v => v.trim());
+              const row = { sourceFile: file.name };
+              headers.forEach((header, idx) => {
+                row[header] = values[idx];
+              });
+              items.push(row);
+            }
+          } else if (fileType === 'json') {
+            let parsed = JSON.parse(e.target.result);
+            if (!Array.isArray(parsed)) parsed = [parsed];
+            items = parsed.map(item => ({ ...item, sourceFile: file.name }));
+          } else if (fileType === 'txt') {
+            const lines = e.target.result.split('\n');
+            lines.forEach(line => {
+              if (line.trim()) {
+                const parts = line.split('|').map(p => p.trim());
+                if (parts.length >= 2) {
+                  items.push({
+                    sourceFile: file.name,
+                    date: parts[0],
+                    description: parts[1],
+                    amount: parts[2] || '0'
+                  });
+                }
+              }
+            });
+          } else if (isBinaryFormat) {
+            // PDF, Excel, Word - store file info for backend parsing
+            items.push({
+              sourceFile: file.name,
+              fileName: file.name,
+              fileType: fileType.toUpperCase(),
+              fileSize: (file.size / 1024 / 1024).toFixed(2) + ' MB',
+              processingMethod: 'Backend parsing',
+              status: 'pending-extraction'
+            });
+          } else if (isImageFormat) {
+            // Images - store for OCR processing
+            items.push({
+              sourceFile: file.name,
+              fileName: file.name,
+              fileType: 'IMAGE',
+              fileSize: (file.size / 1024 / 1024).toFixed(2) + ' MB',
+              processingMethod: 'OCR extraction',
+              status: 'pending-ocr'
+            });
+          }
+
+          callback(items, true);
+        } catch (error) {
+          callback([], false, error.message);
+        }
+      };
+
+      reader.onerror = () => {
+        callback([], false, 'Failed to read file');
+      };
+
+      if (isTextFormat) {
+        reader.readAsText(file);
+      } else {
+        reader.readAsArrayBuffer(file);
+      }
+    }
+
+    // Initialize on page load
+    function initializeExpenseHub() {
+      // Load and display unmapped items
+      const unmappedItems = expenseMappingUI.loadUnmappedItems();
+      if (unmappedItems.length > 0) {
+        const unmappedSection = document.getElementById('unmappedSection');
+        unmappedSection.innerHTML = expenseMappingUI.createUnmappedSection();
+      }
+
+      // Listen for mapped items
+      window.addEventListener('itemMapped', () => {
+        initializeExpenseHub();
+      });
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', initializeExpenseHub);
+    } else {
+      initializeExpenseHub();
+    }
+  </script>
+  <script src="logo-handler.js"></script>
+</body>
+</html>

@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Credits · Adjustments · Equalizations — Veritas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .cr-hero { background:#0e1b2c; color:#fff; border-radius:14px; padding:22px 24px; margin-bottom:20px; display:grid; grid-template-columns:1fr auto; gap:18px; align-items:center; }
+    .cr-hero h2 { margin:0 0 4px; font-family:'Fraunces',serif; font-size:22px; }
+    .cr-hero p { margin:0; font-size:12.5px; color:#c7d2e0; max-width:640px; line-height:1.5; }
+    .cr-total { text-align:right; }
+    .cr-total .cr-total-val { font-size:30px; font-weight:700; color:#e6c583; font-family:'Fraunces',serif; }
+    .cr-total .cr-total-lbl { font-size:11px; color:#9fb0c4; text-transform:uppercase; letter-spacing:.05em; }
+
+    .cr-section { background:#fff; border-radius:14px; box-shadow:0 2px 10px rgba(14,27,44,.06); margin-bottom:18px; overflow:hidden; }
+    .cr-section-head { padding:14px 18px; border-bottom:1px solid #eef1f5; display:flex; justify-content:space-between; align-items:center; }
+    .cr-section-head h3 { margin:0; font-size:15px; color:#1c3f66; }
+    .cr-section-head .cr-sub { font-size:11px; color:#7a8699; }
+    .cr-section-sum { font-size:14px; font-weight:700; color:#2f7d5b; }
+
+    .cr-row { display:grid; grid-template-columns:1fr auto auto; gap:14px; align-items:center; padding:13px 18px; border-bottom:1px solid #f3f5f8; cursor:pointer; transition:background .15s; }
+    .cr-row:last-child { border-bottom:none; }
+    .cr-row:hover { background:#faf6ee; }
+    .cr-row-main .cr-lbl { font-size:13.5px; font-weight:600; color:#1a2f4f; }
+    .cr-row-main .cr-basis { font-size:11px; color:#7a8699; margin-top:2px; }
+    .cr-val { font-size:15px; font-weight:700; color:#1c3f66; white-space:nowrap; }
+    .cr-view { font-size:11px; color:#b8893b; font-weight:600; white-space:nowrap; }
+    .cr-badge { display:inline-block; font-size:9.5px; font-weight:700; padding:2px 7px; border-radius:20px; margin-left:6px; vertical-align:middle; }
+    .cr-badge.doc { background:#e5f3ec; color:#2f7d5b; }
+    .cr-badge.est { background:#fbf1df; color:#9a6b1e; }
+
+    .cr-note { font-size:11px; color:#7a8699; line-height:1.6; padding:13px 18px; background:#f8fafb; }
+    .cr-disclaimer { font-size:11px; color:#8a94a3; margin-top:6px; }
+  </style>
+</head>
+<body>
+  <!-- ===================== SIDEBAR ===================== -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">
+        <img src="logo-vfi.jpg" alt="VFI Logo" />
+        <span class="brand-mark-fallback">VFI</span>
+      </div>
+      <div class="brand-text">
+        <span class="brand-name">Veritas</span>
+        <span class="brand-sub">Financial Intelligence</span>
+      </div>
+    </div>
+    <nav class="nav">
+      <div class="nav-group-label">Workspace</div>
+      <a class="nav-item" href="index.html"><span class="nav-ico">◆</span> Dashboard</a>
+      <a class="nav-item" href="index.html"><span class="nav-ico">▤</span> Matters</a>
+      <a class="nav-item" href="schedules.html"><span class="nav-ico">◷</span> Calendar</a>
+      <a class="nav-item" href="#"><span class="nav-ico">☑</span> Tasks</a>
+      <a class="nav-item" href="discovery-intake.html"><span class="nav-ico">▦</span> Documents</a>
+      <a class="nav-item" href="#"><span class="nav-ico">◍</span> Clients</a>
+
+      <div class="nav-group-label">Analysis Modules</div>
+      <a class="nav-item" href="income-imputation.html"><span class="nav-ico">💠</span> Income Engine</a>
+      <a class="nav-item" href="spousal.html"><span class="nav-ico">⚖</span> Support Calculator</a>
+      <a class="nav-item" href="child-support.html"><span class="nav-ico">◈</span> Child Support</a>
+      <a class="nav-item" href="equitable-distribution.html"><span class="nav-ico">⊟</span> Assets</a>
+      <a class="nav-item" data-module="discovery" href="discovery-intake.html"><span class="nav-ico">◎</span> Discovery</a>
+      <a class="nav-item" href="custody.html"><span class="nav-ico">⌘</span> Custody</a>
+      <a class="nav-item" href="afi.html"><span class="nav-ico">🧾</span> AFI Expenses</a>
+      <a class="nav-item" href="estate.html"><span class="nav-ico">▧</span> Reports</a>
+
+      <div class="nav-group-label">Tools</div>
+      <a class="nav-item" data-module="forensic" href="forensic-tracing.html"><span class="nav-ico">⌕</span> Forensic Tracing</a>
+      <a class="nav-item" href="settlement.html"><span class="nav-ico">⇄</span> Settlement Modeling</a>
+      <a class="nav-item active" href="credits.html"><span class="nav-ico">⊕</span> Credits &amp; Adjustments</a>
+      <a class="nav-item" href="regulations.html"><span class="nav-ico">⚖</span> Regulations</a>
+      <a class="nav-item" href="equitable-distribution.html"><span class="nav-ico">§</span> Prenup Module</a>
+      <a class="nav-item" href="discovery-intake.html"><span class="nav-ico">⤓</span> Document Intake</a>
+      <a class="nav-item" href="discovery-intake.html"><span class="nav-ico">◉</span> Compliance</a>
+      <a class="nav-item" href="red-flags.html"><span class="nav-ico">🚩</span> Red-Flag Detection</a>
+    </nav>
+
+    <div class="sidebar-foot">
+      <div class="plan-chip"><span style="color:var(--green)">●</span> Secure Connection · encrypted &amp; confidential</div>
+    </div>
+  </aside>
+
+  <!-- ===================== MAIN ===================== -->
+  <main class="main">
+    <header class="topbar">
+      <div class="matter-switcher">
+        <span class="matter-label">Active Matter</span>
+        <button class="matter-btn">
+          <strong>Ossandon v. Ossandon</strong>
+          <span class="case-no">No. D2024-1669 · Pima County, AZ</span>
+          <span class="chev">▾</span>
+        </button>
+      </div>
+      <div class="topbar-right">
+        <div class="user">
+          <div class="avatar">TH</div>
+          <div class="user-meta">
+            <span class="user-name">Workspace User</span>
+            <span class="user-role">Ossandon Matter</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="content">
+      <div class="cr-hero">
+        <div>
+          <h2>Credits · Adjustments · Equalizations</h2>
+          <p>Every offset in Luis's favor in one place — spousal-maintenance overpayments, property-division equalizers, reimbursements, and fee-shifting support. Click any row for the full reconciliation and source basis. <span class="cr-disclaimer">Not legal advice — figures and legal theories to be confirmed with Holly.</span></p>
+        </div>
+        <div class="cr-total">
+          <div class="cr-total-val" id="crGrandTotal">$0</div>
+          <div class="cr-total-lbl">Documented claims</div>
+        </div>
+      </div>
+
+      <!-- Spousal-maintenance overpayments -->
+      <div class="cr-section">
+        <div class="cr-section-head">
+          <div><h3>Spousal-maintenance overpayments</h3><div class="cr-sub">Amounts overpaid under the Temporary Orders</div></div>
+          <div class="cr-section-sum" id="crSumSM">$0</div>
+        </div>
+        <div class="cr-row" data-credit-recon="bonus-diff">
+          <div class="cr-row-main"><div class="cr-lbl">Bonus-differential overpayment<span class="cr-badge doc">documented</span></div><div class="cr-basis">$641.69/mo × 13 mo · Temp Orders ¶4.a (2025 bonus lower than 2024)</div></div>
+          <div class="cr-val">$8,342</div><div class="cr-view">View reconciliation →</div>
+        </div>
+        <div class="cr-row" data-credit-recon="base-spousal">
+          <div class="cr-row-main"><div class="cr-lbl">Base-spousal difference<span class="cr-badge doc">documented</span></div><div class="cr-basis">$758/mo × 17 mo · undisclosed Helping Hearts 1099 ($38,510.82)</div></div>
+          <div class="cr-val">$12,886</div><div class="cr-view">View reconciliation →</div>
+        </div>
+        <div class="cr-row" data-credit-recon="hi-reimb">
+          <div class="cr-row-main"><div class="cr-lbl">Health-insurance reimbursement<span class="cr-badge doc">documented</span></div><div class="cr-basis">$70/mo × 11 mo unpaid · Temp Orders ¶4.b</div></div>
+          <div class="cr-val">$770</div><div class="cr-view">View reconciliation →</div>
+        </div>
+      </div>
+
+      <!-- Property-division offsets & equalizers -->
+      <div class="cr-section">
+        <div class="cr-section-head">
+          <div><h3>Property-division offsets &amp; equalizers</h3><div class="cr-sub">§25-318 community-property equalizations at settlement</div></div>
+          <div class="cr-section-sum" id="crSumPD">$0</div>
+        </div>
+        <div class="cr-row" data-credit-recon="home-prep">
+          <div class="cr-row-main"><div class="cr-lbl">Home-sale prep (50% community share)<span class="cr-badge doc">documented</span></div><div class="cr-basis">$15,000 out-of-pocket · Coni owes 50% · §25-318</div></div>
+          <div class="cr-val">$7,500</div><div class="cr-view">View reconciliation →</div>
+        </div>
+        <div class="cr-row" data-credit-recon="hh-equalizer">
+          <div class="cr-row-main"><div class="cr-lbl">Household-goods equalizer<span class="cr-badge doc">documented</span></div><div class="cr-basis">Coni retained $62,050 vs Luis $5,420 · ½ of difference · §25-318</div></div>
+          <div class="cr-val">$28,315</div><div class="cr-view">View reconciliation →</div>
+        </div>
+      </div>
+
+      <!-- Fee-shifting & supporting evidence -->
+      <div class="cr-section">
+        <div class="cr-section-head">
+          <div><h3>Fee-shifting &amp; supporting evidence</h3><div class="cr-sub">A.R.S. §25-324 — reasonableness of positions</div></div>
+          <div class="cr-section-sum" id="crSumFee">$0</div>
+        </div>
+        <div class="cr-row" data-credit-recon="fee-shift">
+          <div class="cr-row-main"><div class="cr-lbl">Fee-shifting estimate<span class="cr-badge est">estimate</span></div><div class="cr-basis">~$50,000 fees after Aug 2025 offer rejected · §25-324</div></div>
+          <div class="cr-val">$50,000</div><div class="cr-view">View reconciliation →</div>
+        </div>
+        <div class="cr-row" data-credit-recon="legal-drawdown">
+          <div class="cr-row-main"><div class="cr-lbl">Legal-expense drawdown — JP Morgan ••3596<span class="cr-badge est">supporting</span></div><div class="cr-basis">Brokerage liquidated to fund fees · supports §25-324 · not additive to the estimate above</div></div>
+          <div class="cr-val">$83,789</div><div class="cr-view">View reconciliation →</div>
+        </div>
+        <div class="cr-note">The <strong>legal-expense drawdown</strong> documents that Luis liquidated ~$83,789 from JP Morgan brokerage ••3596 (DOS $214,168.30 → 12/31/2025 $130,379.57) to cover attorney fees driven up by disclosure delays and litigation conduct. It is shown as <em>evidence</em> supporting the §25-324 fee-shifting request and is <strong>not</strong> added to the documented-claims total to avoid double-counting.</div>
+      </div>
+
+      <!-- Child-expense credits (reimbursement) -->
+      <div class="cr-section">
+        <div class="cr-section-head">
+          <div><h3>Child-expense credits (reimbursement)</h3><div class="cr-sub">Coni's 30% temp-orders share of child costs Luis paid · Nov 2024 → hearing</div></div>
+          <div class="cr-section-sum" id="crSumChild">$0</div>
+        </div>
+        <div class="cr-row" data-credit-recon="child-care-reimb">
+          <div class="cr-row-main"><div class="cr-lbl">Child-care reimbursement (30% share)<span class="cr-badge doc">documented</span></div><div class="cr-basis">30% of $7,883 verified caregiver Zelle payments · 70/30 temp order</div></div>
+          <div class="cr-val">$2,365</div><div class="cr-view">View reconciliation →</div>
+        </div>
+        <div class="cr-row" data-credit-recon="child-phones-reimb">
+          <div class="cr-row-main"><div class="cr-lbl">Children's phone-share reimbursement<span class="cr-badge doc">documented</span></div><div class="cr-basis">$208/mo (Joaquin $132 + Martin $76) × 30% × 17 mo</div></div>
+          <div class="cr-val">$1,061</div><div class="cr-view">View reconciliation →</div>
+        </div>
+        <div class="cr-row" data-credit-recon="child-uber-reimb">
+          <div class="cr-row-main"><div class="cr-lbl">Children's Uber school-transport reimbursement<span class="cr-badge doc">documented</span></div><div class="cr-basis">30% of $2,315.54 Uber kid-rides · Aug 2025 → Mar 2026 · 70/30 temp order</div></div>
+          <div class="cr-val">$695</div><div class="cr-view">View reconciliation →</div>
+        </div>
+        <div class="cr-note">Going <strong>forward</strong> the income split is closer to 60/40, so Coni's share rises to ~40%. School transportation (Uber) also stays in the child-support calculator as a direct-pay credit ($231.55/mo) — the reimbursement above is the historical 30% share, not a double recovery. The reimbursement window may extend to the 08/18/2026 hearing. <span class="cr-disclaimer">Not legal advice — defer to Holly.</span></div>
+      </div>
+
+      <!-- Case matters & procedural issues (relocated from AFI) -->
+      <div class="cr-section">
+        <div class="cr-section-head">
+          <div><h3>Case matters &amp; procedural issues</h3><div class="cr-sub">Discovery compliance, attorney fees, duration disputes, and asset credits — qualitative matters; not added to the documented-claims total</div></div>
+        </div>
+        <div id="caseMattersGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px;margin-top:8px;"></div>
+      </div>
+    </div>
+  </main>
+
+  <script src="recon-modal.js"></script>
+  <script src="logo-handler.js"></script>
+  <script>
+    (function () {
+      const CREDITS_RECON = {
+        'bonus-diff': {
+          title: 'Bonus-Differential Overpayment',
+          intro: 'Temp Orders ¶4.a set $6,800/mo on Luis\'s 2024 bonus; the 2025 bonus came in lower, overstating SM by $641.69/mo from Mar 2025 onward.',
+          columns: [
+            { key: 'desc', label: 'Period', align: 'left' },
+            { key: 'rate', label: 'Rate / mo', align: 'right', money: true },
+            { key: 'amount', label: 'Cumulative', align: 'right', money: true },
+            { key: 'status', label: 'Status', align: 'center', badge: true }
+          ],
+          rows: [ { desc: 'Mar 2025 – Mar 2026 (13 months)', rate: 641.69, amount: 8341.97, status: 'doc' } ],
+          total: { label: 'Overpayment through Mar 2026', value: 8341.97 },
+          summary: { 'Monthly overpayment': 641.69, 'Months': 13, 'Period': 'Mar 2025 – Mar 2026', 'Basis': 'Temp Orders ¶4.a', 'Status': 'Continuing to accrue' },
+          calc: [
+            'Temp Orders ¶4.a fixed $6,800/mo using the 2024 bonus.',
+            '2025 bonus (paid Mar 2025) was materially lower; appropriate SM is $641.69/mo less.',
+            '$641.69/mo × 13 months (Mar 2025 – Mar 2026) = $8,341.97.',
+            'Recovery: overpayment claim under Temp Orders ¶4.d — cash or offset against future SM.'
+          ]
+        },
+        'base-spousal': {
+          title: 'Base-Spousal Difference (Undisclosed HH Income)',
+          intro: 'At the Oct 2024 temp hearing, Wife\'s Helping Hearts (DDD) 1099 income appears omitted. Her 2024 1099-NEC = $38,510.82 (~$3,200/mo); disclosed, the calc would have been $758/mo lower.',
+          columns: [
+            { key: 'desc', label: 'Period', align: 'left' },
+            { key: 'rate', label: 'Rate / mo', align: 'right', money: true },
+            { key: 'amount', label: 'Cumulative', align: 'right', money: true },
+            { key: 'status', label: 'Status', align: 'center', badge: true }
+          ],
+          rows: [ { desc: 'Nov 2024 – Mar 2026 (17 months)', rate: 758, amount: 12886, status: 'doc' } ],
+          total: { label: 'Overpayment through Mar 2026', value: 12886 },
+          summary: { 'Monthly overpayment': 758, 'Months': 17, "Wife's 2024 HH 1099-NEC": 38510.82, 'Period': 'Nov 2024 – Mar 2026', 'Basis': 'Misrepresentation / incomplete disclosure' },
+          calc: [
+            "Wife's 2024 Helping Hearts 1099-NEC = $38,510.82 (~$3,200/mo).",
+            'If disclosed at the Oct 2024 temp hearing, SM would have been $758/mo lower.',
+            '$758/mo × 17 months (Nov 2024 – Mar 2026) = $12,886.',
+            'Recovery: direct overpayment claim; cash from CD or SM offset.'
+          ]
+        },
+        'hi-reimb': {
+          title: 'Past-Due Health-Insurance Reimbursement',
+          intro: 'Temp Orders ¶4.b required Coni to reimburse $70/mo for the children\'s HI premium. She paid $0 from Nov 2024 to Sep 2025; Luis began self-help offset Oct 30, 2025.',
+          columns: [
+            { key: 'desc', label: 'Period', align: 'left' },
+            { key: 'rate', label: 'Rate / mo', align: 'right', money: true },
+            { key: 'amount', label: 'Total', align: 'right', money: true },
+            { key: 'status', label: 'Status', align: 'center', badge: true }
+          ],
+          rows: [ { desc: 'Nov 2024 – Sep 2025 (11 months)', rate: 70, amount: 770, status: 'doc' } ],
+          total: { label: 'Past-due reimbursement', value: 770 },
+          summary: { 'Monthly reimbursement': 70, 'Months unpaid': 11, 'Period': 'Nov 2024 – Sep 2025', 'Basis': 'Temp Orders ¶4.b' },
+          calc: [
+            'Temp Orders ¶4.b: Coni reimburses $70/mo for the children\'s HI premium.',
+            'Coni paid $0 from Nov 2024 through Sep 2025 (11 months).',
+            '$70/mo × 11 months = $770.',
+            'Recovery: direct claim under Temp Orders ¶4.b; cash.'
+          ]
+        },
+        'home-prep': {
+          title: 'Home-Sale Prep (50% Community Share)',
+          intro: 'Luis paid $15,000 out of pocket to prep the marital home for sale; Coni owes 50% as a community expense for joint benefit.',
+          columns: [
+            { key: 'desc', label: 'Item', align: 'left' },
+            { key: 'amount', label: 'Amount', align: 'right', money: true },
+            { key: 'status', label: 'Status', align: 'center', badge: true }
+          ],
+          rows: [
+            { desc: 'Total out-of-pocket prep cost', amount: 15000, status: 'doc' },
+            { desc: "Coni's 50% share", amount: 7500, status: 'doc' }
+          ],
+          total: { label: 'Coni 50% share', value: 7500 },
+          summary: { 'Total paid': 15000, 'Coni share': '50%', 'Amount due': 7500, 'Basis': '§25-318 property division offset' },
+          calc: [
+            'Luis paid $15,000 out of pocket to prep the marital home for sale.',
+            'Community expense for joint benefit → Coni owes 50%.',
+            '$15,000 × 50% = $7,500.',
+            'Recovery: equitable property-division offset under §25-318; pay from CD ...2285 at settlement.'
+          ]
+        },
+        'hh-equalizer': {
+          title: 'Household-Goods Equalizer',
+          intro: 'On an equal division of household goods, the spouse holding more owes the other half of the difference. Coni retained $62,050; Luis $5,420.',
+          columns: [
+            { key: 'desc', label: 'Item', align: 'left' },
+            { key: 'amount', label: 'Amount', align: 'right', money: true },
+            { key: 'status', label: 'Status', align: 'center', badge: true }
+          ],
+          rows: [
+            { desc: 'Household goods retained by Coni', amount: 62050, status: 'doc' },
+            { desc: 'Household goods retained by Luis', amount: 5420, status: 'doc' },
+            { desc: 'Difference', amount: 56630, status: 'doc' },
+            { desc: 'Equalizer owed to Luis (½ of difference)', amount: 28315, status: 'doc' }
+          ],
+          total: { label: 'Equalizer owed to Luis', value: 28315 },
+          summary: { 'Coni retained': 62050, 'Luis retained': 5420, 'Difference': 56630, 'Equalizer (½)': 28315, 'Basis': '§25-318 equal division' },
+          calc: [
+            'Household inventory: Coni retained $62,050; Luis retained $5,420.',
+            'Equal division → the spouse holding more pays half the difference.',
+            '($62,050 − $5,420) ÷ 2 = $28,315 owed to Luis.',
+            'Recovery: property-division equalizing payment at settlement under §25-318.'
+          ]
+        },
+        'fee-shift': {
+          title: 'Fee-Shifting Estimate (§25-324)',
+          intro: 'A.R.S. §25-324 lets the court weigh the reasonableness of positions. Luis incurred ~$50,000 in fees after Wife rejected the Aug 2025 offer without meaningful counter-engagement.',
+          columns: [
+            { key: 'desc', label: 'Item', align: 'left' },
+            { key: 'amount', label: 'Amount', align: 'right', money: true },
+            { key: 'status', label: 'Status', align: 'center', badge: true }
+          ],
+          rows: [ { desc: 'Fees incurred after Aug 2025 offer rejection', amount: 50000, status: 'est' } ],
+          total: { label: 'Fee-shifting estimate', value: 50000 },
+          summary: { 'Estimated fees': 50000, 'Trigger': 'Aug 2025 offer rejected without counter', 'Basis': 'A.R.S. §25-324', 'Note': 'Estimate — not legal advice; defer to Holly' },
+          calc: [
+            'Wife rejected the Aug 2025 settlement offer without meaningful counter-engagement.',
+            'Luis incurred ~$50,000 in fees after that point.',
+            '§25-324 lets the court shift fees based on reasonableness of positions.',
+            'Recovery: fee-shifting motion at trial, or waived in a global settlement (Settlement Letter §XI.8).'
+          ]
+        },
+        'legal-drawdown': {
+          title: 'Legal-Expense Drawdown — JP Morgan Brokerage ••3596',
+          intro: 'Luis liquidated his JP Morgan brokerage ••3596 to fund attorney fees driven up by disclosure delays and litigation conduct. Shown as evidence supporting the §25-324 fee-shifting request — it is not added to the documented-claims total.',
+          columns: [
+            { key: 'desc', label: 'Item', align: 'left' },
+            { key: 'amount', label: 'Balance / amount', align: 'right', money: true },
+            { key: 'status', label: 'Status', align: 'center', badge: true }
+          ],
+          rows: [
+            { desc: 'Balance at Date of Service (06/23/2024)', amount: 214168.30, status: 'doc' },
+            { desc: 'Balance at 12/31/2025', amount: 130379.57, status: 'doc' },
+            { desc: 'Net drawdown to fund fees', amount: 83788.73, status: 'doc' }
+          ],
+          total: { label: 'Net liquidated to fund fees', value: 83788.73 },
+          summary: { 'DOS balance': 214168.30, '12/31/2025 balance': 130379.57, 'Net drawdown': 83788.73, 'Basis': 'Supports §25-324 fee-shifting', 'Note': 'Not additive to the $50,000 estimate — evidence only. Not legal advice; defer to Holly.' },
+          calc: [
+            'JP Morgan brokerage ••3596 held $214,168.30 at the Date of Service (06/23/2024).',
+            'By 12/31/2025 the balance had fallen to $130,379.57.',
+            '$214,168.30 − $130,379.57 = $83,788.73 liquidated to cover attorney fees.',
+            'Use: corroborates the reasonableness / fee-shifting argument under §25-324; not counted as a separate cash claim.'
+          ]
+        },
+        'child-care-reimb': {
+          title: 'Temp-Orders Caregiver Reimbursement (30% share)',
+          intro: "Coni's 30% share of the named-caregiver child care Luis paid under the 70/30 temp-orders split. Zelle payments verified in Luis's raw personal account.",
+          columns: [
+            { key: 'desc', label: 'Item', align: 'left' },
+            { key: 'amount', label: 'Amount', align: 'right', money: true },
+            { key: 'status', label: 'Status', align: 'center', badge: true }
+          ],
+          rows: [
+            { desc: 'Verified named-caregiver total', amount: 7883.00, status: 'doc' },
+            { desc: "Coni's share @ 30%", amount: 2364.90, status: 'doc' }
+          ],
+          total: { label: 'Coni reimbursement due', value: 2364.90 },
+          summary: { 'Named-caregiver total': 7883.00, "Coni's share": '30%', 'Reimbursement due': 2364.90, 'Basis': '70/30 temp order' },
+          calc: [
+            'Verified named-caregiver Zelle payments (Luis raw personal account) = $7,883.00.',
+            'Temp orders split child care 70/30 → Coni owes 30%.',
+            '$7,883.00 × 30% = $2,364.90.',
+            'Recovery: reimbursement claim; window may extend to the 08/18/2026 hearing.'
+          ]
+        },
+        'child-phones-reimb': {
+          title: "Children's Phone-Share Reimbursement",
+          intro: 'Joaquin $132 + Martin $76 = $208/mo base for the two younger boys. Temp-orders 30% share over 17 months (Nov 2024 – Mar 2026).',
+          columns: [
+            { key: 'desc', label: 'Item', align: 'left' },
+            { key: 'amount', label: 'Amount', align: 'right', money: true },
+            { key: 'status', label: 'Status', align: 'center', badge: true }
+          ],
+          rows: [
+            { desc: 'Joaquin (monthly)', amount: 132.00, status: 'doc' },
+            { desc: 'Martin (monthly)', amount: 76.00, status: 'doc' },
+            { desc: 'Monthly base', amount: 208.00, status: 'doc' },
+            { desc: '30% share / month', amount: 62.40, status: 'doc' },
+            { desc: '× 17 months', amount: 1060.80, status: 'doc' }
+          ],
+          total: { label: 'Phone-share reimbursement', value: 1060.80 },
+          summary: { 'Monthly base': 208.00, "Coni's share": '30%', 'Months': 17, 'Reimbursement due': 1060.80, 'Basis': 'Temp-orders 30% share' },
+          calc: [
+            'Two younger boys\' phones: Joaquin $132 + Martin $76 = $208/mo.',
+            '$208 × 30% = $62.40/mo Coni share.',
+            '$62.40 × 17 months (Nov 2024 – Mar 2026) = $1,060.80.',
+            'Confirm month count and any offsets before final filing (defer to Holly).'
+          ]
+        },
+        'child-uber-reimb': {
+          title: "Children's Uber School-Transport Reimbursement (30% share)",
+          intro: "Coni's 30% share of the Uber rides Luis paid to get the two younger boys to and from school during his parenting weeks. Uber began August 2025, after Luis moved out of the school district. Workbook-supported.",
+          columns: [
+            { key: 'desc', label: 'Item', align: 'left' },
+            { key: 'amount', label: 'Amount', align: 'right', money: true },
+            { key: 'status', label: 'Status', align: 'center', badge: true }
+          ],
+          rows: [
+            { desc: 'Documented Uber kid-ride total (Aug 2025 – Mar 2026)', amount: 2315.54, status: 'doc' },
+            { desc: "Coni's share @ 30%", amount: 694.66, status: 'doc' }
+          ],
+          total: { label: 'Coni reimbursement due', value: 694.66 },
+          summary: { 'Documented Uber total': 2315.54, "Coni's share": '30%', 'Period': 'Aug 2025 – Mar 2026', 'Reimbursement due': 694.66, 'Basis': '70/30 temp order' },
+          calc: [
+            'Uber began Aug 2025 after Luis moved out of the school district; used to drive the two younger boys to/from school on his parenting weeks.',
+            'Documented Uber kid-ride spend (Luis_Expenses_Categorized.xlsx) = $2,315.54.',
+            'Temp orders split child costs 70/30 → Coni owes 30%.',
+            '$2,315.54 × 30% = $694.66.',
+            'Same rides feed the child-support transportation credit ($231.55/mo) — present as a historical reimbursement, not a double recovery. Additional months may accrue to the 08/18/2026 hearing (defer to Holly).'
+          ]
+        }
+      };
+
+      // Rows that count toward the documented-claims total (excludes the drawdown, which is evidence only).
+      const SECTION_SUMS = {
+        crSumSM: ['bonus-diff', 'base-spousal', 'hi-reimb'],
+        crSumPD: ['home-prep', 'hh-equalizer'],
+        crSumFee: ['fee-shift'],
+        crSumChild: ['child-care-reimb', 'child-phones-reimb', 'child-uber-reimb']
+      };
+      const fmt = (n) => '$' + Math.round(n).toLocaleString('en-US');
+      let grand = 0;
+      Object.keys(SECTION_SUMS).forEach(function (id) {
+        const sum = SECTION_SUMS[id].reduce(function (t, k) { return t + (CREDITS_RECON[k] ? CREDITS_RECON[k].total.value : 0); }, 0);
+        grand += sum;
+        const el = document.getElementById(id);
+        if (el) el.textContent = fmt(sum);
+      });
+      const gt = document.getElementById('crGrandTotal');
+      if (gt) gt.textContent = fmt(grand);
+
+      document.querySelectorAll('[data-credit-recon]').forEach(function (el) {
+        el.addEventListener('click', function () {
+          const data = CREDITS_RECON[el.getAttribute('data-credit-recon')];
+          if (data && typeof window.openSharedRecon === 'function') window.openSharedRecon(data);
+        });
+      });
+    })();
+
+    // Case matters & procedural issues (relocated from AFI) — qualitative, not totaled.
+    (function () {
+      const CASE_MATTERS = [
+        { id: 'discovery-deficiency', label: 'Discovery Deficiency / Non-Compliance', category: 'Discovery',
+          note: 'Opposing party failure to produce required discovery materials; timeline of requests and responses.',
+          supports: [
+            { label: 'Discovery Deficiency Letter to Belleau (7/30/2026)', file: '../Discovery_Deficiency_Letter_to_Belleau_7.30.26.md' },
+            { label: 'Missing Documents and Discrepancies', file: '../Missing_Documents_and_Disclosure_Discrepancies_7.30.26.md' },
+            { label: 'Discovery Compliance Matrix', file: '../DOCS_INDEX.md' }
+          ] },
+        { id: 'attorney-fees-reimb', label: 'Attorney Fees Reimbursement', category: 'Legal Costs',
+          note: 'Disputed or unpaid attorney fee awards; requests for reimbursement from community property.',
+          supports: [
+            { label: 'Email: Supplemental Disclosure (7/27/2026)', file: '../discovery/Email.Supplemental.Disclosure.2026.07.27.pdf' },
+            { label: 'Discovery Deficiency Letter (attorney fees section)', file: '../Discovery_Deficiency_Letter_to_Belleau_7.30.26.md' }
+          ] },
+        { id: 'cp-withdrawal-fees', label: 'Community Property Withdrawal for Attorney Fees', category: 'Legal Costs',
+          note: 'Withdrawals from community property accounts to fund legal representation; impact on marital estate and claimed expenses.',
+          supports: [
+            { label: 'Settlement Transaction Support (CP withdrawals)', file: '../Settlement_Transaction_Support.xlsx' },
+            { label: 'Missing Documents and Discrepancies', file: '../Missing_Documents_and_Disclosure_Discrepancies_7.30.26.md' }
+          ] },
+        { id: 'spousal-overpayment', label: 'Spousal Support Overpayment / Credit', category: 'Support Adjustments',
+          note: 'Periods of excess spousal support paid; off-the-books payments; duration disputes affecting retroactive adjustments.',
+          supports: [
+            { label: 'Build Overpayments Analysis (Python)', file: '../build_overpayments_analysis.py' },
+            { label: 'Luis Overpayments and Credits analysis', file: '../Luis_Overpayments_and_Credits.xlsx' },
+            { label: 'Settlement Framework (spousal adjustment section)', file: '../Settlement_Framework_5.7.26.md' }
+          ] },
+        { id: 'support-duration-dispute', label: 'Support Duration Dispute', category: 'Support Adjustments',
+          note: 'Disagreement over commencement date, termination trigger, or duration of support obligation; impact on accrued liability.',
+          supports: [
+            { label: 'Spousal Maintenance Duration Argument (Word doc)', file: '../Spousal_Maintenance_Duration_Argument.docx' },
+            { label: 'Build Duration Argument (Python)', file: '../build_duration_argument_docx.py' },
+            { label: 'Settlement Framework (duration section)', file: '../Settlement_Framework_5.7.26.md' }
+          ] },
+        { id: 'family-residence-credit', label: 'Family Residence Sale / Credit Back', category: 'Property Adjustments',
+          note: 'Home sale proceeds, allocation methodology, tax basis, and credit or offset claims against support or asset division.',
+          supports: [
+            { label: 'How to Divide 50-50 Assets', file: '../HOW_TO_DIVIDE_50-50_ASSETS.md' },
+            { label: 'Settlement Framework (property section)', file: '../Settlement_Framework_5.7.26.md' },
+            { label: 'Settlement Position Snapshot (residence credit section)', file: '../Settlement_Position_Snapshot_7.2.26.md' }
+          ] }
+      ];
+      const grid = document.getElementById('caseMattersGrid');
+      if (!grid) return;
+      const esc = (s) => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+      let flagged = [];
+      try { flagged = JSON.parse(localStorage.getItem('veritas.credits.flaggedMatters') || '[]'); } catch (_) {}
+      grid.innerHTML = CASE_MATTERS.map(function (m) {
+        const isFlag = flagged.indexOf(m.id) >= 0;
+        const links = (m.supports && m.supports.length)
+          ? '<div style="font-size:12px;color:#425c7f;line-height:1.6;"><strong>Support files:</strong> ' + m.supports.map(function (d) { return '<a href="' + encodeURI(d.file) + '" target="_blank" rel="noopener" style="color:#b8893b;">' + esc(d.label) + ' ↗</a>'; }).join(' · ') + '</div>'
+          : '<div style="font-size:12px;color:#8a94a3;"><em>Supporting documents pending.</em></div>';
+        return '<article style="border:1px solid #e4e9f0;border-radius:12px;padding:14px 16px;background:#fff;display:flex;flex-direction:column;gap:6px;">' +
+          '<div style="font-weight:700;color:#0e1b2c;font-size:14px;">' + esc(m.label) + '</div>' +
+          '<div style="font-size:11px;color:#8a94a3;text-transform:uppercase;letter-spacing:.04em;">' + esc(m.category) + '</div>' +
+          '<div style="font-size:12.5px;color:#425c7f;line-height:1.5;">' + esc(m.note) + '</div>' +
+          links +
+          '<div style="margin-top:6px;"><button type="button" data-case-matter="' + esc(m.id) + '" style="border:1px solid #cdd8e7;background:' + (isFlag ? '#e5f3ec' : '#fff') + ';color:' + (isFlag ? '#2f7d5b' : '#425c7f') + ';border-radius:8px;padding:6px 12px;font-size:12px;cursor:pointer;">' + (isFlag ? '✓ Matter flagged' : 'Review matter') + '</button></div>' +
+          '</article>';
+      }).join('');
+      grid.addEventListener('click', function (e) {
+        const btn = e.target.closest('[data-case-matter]');
+        if (!btn) return;
+        const id = btn.getAttribute('data-case-matter');
+        const i = flagged.indexOf(id);
+        if (i >= 0) flagged.splice(i, 1); else flagged.push(id);
+        try { localStorage.setItem('veritas.credits.flaggedMatters', JSON.stringify(flagged)); } catch (_) {}
+        const on = flagged.indexOf(id) >= 0;
+        btn.textContent = on ? '✓ Matter flagged' : 'Review matter';
+        btn.style.background = on ? '#e5f3ec' : '#fff';
+        btn.style.color = on ? '#2f7d5b' : '#425c7f';
+      });
+    })();
+  </script>
+</body>
+</html>

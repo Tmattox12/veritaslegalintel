@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Child Custody — Veritas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="ai-chat.css" />
+  <style>
+    .custody-grid { display: grid; grid-template-columns: 1.25fr .95fr; gap: 22px; }
+    .custody-col { display: flex; flex-direction: column; gap: 22px; min-width: 0; }
+    .hero-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 22px; }
+    .hero-stat { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 16px 18px; box-shadow: var(--shadow); }
+    .hero-stat span { display: block; font-size: 11px; color: var(--mute); text-transform: uppercase; letter-spacing: .45px; }
+    .hero-stat strong { display: block; margin-top: 8px; font-family: 'Fraunces', serif; font-size: 26px; color: var(--navy-900); }
+    .hero-stat em { display: block; margin-top: 6px; font-style: normal; font-size: 12px; color: var(--slate); }
+    .pill-row { display: flex; flex-wrap: wrap; gap: 10px; }
+    .pill { padding: 7px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--bg); font-size: 12px; color: var(--navy-800); font-weight: 600; }
+    .decision-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+    .decision-card { border: 1px solid var(--line); border-radius: 12px; padding: 14px 15px; background: linear-gradient(180deg, #fff, #f8fafc); }
+    .decision-card h4 { font-size: 13px; margin-bottom: 8px; }
+    .decision-card p { font-size: 12px; color: var(--slate); line-height: 1.5; }
+    .factor-list, .check-list, .incident-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .factor-item, .check-item, .incident { display: grid; grid-template-columns: auto 1fr auto; gap: 12px; align-items: start; padding: 12px; border: 1px solid var(--line-soft); border-radius: 11px; background: #fbfcfe; }
+    .factor-num, .check-mark, .incident-sev { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font-size: 11px; font-weight: 700; }
+    .factor-num { background: var(--navy-800); color: #fff; }
+    .check-mark { background: var(--green-soft); color: var(--green); }
+    .incident-sev.high { background: var(--red-soft); color: var(--red); }
+    .incident-sev.med { background: var(--amber-soft); color: var(--amber); }
+    .factor-body h5, .check-body h5, .incident-body h5 { font-size: 13px; margin-bottom: 3px; }
+    .factor-body p, .check-body p, .incident-body p { font-size: 12px; color: var(--slate); line-height: 1.45; }
+    .factor-tag, .check-tag, .incident-tag { font-size: 10.5px; font-weight: 700; color: var(--mute); text-transform: uppercase; letter-spacing: .4px; white-space: nowrap; }
+    .matrix { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .matrix th, .matrix td { border: 1px solid var(--line); padding: 10px; vertical-align: top; }
+    .matrix th { background: #f6f8fb; color: var(--navy-800); text-align: left; font-size: 11px; text-transform: uppercase; letter-spacing: .45px; }
+    .matrix td small { display: block; color: var(--mute); margin-top: 4px; }
+    .timeline { display: grid; gap: 12px; }
+    .timeline-step { display: grid; grid-template-columns: 84px 1fr; gap: 14px; align-items: start; }
+    .timeline-step .time { font-family: 'Fraunces', serif; color: var(--navy-900); font-size: 17px; }
+    .timeline-step .detail { padding: 12px 14px; border-radius: 12px; background: var(--bg); border: 1px solid var(--line); }
+    .timeline-step .detail h5 { font-size: 13px; margin-bottom: 4px; }
+    .timeline-step .detail p { font-size: 12px; color: var(--slate); line-height: 1.45; }
+    @media (max-width: 1200px) {
+      .custody-grid { grid-template-columns: 1fr; }
+      .hero-strip { grid-template-columns: repeat(2, 1fr); }
+      .decision-grid { grid-template-columns: 1fr; }
+    }
+    @media (max-width: 720px) {
+      .hero-strip { grid-template-columns: 1fr; }
+      .timeline-step { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-mark">
+        <img src="logo-vfi.jpg" alt="VFI Logo" />
+        <span class="brand-mark-fallback">VFI</span>
+      </div>
+      <div class="brand-text">
+        <span class="brand-name">Veritas</span>
+        <span class="brand-sub">Financial Intelligence</span>
+      </div>
+    </div>
+    <nav class="nav">
+      <div class="nav-group-label">Workspace</div>
+      <a class="nav-item" href="index.html"><span class="nav-ico">◆</span> Dashboard</a>
+      <a class="nav-item" href="index.html"><span class="nav-ico">▤</span> Matters</a>
+      <a class="nav-item" href="schedules.html"><span class="nav-ico">◷</span> Calendar</a>
+      <a class="nav-item" href="#"><span class="nav-ico">☑</span> Tasks</a>
+      <a class="nav-item" href="discovery-intake.html"><span class="nav-ico">▦</span> Documents</a>
+      <a class="nav-item" href="#"><span class="nav-ico">◍</span> Clients</a>
+
+      <div class="nav-group-label">Analysis Modules</div>
+      <a class="nav-item" href="income-imputation.html"><span class="nav-ico">💠</span> Income Engine</a>
+      <a class="nav-item" href="spousal.html"><span class="nav-ico">⚖</span> Support Calculator</a>
+      <a class="nav-item" href="child-support.html"><span class="nav-ico">◈</span> Child Support</a>
+      <a class="nav-item" href="equitable-distribution.html"><span class="nav-ico">⊟</span> Assets</a>
+      <a class="nav-item" data-module="discovery" href="discovery-intake.html"><span class="nav-ico">◎</span> Discovery</a>
+      <a class="nav-item active" href="custody.html"><span class="nav-ico">⌘</span> Custody</a>
+      <a class="nav-item" href="afi.html"><span class="nav-ico">🧾</span> AFI Expenses</a>
+      <a class="nav-item" href="estate.html"><span class="nav-ico">▧</span> Reports</a>
+
+      <div class="nav-group-label">Tools</div>
+      <a class="nav-item" data-module="forensic" href="forensic-tracing.html"><span class="nav-ico">⌕</span> Forensic Tracing</a>
+      <a class="nav-item" href="settlement.html"><span class="nav-ico">⇄</span> Settlement Modeling</a>
+      <a class="nav-item" href="credits.html"><span class="nav-ico">⊕</span> Credits &amp; Adjustments</a>
+      <a class="nav-item" href="regulations.html"><span class="nav-ico">⚖</span> Regulations</a>
+      <a class="nav-item" href="equitable-distribution.html"><span class="nav-ico">§</span> Prenup Module</a>
+      <a class="nav-item" href="discovery-intake.html"><span class="nav-ico">⤓</span> Document Intake</a>
+      <a class="nav-item" href="discovery-intake.html"><span class="nav-ico">◉</span> Compliance</a>
+      <a class="nav-item" href="red-flags.html"><span class="nav-ico">🚩</span> Red-Flag Detection</a>
+    </nav>
+
+    <div class="sidebar-foot">
+      <div class="plan-chip"><span style="color:var(--green)">●</span> Secure Connection · encrypted &amp; confidential</div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <header class="topbar">
+      <div class="matter-switcher">
+        <span class="matter-label">Active Matter</span>
+        <button class="matter-btn">
+          <strong>Ossandon v. Ossandon</strong>
+          <span class="case-no">No. D2024-1669 · Pima County, AZ</span>
+          <span class="chev">▾</span>
+        </button>
+      </div>
+      <div class="topbar-right">
+        <button class="btn ghost">Export Parenting Plan</button>
+        <button class="btn primary">＋ Add Issue</button>
+      </div>
+    </header>
+
+    <div class="content">
+      <section class="page-head">
+        <div>
+          <h1>Child Custody &amp; Parenting Time</h1>
+          <p class="sub">Ossandon v. Ossandon · 50/50 parenting time · Monday week-on/week-off exchanges · 3 children (20, 17, 15)</p>
+        </div>
+      </section>
+
+      <section class="hero-strip">
+        <article class="hero-stat"><span>Parenting Time</span><strong>50 / 50</strong><em>182.5 overnights each parent · per year</em></article>
+        <article class="hero-stat"><span>Exchange Schedule</span><strong>Mondays</strong><em>Week-on / week-off rotation</em></article>
+        <article class="hero-stat"><span>Children</span><strong>3</strong><em>Ages 20 · 17 · 15</em></article>
+        <article class="hero-stat"><span>Nico (20)</span><strong>Disabled adult</strong><em>SSI rep-payee to Coni · $967/mo</em></article>
+      </section>
+
+      <div class="custody-grid">
+        <div class="custody-col">
+          <section class="panel">
+            <div class="panel-head">
+              <h3>Decision-Making Structure</h3>
+              <span class="tag">Core custody terms</span>
+            </div>
+            <div class="decision-grid">
+              <article class="decision-card">
+                <h4>Sole Legal Decision-Making</h4>
+                <p>Use when one parent needs exclusive authority over education, medical or mental-health decisions, with notice rights and document access preserved to the other parent.</p>
+              </article>
+              <article class="decision-card">
+                <h4>Joint Legal Decision-Making</h4>
+                <p>Use when both parents can participate in major decisions, with a tie-break protocol, response deadlines and emergency exceptions defined in the order.</p>
+              </article>
+              <article class="decision-card">
+                <h4>Final Say / Tie-Breaker</h4>
+                <p>Assign a final decision-maker by category only after a required meet-and-confer period, written notice and a documented attempt to resolve the issue.</p>
+              </article>
+              <article class="decision-card">
+                <h4>Emergency Authority</h4>
+                <p>Allow either parent to act immediately for urgent safety or medical issues, with a same-day notice obligation and post-event documentation requirement.</p>
+              </article>
+            </div>
+            <div class="pill-row" style="margin-top:16px;">
+              <span class="pill">School records access</span>
+              <span class="pill">Medical portal access</span>
+              <span class="pill">48-hour response deadline</span>
+              <span class="pill">Tie-break after meet-and-confer</span>
+              <span class="pill">Emergency exception</span>
+            </div>
+          </section>
+
+          <section class="panel">
+            <div class="panel-head">
+              <h3>Best-Interest Factors</h3>
+              <span class="tag">Matter intake checklist</span>
+            </div>
+            <ul class="factor-list">
+              <li class="factor-item"><div class="factor-num">1</div><div class="factor-body"><h5>Historic primary caregiver role</h5><p>Track who handled school, meals, bedtime, homework, medical appointments and extracurricular logistics before separation.</p></div><div class="factor-tag">History</div></li>
+              <li class="factor-item"><div class="factor-num">2</div><div class="factor-body"><h5>Child adjustment to home, school and community</h5><p>Document school attendance, academic stability, friendships, activities, therapy providers and neighborhood continuity.</p></div><div class="factor-tag">Stability</div></li>
+              <li class="factor-item"><div class="factor-num">3</div><div class="factor-body"><h5>Parental cooperation and conflict level</h5><p>Assess communication quality, gatekeeping, refusal to share information, and whether transitions trigger recurring disputes.</p></div><div class="factor-tag">Co-parenting</div></li>
+              <li class="factor-item"><div class="factor-num">4</div><div class="factor-body"><h5>Safety, abuse, coercion or substance concerns</h5><p>Separate verified safety risks from litigation rhetoric and identify whether neutral exchanges, supervision or testing are needed.</p></div><div class="factor-tag">Safety</div></li>
+              <li class="factor-item"><div class="factor-num">5</div><div class="factor-body"><h5>Practical schedule feasibility</h5><p>Compare commute times, work hours, school start times, child age and each parent’s actual availability to exercise time.</p></div><div class="factor-tag">Logistics</div></li>
+            </ul>
+          </section>
+
+          <section class="panel">
+            <div class="panel-head">
+              <h3>Responsibility Matrix</h3>
+              <span class="tag">Drafting backbone</span>
+            </div>
+            <table class="matrix">
+              <thead>
+                <tr><th>Topic</th><th>Default Rule</th><th>Order Detail</th></tr>
+              </thead>
+              <tbody>
+                <tr><td>Education</td><td>Joint decision / 48-hour response</td><td>School choice, IEP/504, tutoring, conferences, portal access<small>Set escalation path if no agreement.</small></td></tr>
+                <tr><td>Medical</td><td>Joint, except emergencies</td><td>Routine care, specialists, therapy, medications, reimbursement workflow<small>Define who schedules and who receives records.</small></td></tr>
+                <tr><td>Activities</td><td>Enrollment by agreement</td><td>Registration deadlines, transportation, gear costs, missed-time makeup<small>Prevent unilateral over-scheduling on the other parent’s time.</small></td></tr>
+                <tr><td>Religion / culture</td><td>Preserve existing practice</td><td>Services, holidays, rites, dietary restrictions<small>Useful in high-conflict holiday drafting.</small></td></tr>
+              </tbody>
+            </table>
+          </section>
+        </div>
+
+        <div class="custody-col">
+          <section class="panel">
+            <div class="panel-head">
+              <h3>Safety &amp; Temporary Controls</h3>
+              <span class="tag">Protective drafting</span>
+            </div>
+            <ul class="check-list">
+              <li class="check-item"><div class="check-mark">✓</div><div class="check-body"><h5>Neutral exchange sites</h5><p>School, daycare, police substation or curbside exchange with no house entry.</p></div><div class="check-tag">Exchanges</div></li>
+              <li class="check-item"><div class="check-mark">✓</div><div class="check-body"><h5>No-disparagement / no child-messaging clause</h5><p>Prohibit using the child as messenger, witness or information source.</p></div><div class="check-tag">Conduct</div></li>
+              <li class="check-item"><div class="check-mark">✓</div><div class="check-body"><h5>App-based communication only</h5><p>Confine routine communication to OurFamilyWizard, TalkingParents or another specified platform.</p></div><div class="check-tag">Evidence</div></li>
+              <li class="check-item"><div class="check-mark">✓</div><div class="check-body"><h5>Travel notice and itinerary requirements</h5><p>Advance notice, contact numbers, out-of-state consent and passport controls.</p></div><div class="check-tag">Travel</div></li>
+            </ul>
+          </section>
+
+          <section class="panel">
+            <div class="panel-head">
+              <h3>Communication &amp; Incident Log</h3>
+              <span class="tag">For pattern tracking</span>
+            </div>
+            <ul class="incident-list">
+              <li class="incident"><div class="incident-sev med">M</div><div class="incident-body"><h5>Missed exchange / late pickup</h5><p>Track time, who notified whom, the reason given, and impact on school or bedtime.</p></div><div class="incident-tag">Log item</div></li>
+              <li class="incident"><div class="incident-sev med">M</div><div class="incident-body"><h5>Decision-making impasse</h5><p>Capture the issue, proposed options, response deadline, and whether a tie-break clause was invoked.</p></div><div class="incident-tag">Escalation</div></li>
+              <li class="incident"><div class="incident-sev high">H</div><div class="incident-body"><h5>Safety event</h5><p>Document witnesses, police / medical reports, photos, and whether temporary modifications are needed.</p></div><div class="incident-tag">Critical</div></li>
+            </ul>
+          </section>
+
+          <section class="panel">
+            <div class="panel-head">
+              <h3>Order Assembly Timeline</h3>
+              <span class="tag">Workflow</span>
+            </div>
+            <div class="timeline">
+              <div class="timeline-step"><div class="time">Step 1</div><div class="detail"><h5>Intake the parenting facts</h5><p>Capture school, work, child age, providers, transportation and current informal schedule.</p></div></div>
+              <div class="timeline-step"><div class="time">Step 2</div><div class="detail"><h5>Map disputed decision categories</h5><p>Separate daily logistics from major decisions and decide where final authority, if any, should sit.</p></div></div>
+              <div class="timeline-step"><div class="time">Step 3</div><div class="detail"><h5>Draft practical controls</h5><p>Add communication rules, makeup time, holiday priority, travel, school records and emergency language.</p></div></div>
+              <div class="timeline-step"><div class="time">Step 4</div><div class="detail"><h5>Generate proposed order language</h5><p>Turn the chosen structure into a parenting plan, temporary order proposal or mediation draft.</p></div></div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+  </main>
+  <script src="ai-chat.js"></script>
+  <script src="logo-handler.js"></script>
+</body>
+</html>

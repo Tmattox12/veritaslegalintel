@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Case Detail — Veritas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f5f7fa;
+      color: #1c3f66;
+      line-height: 1.6;
+      padding: 20px;
+    }
+    .page-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .page-header {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .page-header h1 {
+      font-family: 'Fraunces', serif;
+      font-size: 28px;
+      margin-bottom: 8px;
+    }
+    .page-header p {
+      color: #666;
+      font-size: 14px;
+    }
+    .header-actions {
+      display: flex;
+      gap: 12px;
+    }
+    .btn {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-primary {
+      background: #2e5b8a;
+      color: white;
+    }
+    .btn-primary:hover {
+      background: #1c3f66;
+    }
+    .btn-secondary {
+      background: #f0f0f0;
+      color: #1c3f66;
+    }
+    .btn-secondary:hover {
+      background: #e0e0e0;
+    }
+    .case-summary {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .summary-card {
+      background: white;
+      border-radius: 8px;
+      padding: 16px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    }
+    .summary-card h4 {
+      font-size: 11px;
+      font-weight: 600;
+      color: #999;
+      text-transform: uppercase;
+      margin-bottom: 8px;
+    }
+    .summary-card p {
+      font-size: 14px;
+      color: #1c3f66;
+    }
+    .modules-section {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+    .modules-section h2 {
+      font-family: 'Fraunces', serif;
+      font-size: 20px;
+      margin-bottom: 24px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #b8893b;
+    }
+    .modules-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+    }
+    .module-card {
+      background: #f9f9f9;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 20px;
+      text-decoration: none;
+      color: inherit;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      flex-direction: column;
+    }
+    .module-card:hover {
+      border-color: #2e5b8a;
+      box-shadow: 0 4px 16px rgba(46, 91, 138, 0.15);
+      transform: translateY(-2px);
+    }
+    .module-icon {
+      font-size: 32px;
+      margin-bottom: 12px;
+    }
+    .module-title {
+      font-weight: 600;
+      font-size: 14px;
+      color: #1c3f66;
+      margin-bottom: 8px;
+    }
+    .module-description {
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 12px;
+      flex-grow: 1;
+    }
+    .module-status {
+      font-size: 11px;
+      font-weight: 600;
+      padding: 6px 8px;
+      border-radius: 4px;
+      display: inline-block;
+      width: fit-content;
+    }
+    .status-pending {
+      background: #fff3cd;
+      color: #856404;
+    }
+    .status-complete {
+      background: #d4edda;
+      color: #155724;
+    }
+    .status-partial {
+      background: #e2e3e5;
+      color: #383d41;
+    }
+    @media (max-width: 768px) {
+      .page-header {
+        flex-direction: column;
+        text-align: center;
+      }
+      .header-actions {
+        width: 100%;
+        justify-content: center;
+      }
+      .modules-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="page-container">
+    <div class="page-header">
+      <div style="display:flex;align-items:center;gap:16px;">
+        <div class="brand-logo" style="width:56px;height:56px;flex-shrink:0;background:#fff;border-radius:10px;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(184,137,59,.2);border:2px solid #f4ead6;overflow:hidden;">
+          <img src="logo-vfi.jpg" alt="VFI Logo" style="width:90%;height:90%;object-fit:contain;" onerror="this.style.display='none';this.nextElementSibling.style.display='flex';" />
+          <span style="display:none;align-items:center;justify-content:center;width:100%;height:100%;font-family:'Fraunces',serif;font-weight:700;color:#b8893b;font-size:20px;">VFI</span>
+        </div>
+        <div>
+          <h1 id="caseName">Case Name</h1>
+          <p id="caseInfo">Loading case information...</p>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="btn btn-secondary" onclick="goBack()">Back to Cases</button>
+      </div>
+    </div>
+
+    <div class="case-summary" id="caseSummary"></div>
+
+    <div class="modules-section">
+      <h2>Analysis Modules</h2>
+      <div class="modules-grid" id="modulesGrid"></div>
+    </div>
+  </div>
+
+  <script src="api-client.js"></script>
+  <script>
+    const caseId = new URLSearchParams(window.location.search).get('id');
+
+    const modules = [
+      {
+        id: 'spousal',
+        title: 'Spousal Maintenance',
+        icon: '💰',
+        description: 'Analyze alimony/spousal support obligations and duration',
+        file: 'spousal.html'
+      },
+      {
+        id: 'child-support',
+        title: 'Child Support',
+        icon: '👶',
+        description: 'Calculate child support obligations using statutory guidelines',
+        file: 'child-support.html'
+      },
+      {
+        id: 'child-support-reimbursement',
+        title: 'CS Reimbursement Claim',
+        icon: '↺',
+        description: 'Track the 30% child-care reimbursement claim from temp orders through final hearing',
+        file: 'child-support-reimbursement.html'
+      },
+      {
+        id: 'afi',
+        title: 'AFI Discrepancy',
+        icon: '📊',
+        description: 'Analyze income discrepancies and imputation calculations',
+        file: 'afi.html'
+      },
+      {
+        id: 'equitable-distribution',
+        title: 'Equitable Distribution',
+        icon: '⚖️',
+        description: 'Divide assets and liabilities between parties',
+        file: 'equitable-distribution.html'
+      },
+      {
+        id: 'income-imputation',
+        title: 'Income Imputation',
+        icon: '💼',
+        description: 'Determine earning capacity and imputed income',
+        file: 'income-imputation.html'
+      },
+      {
+        id: 'forensic-tracing',
+        title: 'Forensic Tracing',
+        icon: '🔍',
+        description: 'Trace separate property and community property origins',
+        file: 'forensic-tracing.html'
+      },
+      {
+        id: 'red-flags',
+        title: 'Red-Flag Detection',
+        icon: '🚩',
+        description: 'Identify discrepancies and areas requiring investigation',
+        file: 'red-flags.html'
+      },
+      {
+        id: 'discovery',
+        title: 'Discovery Intake',
+        icon: '📋',
+        description: 'Organize discovery requests and document requests',
+        file: 'discovery-intake.html'
+      },
+      {
+        id: 'estate',
+        title: 'Estate Analysis',
+        icon: '🏠',
+        description: 'Analyze inheritance and estate planning issues',
+        file: 'estate.html'
+      },
+      {
+        id: 'owes-to',
+        title: 'Owes-To Analysis',
+        icon: '📝',
+        description: 'Calculate money owed to/from third parties',
+        file: 'owes.html'
+      },
+      {
+        id: 'settlement',
+        title: 'Settlement Modeling',
+        icon: '🤝',
+        description: 'Model settlement scenarios and compare outcomes',
+        file: 'settlement.html'
+      },
+      {
+        id: 'export',
+        title: 'Export & Reports',
+        icon: '📄',
+        description: 'Generate comprehensive case reports and export data',
+        file: 'export.html'
+      }
+    ];
+
+    async function loadCaseDetail() {
+      if (!caseId) {
+        alert('No case selected');
+        window.location.href = 'cases.html';
+        return;
+      }
+
+      try {
+        if (!api.isAuthenticated()) {
+          window.location.href = 'auth.html';
+          return;
+        }
+
+        const response = await fetch(`http://localhost:5000/api/cases/${caseId}`, {
+          headers: {
+            'Authorization': `Bearer ${api.getToken()}`,
+          }
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to load case');
+        }
+
+        const caseData = await response.json();
+
+        // Set case name
+        document.getElementById('caseName').textContent = caseData.name;
+        document.getElementById('caseInfo').textContent =
+          `${caseData.petitioner} v. ${caseData.respondent} — ${caseData.county}, ${caseData.state}`;
+
+        // Build summary cards
+        const summary = document.getElementById('caseSummary');
+        summary.innerHTML = `
+          <div class="summary-card">
+            <h4>Petitioner</h4>
+            <p>${caseData.petitioner} (Age ${caseData.petitionerAge})</p>
+          </div>
+          <div class="summary-card">
+            <h4>Respondent</h4>
+            <p>${caseData.respondent} (Age ${caseData.respondentAge})</p>
+          </div>
+          <div class="summary-card">
+            <h4>Marriage Duration</h4>
+            <p>${caseData.marriageLength.toFixed(1)} years</p>
+          </div>
+          <div class="summary-card">
+            <h4>Children</h4>
+            <p>${caseData.childrenCount || 0} child${caseData.childrenCount !== 1 ? 'ren' : ''}</p>
+          </div>
+          <div class="summary-card">
+            <h4>Case Status</h4>
+            <p style="text-transform: capitalize;">${caseData.status}</p>
+          </div>
+          <div class="summary-card">
+            <h4>Court</h4>
+            <p>${caseData.court}, ${caseData.county} County</p>
+          </div>
+        `;
+
+        // Build modules grid
+        const grid = document.getElementById('modulesGrid');
+        grid.innerHTML = modules.map(mod => `
+          <a href="${mod.file}?caseId=${caseId}" class="module-card">
+            <div class="module-icon">${mod.icon}</div>
+            <div class="module-title">${mod.title}</div>
+            <div class="module-description">${mod.description}</div>
+            <div class="module-status status-pending">Start Analysis</div>
+          </a>
+        `).join('');
+
+      } catch (err) {
+        console.error('Error loading case:', err);
+        alert('Error loading case: ' + err.message);
+        window.location.href = 'cases.html';
+      }
+    }
+
+    function goBack() {
+      window.location.href = 'cases.html';
+    }
+
+    document.addEventListener('DOMContentLoaded', loadCaseDetail);
+  </script>
+  <script src="logo-handler.js"></script>
+</body>
+</html>

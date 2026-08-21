@@ -1,0 +1,1330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Asset Division Valuation - Veritas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="stylesheet" href="ai-chat-widget.css" />
+  <style>
+    .asset-container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    .asset-header {
+      background: linear-gradient(135deg, #2e5b8a 0%, #1f5f9d 100%);
+      color: white;
+      padding: 40px 20px;
+      margin: -20px -20px 40px -20px;
+      border-radius: 0;
+    }
+
+    .asset-title {
+      font-size: 32px;
+      font-weight: 700;
+      margin-bottom: 8px;
+    }
+
+    .asset-subtitle {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    .division-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 30px;
+      margin-bottom: 40px;
+    }
+
+    .party-column {
+      background: white;
+      border-radius: 8px;
+      padding: 24px;
+      border: 2px solid #e5e0d5;
+    }
+
+    .party-header {
+      font-size: 18px;
+      font-weight: 700;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 3px solid #2e5b8a;
+      color: #2e5b8a;
+    }
+
+    .asset-card {
+      background: #f9f9f9;
+      border: 1px solid #e5e0d5;
+      border-radius: 6px;
+      padding: 16px;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .asset-info {
+      flex: 1;
+    }
+
+    .asset-name {
+      font-weight: 600;
+      color: #333;
+      font-size: 14px;
+    }
+
+    .asset-category {
+      font-size: 12px;
+      color: #999;
+      margin-top: 4px;
+    }
+
+    .asset-value {
+      font-size: 16px;
+      font-weight: 700;
+      color: #2e5b8a;
+      text-align: right;
+      min-width: 120px;
+    }
+
+    .asset-input-section {
+      background: white;
+      border-radius: 8px;
+      padding: 24px;
+      border: 1px solid #e5e0d5;
+      margin-bottom: 30px;
+    }
+
+    .section-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #e5e0d5;
+    }
+
+    .form-group {
+      margin-bottom: 16px;
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr 1fr;
+      gap: 12px;
+      align-items: end;
+    }
+
+    .form-group.full {
+      grid-template-columns: 1fr;
+    }
+
+    .form-field {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .form-label {
+      font-size: 12px;
+      font-weight: 600;
+      color: #666;
+      margin-bottom: 6px;
+    }
+
+    .form-input {
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 10px;
+      font-size: 14px;
+      font-family: 'Inter', sans-serif;
+    }
+
+    .form-select {
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      padding: 10px;
+      font-size: 14px;
+      background: white;
+      cursor: pointer;
+    }
+
+    .form-button {
+      background: #2e5b8a;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      padding: 10px 16px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 13px;
+      transition: background 0.2s;
+    }
+
+    .form-button:hover {
+      background: #1f5f9d;
+    }
+
+    .summary-card {
+      background: white;
+      border-radius: 8px;
+      padding: 24px;
+      border: 1px solid #e5e0d5;
+      margin-bottom: 30px;
+    }
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 14px;
+    }
+
+    .summary-row.total {
+      border-bottom: 2px solid #2e5b8a;
+      font-weight: 700;
+      padding-top: 12px;
+      margin-top: 12px;
+      color: #2e5b8a;
+    }
+
+    .summary-label {
+      color: #666;
+    }
+
+    .summary-value {
+      font-weight: 600;
+      color: #333;
+    }
+
+    .balance-section {
+      background: linear-gradient(135deg, #f0f4f8 0%, #e8f0f7 100%);
+      border-radius: 8px;
+      padding: 24px;
+      border: 2px solid #2e5b8a;
+      margin-bottom: 30px;
+    }
+
+    .balance-title {
+      font-size: 18px;
+      font-weight: 700;
+      color: #2e5b8a;
+      margin-bottom: 16px;
+    }
+
+    .balance-result {
+      background: white;
+      border-radius: 6px;
+      padding: 20px;
+      text-align: center;
+      border: 2px solid #2e5b8a;
+    }
+
+    .balance-amount {
+      font-size: 32px;
+      font-weight: 700;
+      color: #2e5b8a;
+      margin-bottom: 8px;
+    }
+
+    .balance-text {
+      font-size: 14px;
+      color: #666;
+    }
+
+    .tab-section {
+      background: white;
+      border-radius: 8px;
+      border: 1px solid #e5e0d5;
+      margin-bottom: 30px;
+      overflow: hidden;
+    }
+
+    .tab-buttons {
+      display: flex;
+      background: #f9f9f9;
+      border-bottom: 2px solid #e5e0d5;
+    }
+
+    .tab-button {
+      flex: 1;
+      padding: 16px;
+      border: none;
+      background: #f9f9f9;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 13px;
+      color: #666;
+      border-bottom: 3px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .tab-button.active {
+      color: #2e5b8a;
+      border-bottom-color: #2e5b8a;
+      background: white;
+    }
+
+    .tab-content {
+      padding: 24px;
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .tax-implication {
+      background: #fff8e1;
+      border-left: 4px solid #ffc107;
+      padding: 16px;
+      margin-bottom: 16px;
+      border-radius: 4px;
+    }
+
+    .tax-title {
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 8px;
+    }
+
+    .tax-content {
+      font-size: 13px;
+      color: #666;
+      line-height: 1.6;
+    }
+
+    .tax-research {
+      background: #e3f2fd;
+      border-left: 4px solid #2196f3;
+      padding: 16px;
+      margin-bottom: 16px;
+      border-radius: 4px;
+    }
+
+    .research-title {
+      font-weight: 700;
+      color: #1565c0;
+      margin-bottom: 8px;
+    }
+
+    .research-link {
+      color: #1565c0;
+      text-decoration: none;
+      font-size: 13px;
+      margin-top: 8px;
+      display: inline-block;
+    }
+
+    .research-link:hover {
+      text-decoration: underline;
+    }
+
+    .scenario-section {
+      background: white;
+      border-radius: 8px;
+      padding: 24px;
+      border: 1px solid #e5e0d5;
+      margin-bottom: 30px;
+    }
+
+    .scenario-controls {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .scenario-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr;
+      gap: 16px;
+      padding: 16px;
+      background: #f9f9f9;
+      border-radius: 6px;
+      margin-bottom: 12px;
+      align-items: center;
+    }
+
+    .export-buttons {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 30px;
+    }
+
+    .btn-primary {
+      background: #2e5b8a;
+      color: white;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+      transition: background 0.2s;
+    }
+
+    .btn-primary:hover {
+      background: #1f5f9d;
+    }
+
+    .btn-secondary {
+      background: #f0f0f0;
+      color: #333;
+      padding: 12px 24px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+
+    .btn-secondary:hover {
+      background: #e5e5e5;
+    }
+
+    .kpi-row {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    .kpi-card {
+      background: white;
+      border-radius: 8px;
+      padding: 20px;
+      border: 1px solid #e5e0d5;
+      text-align: center;
+    }
+
+    .kpi-value {
+      font-size: 28px;
+      font-weight: 700;
+      color: #2e5b8a;
+      margin-bottom: 8px;
+    }
+
+    .kpi-label {
+      font-size: 12px;
+      color: #666;
+      font-weight: 600;
+    }
+
+    @media (max-width: 1024px) {
+      .division-grid {
+        grid-template-columns: 1fr;
+      }
+      .scenario-controls {
+        grid-template-columns: 1fr;
+      }
+      .scenario-row {
+        grid-template-columns: 1fr;
+      }
+      .kpi-row {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .form-group {
+        grid-template-columns: 1fr;
+      }
+      .kpi-row {
+        grid-template-columns: 1fr;
+      }
+      .tab-buttons {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- ===================== SIDEBAR ===================== -->
+  <aside class="sidebar">
+    <div class="sidebar-head">
+      <div class="logo-section">
+        <span class="logo-text">⚖️ VERITAS</span>
+        <span class="logo-sub">Legal Intelligence</span>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <div class="nav-group-label">Workspace</div>
+      <a class="nav-item" href="index.html"><span class="nav-ico">📊</span> Dashboard</a>
+      <a class="nav-item" href="document-hub-master.html"><span class="nav-ico">📁</span> Document Hub</a>
+
+      <div class="nav-group-label">Analysis Modules</div>
+      <a class="nav-item" href="afi.html"><span class="nav-ico">📋</span> AFI Discrepancy</a>
+      <a class="nav-item" href="asset-division-valuation.html" class="active"><span class="nav-ico">💰</span> Asset Division</a>
+      <a class="nav-item" href="spousal.html"><span class="nav-ico">👥</span> Spousal Support</a>
+      <a class="nav-item" href="credits.html"><span class="nav-ico">✏️</span> Credits & Adjustments</a>
+
+      <div class="nav-group-label">Tools</div>
+      <a class="nav-item" href="document-hub-master.html" data-module="document-hub"><span class="nav-ico">📁</span> Document Hub</a>
+      <a class="nav-item" href="estate.html"><span class="nav-ico">▧</span> Reports</a>
+      <a class="nav-item" href="forensic-tracing.html"><span class="nav-ico">⌕</span> Forensic Tracing</a>
+      <a class="nav-item" href="settlement.html"><span class="nav-ico">⇄</span> Settlement Modeling</a>
+      <a class="nav-item" href="regulations.html"><span class="nav-ico">⚖</span> Regulations</a>
+      <a class="nav-item" href="equitable-distribution.html"><span class="nav-ico">§</span> Prenup Module</a>
+      <a class="nav-item" href="discovery-intake.html"><span class="nav-ico">⤓</span> Document Intake</a>
+      <a class="nav-item" href="discovery-intake.html"><span class="nav-ico">◉</span> Compliance</a>
+      <a class="nav-item" href="red-flags.html"><span class="nav-ico">🚩</span> Red-Flag Detection</a>
+    </nav>
+
+    <div class="sidebar-foot">
+      <div class="plan-chip"><span style="color:var(--green)">●</span> Secure Connection · encrypted &amp; confidential</div>
+    </div>
+  </aside>
+
+  <!-- ===================== MAIN ===================== -->
+  <main class="main">
+    <header class="topbar">
+      <div class="matter-switcher">
+        <span class="matter-label">Active Matter</span>
+        <button class="matter-btn">
+          <strong>Matter v. Case</strong>
+          <span class="case-no">Community Property Division</span>
+          <span class="chev"></span>
+        </button>
+      </div>
+      <div class="topbar-right">
+        <div class="user">
+          <div class="avatar">WU</div>
+          <div class="user-meta">
+            <span class="user-name">Workspace User</span>
+            <span class="user-role">Matter Name</span>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div class="asset-container">
+      <!-- Header -->
+      <div class="asset-header">
+        <div>
+          <h1 class="asset-title">💰 Asset Division Valuation</h1>
+          <p class="asset-subtitle">Community property asset and liability allocation with tax implications analysis and equalization calculation</p>
+        </div>
+      </div>
+
+      <!-- Export & Actions -->
+      <div class="export-buttons">
+        <button class="btn-primary" onclick="exportToPDF()">📄 Export PDF Report</button>
+        <button class="btn-secondary" onclick="exportToJSON()">📊 Export JSON Data</button>
+        <button class="btn-secondary" onclick="printReport()">🖨️ Print Report</button>
+        <button class="btn-secondary" onclick="resetData()">🔄 Clear All Data</button>
+      </div>
+
+      <!-- KPI Summary -->
+      <div class="kpi-row" id="kpiRow">
+        <div class="kpi-card">
+          <div class="kpi-value" id="totalAssetsKPI">$0</div>
+          <div class="kpi-label">Total Community Assets</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-value" id="totalDebtsKPI">$0</div>
+          <div class="kpi-label">Total Community Debts</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-value" id="netAssetsKPI">$0</div>
+          <div class="kpi-label">Net Community Estate</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-value" id="equalShareKPI">$0</div>
+          <div class="kpi-label">50/50 Equal Share</div>
+        </div>
+      </div>
+
+      <!-- Asset Input Section -->
+      <div class="asset-input-section">
+        <div class="section-title">📥 Import Assets & Liabilities</div>
+
+        <div class="form-group full">
+          <button class="form-button" onclick="importFromDocumentHub()">📁 Import from Document Hub</button>
+          <button class="form-button" onclick="showAssetForm()">➕ Add Asset Manually</button>
+          <button class="form-button" onclick="showLiabilityForm()">➕ Add Liability Manually</button>
+        </div>
+
+        <div id="assetFormContainer" style="display:none; margin-top: 20px; padding-top: 20px; border-top: 2px solid #e5e0d5;">
+          <h3 style="font-size: 14px; font-weight: 700; margin-bottom: 16px;">Add Asset</h3>
+
+          <div class="form-group">
+            <div class="form-field">
+              <label class="form-label">Asset Name</label>
+              <input type="text" class="form-input" id="assetName" placeholder="e.g., Primary Residence, Bank Account, 401k">
+            </div>
+            <div class="form-field">
+              <label class="form-label">Category</label>
+              <select class="form-select" id="assetCategory">
+                <option value="Real Estate">Real Estate</option>
+                <option value="Bank Accounts">Bank Accounts</option>
+                <option value="Investments">Investments</option>
+                <option value="Retirement">Retirement (401k/IRA)</option>
+                <option value="Pension">Pension</option>
+                <option value="Vehicles">Vehicles</option>
+                <option value="Business">Business Interest</option>
+                <option value="Personal Property">Personal Property</option>
+                <option value="Other">Other Assets</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label class="form-label">Current Value</label>
+              <input type="number" class="form-input" id="assetValue" placeholder="0.00" step="0.01">
+            </div>
+            <div class="form-field">
+              <label class="form-label">Assign To</label>
+              <select class="form-select" id="assetOwner">
+                <option value="joint">Joint/Community</option>
+                <option value="party1">Party A</option>
+                <option value="party2">Party B</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group full">
+            <div class="form-field">
+              <label class="form-label">Notes (Valuation Date, Source, etc.)</label>
+              <textarea class="form-input" id="assetNotes" placeholder="e.g., Appraised 8/1/2026, Zillow estimate" style="min-height: 60px;"></textarea>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 12px;">
+            <button class="form-button" onclick="addAsset()">✓ Add Asset</button>
+            <button class="form-button" style="background: #999;" onclick="hideAssetForm()">Cancel</button>
+          </div>
+        </div>
+
+        <div id="liabilityFormContainer" style="display:none; margin-top: 20px; padding-top: 20px; border-top: 2px solid #e5e0d5;">
+          <h3 style="font-size: 14px; font-weight: 700; margin-bottom: 16px;">Add Liability</h3>
+
+          <div class="form-group">
+            <div class="form-field">
+              <label class="form-label">Liability Name</label>
+              <input type="text" class="form-input" id="liabilityName" placeholder="e.g., Mortgage, Credit Card, Auto Loan">
+            </div>
+            <div class="form-field">
+              <label class="form-label">Category</label>
+              <select class="form-select" id="liabilityCategory">
+                <option value="Mortgage">Mortgage</option>
+                <option value="Credit Card">Credit Card</option>
+                <option value="Auto Loan">Auto Loan</option>
+                <option value="Personal Loan">Personal Loan</option>
+                <option value="Student Loan">Student Loan</option>
+                <option value="Business Debt">Business Debt</option>
+                <option value="Other">Other Debt</option>
+              </select>
+            </div>
+            <div class="form-field">
+              <label class="form-label">Balance Owed</label>
+              <input type="number" class="form-input" id="liabilityValue" placeholder="0.00" step="0.01">
+            </div>
+            <div class="form-field">
+              <label class="form-label">Assign To</label>
+              <select class="form-select" id="liabilityOwner">
+                <option value="joint">Joint/Community</option>
+                <option value="party1">Party A</option>
+                <option value="party2">Party B</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group full">
+            <div class="form-field">
+              <label class="form-label">Notes (Creditor, Rate, Payment, etc.)</label>
+              <textarea class="form-input" id="liabilityNotes" placeholder="e.g., Bank of America, 5.2% APR, $2,500/mo" style="min-height: 60px;"></textarea>
+            </div>
+          </div>
+
+          <div style="display: flex; gap: 12px;">
+            <button class="form-button" onclick="addLiability()">✓ Add Liability</button>
+            <button class="form-button" style="background: #999;" onclick="hideLiabilityForm()">Cancel</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Asset Division Summary -->
+      <div class="division-grid" id="divisionGrid">
+        <div class="party-column">
+          <div class="party-header">💼 Party A Assets & Debts</div>
+          <div id="party1Assets"></div>
+          <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid #e5e0d5;">
+            <div class="summary-row total">
+              <div class="summary-label">Total Assets</div>
+              <div class="summary-value" id="party1AssetTotal">$0</div>
+            </div>
+            <div class="summary-row total">
+              <div class="summary-label">Total Debts</div>
+              <div class="summary-value" id="party1DebtTotal">$0</div>
+            </div>
+            <div class="summary-row total" style="color: #2e7d32; border-color: #2e7d32;">
+              <div class="summary-label">NET VALUE</div>
+              <div class="summary-value" id="party1NetValue">$0</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="party-column">
+          <div class="party-header">💼 Party B Assets & Debts</div>
+          <div id="party2Assets"></div>
+          <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid #e5e0d5;">
+            <div class="summary-row total">
+              <div class="summary-label">Total Assets</div>
+              <div class="summary-value" id="party2AssetTotal">$0</div>
+            </div>
+            <div class="summary-row total">
+              <div class="summary-label">Total Debts</div>
+              <div class="summary-value" id="party2DebtTotal">$0</div>
+            </div>
+            <div class="summary-row total" style="color: #2e7d32; border-color: #2e7d32;">
+              <div class="summary-label">NET VALUE</div>
+              <div class="summary-value" id="party2NetValue">$0</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Equalization Calculation -->
+      <div class="balance-section" id="balanceSection" style="display:none;">
+        <div class="balance-title">⚖️ Equalization Calculation</div>
+        <div class="balance-result">
+          <div class="balance-amount" id="balanceAmount">$0</div>
+          <div class="balance-text" id="balanceText">Enter assets and liabilities to calculate equalization payment</div>
+        </div>
+      </div>
+
+      <!-- Tax Implications & Research -->
+      <div class="tab-section">
+        <div class="tab-buttons">
+          <button class="tab-button active" onclick="switchTab('retirement')">🏛️ Retirement & Pension</button>
+          <button class="tab-button" onclick="switchTab('realestate')">🏠 Real Estate</button>
+          <button class="tab-button" onclick="switchTab('investments')">📈 Investments</button>
+          <button class="tab-button" onclick="switchTab('business')">🏢 Business Interests</button>
+          <button class="tab-button" onclick="switchTab('other')">📋 Other Assets</button>
+        </div>
+
+        <!-- Retirement Tab -->
+        <div id="retirement" class="tab-content active">
+          <div class="section-title">Retirement Accounts & Pensions - Tax Implications</div>
+
+          <div class="tax-implication">
+            <div class="tax-title">401(k) Division (QDRO Required)</div>
+            <div class="tax-content">
+              <strong>Tax Implications:</strong><br>
+              • Direct QDRO transfer = NO immediate tax<br>
+              • Receiving spouse: No tax until withdrawal<br>
+              • Rollovers to IRA available (defer taxation)<br>
+              • Early withdrawal (before 59½) = 10% penalty + income tax (unless QDRO exception)<br>
+              • Requires Qualified Domestic Relations Order (QDRO)<br><br>
+              <strong>Recommendation:</strong> Use QDRO to avoid immediate taxation. Receiving spouse can roll over to Traditional or Roth IRA for continued tax deferral.
+            </div>
+          </div>
+
+          <div class="tax-implication">
+            <div class="tax-title">IRA Division (Spousal Rollover)</div>
+            <div class="tax-content">
+              <strong>Tax Implications:</strong><br>
+              • Direct transfer (not rollover) = NO immediate tax<br>
+              • Receiving spouse: Treats as own IRA<br>
+              • No RMDs until reaching age 73 (SECURE 2.0)<br>
+              • Early withdrawal (before 59½) = 10% penalty + income tax<br>
+              • Exception: Up to $35,000 can be rolled to Roth (penalty-free)<br><br>
+              <strong>Recommendation:</strong> Use trustee-to-trustee transfer to avoid withholding. Consider Roth conversion for tax planning.
+            </div>
+          </div>
+
+          <div class="tax-implication">
+            <div class="tax-title">Pension Division (QDRO)</div>
+            <div class="tax-content">
+              <strong>Tax Implications:</strong><br>
+              • QDRO creates separate payee for alternate payee<br>
+              • Distributions taxed to receiving spouse only<br>
+              • No early withdrawal penalty with QDRO<br>
+              • Lump sum options may have different tax treatments<br>
+              • Survivor benefits must be addressed<br><br>
+              <strong>Recommendation:</strong> Determine lump sum value (QDRO will require actuary). Consider present value vs. future payment stream. Survivor benefits critical for younger spouses.
+            </div>
+          </div>
+
+          <div class="tax-research">
+            <div class="research-title">📚 Research Resources</div>
+            <p style="font-size: 13px; color: #666; margin-bottom: 8px;">
+              For detailed guidance on retirement division:
+            </p>
+            <a href="#" class="research-link">IRS: Retirement Plans & Divorce (Publication 575)</a><br>
+            <a href="#" class="research-link">QDRO: Qualified Domestic Relations Orders (IRS.gov)</a><br>
+            <a href="#" class="research-link">Spousal IRA Rollovers (IRS.gov)</a><br>
+            <a href="#" class="research-link">Early Withdrawal Penalties & Exceptions (IRS.gov)</a>
+          </div>
+        </div>
+
+        <!-- Real Estate Tab -->
+        <div id="realestate" class="tab-content">
+          <div class="section-title">Real Estate - Tax Implications</div>
+
+          <div class="tax-implication">
+            <div class="tax-title">Primary Residence Transfer</div>
+            <div class="tax-content">
+              <strong>Tax Implications:</strong><br>
+              • No immediate capital gains tax on transfer (§1041 exchange)<br>
+              • Receiving spouse receives stepped-up basis for appreciation<br>
+              • If sold later: Only gain AFTER divorce taxed (at preferential rates if <$250k single / $500k joint)<br>
+              • Mortgage interest & property tax deductions continue<br>
+              • Transfer cannot trigger "due on sale" clause (divorce exception)<br><br>
+              <strong>Recommendation:</strong> Primary residence transfers are VERY tax-efficient. Ensure title transfer is done correctly to avoid issues. Document stepped-up basis calculation.
+            </div>
+          </div>
+
+          <div class="tax-implication">
+            <div class="tax-title">Rental Property / Investment Real Estate</div>
+            <div class="tax-content">
+              <strong>Tax Implications:</strong><br>
+              • §1041 applies: No tax on transfer in divorce<br>
+              • Receiving spouse takes over depreciation recapture liability<br>
+              • Depreciation claimed will be recaptured (25% rate) on future sale<br>
+              • Basis adjustments important for both parties<br>
+              • Mortgage interest deductions transfer with property<br><br>
+              <strong>Recommendation:</strong> Calculate depreciation recapture liability for balance sheet. Consider who should receive property based on future tax implications. Update Form 4797 records.
+            </div>
+          </div>
+
+          <div class="tax-implication">
+            <div class="tax-title">Vacation Home / Second Home</div>
+            <div class="tax-content">
+              <strong>Tax Implications:</strong><br>
+              • §1041 applies: No transfer tax in divorce<br>
+              • If used as rental: Depreciation recapture applies<br>
+              • If used personally: Capital gains treatment on appreciation<br>
+              • Mortgage interest only deductible if primary residence or one other home<br>
+              • State transfer taxes may apply (state law dependent)<br><br>
+              <strong>Recommendation:</strong> Clarify intended use after divorce. Consider mortgage interest deduction implications if receiving spouse doesn't have another deductible home.
+            </div>
+          </div>
+
+          <div class="tax-research">
+            <div class="research-title">📚 Research Resources</div>
+            <p style="font-size: 13px; color: #666; margin-bottom: 8px;">
+              For detailed guidance on real estate division:
+            </p>
+            <a href="#" class="research-link">§1041 Exchange Treatment in Divorce (IRS.gov)</a><br>
+            <a href="#" class="research-link">Capital Gains Exclusion (Up to $250k Single)</a><br>
+            <a href="#" class="research-link">Depreciation Recapture on Rental Property</a><br>
+            <a href="#" class="research-link">State Transfer Tax Implications</a>
+          </div>
+        </div>
+
+        <!-- Investments Tab -->
+        <div id="investments" class="tab-content">
+          <div class="section-title">Investment Accounts - Tax Implications</div>
+
+          <div class="tax-implication">
+            <div class="tax-title">Brokerage Account Transfer</div>
+            <div class="tax-content">
+              <strong>Tax Implications:</strong><br>
+              • §1041 applies: No recognition of gain/loss on transfer<br>
+              • Basis carries over (no stepped-up basis)<br>
+              • Receiving spouse inherits capital gain liabilities<br>
+              • Unrealized gains will be taxed when receiving spouse sells<br>
+              • Dividend/interest income transfers to receiving spouse<br><br>
+              <strong>Recommendation:</strong> Calculate unrealized gain liabilities for each security. Consider tax-loss harvesting opportunities. Document cost basis for future sales.
+            </div>
+          </div>
+
+          <div class="tax-implication">
+            <div class="tax-title">Mutual Fund Distribution During Divorce</div>
+            <div class="tax-content">
+              <strong>Tax Implications:</strong><br>
+              • Distributions during divorce year taxed to original owner<br>
+              • After transfer: Distributions taxed to receiving spouse<br>
+              • Reinvested dividends create new basis lots<br>
+              • Capital gains distributions = ordinary income<br>
+              • Careful timing of transfer important for tax efficiency<br><br>
+              <strong>Recommendation:</strong> Time transfer to avoid mid-year distributions. Track dividend reinvestment for basis calculations. Consider market conditions timing.
+            </div>
+          </div>
+
+          <div class="tax-implication">
+            <div class="tax-title">Stock Options & Restricted Stock Units (RSUs)</div>
+            <div class="tax-content">
+              <strong>Tax Implications:</strong><br>
+              • Complex valuation issues (vesting vs. unvested)<br>
+              • Unvested options: Typically $0 value in division<br>
+              • Vested options: Valued at fair market value<br>
+              • RSUs: Taxed as ordinary income when vested<br>
+              • QDRO may be required for plan division<br>
+              • Timing of exercise/vesting affects taxation<br><br>
+              <strong>Recommendation:</strong> Obtain valuation from company. Use QDRO if applicable. Consider tax implications of exercise timing. May want offsetting compensation.
+            </div>
+          </div>
+
+          <div class="tax-research">
+            <div class="research-title">📚 Research Resources</div>
+            <p style="font-size: 13px; color: #666; margin-bottom: 8px;">
+              For detailed guidance on investment division:
+            </p>
+            <a href="#" class="research-link">§1041 Property Exchange (IRC §1041)</a><br>
+            <a href="#" class="research-link">Basis Carry-Over in Divorce</a><br>
+            <a href="#" class="research-link">Capital Gains Tax Rates (2026)</a><br>
+            <a href="#" class="research-link">Unrealized Gain Tracking</a>
+          </div>
+        </div>
+
+        <!-- Business Tab -->
+        <div id="business" class="tab-content">
+          <div class="section-title">Business Interests - Tax Implications</div>
+
+          <div class="tax-implication">
+            <div class="tax-title">S-Corp / C-Corp Stock Division</div>
+            <div class="tax-content">
+              <strong>Tax Implications:</strong><br>
+              • §1041 applies: No gain/loss on transfer<br>
+              • Basis carries over to receiving spouse<br>
+              • S-Corp: Receiving spouse becomes shareholder (K-1 reporting)<br>
+              • C-Corp: Dividends taxed at corporate + individual level<br>
+              • Stock redemption: May trigger tax on corporation/spouse<br>
+              • Consider operating agreement restrictions<br><br>
+              <strong>Recommendation:</strong> Obtain professional business valuation. Review operating agreement for buyout provisions. Consider recapture taxation.
+            </div>
+          </div>
+
+          <div class="tax-implication">
+            <div class="tax-title">Partnership Interest Division</div>
+            <div class="tax-content">
+              <strong>Tax Implications:</strong><br>
+              • §1041 applies: Transfer not taxable event<br>
+              • Receiving spouse becomes partner (K-1 reporting)<br>
+              • Allocations of income/loss transfer with interest<br>
+              • Liabilities of partnership transfer (at-risk limitation)<br>
+              • Unrealized receivables: Ordinary income treatment<br>
+              • Goodwill: Capital gain treatment<br><br>
+              <strong>Recommendation:</strong> Obtain K-1 history. Calculate unrealized receivables separately. Consider cash flow impact on both parties. May require partnership agreement amendment.
+            </div>
+          </div>
+
+          <div class="tax-implication">
+            <div class="tax-title">LLC / Sole Proprietorship Transfer</div>
+            <div class="tax-content">
+              <strong>Tax Implications:</strong><br>
+              • §1041 applies: No immediate tax on transfer<br>
+              • Operating assets: Basis carries over<br>
+              • Goodwill: May be valued separately<br>
+              • Schedule C income/expenses transfer with business<br>
+              • Self-employment tax implications<br>
+              • Working capital adjustments needed<br><br>
+              <strong>Recommendation:</strong> Professional business valuation essential. Include tangible assets, inventory, customer lists, goodwill. Consider who can operate business. May need operating agreement amendment.
+            </div>
+          </div>
+
+          <div class="tax-research">
+            <div class="research-title">📚 Research Resources</div>
+            <p style="font-size: 13px; color: #666; margin-bottom: 8px;">
+              For detailed guidance on business division:
+            </p>
+            <a href="#" class="research-link">Business Valuation Methods (Revenue Approach, Market, Cost)</a><br>
+            <a href="#" class="research-link">S-Corp Election & Shareholder Basis</a><br>
+            <a href="#" class="research-link">Partnership K-1 Reporting (Schedule K-1)</a><br>
+            <a href="#" class="research-link">Goodwill & Intangible Asset Valuation</a>
+          </div>
+        </div>
+
+        <!-- Other Tab -->
+        <div id="other" class="tab-content">
+          <div class="section-title">Other Assets - Tax Implications</div>
+
+          <div class="tax-implication">
+            <div class="tax-title">Life Insurance Cash Value</div>
+            <div class="tax-content">
+              <strong>Tax Implications:</strong><br>
+              • §1041 applies: No tax on transfer in divorce<br>
+              • Receiving spouse takes over tax basis<br>
+              • Surrender charges (company policy dependent)<br>
+              • Death benefits receive income tax exemption<br>
+              • Basis increases with premiums paid<br>
+              • Cash value subject to creditor claims<br><br>
+              <strong>Recommendation:</strong> Obtain policy illustration showing current cash value, death benefit, and surrender costs. Consider who maintains policy. Insurance trust planning may be needed.
+            </div>
+          </div>
+
+          <div class="tax-implication">
+            <div class="tax-title">Collectibles & Personal Property</div>
+            <div class="tax-content">
+              <strong>Tax Implications:</strong><br>
+              • §1041 applies: No tax on transfer<br>
+              • Basis carries over for future sales<br>
+              • Collectibles taxed at 28% rate (vs. 15-20% for investments)<br>
+              • Valuation may be challenging (professional appraisal needed)<br>
+              • Depreciation: Not allowed on personal use property<br>
+              • Art/Antiques: Professional valuation recommended<br><br>
+              <strong>Recommendation:</strong> Professional appraisals for valuable items. Keep documentation for basis. Consider collectible taxation rates (28%) when dividing. Condition/authenticity critical.
+            </div>
+          </div>
+
+          <div class="tax-implication">
+            <div class="tax-title">Accounts Receivable / Contingent Assets</div>
+            <div class="tax-content">
+              <strong>Tax Implications:</strong><br>
+              • §1041 applies: No transfer tax<br>
+              • Receivables taxed as ordinary income when collected<br>
+              • Contingent assets: Valued at settlement date<br>
+              • Lawsuit settlements: May have tax consequences<br>
+              • Bonus/deferred compensation: Income tax to recipient<br>
+              • Goodwill from business transition<br><br>
+              <strong>Recommendation:</strong> Carefully value contingent assets. Consider timing of receipt. Tax treatment of various proceeds types. May need escrow for uncertain amounts.
+            </div>
+          </div>
+
+          <div class="tax-research">
+            <div class="research-title">📚 Research Resources</div>
+            <p style="font-size: 13px; color: #666; margin-bottom: 8px;">
+              For detailed guidance on other assets:
+            </p>
+            <a href="#" class="research-link">Life Insurance Policy Valuation</a><br>
+            <a href="#" class="research-link">Collectible Tax Rate (28% vs. 15-20%)</a><br>
+            <a href="#" class="research-link">Professional Appraisal Standards (ASA)</a><br>
+            <a href="#" class="research-link">Contingent Asset Valuation</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Scenario Comparison -->
+      <div class="scenario-section">
+        <div class="section-title">📊 Division Scenario Comparison</div>
+
+        <div class="scenario-controls">
+          <div class="form-field">
+            <label class="form-label">Division Method</label>
+            <select class="form-select" id="scenarioMethod" onchange="updateScenarios()">
+              <option value="50-50">50/50 Equal Split</option>
+              <option value="custom">Custom Percentage</option>
+              <option value="specific">Specific Asset Assignment</option>
+            </select>
+          </div>
+          <div class="form-field" id="customPercentField" style="display:none;">
+            <label class="form-label">Party A %</label>
+            <input type="number" class="form-input" id="party1Percent" value="50" min="0" max="100" onchange="updateScenarios()">
+          </div>
+          <div class="form-field">
+            <button class="form-button" onclick="updateScenarios()">🔄 Calculate Scenarios</button>
+          </div>
+        </div>
+
+        <div id="scenarioResults"></div>
+      </div>
+
+      <!-- Summary & Recommendations -->
+      <div class="summary-card">
+        <div class="section-title">📋 Summary & Recommendations</div>
+
+        <div class="summary-row">
+          <div class="summary-label">Total Community Assets</div>
+          <div class="summary-value" id="summaryAssets">$0</div>
+        </div>
+        <div class="summary-row">
+          <div class="summary-label">Total Community Debts</div>
+          <div class="summary-value" id="summaryDebts">$0</div>
+        </div>
+        <div class="summary-row total">
+          <div class="summary-label">NET ESTATE</div>
+          <div class="summary-value" id="summaryNet">$0</div>
+        </div>
+
+        <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid #e5e0d5;">
+          <p style="color: #666; line-height: 1.6; margin-bottom: 12px;">
+            <strong>Key Considerations:</strong><br>
+            • All transfers under §1041: No gain/loss on division<br>
+            • Tax liability depends on asset type and future sales<br>
+            • Retirement accounts (401k/IRA/Pension): QDRO required<br>
+            • Real estate: Stepped-up basis for appreciation<br>
+            • Investments: Basis carryover (unrealized gains transfer)<br>
+            • Business interests: Professional valuation essential<br>
+            • Cash adjustments can equalize after division<br>
+            • Spousal support affects tax calculations<br>
+          </p>
+        </div>
+
+        <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid #e5e0d5; background: #f0f4f8; padding: 16px; border-radius: 6px;">
+          <p style="color: #2e5b8a; font-weight: 600; margin-bottom: 8px;">⚠️ Consult CPA/Tax Advisor</p>
+          <p style="font-size: 13px; color: #666;">
+            This tool provides asset division framework and general tax information. Specific tax consequences should be reviewed with:
+            <br>• CPA or tax professional (tax implications)
+            <br>• Financial advisor (retirement planning)
+            <br>• Business appraiser (business valuations)
+            <br>• Real estate appraiser (property valuations)
+          </p>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    // Data Storage
+    const assetDivisionData = {
+      assets: [],
+      liabilities: [],
+      party1Name: 'Party A',
+      party2Name: 'Party B'
+    };
+
+    // Load from localStorage
+    function loadData() {
+      const saved = localStorage.getItem('assetDivisionData');
+      if (saved) {
+        Object.assign(assetDivisionData, JSON.parse(saved));
+        renderDivision();
+      }
+    }
+
+    // Save to localStorage
+    function saveData() {
+      localStorage.setItem('assetDivisionData', JSON.stringify(assetDivisionData));
+    }
+
+    // Show/Hide Forms
+    function showAssetForm() {
+      document.getElementById('assetFormContainer').style.display = 'block';
+      document.getElementById('liabilityFormContainer').style.display = 'none';
+    }
+
+    function hideAssetForm() {
+      document.getElementById('assetFormContainer').style.display = 'none';
+      document.getElementById('assetName').value = '';
+      document.getElementById('assetValue').value = '';
+      document.getElementById('assetNotes').value = '';
+    }
+
+    function showLiabilityForm() {
+      document.getElementById('liabilityFormContainer').style.display = 'block';
+      document.getElementById('assetFormContainer').style.display = 'none';
+    }
+
+    function hideLiabilityForm() {
+      document.getElementById('liabilityFormContainer').style.display = 'none';
+      document.getElementById('liabilityName').value = '';
+      document.getElementById('liabilityValue').value = '';
+      document.getElementById('liabilityNotes').value = '';
+    }
+
+    // Add Asset
+    function addAsset() {
+      const asset = {
+        id: Date.now(),
+        name: document.getElementById('assetName').value,
+        category: document.getElementById('assetCategory').value,
+        value: parseFloat(document.getElementById('assetValue').value) || 0,
+        owner: document.getElementById('assetOwner').value,
+        notes: document.getElementById('assetNotes').value,
+        type: 'asset'
+      };
+
+      if (!asset.name || asset.value <= 0) {
+        alert('Please enter asset name and value');
+        return;
+      }
+
+      assetDivisionData.assets.push(asset);
+      saveData();
+      renderDivision();
+      hideAssetForm();
+    }
+
+    // Add Liability
+    function addLiability() {
+      const liability = {
+        id: Date.now(),
+        name: document.getElementById('liabilityName').value,
+        category: document.getElementById('liabilityCategory').value,
+        value: parseFloat(document.getElementById('liabilityValue').value) || 0,
+        owner: document.getElementById('liabilityOwner').value,
+        notes: document.getElementById('liabilityNotes').value,
+        type: 'liability'
+      };
+
+      if (!liability.name || liability.value <= 0) {
+        alert('Please enter liability name and amount');
+        return;
+      }
+
+      assetDivisionData.liabilities.push(liability);
+      saveData();
+      renderDivision();
+      hideLiabilityForm();
+    }
+
+    // Render Division
+    function renderDivision() {
+      // Party 1 Assets
+      const party1Assets = assetDivisionData.assets.filter(a => a.owner === 'party1' || a.owner === 'joint');
+      const party1Liabilities = assetDivisionData.liabilities.filter(l => l.owner === 'party1' || l.owner === 'joint');
+
+      // Party 2 Assets
+      const party2Assets = assetDivisionData.assets.filter(a => a.owner === 'party2' || a.owner === 'joint');
+      const party2Liabilities = assetDivisionData.liabilities.filter(l => l.owner === 'party2' || l.owner === 'joint');
+
+      // Render Party 1
+      let party1HTML = '';
+      party1Assets.forEach(asset => {
+        party1HTML += `
+          <div class="asset-card">
+            <div class="asset-info">
+              <div class="asset-name">${asset.name}</div>
+              <div class="asset-category">${asset.category}</div>
+            </div>
+            <div class="asset-value">$${asset.value.toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+          </div>
+        `;
+      });
+      party1Liabilities.forEach(liability => {
+        party1HTML += `
+          <div class="asset-card" style="background: #ffe5e5;">
+            <div class="asset-info">
+              <div class="asset-name">${liability.name}</div>
+              <div class="asset-category">${liability.category}</div>
+            </div>
+            <div class="asset-value" style="color: #d32f2f;">-$${liability.value.toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+          </div>
+        `;
+      });
+
+      // Render Party 2
+      let party2HTML = '';
+      party2Assets.forEach(asset => {
+        party2HTML += `
+          <div class="asset-card">
+            <div class="asset-info">
+              <div class="asset-name">${asset.name}</div>
+              <div class="asset-category">${asset.category}</div>
+            </div>
+            <div class="asset-value">$${asset.value.toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+          </div>
+        `;
+      });
+      party2Liabilities.forEach(liability => {
+        party2HTML += `
+          <div class="asset-card" style="background: #ffe5e5;">
+            <div class="asset-info">
+              <div class="asset-name">${liability.name}</div>
+              <div class="asset-category">${liability.category}</div>
+            </div>
+            <div class="asset-value" style="color: #d32f2f;">-$${liability.value.toLocaleString('en-US', {minimumFractionDigits: 2})}</div>
+          </div>
+        `;
+      });
+
+      document.getElementById('party1Assets').innerHTML = party1HTML;
+      document.getElementById('party2Assets').innerHTML = party2HTML;
+
+      // Calculate Totals
+      const party1AssetTotal = party1Assets.reduce((sum, a) => sum + a.value, 0);
+      const party1DebtTotal = party1Liabilities.reduce((sum, l) => sum + l.value, 0);
+      const party1NetValue = party1AssetTotal - party1DebtTotal;
+
+      const party2AssetTotal = party2Assets.reduce((sum, a) => sum + a.value, 0);
+      const party2DebtTotal = party2Liabilities.reduce((sum, l) => sum + l.value, 0);
+      const party2NetValue = party2AssetTotal - party2DebtTotal;
+
+      // Update Summary
+      document.getElementById('party1AssetTotal').textContent = '$' + party1AssetTotal.toLocaleString('en-US', {minimumFractionDigits: 2});
+      document.getElementById('party1DebtTotal').textContent = '$' + party1DebtTotal.toLocaleString('en-US', {minimumFractionDigits: 2});
+      document.getElementById('party1NetValue').textContent = '$' + party1NetValue.toLocaleString('en-US', {minimumFractionDigits: 2});
+
+      document.getElementById('party2AssetTotal').textContent = '$' + party2AssetTotal.toLocaleString('en-US', {minimumFractionDigits: 2});
+      document.getElementById('party2DebtTotal').textContent = '$' + party2DebtTotal.toLocaleString('en-US', {minimumFractionDigits: 2});
+      document.getElementById('party2NetValue').textContent = '$' + party2NetValue.toLocaleString('en-US', {minimumFractionDigits: 2});
+
+      // Update KPIs
+      const totalAssets = party1AssetTotal + party2AssetTotal;
+      const totalDebts = party1DebtTotal + party2DebtTotal;
+      const netEstate = totalAssets - totalDebts;
+      const equalShare = netEstate / 2;
+
+      document.getElementById('totalAssetsKPI').textContent = '$' + totalAssets.toLocaleString('en-US', {minimumFractionDigits: 2});
+      document.getElementById('totalDebtsKPI').textContent = '$' + totalDebts.toLocaleString('en-US', {minimumFractionDigits: 2});
+      document.getElementById('netAssetsKPI').textContent = '$' + netEstate.toLocaleString('en-US', {minimumFractionDigits: 2});
+      document.getElementById('equalShareKPI').textContent = '$' + equalShare.toLocaleString('en-US', {minimumFractionDigits: 2});
+
+      // Update Balance Section
+      if (party1NetValue !== party2NetValue) {
+        document.getElementById('balanceSection').style.display = 'block';
+        const balanceDue = Math.abs(party1NetValue - party2NetValue) / 2;
+        const payingParty = party1NetValue > party2NetValue ? 'Party A' : 'Party B';
+        document.getElementById('balanceAmount').textContent = '$' + balanceDue.toLocaleString('en-US', {minimumFractionDigits: 2});
+        document.getElementById('balanceText').textContent = `${payingParty} owes the other party this amount to equalize the division`;
+      } else {
+        document.getElementById('balanceSection').style.display = 'none';
+      }
+
+      // Update Summary Section
+      document.getElementById('summaryAssets').textContent = '$' + totalAssets.toLocaleString('en-US', {minimumFractionDigits: 2});
+      document.getElementById('summaryDebts').textContent = '$' + totalDebts.toLocaleString('en-US', {minimumFractionDigits: 2});
+      document.getElementById('summaryNet').textContent = '$' + netEstate.toLocaleString('en-US', {minimumFractionDigits: 2});
+    }
+
+    // Tab Switching
+    function switchTab(tabName) {
+      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+      document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+      document.getElementById(tabName).classList.add('active');
+      event.target.classList.add('active');
+    }
+
+    // Scenario Updates
+    function updateScenarios() {
+      const method = document.getElementById('scenarioMethod').value;
+      const customPercentField = document.getElementById('customPercentField');
+
+      if (method === 'custom') {
+        customPercentField.style.display = 'block';
+      } else {
+        customPercentField.style.display = 'none';
+      }
+
+      // TODO: Implement scenario rendering
+    }
+
+    // Import from Document Hub
+    function importFromDocumentHub() {
+      alert('Feature coming soon:\n\nThis will automatically import assets and liabilities from your Document Hub categories:\n\n• Real Estate (from Real Estate hub)\n• Bank Accounts (from Assets hub)\n• Investments (from Investments hub)\n• Retirement (from Retirement hub)\n• Mortgages & Debts (from Liabilities hub)\n\nFor now, please use "Add Asset" / "Add Liability" buttons to manually enter your data.');
+    }
+
+    // Export Functions
+    function exportToPDF() {
+      alert('PDF export coming soon. For now, use Print (Ctrl+P) to save as PDF.');
+    }
+
+    function exportToJSON() {
+      const data = {
+        ...assetDivisionData,
+        exportDate: new Date().toISOString()
+      };
+      const json = JSON.stringify(data, null, 2);
+      const blob = new Blob([json], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `asset-division-${new Date().toISOString().split('T')[0]}.json`;
+      link.click();
+    }
+
+    function printReport() {
+      window.print();
+    }
+
+    function resetData() {
+      if (confirm('Are you sure? This will clear all asset and liability data.')) {
+        assetDivisionData.assets = [];
+        assetDivisionData.liabilities = [];
+        saveData();
+        renderDivision();
+      }
+    }
+
+    // Initialize
+    loadData();
+  </script>
+</body>
+</html>
