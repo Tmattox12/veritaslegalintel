@@ -2,8 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Export & Reports — Veritas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />  <title>Export & Reports — Veritas</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -43,8 +42,7 @@
   <aside class="sidebar">
     <div class="brand">
       <div class="brand-mark">
-        <img src="logo-vfi.jpg" alt="VFI Logo" />
-        <span class="brand-mark-fallback">VFI</span>
+        <img src="logo-vfi.jpg" alt="VFI Logo" />        <span class="brand-mark-fallback">VFI</span>
       </div>
       <div class="brand-text">
         <span class="brand-name">Veritas</span>
@@ -68,8 +66,7 @@
       <a class="nav-item" href="credits.html"><span class="nav-ico">⊕</span> Credits &amp; Adjustments</a>
       <a class="nav-item" href="regulations.html"><span class="nav-ico">§</span> Regulations</a>
     </nav>
-    <div class="sidebar-foot"><div class="plan-chip">Firm Plan · 12 seats</div></div>
-  </aside>
+    <div class="sidebar-foot"><div class="plan-chip">Firm Plan · 12 seats</div></div>  </aside>
 
   <!-- ===================== MAIN ===================== -->
   <main class="main">
@@ -79,16 +76,14 @@
         <button class="matter-btn">
           <strong>Ossandon v. Ossandon</strong>
           <span class="case-no">No. D2024-1669 · Pima County, AZ</span>
-          <span class="chev">▾</span>
-        </button>
+          <span class="chev">▾</span>        </button>
       </div>
       <div class="topbar-right">
         <div class="user">
           <div class="avatar">TH</div>
           <div class="user-meta">
             <span class="user-name">Workspace User</span>
-            <span class="user-role">Ossandon Matter</span>
-          </div>
+            <span class="user-role">Ossandon Matter</span>          </div>
         </div>
       </div>
     </header>
@@ -111,51 +106,44 @@
         <div style="display:flex;gap:10px;flex-wrap:wrap;margin-top:8px;">
           <button type="button" class="btn" id="exportLiveSummaryTxt">Download summary (.txt)</button>
           <button type="button" class="btn ghost" id="exportLiveSummaryCsv">Download summary (.csv)</button>
-          <button type="button" class="btn" id="exportReconWorkbookBtn" style="background:#1c3f66;">Download reconciliation workbook (.csv)</button>
-        </div>
+          <button type="button" class="btn" id="exportReconWorkbookBtn" style="background:#1c3f66;">Download reconciliation workbook (.csv)</button>        </div>
       </div>
 
       <!-- Quick Export Templates -->
       <h2 class="section-title">Quick Export</h2>
       <div class="export-grid">
         <div class="export-card" onclick="exportReport('trial-binder')">
-          <div class="export-icon">📚</div>
-          <div class="export-title">Trial Binder</div>
+          <div class="export-icon">📚</div>          <div class="export-title">Trial Binder</div>
           <div class="export-desc">Complete trial exhibit package with case summary, all exhibits, and index</div>
           <button class="export-btn">Export as PDF</button>
         </div>
 
         <div class="export-card" onclick="exportReport('settlement-package')">
-          <div class="export-icon">⚖️</div>
-          <div class="export-title">Settlement Package</div>
+          <div class="export-icon">⚖️</div>          <div class="export-title">Settlement Package</div>
           <div class="export-desc">Offer letter, settlement analysis, and financial summary for negotiations</div>
           <button class="export-btn">Export as DOCX</button>
         </div>
 
         <div class="export-card" onclick="exportReport('financial-summary')">
-          <div class="export-icon">💼</div>
-          <div class="export-title">Financial Summary</div>
+          <div class="export-icon">💼</div>          <div class="export-title">Financial Summary</div>
           <div class="export-desc">AFI analysis, discrepancies, and supporting calculations in presentation format</div>
           <button class="export-btn">Export as PDF</button>
         </div>
 
         <div class="export-card" onclick="exportReport('expert-report')">
-          <div class="export-icon">👤</div>
-          <div class="export-title">Expert Report Draft</div>
+          <div class="export-icon">👤</div>          <div class="export-title">Expert Report Draft</div>
           <div class="export-desc">Formatted expert report template with case findings and methodology</div>
           <button class="export-btn">Export as DOCX</button>
         </div>
 
         <div class="export-card" onclick="exportReport('discovery-index')">
-          <div class="export-icon">📑</div>
-          <div class="export-title">Discovery Index</div>
+          <div class="export-icon">📑</div>          <div class="export-title">Discovery Index</div>
           <div class="export-desc">Complete document index with bates numbering and organization by category</div>
           <button class="export-btn">Export as XLSX</button>
         </div>
 
         <div class="export-card" onclick="exportReport('red-flags')">
-          <div class="export-icon">⚠️</div>
-          <div class="export-title">Red Flags Report</div>
+          <div class="export-icon">⚠️</div>          <div class="export-title">Red Flags Report</div>
           <div class="export-desc">Summary of detected issues, missing documents, and litigation risks</div>
           <button class="export-btn">Export as PDF</button>
         </div>
@@ -212,8 +200,7 @@
 
         <div style="display: flex; gap: 8px; margin-top: 16px;">
           <button class="btn primary" onclick="generateCustomReport('pdf')">Generate PDF</button>
-          <button class="btn ghost" onclick="generateCustomReport('docx')">Generate Word</button>
-        </div>
+          <button class="btn ghost" onclick="generateCustomReport('docx')">Generate Word</button>        </div>
       </div>
 
       <!-- Recent Exports -->
@@ -226,8 +213,7 @@
           </div>
           <div class="report-actions">
             <button class="report-btn" onclick="downloadFile('Luis_Financial_Summary.pdf')">⤓ Download</button>
-            <button class="report-btn" onclick="alert('File deleted')">🗑 Delete</button>
-          </div>
+            <button class="report-btn" onclick="alert('File deleted')">🗑 Delete</button>          </div>
         </div>
 
         <div class="report-item">
@@ -237,8 +223,7 @@
           </div>
           <div class="report-actions">
             <button class="report-btn" onclick="downloadFile('Settlement_Comparison.docx')">⤓ Download</button>
-            <button class="report-btn" onclick="alert('File deleted')">🗑 Delete</button>
-          </div>
+            <button class="report-btn" onclick="alert('File deleted')">🗑 Delete</button>          </div>
         </div>
 
         <div class="report-item">
@@ -248,8 +233,7 @@
           </div>
           <div class="report-actions">
             <button class="report-btn" onclick="downloadFile('Trial_Binder.pdf')">⤓ Download</button>
-            <button class="report-btn" onclick="alert('File deleted')">🗑 Delete</button>
-          </div>
+            <button class="report-btn" onclick="alert('File deleted')">🗑 Delete</button>          </div>
         </div>
       </div>
 
@@ -276,14 +260,12 @@
           </div>
           <div>
             <label style="font-size: 12px; font-weight: 600; color: #1c3f66; display: block; margin-bottom: 8px;">Password Protect PDF</label>
-            <input type="checkbox"> <span style="font-size: 11px; color: #666;">Require password to open</span>
-          </div>
+            <input type="checkbox"> <span style="font-size: 11px; color: #666;">Require password to open</span>          </div>
         </div>
       </div>
 
       <footer class="foot">
-        <span>Veritas · Export & Reports</span>
-        <span class="foot-dim">Generate trial exhibits, settlement packages, expert reports, and discovery documents</span>
+        <span>Veritas · Export & Reports</span>        <span class="foot-dim">Generate trial exhibits, settlement packages, expert reports, and discovery documents</span>
       </footer>
     </div>
   </main>
@@ -294,4 +276,3 @@
   <script src="logo-handler.js"></script>
 </body>
 </html>
-

@@ -1,6 +1,10 @@
 /**
  * Calculations Registry for Veritas Template
+<<<<<<< HEAD
  * Sample Anderson v. Anderson case data
+=======
+ * Sample [Case Name] case data
+>>>>>>> cbd6749 (Clean stale case data and neutralize templates)
  */
 
 const CalculationsRegistry = {
@@ -164,4 +168,8 @@ const RESPONDENT_NAME = "Sarah";
 const PETITIONER_NAME = "Michael";
 const RESPONDENT_INCOME = 72400;
 const PETITIONER_INCOME = 185400;
+<<<<<<< HEAD
 const CASE_TITLE = "Anderson v. Anderson";
+=======
+const CASE_TITLE = "[Case Name]";
+>>>>>>> cbd6749 (Clean stale case data and neutralize templates)

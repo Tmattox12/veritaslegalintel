@@ -296,7 +296,11 @@ Methods:
 
 ### Workflow 4: Find Specific Expense
 ```
+<<<<<<< HEAD
 1. Upload 945 Ossandon transactions
+=======
+1. Upload 945 Template Matter transactions
+>>>>>>> cbd6749 (Clean stale case data and neutralize templates)
 2. Search for "CVS" merchant
 3. Results: 15 CVS pharmacy items
 4. Filter by date (Sept 2024)
@@ -369,7 +373,11 @@ All three tools are immediately usable:
 - ✅ Data entry ready
 - ✅ Calculations working
 - ✅ Export functional
+<<<<<<< HEAD
 - ✅ Ready to populate with Ossandon data
+=======
+- ✅ Ready to populate with Template Matter data
+>>>>>>> cbd6749 (Clean stale case data and neutralize templates)
 
 ### Search & Filter
 - ✅ Module complete

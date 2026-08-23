@@ -2,8 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Dashboard — Veritas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />  <title>Dashboard — Veritas</title>
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body {
@@ -62,8 +61,7 @@
     <div style="display: flex; gap: 12px; margin-top: 20px; flex-wrap: wrap;">
       <button class="btn" onclick="window.location.href='cases.html'">View Cases</button>
       <button class="btn" onclick="window.location.href='case-intake.html'" style="background: #b8893b;">New Case Intake</button>
-      <button class="btn" onclick="logout()" style="background: #999;">Log Out</button>
-    </div>
+      <button class="btn" onclick="logout()" style="background: #999;">Log Out</button>    </div>
   </div>
 
   <script src="api-client.js"></script>
@@ -86,8 +84,7 @@
         `;
       } catch (err) {
         console.error('Error loading user:', err);
-        document.getElementById('userInfo').innerHTML = '<p style="color: red;">Error loading user info</p>';
-      }
+        document.getElementById('userInfo').innerHTML = '<p style="color: red;">Error loading user info</p>';      }
     }
 
     function logout() {
@@ -100,4 +97,3 @@
   <script src="logo-handler.js"></script>
 </body>
 </html>
-

@@ -56,8 +56,13 @@
 **Status**: All styling consistent and responsive
 
 ### Data Files (3/3) - COMPLETE
+<<<<<<< HEAD
 - ✅ ossandon-extracted-expenses.json (945 transactions, $17,612.78)
 - ✅ ossandon-extracted-income.json (3 income sources)
+=======
+- ✅ Template Matter-extracted-expenses.json (945 transactions, $17,612.78)
+- ✅ Template Matter-extracted-income.json (3 income sources)
+>>>>>>> cbd6749 (Clean stale case data and neutralize templates)
 - ✅ OSSANDON_AFI_FINAL_AMOUNTS.md (AFI form ready)
 
 **Status**: All sample data extracted and verified
@@ -71,8 +76,13 @@
 **Status**: Complete documentation ready
 
 ### Python Extraction Scripts (3/3) - COMPLETE
+<<<<<<< HEAD
 - ✅ extract_ossandon_expenses.py (Chase CC parsing)
 - ✅ extract_ossandon_income.py (Income extraction)
+=======
+- ✅ extract_template-matter_expenses.py (Chase CC parsing)
+- ✅ extract_template-matter_income.py (Income extraction)
+>>>>>>> cbd6749 (Clean stale case data and neutralize templates)
 - ✅ build_document_hub_categories.py (Page generation)
 
 **Status**: All scripts functional and documented
@@ -111,7 +121,11 @@
 
 ## 📈 DATA VALIDATION
 
+<<<<<<< HEAD
 ### Ossandon Case - Expense Extraction
+=======
+### Template Matter Case - Expense Extraction
+>>>>>>> cbd6749 (Clean stale case data and neutralize templates)
 ```
 Total Transactions Extracted: 945
 Auto-Mapped Transactions: 219 (23%)
@@ -261,12 +275,21 @@ Total: 24 files
 ### Supporting Files (Reference Only)
 ```
 Data Files:
+<<<<<<< HEAD
   - ossandon-extracted-expenses.json
   - ossandon-extracted-income.json
 
 Python Scripts:
   - extract_ossandon_expenses.py
   - extract_ossandon_income.py
+=======
+  - Template Matter-extracted-expenses.json
+  - Template Matter-extracted-income.json
+
+Python Scripts:
+  - extract_template-matter_expenses.py
+  - extract_template-matter_income.py
+>>>>>>> cbd6749 (Clean stale case data and neutralize templates)
   - build_document_hub_categories.py
 
 Documentation:

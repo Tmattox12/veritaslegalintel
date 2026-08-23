@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /**
  * Veritas Reconciliation Data - Enhanced
  * Comprehensive data structure for all AFI expense categories
@@ -859,3 +860,14 @@ const RECONCILIATION_DATA_ENHANCED = {
 
 // Merge with existing data for backward compatibility
 Object.assign(RECONCILIATION_DATA, RECONCILIATION_DATA_ENHANCED);
+=======
+/* Empty reconciliation template. Populate from uploaded documents for the active matter. */
+function calculateYTD(items) {
+  let ytd = 0;
+  return items.map((item) => {
+    ytd += Number(item.amount) || 0;
+    return { ...item, ytd };
+  });
+}
+const RECONCILIATION_DATA_ENHANCED = {};
+>>>>>>> cbd6749 (Clean stale case data and neutralize templates)

@@ -1,11 +1,20 @@
 # Veritas Template — Generic Demo & Testing Version
 
+<<<<<<< HEAD
 This is a **clean, generic fork** of Veritas tailored for demo, testing, and future client onboarding. It contains **80% of the core functionality** without any Ossandon-case-specific data or hardcoded client references.
 
 ## Key Differences from `../webapp/` (Production Ossandon)
 
 - **No case-specific hardcoding**: Removes all real party names (Luis, Coni, Nico, Constanza, Martin, Joaquin), real dollar figures, real document paths, and real account numbers.
 - **Sample data only**: Uses a fictional "Anderson v. Anderson" case (`sampleData.js`) for all calculations and displays.
+=======
+This is a **clean, generic fork** of Veritas tailored for demo, testing, and future client onboarding. It contains **80% of the core functionality** without any Template Matter-case-specific data or hardcoded client references.
+
+## Key Differences from `../webapp/` (Production Template Matter)
+
+- **No case-specific hardcoding**: Removes all real party names (Parent A, Parent B, Nico, Parent B, Martin, Joaquin), real dollar figures, real document paths, and real account numbers.
+- **Sample data only**: Uses a fictional "[Case Name]" case (`sampleData.js`) for all calculations and displays.
+>>>>>>> cbd6749 (Clean stale case data and neutralize templates)
 - **No external asset dependencies**: Excludes the 80MB+ of real PDFs, exhibits, and generated Excel workbooks (`support-pdfs/`, `exhibits/`, all `.xlsx` and case-specific `.json` files).
 - **Upload-ready structure**: The infrastructure (backend models, API routes, frontend form scaffolds) exists to wire real file uploads and document processing in a future phase.
 
@@ -14,7 +23,11 @@ This is a **clean, generic fork** of Veritas tailored for demo, testing, and fut
 ```
 webapp-template/
 ├── README.md                              (this file)
+<<<<<<< HEAD
 ├── sampleData.js                          (fictional Anderson v. Anderson case data)
+=======
+├── sampleData.js                          (fictional [Case Name] case data)
+>>>>>>> cbd6749 (Clean stale case data and neutralize templates)
 ├── app.js                                 (generic dashboard with sample stats)
 ├── reconData.js                           (sample bank/card transactions)
 ├── calculations-registry.js               (sample income calculations)
@@ -53,14 +66,22 @@ Then open `http://localhost:8000/index.html` in your browser.
 The dashboard (`index.html`) displays sample module stats and activity log pulled from `sampleData.js` and `app.js`. All numbers are fictional but structurally realistic.
 
 ### 3. Check Sample Data
+<<<<<<< HEAD
 - `sampleData.js`: Fictional "Anderson v. Anderson" case with party info, income, expenses, estate snapshot, children.
+=======
+- `sampleData.js`: Fictional "[Case Name]" case with party info, income, expenses, estate snapshot, children.
+>>>>>>> cbd6749 (Clean stale case data and neutralize templates)
 - `reconData.js`: Sample bank transactions (groceries, restaurants, utilities, childcare, etc.) across 3-month period.
 - `calculations-registry.js`: Sample income calculations for both parties.
 
 ## Genericization Checklist
 
 ✅ **Completed:**
+<<<<<<< HEAD
 - Removed all Ossandon/Luis/Coni party name references from core infrastructure files  
+=======
+- Removed all Template Matter/Parent A/Parent B party name references from core infrastructure files  
+>>>>>>> cbd6749 (Clean stale case data and neutralize templates)
 - Created sample dataset (`sampleData.js`) with fictional party names and realistic financials  
 - Rewrote `app.js` dashboard using sample stats instead of real case numbers  
 - Genericized `reconData.js` with sample merchant transactions  
@@ -84,7 +105,11 @@ The dashboard (`index.html`) displays sample module stats and activity log pulle
 
 ## Notes
 
+<<<<<<< HEAD
 - The backend (`backend/` directory) is **not included** in this template folder — it remains in the parent directory and is case-agnostic (multi-tenant User/Case/Document models, no Ossandon-specific code).  
+=======
+- The backend (`backend/` directory) is **not included** in this template folder — it remains in the parent directory and is case-agnostic (multi-tenant User/Case/Document models, no Template Matter-specific code).  
+>>>>>>> cbd6749 (Clean stale case data and neutralize templates)
 - Static assets (real PDFs, exhibit images) are **excluded** by design. The template's lightweight asset footprint makes it portable.  
 - The "upload tab" (`discovery-intake.html`) currently shows a simulated upload UI; real file processing is a next-phase task.  
 
@@ -92,7 +117,11 @@ The dashboard (`index.html`) displays sample module stats and activity log pulle
 
 To double-check no real party names remain:
 ```bash
+<<<<<<< HEAD
 grep -r "Ossandon\|Luis\|Coni\|Nico\|Constanza\|Martin\|Joaquin" webapp-template/
+=======
+grep -r "Template Matter\|Parent A\|Parent B\|Nico\|Parent B\|Martin\|Joaquin" webapp-template/
+>>>>>>> cbd6749 (Clean stale case data and neutralize templates)
 ```
 
 Should return **zero results** (only in this README as documentation).

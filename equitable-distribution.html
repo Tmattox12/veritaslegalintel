@@ -3,8 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Equitable Distribution — Veritas</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <title>Equitable Distribution — Veritas</title>  <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
@@ -28,7 +27,6 @@
     .split-bar { display: grid; grid-template-columns: 1fr 1fr; gap: 0; margin-top: 12px; border-radius: 4px; overflow: hidden; }
     .split-luis { background: #e3f2fd; padding: 12px; text-align: center; font-weight: 700; color: #1565c0; }
     .split-coni { background: #fff3e0; padding: 12px; text-align: center; font-weight: 700; color: #e65100; }
-
     .factor-section { background: white; border-radius: 6px; padding: 12px; margin-bottom: 12px; border-left: 4px solid #2e5b8a; }
     .factor-title { font-weight: 600; color: #1c3f66; margin-bottom: 8px; font-size: 12px; }
     .factor-slider { width: 100%; margin: 8px 0; }
@@ -45,8 +43,7 @@
   <aside class="sidebar">
     <div class="brand">
       <div class="brand-mark">
-        <img src="logo-vfi.jpg" alt="VFI Logo" />
-        <span class="brand-mark-fallback">VFI</span>
+        <img src="logo-vfi.jpg" alt="VFI Logo" />        <span class="brand-mark-fallback">VFI</span>
       </div>
       <div class="brand-text">
         <span class="brand-name">Veritas</span>
@@ -84,8 +81,7 @@
     </nav>
 
     <div class="sidebar-foot">
-      <div class="plan-chip"><span style="color:var(--green)">●</span> Secure Connection · encrypted &amp; confidential</div>
-    </div>
+      <div class="plan-chip"><span style="color:var(--green)">●</span> Secure Connection · encrypted &amp; confidential</div>    </div>
   </aside>
 
   <!-- ===================== MAIN ===================== -->
@@ -96,16 +92,14 @@
         <button class="matter-btn">
           <strong>Ossandon v. Ossandon</strong>
           <span class="case-no">No. D2024-1669 · Pima County, AZ</span>
-          <span class="chev">▾</span>
-        </button>
+          <span class="chev">▾</span>        </button>
       </div>
       <div class="topbar-right">
         <div class="user">
           <div class="avatar">TH</div>
           <div class="user-meta">
             <span class="user-name">Workspace User</span>
-            <span class="user-role">Ossandon Matter</span>
-          </div>
+            <span class="user-role">Ossandon Matter</span>          </div>
         </div>
       </div>
     </header>
@@ -114,8 +108,7 @@
       <section class="page-head">
         <div>
           <h1>Equitable Distribution</h1>
-          <p class="sub">AZ §25-318 asset division · statutory factors · deviation modeling</p>
-        </div>
+          <p class="sub">AZ §25-318 asset division · statutory factors · deviation modeling</p>        </div>
       </section>
 
       <!-- Marital Estate Summary -->
@@ -132,8 +125,7 @@
           </div>
           <div>
             <div style="font-weight: 600; color: #1c3f66; margin-bottom: 12px; font-size: 13px;">Community Liabilities</div>
-            <table class="asset-table" id="liabilitiesTable"></table>
-          </div>
+            <table class="asset-table" id="liabilitiesTable"></table>          </div>
         </div>
       </div>
 
@@ -141,8 +133,7 @@
       <div class="panel">
         <div class="panel-head">
           <h3>⚖️ Net Estate & 50/50 Presumption</h3>
-          <span class="tag">§25-318 baseline</span>
-        </div>
+          <span class="tag">§25-318 baseline</span>        </div>
         <div class="summary-box">
           <div class="summary-row">
             <span class="summary-label">Total Assets</span>
@@ -158,8 +149,7 @@
           </div>
           <div class="summary-row">
             <span class="summary-label">50/50 Presumption</span>
-            <span class="summary-value" id="halfEstate">$961,328 each</span>
-          </div>
+            <span class="summary-value" id="halfEstate">$961,328 each</span>          </div>
         </div>
 
         <div class="split-bar">
@@ -177,14 +167,12 @@
           <span class="tag">§25-318 equalizing payment</span>
         </div>
         <p class="panel-note" style="font-size:12px;color:#617088;margin:0 0 12px;">Assets and liabilities split by who currently holds them (DOS basis), showing the equalizing payment that brings both parties to a 50/50 net share.</p>
-        <div id="whoHoldsSummary"></div>
-      </div>
+        <div id="whoHoldsSummary"></div>      </div>
 
       <!-- Statutory Deviation Factors -->
       <div class="panel">
         <div class="panel-head">
-          <h3>📋 Statutory Factors — §25-318(B)</h3>
-          <span class="tag">Deviation analysis</span>
+          <h3>📋 Statutory Factors — §25-318(B)</h3>          <span class="tag">Deviation analysis</span>
         </div>
         <p class="panel-note">The court may deviate from a 50/50 split based on these factors. Adjust the sliders to model how each factor affects the recommended split.</p>
 
@@ -197,8 +185,7 @@
               <span id="durationVal">Long (20+ yrs)</span>
             </div>
             <input type="range" id="durationSlider" min="0" max="100" value="95" class="factor-slider" onchange="calculateDeviation()">
-            <div class="factor-value">21-year marriage → favors current split</div>
-          </div>
+            <div class="factor-value">21-year marriage → favors current split</div>          </div>
 
           <!-- Factor: Contribution to Education -->
           <div class="factor-section">
@@ -208,8 +195,7 @@
               <span id="educationVal">Significant contribution</span>
             </div>
             <input type="range" id="educationSlider" min="0" max="100" value="35" class="factor-slider" onchange="calculateDeviation()">
-            <div class="factor-value">Supported spouse's career interrupted for childcare</div>
-          </div>
+            <div class="factor-value">Supported spouse's career interrupted for childcare</div>          </div>
 
           <!-- Factor: Property Brought to Marriage -->
           <div class="factor-section">
@@ -219,8 +205,7 @@
               <span id="separateVal">Significant separate property</span>
             </div>
             <input type="range" id="separateSlider" min="0" max="100" value="15" class="factor-slider" onchange="calculateDeviation()">
-            <div class="factor-value">Paying spouse family inheritance (disputed character)</div>
-          </div>
+            <div class="factor-value">Paying spouse family inheritance (disputed character)</div>          </div>
 
           <!-- Factor: Custodial Responsibilities -->
           <div class="factor-section">
@@ -230,8 +215,7 @@
               <span id="custodyVal">Equal parenting</span>
             </div>
             <input type="range" id="custodySlider" min="0" max="100" value="50" class="factor-slider" onchange="calculateDeviation()">
-            <div class="factor-value">50/50 legal decision-making & parenting time (April 2025 Temp Orders)</div>
-          </div>
+            <div class="factor-value">50/50 legal decision-making & parenting time (April 2025 Temp Orders)</div>          </div>
 
           <!-- Factor: Age & Health -->
           <div class="factor-section">
@@ -241,8 +225,7 @@
               <span id="healthVal">One party disadvantaged</span>
             </div>
             <input type="range" id="healthSlider" min="0" max="100" value="40" class="factor-slider" onchange="calculateDeviation()">
-            <div class="factor-value">Supported Spouse age 51, limited earning capacity; Paying Spouse age 50, employed</div>
-          </div>
+            <div class="factor-value">Supported Spouse age 51, limited earning capacity; Paying Spouse age 50, employed</div>          </div>
 
           <!-- Factor: Contribution to Marital Property -->
           <div class="factor-section">
@@ -252,8 +235,7 @@
               <span id="contributionVal">Unequal contributions</span>
             </div>
             <input type="range" id="contributionSlider" min="0" max="100" value="45" class="factor-slider" onchange="calculateDeviation()">
-            <div class="factor-value">Both contributed to marital asset accumulation</div>
-          </div>
+            <div class="factor-value">Both contributed to marital asset accumulation</div>          </div>
 
           <!-- Factor: Goodwill & Intangible Assets -->
           <div class="factor-section">
@@ -263,8 +245,7 @@
               <span id="goodwillVal">Significant goodwill</span>
             </div>
             <input type="range" id="goodwillSlider" min="0" max="100" value="20" class="factor-slider" onchange="calculateDeviation()">
-            <div class="factor-value">Luis employment is W-2 (no professional practice)</div>
-          </div>
+            <div class="factor-value">Luis employment is W-2 (no professional practice)</div>          </div>
         </div>
       </div>
 
@@ -272,8 +253,7 @@
       <div class="panel">
         <div class="panel-head">
           <h3>🎯 Recommended Division (With Deviations)</h3>
-          <span class="tag">Based on §25-318(B) factors</span>
-        </div>
+          <span class="tag">Based on §25-318(B) factors</span>        </div>
 
         <div class="summary-box">
           <div class="summary-row">
@@ -286,8 +266,7 @@
           </div>
           <div class="summary-row" style="border-top: 1px solid rgba(0,0,0,0.1); padding-top: 8px; margin-top: 8px;">
             <span class="summary-label">Deviation from 50/50</span>
-            <span class="summary-value" id="deviationPercent">+6.5% to Coni</span>
-          </div>
+            <span class="summary-value" id="deviationPercent">+6.5% to Coni</span>          </div>
         </div>
 
         <div class="split-bar">
@@ -302,8 +281,7 @@
             <li>Primary custodial parent (70% per Temp Orders)</li>
             <li>Limited earning capacity (age 51, career gap due to childcare)</li>
             <li>Indirect contribution to marital asset accumulation</li>
-          </ul>
-        </div>
+          </ul>        </div>
       </div>
 
       <!-- Alternative Scenarios -->
@@ -318,8 +296,7 @@
               <tr>
                 <th>Scenario</th>
                 <th class="amount">Luis Receives</th>
-                <th class="amount">Coni Receives</th>
-                <th class="amount">Deviation</th>
+                <th class="amount">Coni Receives</th>                <th class="amount">Deviation</th>
               </tr>
             </thead>
             <tbody>
@@ -345,8 +322,7 @@
                 <td>Conservative (Luis's position)</td>
                 <td class="amount">$830,000</td>
                 <td class="amount">$782,322</td>
-                <td class="amount">−2.9% Coni</td>
-              </tr>
+                <td class="amount">−2.9% Coni</td>              </tr>
             </tbody>
           </table>
         </div>
@@ -362,14 +338,12 @@
           <li><strong>§25-318</strong> — Equitable distribution of property; factors for deviation from 50/50</li>
           <li><strong>§25-211</strong> — Character fixed at service (community vs. separate property)</li>
           <li><strong>§25-213</strong> — Tracing separate property through commingled accounts</li>
-          <li><strong>Case law</strong> — Husband's career as marital asset; wife's homemaker contributions count as direct contribution to marital property</li>
-        </ul>
+          <li><strong>Case law</strong> — Husband's career as marital asset; wife's homemaker contributions count as direct contribution to marital property</li>        </ul>
       </div>
 
       <footer class="foot">
         <span>Veritas · Equitable Distribution</span>
-        <span class="foot-dim">AZ §25-318 · Statutory factors · Non-binding recommendation</span>
-      </footer>
+        <span class="foot-dim">AZ §25-318 · Statutory factors · Non-binding recommendation</span>      </footer>
     </div>
   </main>
 
@@ -380,4 +354,3 @@
   <script src="logo-handler.js"></script>
 </body>
 </html>
-

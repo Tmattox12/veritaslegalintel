@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>RSU Analysis | Veritas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .rsu-layout { display:grid; grid-template-columns:minmax(0,1fr) 310px; gap:18px; align-items:start; }
+    .dropzone { border:2px dashed #cfd8e6; border-radius:8px; background:var(--bg); padding:30px 20px; text-align:center; transition:.15s; }
+    .dropzone.dragging { border-color:var(--gold); background:var(--gold-soft); }
+    .dropzone input { display:none; }
+    .dropzone label { display:block; color:var(--navy-700); font-weight:600; cursor:pointer; font-size:14px; }
+    .dropzone p { color:var(--mute); margin-top:6px; font-size:12px; }
+    .document-list { display:grid; gap:7px; margin-top:14px; }
+    .document-item { display:flex; justify-content:space-between; gap:12px; align-items:center; border:1px solid var(--line-soft); border-radius:6px; background:var(--bg); padding:9px 11px; color:var(--slate); font-size:12px; }
+    .document-item button { border:0; background:none; color:var(--red); cursor:pointer; font:600 12px Inter,sans-serif; }
+    .field-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+    .field { display:flex; flex-direction:column; gap:6px; }
+    .field label { font-size:12px; color:var(--slate); font-weight:600; }
+    .field input, .field select { border:1px solid #cfd8e6; border-radius:6px; padding:9px; color:var(--ink); background:#fff; font:13px Inter,sans-serif; }
+    .field input:focus, .field select:focus { outline:2px solid rgba(39,69,102,.16); border-color:var(--navy-600); }
+    .formula-note { margin-top:15px; padding:11px 13px; border-left:4px solid var(--green); background:var(--green-soft); color:#295d49; border-radius:6px; font-size:12px; line-height:1.5; }
+    .result-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
+    .result { padding:13px; border:1px solid var(--line); border-radius:8px; background:var(--bg); }
+    .result span { display:block; color:var(--slate); font-size:10px; font-weight:700; letter-spacing:.45px; text-transform:uppercase; }
+    .result output { display:block; margin-top:6px; color:var(--navy-900); font:600 22px Fraunces,serif; }
+    .side-card { border:1px solid var(--line); border-radius:8px; padding:14px; background:var(--card); margin-bottom:12px; }
+    .side-card h2 { color:var(--navy-900); font-size:15px; }
+    .side-card p, .side-card li { color:var(--slate); font-size:12px; line-height:1.5; }
+    .side-card p { margin-top:7px; }.side-card ul { margin:9px 0 0 17px; }
+    .actions { display:flex; gap:9px; flex-wrap:wrap; }
+    .status { margin-top:10px; color:var(--mute); font-size:11px; }
+    @media (max-width:1100px) { .rsu-layout { grid-template-columns:1fr; } .rsu-aside { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }.side-card { margin:0; } }
+    @media (max-width:760px) { body { grid-template-columns:1fr; }.sidebar { display:none; }.topbar { padding:12px 18px; }.topbar-right { display:none; }.content { padding:20px 16px; }.page-head { flex-direction:column; align-items:flex-start; gap:14px; }.field-grid,.result-grid,.rsu-aside { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="brand"><div class="brand-mark"><img src="logo-vfi.jpg" alt="VFI Logo" /><span class="brand-mark-fallback">VFI</span></div><div class="brand-text"><span class="brand-name">Veritas</span><span class="brand-sub">Financial Intelligence</span></div></div>
+    <nav class="nav"><div class="nav-group-label">Workspace</div><a class="nav-item" href="index.html">Dashboard</a><a class="nav-item" href="cases.html">Matters</a><a class="nav-item" href="schedules.html">Calendar</a><div class="nav-group-label">Analysis Modules</div><a class="nav-item" href="income-imputation.html">Income Engine</a><a class="nav-item" href="spousal.html">Support Calculator</a><a class="nav-item" href="cashflow.html">Cash Flow</a><a class="nav-item" href="child-support.html">Child Support</a><a class="nav-item" href="estate.html">Inventory of Property and Debts</a><a class="nav-item" href="equitable-distribution.html">Equitable Distribution</a><a class="nav-item" href="asset-division-valuation.html">Asset Valuation</a><a class="nav-item" href="discovery-intake.html">Discovery</a><a class="nav-item" href="custody.html">Custody</a><a class="nav-item" href="afi.html">AFI Expenses</a><a class="nav-item active" href="rsu.html">RSU Analysis</a><a class="nav-item" href="estate.html">Reports</a></nav>
+    <div class="sidebar-foot"><div class="plan-chip">Secure connection · encrypted and confidential</div></div>
+  </aside>
+  <main class="main">
+    <header class="topbar"><div class="matter-switcher"><span class="matter-label">Active Matter</span><div class="matter-btn"><strong>No active matter</strong><span class="case-no">Upload award documents to start an analysis</span></div></div><div class="topbar-right"><div class="user"><div class="avatar">VU</div><div class="user-meta"><span class="user-name">Workspace User</span><span class="user-role">Template workspace</span></div></div></div></header>
+    <div class="content">
+      <section class="page-head"><div><h1>RSU Analysis</h1><p class="sub">Analyze an equity award using dates and values verified from the uploaded record.</p></div><div class="actions"><button class="btn ghost" id="resetRsu" type="button">Clear analysis</button><button class="btn primary" id="printRsu" type="button">Print summary</button></div></section>
+      <div class="rsu-layout">
+        <div>
+          <section class="panel"><div class="panel-head"><h3>Upload award documents</h3><span class="tag">Reference only</span></div><p class="panel-note">Add award notices, equity plan documents, vesting schedules, or brokerage statements. This template lists file names locally; it does not extract or transmit document content.</p><div class="dropzone" id="rsuDropzone"><label for="rsuFiles">Choose RSU award documents</label><p>PDF, Word, Excel, image, or CSV</p><input id="rsuFiles" type="file" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.jpg,.jpeg,.png" /></div><div class="document-list" id="rsuDocumentList"><div class="document-item"><span>No documents selected.</span></div></div></section>
+          <section class="panel" style="margin-top:18px"><div class="panel-head"><h3>Award inputs</h3><span class="tag">Required fields</span></div><div class="field-grid"><div class="field"><label for="grantDate">Grant date</label><input id="grantDate" type="date" /></div><div class="field"><label for="vestDate">Vest date</label><input id="vestDate" type="date" /></div><div class="field"><label for="separationDate">Date of service or separation</label><input id="separationDate" type="date" /></div><div class="field"><label for="awardValue">Award value at selected valuation date</label><input id="awardValue" type="number" min="0" step="0.01" placeholder="0.00" /></div><div class="field"><label for="awardShares">Vested or scheduled shares</label><input id="awardShares" type="number" min="0" step="0.0001" placeholder="0" /></div><div class="field"><label for="formula">Allocation approach</label><select id="formula"><option value="future">Future-service formula</option><option value="past">Past-service formula</option></select></div></div><div class="formula-note" id="formulaNote">Future-service formula: marital percentage is the service time from grant to separation divided by the service time from grant to vest.</div></section>
+          <section class="panel" style="margin-top:18px"><div class="panel-head"><h3>Allocation result</h3><span class="tag" id="rsuState">Awaiting inputs</span></div><div class="result-grid"><div class="result"><span>Marital percentage</span><output id="maritalPercent">—</output></div><div class="result"><span>Marital award value</span><output id="maritalValue">—</output></div><div class="result"><span>Marital shares</span><output id="maritalShares">—</output></div></div><p class="panel-note" id="rsuNarrative" style="margin-top:14px">Enter the grant, vest, and separation dates to calculate the time-based marital percentage.</p><p class="status" id="rsuSaveStatus">Draft inputs are saved locally in this browser.</p></section>
+        </div>
+        <aside class="rsu-aside"><section class="side-card"><h2>Formula selection</h2><p>The correct formula depends on the award's purpose and governing jurisdiction.</p><ul><li><strong>Future service:</strong> measures the marital part of service between grant and separation.</li><li><strong>Past service:</strong> measures service from employment start to separation against employment start to vest.</li></ul><p>Obtain legal review before relying on a classification or allocation.</p></section><section class="side-card"><h2>Documentation checklist</h2><ul><li>Award agreement and plan terms</li><li>Grant and vesting dates</li><li>Separation or service date</li><li>Share count and valuation evidence</li><li>Any sales or withholding records</li></ul></section></aside>
+      </div>
+    </div>
+  </main>
+  <script src="rsu.js"></script>
+  <script src="template-data-sanitizer.js"></script>
+</body>
+</html>

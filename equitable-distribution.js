@@ -1,0 +1,1 @@
+(function() { 'use strict'; console.log('equitable-distribution.js loaded'); })();

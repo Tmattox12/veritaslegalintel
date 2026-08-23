@@ -2,8 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Child Support Calculator — Veritas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />  <title>Child Support Calculator — Veritas</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -49,8 +48,7 @@
     .intake-table { width: 100%; border-collapse: collapse; font-size: 12px; }
     .intake-table th { background: #f0f4fa; padding: 8px; text-align: left; border: 1px solid #dbe3ef; color: #345; }
     .intake-table td { padding: 8px; border: 1px solid #e4eaf3; vertical-align: middle; }
-    .intake-table input[type="text"], .intake-table input[type="number"], .intake-table select { width: 100%; padding: 6px 8px; border: 1px solid #ccd6e6; border-radius: 6px; font-size: 12px; }
-    .intake-chip { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 10px; font-weight: 700; }
+    .intake-table input[type="text"], .intake-table input[type="number"], .intake-table select { width: 100%; padding: 6px 8px; border: 1px solid #ccd6e6; border-radius: 6px; font-size: 12px; }    .intake-chip { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 10px; font-weight: 700; }
     .intake-chip.in { background: #e6f4ea; color: #1b6f3a; border: 1px solid #b7ddc4; }
     .intake-chip.out { background: #f3f4f6; color: #6b7280; border: 1px solid #d5d8de; }
     .note { font-size: 11px; color: #666; margin-top: 12px; padding: 12px; background: #f9f7f3; border-radius: 4px; line-height: 1.5; }
@@ -96,8 +94,7 @@
   <aside class="sidebar">
     <div class="brand">
       <div class="brand-mark">
-        <img src="logo-vfi.jpg" alt="VFI Logo" />
-        <span class="brand-mark-fallback">VFI</span>
+        <img src="logo-vfi.jpg" alt="VFI Logo" />        <span class="brand-mark-fallback">VFI</span>
       </div>
       <div class="brand-text">
         <span class="brand-name">Veritas</span>
@@ -135,8 +132,7 @@
     </nav>
 
     <div class="sidebar-foot">
-      <div class="plan-chip"><span style="color:var(--green)">●</span> Secure Connection · encrypted &amp; confidential</div>
-    </div>
+      <div class="plan-chip"><span style="color:var(--green)">●</span> Secure Connection · encrypted &amp; confidential</div>    </div>
   </aside>
 
   <!-- ===================== MAIN ===================== -->
@@ -147,16 +143,14 @@
         <button class="matter-btn">
           <strong>Matter v. Case</strong>
           <span class="case-no">No. [Case Number] · [Jurisdiction]</span>
-          <span class="chev">▾</span>
-        </button>
+          <span class="chev">▾</span>        </button>
       </div>
       <div class="topbar-right">
         <div class="user">
           <div class="avatar">TH</div>
           <div class="user-meta">
             <span class="user-name">Workspace User</span>
-            <span class="user-role">Ossandon Matter</span>
-          </div>
+            <span class="user-role">Ossandon Matter</span>          </div>
         </div>
       </div>
     </header>
@@ -191,15 +185,13 @@
             <div id="csSelectionSaveLine" style="margin-top:6px;font-size:11px;color:#4d5f78;">Selection status: waiting for first save.</div>
             <div id="csTopIncomeBreakdown" style="margin-top:8px;padding:10px;border:1px solid #dce7f3;border-radius:10px;background:#f8fbff;color:#213b5a;font-size:12px;line-height:1.45;"></div>
             <div class="note" style="margin-top:12px;background:transparent;padding:0;">
-              Presumptive amount under AZ §25-320 using the income-shares model for the Ossandon matter. This screen supports spousal-maintenance reallocation, other-child-support adjustments, child medical coverage, work-related child care, extraordinary child expenses, transportation / exchange costs, and direct-pay credits.
-            </div>
+              Presumptive amount under AZ §25-320 using the income-shares model for the Ossandon matter. This screen supports spousal-maintenance reallocation, other-child-support adjustments, child medical coverage, work-related child care, extraordinary child expenses, transportation / exchange costs, and direct-pay credits.            </div>
           </div>
         </div>
         <div class="formula-note">
           <div class="formula-pill">How this result is built</div>
           <div id="csExplanationText" style="font-size:12px;line-height:1.55"></div>
-          <div class="scenario-tip" id="csScenarioTip">Both parties' income is set on the Income Engine. Adjust parenting time or the direct child-expense credits to see how the presumptive amount changes.</div>
-        </div>
+          <div class="scenario-tip" id="csScenarioTip">Both parties' income is set on the Income Engine. Adjust parenting time or the direct child-expense credits to see how the presumptive amount changes.</div>        </div>
       </div>
 
       <!-- Adjustments -->
@@ -222,8 +214,7 @@
             <div style="display:flex;gap:8px;flex-wrap:wrap;">
               <button id="applyNicoCaregiverWorkpaperBtn" class="btn ghost" type="button">Apply latest 12-month average credit</button>
             </div>
-            <span id="nicoCaregiverWorkpaperStatus" style="font-size:11px;color:#5b6472"></span>
-          </div>
+            <span id="nicoCaregiverWorkpaperStatus" style="font-size:11px;color:#5b6472"></span>          </div>
           <div class="workpaper-summary">
             <div class="workpaper-card">
               <h5>Named caregiver total</h5>
@@ -263,8 +254,7 @@
           <div class="workpaper-summary" style="grid-template-columns: repeat(2, minmax(0, 1fr));">
             <div class="workpaper-card">
               <h5>Coni reimbursement due</h5>
-              <div class="value">$2,015.70</div>
-              <div class="sub">30% of the latest 12-month named caregiver payments under the temp-orders split.</div>
+              <div class="value">$2,015.70</div>              <div class="sub">30% of the latest 12-month named caregiver payments under the temp-orders split.</div>
             </div>
             <div class="workpaper-card">
               <h5>Phone-share estimate</h5>
@@ -355,8 +345,7 @@
             </div>
             <div class="income-row">
               <span class="income-label">Other-child support adjustment, Parent B ($/mo)<br><span style="font-size:11px;color:#999">reduces Parent B adjusted gross income if allowed</span></span>
-              <input type="number" id="parentBOtherSupport" class="income-input" placeholder="0">
-            </div>
+              <input type="number" id="parentBOtherSupport" class="income-input" placeholder="0">            </div>
           </div>
           <div class="party-card">
             <div class="income-row">
@@ -365,8 +354,7 @@
             </div>
             <div class="income-row">
               <span class="income-label">All children age 12+<br><span style="font-size:11px;color:#999">mandatory +10% BCSO</span></span>
-              <input type="checkbox" id="age12plus" checked style="width:20px;height:20px">
-            </div>
+              <input type="checkbox" id="age12plus" checked style="width:20px;height:20px">            </div>
           </div>
         </div>
       </div>
@@ -393,8 +381,7 @@
             </div>
             <div class="income-row">
               <span class="income-label">Disabled dependent age</span>
-              <input type="number" id="disabledAdultAge" class="income-input" min="18" max="99" value="20">
-            </div>
+              <input type="number" id="disabledAdultAge" class="income-input" min="18" max="99" value="20">            </div>
           </div>
           <div class="party-card">
             <div class="income-row">
@@ -414,8 +401,7 @@
               <button id="applyIntakeBtn" class="btn ghost" type="button">Apply intake to calculator</button>
               <span id="intakeApplyStatus" style="font-size:11px;color:#5b6472"></span>
             </div>
-            <div class="note" id="intakeSummary" style="margin-top:8px;">
-              Intake not yet applied.
+            <div class="note" id="intakeSummary" style="margin-top:8px;">              Intake not yet applied.
             </div>
           </div>
         </div>
@@ -438,16 +424,14 @@
               <tbody id="childProfileRows"></tbody>
             </table>
           </div>
-          <p class="note" id="childProfileFootnote">Per-child inclusion is shown for audit. Calculator still uses AZ schedule with up to 4 children.</p>
-        </details>
+          <p class="note" id="childProfileFootnote">Per-child inclusion is shown for audit. Calculator still uses AZ schedule with up to 4 children.</p>        </details>
       </div>
 
       <!-- Number of Children (compact, inline with intake) -->
       <div style="padding:0 0 4px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
         <span style="font-size:12px;font-weight:600;color:#1c3f66;">Children in calculation:</span>
         <div class="children-selector" id="childrenSelector" style="display:flex;gap:6px;margin:0;"></div>
-        <span style="font-size:11px;color:#666;">Override if needed — intake auto-sets this.</span>
-      </div>
+        <span style="font-size:11px;color:#666;">Override if needed — intake auto-sets this.</span>      </div>
 
       <!-- Income Selection (spousal-style scenario cards) -->
       <div class="cs-grid">
@@ -489,8 +473,7 @@
             <span class="income-value" id="coniAGI">$0</span>
           </div>
           <input type="hidden" id="coniWages"><input type="hidden" id="coniSelfEmp"><input type="hidden" id="coniBonus">
-          <input type="hidden" id="coniInvestment"><input type="hidden" id="coniSS"><input type="hidden" id="coniUnemployment">
-        </div>
+          <input type="hidden" id="coniInvestment"><input type="hidden" id="coniSS"><input type="hidden" id="coniUnemployment">        </div>
       </div>
 
       <div class="advanced-toggle-row">
@@ -500,8 +483,7 @@
       <section id="csAdvancedPanel" class="advanced-tools" hidden>
       <div class="panel">
         <div class="panel-head">
-          <h3>📊 Calculation Breakdown</h3>
-          <span class="tag">AZ §25-320 steps</span>
+          <h3>📊 Calculation Breakdown</h3>          <span class="tag">AZ §25-320 steps</span>
         </div>
         <div class="calculation-panel">
           <div class="calc-step">
@@ -546,8 +528,7 @@
           </div>
           <div class="calc-step">
             <span class="calc-step-label">Other direct child-expense credits (Parent A)</span>
-            <span class="calc-step-value" id="calcDirectCredits">—</span>
-          </div>
+            <span class="calc-step-value" id="calcDirectCredits">—</span>          </div>
         </div>
       </div>
 
@@ -558,8 +539,7 @@
           <span class="tag">For reference</span>
         </div>
         <p class="panel-note">Basic Child Support Obligation (BCSO) anchors used by this calculator, taken from the parties' own 4/27/26 and 5/14/26 worksheets. The published AZ Schedule tops out at $30,000/mo combined income; above that ceiling the $30k row is presumptive. 2- and 1-child figures are extrapolated from the confirmed 3-child anchor (exact AZ Schedule values still to be verified).</p>
-        <div style="overflow-x: auto;">
-          <table class="guideline-table">
+        <div style="overflow-x: auto;">          <table class="guideline-table">
             <thead>
               <tr>
                 <th>Combined adjusted income /mo</th>
@@ -582,26 +562,22 @@
                 <td class="amount">$4,723</td>
                 <td class="amount">$4,010</td>
                 <td class="amount">$2,612</td>
-                <td>5/14/26 worksheet ($30k row)</td>
-              </tr>
+                <td>5/14/26 worksheet ($30k row)</td>              </tr>
             </tbody>
           </table>
         </div>
-        <p class="note">Between the confirmed point and the $30k cap the calculator interpolates the 3-child BCSO; the 2-child (×0.849) and 1-child (×0.553) columns scale from it. Above $30,000/mo combined the $30k row applies presumptively (the party seeking more carries the burden). Exact AZ Schedule values remain pending verification per case documentation.</p>
-      </div>
+        <p class="note">Between the confirmed point and the $30k cap the calculator interpolates the 3-child BCSO; the 2-child (×0.849) and 1-child (×0.553) columns scale from it. Above $30,000/mo combined the $30k row applies presumptively (the party seeking more carries the burden). Exact AZ Schedule values remain pending verification per case documentation.</p>      </div>
       </section>
 
       <footer class="foot">
         <span>Veritas · Child Support Calculator</span>
-        <span class="foot-dim">AZ §25-320 Guidelines · 2022 Model · Non-binding reference only</span>
-      </footer>
+        <span class="foot-dim">AZ §25-320 Guidelines · 2022 Model · Non-binding reference only</span>      </footer>
     </div>
   </main>
 
   <script src="api-client.js"></script>
   <script src="case-manager.js"></script>
   <script src="calculator.js"></script>
-  <script src="//cdn.socket.io/4.6.0/socket.io.min.js"></script>
   <script src="socket-client.js"></script>
   <script src="sync-handler.js"></script>
   <script src="safe-text.js"></script>
@@ -613,4 +589,3 @@
   <script src="logo-handler.js"></script>
 </body>
 </html>
-

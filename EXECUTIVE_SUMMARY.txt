@@ -120,7 +120,11 @@ COMPLETION: 100% of planned scope
     ✅ Touch-friendly buttons
     ✅ Readable text at all sizes
 
+<<<<<<< HEAD
 12. OSSANDON CASE - SAMPLE DATA EXTRACTION
+=======
+12. Template Matter CASE - SAMPLE DATA EXTRACTION
+>>>>>>> cbd6749 (Clean stale case data and neutralize templates)
     ✅ Processed 17 Chase Freedom CC statements
     ✅ Extracted 945 transactions
     ✅ Auto-mapped 219 transactions (23%)
@@ -171,7 +175,11 @@ COMPATIBILITY:
 1. BUILD_COMPLETE_SUMMARY.md (5 pages)
    - Complete feature list
    - Deliverables breakdown
+<<<<<<< HEAD
    - Ossandon case analysis
+=======
+   - Template Matter case analysis
+>>>>>>> cbd6749 (Clean stale case data and neutralize templates)
    - File manifest
    - User workflow documentation
 
@@ -218,7 +226,11 @@ COMPATIBILITY:
 ✅ No console JavaScript errors
 ✅ Processing timeline displays 5-step flow
 ✅ 30-second timeout protection active
+<<<<<<< HEAD
 ✅ Ossandon sample data extracts correctly ($17,612.78 verified)
+=======
+✅ Template Matter sample data extracts correctly ($17,612.78 verified)
+>>>>>>> cbd6749 (Clean stale case data and neutralize templates)
 
 ================================================================================
  WHAT NEEDS TO HAPPEN NEXT
@@ -408,8 +420,13 @@ Documentation Files:
   └─ EXECUTIVE_SUMMARY.txt (This file)
 
 Sample Data Files:
+<<<<<<< HEAD
   ├─ ossandon-extracted-expenses.json
   ├─ ossandon-extracted-income.json
+=======
+  ├─ Template Matter-extracted-expenses.json
+  ├─ Template Matter-extracted-income.json
+>>>>>>> cbd6749 (Clean stale case data and neutralize templates)
   └─ OSSANDON_AFI_FINAL_AMOUNTS.md
 
 ================================================================================

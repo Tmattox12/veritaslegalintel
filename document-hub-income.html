@@ -2,8 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Income Documents - Document Hub - Veritas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />  <title>Income Documents - Document Hub - Veritas</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -248,8 +247,7 @@
   <aside class="sidebar">
     <div class="brand">
       <div class="brand-mark">
-        <img src="logo-vfi.jpg" alt="VFI Logo" />
-        <span class="brand-mark-fallback">VFI</span>
+        <img src="logo-vfi.jpg" alt="VFI Logo" />        <span class="brand-mark-fallback">VFI</span>
       </div>
       <div class="brand-text">
         <span class="brand-name">Veritas</span>
@@ -268,8 +266,7 @@
     </nav>
 
     <div class="sidebar-foot">
-      <div class="plan-chip"><span style="color:var(--green)">●</span> Secure Connection · encrypted &amp; confidential</div>
-    </div>
+      <div class="plan-chip"><span style="color:var(--green)">●</span> Secure Connection · encrypted &amp; confidential</div>    </div>
   </aside>
 
   <!-- ===================== MAIN ===================== -->
@@ -280,8 +277,7 @@
         <div class="area-title">💵 Income Documents</div>
         <div class="area-subtitle">W2s, 1099s, pay stubs, business income, and other income sources</div>
         <div class="breadcrumb">
-          <a href="document-hub-master.html">← Back to Document Hub</a>
-        </div>
+          <a href="document-hub-master.html">← Back to Document Hub</a>        </div>
       </div>
     </div>
 
@@ -299,8 +295,7 @@
         </div>
         <div class="stat-box">
           <div class="stat-label">Total Income</div>
-          <div class="stat-value" id="totalIncome">$0</div>
-        </div>
+          <div class="stat-value" id="totalIncome">$0</div>        </div>
       </div>
 
       <!-- Upload Section -->
@@ -325,8 +320,7 @@
         </div>
 
         <div style="background: #fff8e1; border-left: 3px solid #fbc02d; padding: 12px 15px; border-radius: 4px; margin-top: 12px; font-size: 12px; color: #333;">
-          <strong>💡 Tip:</strong> Upload pay stubs to auto-extract employment history and income verification. Upload tax returns for comprehensive income summary.
-        </div>
+          <strong>💡 Tip:</strong> Upload pay stubs to auto-extract employment history and income verification. Upload tax returns for comprehensive income summary.        </div>
       </div>
 
       <!-- Income Categories -->
@@ -362,8 +356,7 @@
             <div class="category-desc">Rental property income</div>
           </div>
           <div class="category-item" onclick="selectCategory('other')">
-            <div class="category-icon">💰</div>
-            <div class="category-name">Other Income</div>
+            <div class="category-icon">💰</div>            <div class="category-name">Other Income</div>
             <div class="category-desc">Bonuses, gifts, settlements</div>
           </div>
         </div>
@@ -376,15 +369,13 @@
           <div class="empty-state">
             <div class="empty-icon">📭</div>
             <div class="empty-title">No documents uploaded yet</div>
-            <p style="font-size: 12px; margin-top: 6px;">Upload income documents above to get started</p>
-          </div>
+            <p style="font-size: 12px; margin-top: 6px;">Upload income documents above to get started</p>          </div>
         </div>
       </div>
     </div>
 
     <footer class="foot" style="margin-top: 48px;">
-      <span>Veritas · Income Documents</span>
-      <span class="foot-dim">Part of Master Document Hub</span>
+      <span>Veritas · Income Documents</span>      <span class="foot-dim">Part of Master Document Hub</span>
     </footer>
   </main>
 
@@ -438,8 +429,7 @@
           <div class="empty-state">
             <div class="empty-icon">📭</div>
             <div class="empty-title">No documents uploaded yet</div>
-            <p style="font-size: 12px; margin-top: 6px;">Upload income documents above to get started</p>
-          </div>
+            <p style="font-size: 12px; margin-top: 6px;">Upload income documents above to get started</p>          </div>
         `;
         return;
       }
@@ -465,8 +455,7 @@
             <div class="doc-name">${doc.fileName}</div>
             <div class="doc-meta">
               ${new Date(doc.timestamp).toLocaleDateString()} ·
-              ${doc.category.toUpperCase()} ·
-              ${(doc.fileSize / 1024 / 1024).toFixed(2)} MB
+              ${doc.category.toUpperCase()} ·              ${(doc.fileSize / 1024 / 1024).toFixed(2)} MB
             </div>
           </div>
           <div class="doc-stat">${doc.items || 0} items</div>

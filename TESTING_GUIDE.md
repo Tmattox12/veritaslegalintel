@@ -307,7 +307,11 @@ On afi.html:
 
 #### Test 7.2: AFI Data Population
 ```
+<<<<<<< HEAD
 With Ossandon test data:
+=======
+With Template Matter test data:
+>>>>>>> cbd6749 (Clean stale case data and neutralize templates)
   ❑ Upload Chase Freedom CC statements
   ❑ Verify auto-mapping works (75%+ confidence)
   ❑ Check AFI expense totals:

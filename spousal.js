@@ -1,0 +1,1 @@
+(function() { 'use strict'; console.log('spousal.js loaded'); })();

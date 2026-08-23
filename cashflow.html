@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cash Flow | Veritas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .cashflow-layout { display:grid; grid-template-columns:minmax(0,1fr) 300px; gap:18px; align-items:start; }
+    .party-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; }
+    .party-card, .control-card { border:1px solid var(--line); border-radius:8px; background:var(--card); overflow:hidden; }
+    .party-head { display:flex; align-items:center; justify-content:space-between; padding:14px 16px; border-top:4px solid var(--navy-600); border-bottom:1px solid var(--line); }
+    .party-card.secondary .party-head { border-top-color:var(--gold); }
+    .party-head h2, .control-card h2 { color:var(--navy-900); font-size:15px; }
+    .party-body { padding:4px 16px 14px; }
+    .cash-row { display:grid; grid-template-columns:minmax(0,1fr) 112px; gap:10px; align-items:center; min-height:48px; border-bottom:1px solid var(--line-soft); }
+    .cash-row:last-child { border-bottom:0; }
+    .cash-row label { color:var(--slate); font-size:12px; line-height:1.25; }
+    .cash-row input { width:100%; border:1px solid #cfd8e6; border-radius:6px; padding:7px 8px; text-align:right; font:600 12px/1.2 Inter,sans-serif; color:var(--ink); }
+    .cash-row input:focus { outline:2px solid rgba(39,69,102,.16); border-color:var(--navy-600); }
+    .cash-row.total { border-top:2px solid var(--line); font-weight:700; }
+    .cash-row.total output { text-align:right; font-family:Fraunces,serif; font-size:19px; color:var(--navy-900); }
+    .result-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin-top:18px; }
+    .result { border:1px solid var(--line); border-radius:8px; padding:12px; background:var(--bg); }
+    .result span { display:block; color:var(--slate); font-size:10px; font-weight:700; letter-spacing:.4px; text-transform:uppercase; }
+    .result output { display:block; margin-top:6px; font:600 22px Fraunces,serif; color:var(--navy-900); }
+    .result output.negative { color:var(--red); }
+    .control-card { padding:14px; margin-bottom:12px; }
+    .control-card p { margin-top:6px; color:var(--slate); font-size:12px; line-height:1.45; }
+    .upload-box { margin-top:12px; border:2px dashed #cfd8e6; border-radius:8px; padding:17px 12px; text-align:center; background:var(--bg); }
+    .upload-box input { display:none; }
+    .upload-box label { display:block; color:var(--navy-700); font-size:12px; font-weight:600; cursor:pointer; }
+    .upload-box small { display:block; color:var(--mute); margin-top:5px; font-size:11px; }
+    .file-summary { margin-top:9px; color:var(--slate); font-size:11px; line-height:1.4; }
+    .notice { margin-bottom:18px; padding:11px 13px; border:1px solid #d7e5f6; border-left:4px solid var(--navy-600); border-radius:7px; background:#f7f9fc; color:var(--slate); font-size:12px; line-height:1.5; }
+    .notice strong { color:var(--navy-900); }
+    .cashflow-actions { display:flex; gap:9px; flex-wrap:wrap; }
+    .save-note { margin-top:10px; color:var(--mute); font-size:11px; line-height:1.4; }
+    @media (max-width:1100px) { .cashflow-layout { grid-template-columns:1fr; } .control-stack { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; } .control-card { margin:0; } }
+    @media (max-width:760px) { body { grid-template-columns:1fr; } .sidebar { display:none; } .topbar { padding:12px 18px; } .topbar-right { display:none; } .content { padding:20px 16px; } .page-head { align-items:flex-start; gap:14px; flex-direction:column; } .party-grid, .result-grid, .control-stack { grid-template-columns:1fr; } }
+  </style>
+</head>
+<body>
+  <aside class="sidebar">
+    <div class="brand"><div class="brand-mark"><img src="logo-vfi.jpg" alt="VFI Logo" /><span class="brand-mark-fallback">VFI</span></div><div class="brand-text"><span class="brand-name">Veritas</span><span class="brand-sub">Financial Intelligence</span></div></div>
+    <nav class="nav">
+      <div class="nav-group-label">Workspace</div>
+      <a class="nav-item" href="index.html">Dashboard</a><a class="nav-item" href="cases.html">Matters</a><a class="nav-item" href="schedules.html">Calendar</a>
+      <div class="nav-group-label">Analysis Modules</div>
+      <a class="nav-item" href="income-imputation.html">Income Engine</a><a class="nav-item" href="spousal.html">Support Calculator</a><a class="nav-item active" href="cashflow.html">Cash Flow</a><a class="nav-item" href="child-support.html">Child Support</a><a class="nav-item" href="estate.html">Inventory of Property and Debts</a><a class="nav-item" href="equitable-distribution.html">Equitable Distribution</a><a class="nav-item" href="asset-division-valuation.html">Asset Valuation</a><a class="nav-item" href="discovery-intake.html">Discovery</a><a class="nav-item" href="custody.html">Custody</a><a class="nav-item" href="afi.html">AFI Expenses</a><a class="nav-item" href="rsu.html">RSU Analysis</a><a class="nav-item" href="estate.html">Reports</a>
+    </nav>
+    <div class="sidebar-foot"><div class="plan-chip">Secure connection · encrypted and confidential</div></div>
+  </aside>
+  <main class="main">
+    <header class="topbar"><div class="matter-switcher"><span class="matter-label">Active Matter</span><div class="matter-btn"><strong>No active matter</strong><span class="case-no">Upload documents to populate this analysis</span></div></div><div class="topbar-right"><div class="user"><div class="avatar">VU</div><div class="user-meta"><span class="user-name">Workspace User</span><span class="user-role">Template workspace</span></div></div></div></header>
+    <div class="content">
+      <section class="page-head"><div><h1>Cash Flow</h1><p class="sub">Compare monthly cash position after income, transfers, and ordinary expenses.</p></div><div class="cashflow-actions"><button class="btn ghost" id="clearCashflow" type="button">Clear analysis</button><button class="btn primary" id="printCashflow" type="button">Print summary</button></div></section>
+      <div class="notice"><strong>Start with source documents.</strong> Upload bank statements, pay records, and expense schedules for reference, then enter verified monthly amounts below. Uploaded files remain in this browser session and are not sent anywhere by this template.</div>
+      <div class="cashflow-layout">
+        <div>
+          <div class="party-grid">
+            <section class="party-card"><div class="party-head"><h2>Party A</h2><span class="tag">monthly</span></div><div class="party-body">
+              <div class="cash-row"><label for="aIncome">Net employment income</label><input id="aIncome" type="number" min="0" step="0.01" value="0" /></div>
+              <div class="cash-row"><label for="aOther">Other cash income</label><input id="aOther" type="number" min="0" step="0.01" value="0" /></div>
+              <div class="cash-row"><label for="aSupport">Support received</label><input id="aSupport" type="number" min="0" step="0.01" value="0" /></div>
+              <div class="cash-row"><label for="aExpenses">Ordinary expenses</label><input id="aExpenses" type="number" min="0" step="0.01" value="0" /></div>
+              <div class="cash-row"><label for="aPaid">Support and direct costs paid</label><input id="aPaid" type="number" min="0" step="0.01" value="0" /></div>
+              <div class="cash-row total"><label>Remaining monthly cash</label><output id="aRemaining">$0.00</output></div>
+            </div></section>
+            <section class="party-card secondary"><div class="party-head"><h2>Party B</h2><span class="tag">monthly</span></div><div class="party-body">
+              <div class="cash-row"><label for="bIncome">Net employment income</label><input id="bIncome" type="number" min="0" step="0.01" value="0" /></div>
+              <div class="cash-row"><label for="bOther">Other cash income</label><input id="bOther" type="number" min="0" step="0.01" value="0" /></div>
+              <div class="cash-row"><label for="bSupport">Support received</label><input id="bSupport" type="number" min="0" step="0.01" value="0" /></div>
+              <div class="cash-row"><label for="bExpenses">Ordinary expenses</label><input id="bExpenses" type="number" min="0" step="0.01" value="0" /></div>
+              <div class="cash-row"><label for="bPaid">Support and direct costs paid</label><input id="bPaid" type="number" min="0" step="0.01" value="0" /></div>
+              <div class="cash-row total"><label>Remaining monthly cash</label><output id="bRemaining">$0.00</output></div>
+            </div></section>
+          </div>
+          <section class="panel" style="margin-top:18px"><div class="panel-head"><h3>Cash Position Summary</h3><span class="tag" id="cashflowState">Awaiting inputs</span></div><div class="result-grid"><div class="result"><span>Party A remaining</span><output id="summaryA">$0.00</output></div><div class="result"><span>Party B remaining</span><output id="summaryB">$0.00</output></div><div class="result"><span>Difference</span><output id="summaryDifference">$0.00</output></div></div><p class="panel-note" id="cashflowNarrative" style="margin-top:14px">Enter verified monthly values to compare each household's remaining cash.</p></section>
+        </div>
+        <aside class="control-stack"><section class="control-card"><h2>Source documents</h2><p>Use the upload list as a work queue while you validate the entries.</p><div class="upload-box"><label for="cashflowFiles">Select source documents</label><small>PDF, spreadsheet, image, or statement</small><input id="cashflowFiles" type="file" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.jpg,.jpeg,.png" /></div><div class="file-summary" id="cashflowFileSummary">No documents selected.</div></section><section class="control-card"><h2>Method notes</h2><p>Use net cash actually available for spending. Identify non-cash compensation, tax reserves, and disputed expenses separately in the supporting workpapers.</p><p class="save-note" id="cashflowSaveNote">Draft values are saved locally in this browser.</p></section></aside>
+      </div>
+    </div>
+  </main>
+  <script src="cashflow.js"></script>
+  <script src="template-data-sanitizer.js"></script>
+</body>
+</html>

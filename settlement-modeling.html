@@ -2,8 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Settlement Modeling - Veritas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />  <title>Settlement Modeling - Veritas</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -53,8 +52,7 @@
   <aside class="sidebar">
     <div class="sidebar-head">
       <div class="logo-section">
-        <span class="logo-text">⚖️ VERITAS</span>
-        <span class="logo-sub">Legal Intelligence</span>
+        <span class="logo-text">⚖️ VERITAS</span>        <span class="logo-sub">Legal Intelligence</span>
       </div>
     </div>
     <nav class="nav">
@@ -66,8 +64,7 @@
       <a class="nav-item" href="spousal.html"><span class="nav-ico">👥</span> Spousal Support</a>
     </nav>
     <div class="sidebar-foot">
-      <div class="plan-chip"><span style="color:var(--green)">●</span> Secure Connection</div>
-    </div>
+      <div class="plan-chip"><span style="color:var(--green)">●</span> Secure Connection</div>    </div>
   </aside>
 
   <main class="main">
@@ -93,8 +90,7 @@
 
     <div class="settlement-container">
       <div class="settlement-header">
-        <h1 class="settlement-title">⇄ Settlement Modeling</h1>
-        <p class="settlement-subtitle">Compare settlement proposals side-by-side with complete financial impact analysis</p>
+        <h1 class="settlement-title">⇄ Settlement Modeling</h1>        <p class="settlement-subtitle">Compare settlement proposals side-by-side with complete financial impact analysis</p>
       </div>
 
       <div class="warning-box">
@@ -111,7 +107,6 @@
 
       <div class="input-panel">
         <div class="panel-title">📊 Comparison Metrics</div>
-
         <div class="warning-box">
           Enter settlement terms for each scenario. The tool automatically calculates totals and compares outcomes.
         </div>
@@ -128,8 +123,7 @@
           </thead>
           <tbody id="comparisonBody">
             <tr>
-              <td colspan="5" style="text-align: center; padding: 20px; color: #999;">Add scenarios to compare</td>
-            </tr>
+              <td colspan="5" style="text-align: center; padding: 20px; color: #999;">Add scenarios to compare</td>            </tr>
           </tbody>
         </table>
       </div>
@@ -146,8 +140,7 @@
           ✓ Can Party A afford to pay support?<br>
           ✓ Can Party B survive on assets + support?<br>
           ✓ Are debts assigned to paying party?<br>
-          ✓ Is cash flow sustainable post-divorce?<br><br>
-          <strong>Key Terms:</strong><br>
+          ✓ Is cash flow sustainable post-divorce?<br><br>          <strong>Key Terms:</strong><br>
           • Asset Division (%) vs. Support ($ amount)<br>
           • Child Support vs. Spousal Support balance<br>
           • Debt assignment impact on net worth<br>
@@ -163,7 +156,6 @@
     function addScenario() {
       const id = Date.now();
       const name = prompt('Scenario name (e.g., "Proposal A", "50/50 Split", "Unequal Division"):');
-
       if (!name) return;
 
       scenarios.push({
@@ -213,8 +205,7 @@
               <span class="scenario-label">Debts Assigned</span>
               <input type="number" class="form-input" style="width: 80px; padding: 4px; font-size: 11px;" value="${scenario.partyADebt}" onchange="updateScenario(${scenario.id}, 'partyADebt', this.value)" step="1000">
             </div>
-            <div class="scenario-item total">
-              <span class="scenario-label">NET TOTAL</span>
+            <div class="scenario-item total">              <span class="scenario-label">NET TOTAL</span>
               <span class="scenario-value">$${partyATotal.toLocaleString('en-US', {minimumFractionDigits: 0})}</span>
             </div>
           </div>
@@ -237,16 +228,14 @@
               <span class="scenario-label">Debts Assigned</span>
               <input type="number" class="form-input" style="width: 80px; padding: 4px; font-size: 11px;" value="${scenario.partyBDebt}" onchange="updateScenario(${scenario.id}, 'partyBDebt', this.value)" step="1000">
             </div>
-            <div class="scenario-item total">
-              <span class="scenario-label">NET TOTAL</span>
+            <div class="scenario-item total">              <span class="scenario-label">NET TOTAL</span>
               <span class="scenario-value">$${partyBTotal.toLocaleString('en-US', {minimumFractionDigits: 0})}</span>
             </div>
           </div>
         </div>`;
       });
 
-      document.getElementById('scenariosContainer').innerHTML = html || '<div style="text-align: center; padding: 40px; color: #999;">Click "Add Scenario" to begin modeling settlements</div>';
-      updateComparison();
+      document.getElementById('scenariosContainer').innerHTML = html || '<div style="text-align: center; padding: 40px; color: #999;">Click "Add Scenario" to begin modeling settlements</div>';      updateComparison();
     }
 
     function updateScenario(id, field, value) {
@@ -264,8 +253,7 @@
 
     function updateComparison() {
       if (scenarios.length === 0) {
-        document.getElementById('comparisonBody').innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px; color: #999;">Add scenarios to compare</td></tr>';
-        return;
+        document.getElementById('comparisonBody').innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 20px; color: #999;">Add scenarios to compare</td></tr>';        return;
       }
 
       let html = '';

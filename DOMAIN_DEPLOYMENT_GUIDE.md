@@ -11,9 +11,15 @@
 ## ✅ Pre-Deployment Checklist
 
 All case data has been successfully removed:
+<<<<<<< HEAD
 - ✅ Ossandon case files deleted
 - ✅ Coni references removed
 - ✅ Luis references removed
+=======
+- ✅ Template Matter case files deleted
+- ✅ Parent B references removed
+- ✅ Parent A references removed
+>>>>>>> cbd6749 (Clean stale case data and neutralize templates)
 - ✅ Case-specific income data cleared
 - ✅ Hard-coded financial amounts removed
 - ✅ Test data cleaned from all forms
@@ -296,9 +302,15 @@ After deployment, verify:
 - [ ] Reset utility functions
 
 ### Data Integrity
+<<<<<<< HEAD
 - [ ] No Ossandon references anywhere
 - [ ] No Coni references anywhere
 - [ ] No Luis references anywhere
+=======
+- [ ] No Template Matter references anywhere
+- [ ] No Parent B references anywhere
+- [ ] No Parent A references anywhere
+>>>>>>> cbd6749 (Clean stale case data and neutralize templates)
 - [ ] No financial amounts show
 - [ ] Forms show blank templates
 - [ ] localStorage is empty on fresh load

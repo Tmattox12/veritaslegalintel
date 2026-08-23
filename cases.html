@@ -2,8 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Case Management — Veritas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />  <title>Case Management — Veritas</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -15,8 +14,7 @@
   <aside class="sidebar">
     <div class="brand">
       <div class="brand-mark">
-        <img src="logo-vfi.jpg" alt="VFI Logo" />
-        <span class="brand-mark-fallback">VFI</span>
+        <img src="logo-vfi.jpg" alt="VFI Logo" />        <span class="brand-mark-fallback">VFI</span>
       </div>
       <div class="brand-text">
         <span class="brand-name">Veritas</span>
@@ -38,8 +36,7 @@
       <a class="nav-item" href="equitable-distribution.html"><span class="nav-ico">📊</span> Equitable Distribution</a>
       <a class="nav-item" href="regulations.html"><span class="nav-ico">§</span> Regulations</a>
     </nav>
-    <div class="sidebar-foot"><div class="plan-chip">Firm Plan · 12 seats</div></div>
-  </aside>
+    <div class="sidebar-foot"><div class="plan-chip">Firm Plan · 12 seats</div></div>  </aside>
 
   <!-- ===================== MAIN ===================== -->
   <main class="main">
@@ -52,8 +49,7 @@
       </div>
       <div class="topbar-right">
         <button class="btn primary" onclick="showNewCaseModal()">+ New Case</button>
-        <button class="btn secondary" onclick="handleLogout()" style="margin-left: 8px;">Logout</button>
-      </div>
+        <button class="btn secondary" onclick="handleLogout()" style="margin-left: 8px;">Logout</button>      </div>
     </header>
 
     <div class="content">
@@ -68,8 +64,7 @@
             <button class="view-btn" data-view="list" title="List view">≡</button>
           </div>
           <div class="search-box">
-            <input type="text" id="searchInput" placeholder="Search cases..." />
-          </div>
+            <input type="text" id="searchInput" placeholder="Search cases..." />          </div>
         </div>
       </section>
 
@@ -86,8 +81,7 @@
 
       <footer class="foot">
         <span>Veritas · Case Management</span>
-        <span class="foot-dim">Multi-case support with real-time sync · Cloud persistence</span>
-      </footer>
+        <span class="foot-dim">Multi-case support with real-time sync · Cloud persistence</span>      </footer>
     </div>
   </main>
 
@@ -102,8 +96,7 @@
         <div class="modal-body">
           <div class="form-group">
             <label class="form-label">Case Name *</label>
-            <input type="text" id="caseName" class="form-input" placeholder="e.g., Party A v. Party B" required>
-            <span class="form-hint">Name that identifies the case parties</span>
+            <input type="text" id="caseName" class="form-input" placeholder="e.g., Party A v. Party B" required>            <span class="form-hint">Name that identifies the case parties</span>
           </div>
           <div class="form-row">
             <div class="form-group">
@@ -112,8 +105,7 @@
             </div>
             <div class="form-group">
               <label class="form-label">Court / Jurisdiction *</label>
-              <input type="text" id="court" class="form-input" placeholder="e.g., County Court" required>
-            </div>
+              <input type="text" id="court" class="form-input" placeholder="e.g., County Court" required>            </div>
           </div>
           <div class="form-group">
             <label class="form-label">Petitioner / Party A Name</label>
@@ -126,8 +118,7 @@
         </div>
         <div class="modal-footer">
           <button type="button" class="btn secondary" onclick="hideNewCaseModal()">Cancel</button>
-          <button type="submit" class="btn primary">Create Case</button>
-        </div>
+          <button type="submit" class="btn primary">Create Case</button>        </div>
       </form>
     </div>
   </div>
@@ -139,8 +130,7 @@
         <div class="modal-title" id="detailsTitle">Case Details</div>
         <button class="modal-close" onclick="hideCaseDetailsModal()">×</button>
       </div>
-      <div class="modal-body" id="caseDetailsContent">
-        <!-- Will be populated dynamically -->
+      <div class="modal-body" id="caseDetailsContent">        <!-- Will be populated dynamically -->
       </div>
     </div>
   </div>
@@ -162,21 +152,18 @@
             <label class="form-label">Role *</label>
             <select id="shareRole" class="form-input" required>
               <option value="viewer">Viewer (read-only access)</option>
-              <option value="editor">Editor (can edit case data)</option>
-            </select>
+              <option value="editor">Editor (can edit case data)</option>            </select>
           </div>
         </div>
         <div class="modal-footer">
           <button type="button" class="btn secondary" onclick="hideShareModal()">Cancel</button>
-          <button type="submit" class="btn primary">Share Case</button>
-        </div>
+          <button type="submit" class="btn primary">Share Case</button>        </div>
       </form>
     </div>
   </div>
 
   <!-- ===================== LOADING SPINNER ===================== -->
-  <div class="loading-spinner" id="loadingSpinner">
-    <div class="spinner"></div>
+  <div class="loading-spinner" id="loadingSpinner">    <div class="spinner"></div>
   </div>
 
   <script src="api-client.js"></script>

@@ -10,7 +10,11 @@
 - [x] Verify zero case-specific names in all infrastructure files
 
 ### Sample Data Layer
+<<<<<<< HEAD
 - [x] Create `sampleData.js` with fictional Anderson v. Anderson case
+=======
+- [x] Create `sampleData.js` with fictional [Case Name] case
+>>>>>>> cbd6749 (Clean stale case data and neutralize templates)
 - [x] Create generic `app.js` dashboard using sample data
 - [x] Create generic `reconData.js` with sample transactions
 - [x] Create generic `calculations-registry.js` with sample income
@@ -22,7 +26,11 @@
 - [x] Create this checklist (tracking progress for future phases)
 
 ### Verification
+<<<<<<< HEAD
 - [x] Grep sweep: `app.js`, `reconData.js`, `calculations-registry.js`, `sampleData.js`, `doc-linking-integration.js` all have ZERO Ossandon/Luis/Coni/Nico names
+=======
+- [x] Grep sweep: `app.js`, `reconData.js`, `calculations-registry.js`, `sampleData.js`, `doc-linking-integration.js` all have ZERO Template Matter/Parent A/Parent B/Nico names
+>>>>>>> cbd6749 (Clean stale case data and neutralize templates)
 - [x] File count: 56 files, 1.2MB (vs. 900MB original with PDFs)
 - [x] Entry point: `index.html` loads with sample dashboard stats
 
@@ -68,7 +76,11 @@ These 10 JS modules contain hardcoded case values and need to be rewritten to re
 
 ### Search & Replace Pattern
 For each module, the pattern is:
+<<<<<<< HEAD
 1. Replace hardcoded `const LuisName = 'Luis';` with reads from `SAMPLE_CASE.parties.petitioner.name`
+=======
+1. Replace hardcoded `const PartyAName = 'Parent A';` with reads from `SAMPLE_CASE.parties.petitioner.name`
+>>>>>>> cbd6749 (Clean stale case data and neutralize templates)
 2. Replace hardcoded dollar amounts with reads from `calculations-registry.js` or `sampleData.js`
 3. Replace real transaction lists with `reconData.js` categories
 4. Keep all calculation logic, render logic, UI patterns **unchanged**
@@ -150,14 +162,23 @@ For each module, the pattern is:
 ### Phase 1 Verification (Do This Now)
 - [ ] Open `http://localhost:8000/index.html` — dashboard loads
 - [ ] Click "Discovery Intake" tab — loads without errors
+<<<<<<< HEAD
 - [ ] Console (F12) shows no `Uncaught ReferenceError: Luis is not defined` errors
 - [ ] Grep for case names: `grep -r "Ossandon\|Luis\|Coni" webapp-template/*.js` returns ZERO
+=======
+- [ ] Console (F12) shows no `Uncaught ReferenceError: Parent A is not defined` errors
+- [ ] Grep for case names: `grep -r "Template Matter\|Parent A\|Parent B" webapp-template/*.js` returns ZERO
+>>>>>>> cbd6749 (Clean stale case data and neutralize templates)
 - [ ] Dashboard stats show sample numbers (e.g., "$2,850/mo · 11 yr" for spousal)
 
 ### Phase 2 Testing
 - [ ] Each genericized module loads its sample data correctly
 - [ ] Changing sample data in `sampleData.js` re-calculates numbers in modules
+<<<<<<< HEAD
 - [ ] No hardcoded Ossandon/Luis/Coni references remain in JS (except HTML embedded data)
+=======
+- [ ] No hardcoded Template Matter/Parent A/Parent B references remain in JS (except HTML embedded data)
+>>>>>>> cbd6749 (Clean stale case data and neutralize templates)
 
 ### Phase 3 Testing
 - [ ] Upload a test CSV file → file appears in file list
@@ -181,11 +202,19 @@ For each module, the pattern is:
 ### Architecture Observations
 1. **CLI vs. UI**: Currently you have Python scripts (build_*.py) that generate Excel workbooks offline. Future should be: user uploads documents → web UI processes & displays → no offline step needed.
 
+<<<<<<< HEAD
 2. **Data Flow**: Real Ossandon workflow: `hard-drive folders → Python builds Excel → manual calculations → stored in git`. Template workflow should be: `Upload tab → Document parsing → Veritas calculates & displays → saved in database → exportable Excel (optional)`.
 
 3. **Reusability**: The 80% of calculation logic (spousal support formula, child support worksheet, AFI variance) is all here and works. The other 20% is UI/data-plumbing (upload, parse, display). Focus Phase 2-3 on that plumbing, not recalculating the math.
 
 4. **Ossandon as Living Demo**: Keep the original `webapp/` (pointing to real case data via Python builds) as a **reference implementation** and demo of what the finished product looks like with real data. Template is the blank slate others fill in.
+=======
+2. **Data Flow**: Real Template Matter workflow: `hard-drive folders → Python builds Excel → manual calculations → stored in git`. Template workflow should be: `Upload tab → Document parsing → Veritas calculates & displays → saved in database → exportable Excel (optional)`.
+
+3. **Reusability**: The 80% of calculation logic (spousal support formula, child support worksheet, AFI variance) is all here and works. The other 20% is UI/data-plumbing (upload, parse, display). Focus Phase 2-3 on that plumbing, not recalculating the math.
+
+4. **Template Matter as Living Demo**: Keep the original `webapp/` (pointing to real case data via Python builds) as a **reference implementation** and demo of what the finished product looks like with real data. Template is the blank slate others fill in.
+>>>>>>> cbd6749 (Clean stale case data and neutralize templates)
 
 ---
 

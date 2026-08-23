@@ -123,8 +123,7 @@
       padding-top: 6px;
     }
     .form-group input[type="text"],
-    .form-group input[type="date"],
-    .form-group select,
+    .form-group input[type="date"],    .form-group select,
     .form-group textarea {
       padding: 8px 10.8px;
       border: 1px solid #ddd;
@@ -141,8 +140,7 @@
       box-shadow: 0 0 0 3px rgba(46, 91, 138, 0.1);
     }
     .form-group input[type="checkbox"],
-    .form-group input[type="radio"] {
-      width: 16px;
+    .form-group input[type="radio"] {      width: 16px;
       height: 16px;
       cursor: pointer;
       margin-right: 6px;
@@ -208,8 +206,7 @@
       border-radius: 4px;
       border: 1px solid #e5e5e5;
     }
-    .checklist-item input[type="checkbox"] {
-      width: 16px;
+    .checklist-item input[type="checkbox"] {      width: 16px;
       height: 16px;
       margin-top: 2px;
       flex-shrink: 0;
@@ -346,8 +343,7 @@
   <aside class="sidebar">
     <div class="brand">
       <div class="brand-mark">
-        <img src="logo-vfi.jpg" alt="VFI Logo" />
-        <span class="brand-mark-fallback">VFI</span>
+        <img src="logo-vfi.jpg" alt="VFI Logo" />        <span class="brand-mark-fallback">VFI</span>
       </div>
       <div class="brand-text">
         <span class="brand-name">Veritas</span>
@@ -386,8 +382,7 @@
     </nav>
 
     <div class="sidebar-foot">
-      <div class="plan-chip"><span style="color:var(--green)">●</span> Secure Connection · encrypted &amp; confidential</div>
-    </div>
+      <div class="plan-chip"><span style="color:var(--green)">●</span> Secure Connection · encrypted &amp; confidential</div>    </div>
   </aside>
 
   <main class="main">
@@ -405,8 +400,7 @@
 
   <div class="nav-bar">
     <div class="container">
-      <a href="afi.html">← Back to AFI Template</a>
-    </div>
+      <a href="afi.html">← Back to AFI Template</a>    </div>
   </div>
 
   <div class="container">
@@ -423,21 +417,18 @@
         </div>
         <div class="form-group">
           <label for="dob">Date of Birth</label>
-          <input type="date" id="dob" />
-        </div>
+          <input type="date" id="dob" />        </div>
       </div>
     </div>
 
     <!-- SECTION 2: KEY DATES (Case Timeline) -->
     <div class="form-section">
-      <div class="section-header" onclick="this.nextElementSibling.classList.toggle('open'); this.querySelector('.section-toggle').classList.toggle('closed')">
-        <h2>2. KEY DATES</h2>
+      <div class="section-header" onclick="this.nextElementSibling.classList.toggle('open'); this.querySelector('.section-toggle').classList.toggle('closed')">        <h2>2. KEY DATES</h2>
         <span class="section-toggle">+</span>
       </div>
       <div class="section-content">
         <div style="background: #e8f3ff; padding: 10px; border-left: 3px solid #2e5b8a; margin-bottom: 16px; border-radius: 4px;">
-          <p style="font-size: 10.8px; color: #2e5b8a; margin: 0;">
-            <strong>Help:</strong> Important family law case dates are used to calculate asset division periods, support duration, and other critical determinations. All fields are optional.
+          <p style="font-size: 10.8px; color: #2e5b8a; margin: 0;">            <strong>Help:</strong> Important family law case dates are used to calculate asset division periods, support duration, and other critical determinations. All fields are optional.
           </p>
         </div>
         <div class="form-group">
@@ -470,8 +461,7 @@
         </div>
         <div class="form-group">
           <label for="currentDate">Current Date</label>
-          <input type="date" id="currentDate" />
-        </div>
+          <input type="date" id="currentDate" />        </div>
       </div>
     </div>
 
@@ -486,8 +476,7 @@
           <label>Are you employed by an employer?</label>
           <div class="radio-group">
             <label><input type="radio" name="employedByEmployer" value="yes" onchange="toggleEmploymentDetails(this)" /> Yes</label>
-            <label><input type="radio" name="employedByEmployer" value="no" onchange="toggleEmploymentDetails(this)" /> No</label>
-          </div>
+            <label><input type="radio" name="employedByEmployer" value="no" onchange="toggleEmploymentDetails(this)" /> No</label>          </div>
         </div>
 
         <!-- EMPLOYMENT DETAILS - conditionally shown -->
@@ -503,20 +492,17 @@
           </div>
           <div class="form-group">
             <label for="startDate">Start Date</label>
-            <input type="date" id="startDate" />
-          </div>
+            <input type="date" id="startDate" />          </div>
 
           <div class="form-group">
             <label>Does your employer provide any non-cash benefits?</label>
             <div class="radio-group">
               <label><input type="radio" name="hasEmployerBenefits" value="yes" onchange="toggleEmployerBenefits(this)" /> Yes</label>
-              <label><input type="radio" name="hasEmployerBenefits" value="no" onchange="toggleEmployerBenefits(this)" /> No</label>
-            </div>
+              <label><input type="radio" name="hasEmployerBenefits" value="no" onchange="toggleEmployerBenefits(this)" /> No</label>            </div>
           </div>
 
           <!-- EMPLOYER BENEFITS - conditionally shown -->
-          <div id="employerBenefits" class="conditional-section">
-            <span class="conditional-section-title">Employer-Provided Benefits</span>
+          <div id="employerBenefits" class="conditional-section">            <span class="conditional-section-title">Employer-Provided Benefits</span>
             <div class="form-group">
               <label>Which benefits are provided?</label>
               <div class="checkbox-group">
@@ -529,16 +515,14 @@
             </div>
             <div class="form-group">
               <label for="benefitDetails">Provide details of benefits (amounts, frequency)</label>
-              <textarea id="benefitDetails" placeholder="Describe each benefit provided" rows="3"></textarea>
-            </div>
+              <textarea id="benefitDetails" placeholder="Describe each benefit provided" rows="3"></textarea>            </div>
           </div>
 
           <div class="form-group">
             <label>Do you receive bonuses or commissions?</label>
             <div class="radio-group">
               <label><input type="radio" name="hasBonus" value="yes" onchange="toggleBonusDetails(this)" /> Yes</label>
-              <label><input type="radio" name="hasBonus" value="no" onchange="toggleBonusDetails(this)" /> No</label>
-            </div>
+              <label><input type="radio" name="hasBonus" value="no" onchange="toggleBonusDetails(this)" /> No</label>            </div>
           </div>
 
           <!-- BONUS/COMMISSION DETAILS - conditionally shown -->
@@ -564,8 +548,7 @@
             </div>
             <div class="form-group">
               <label for="bonusHistory">Last 2 Years of Amounts</label>
-              <textarea id="bonusHistory" placeholder="List amounts by date received" rows="3"></textarea>
-            </div>
+              <textarea id="bonusHistory" placeholder="List amounts by date received" rows="3"></textarea>            </div>
           </div>
         </div>
 
@@ -573,8 +556,7 @@
           <label>Are you self-employed?</label>
           <div class="radio-group">
             <label><input type="radio" name="selfEmployed" value="yes" onchange="toggleSelfEmploymentDetails(this)" /> Yes</label>
-            <label><input type="radio" name="selfEmployed" value="no" onchange="toggleSelfEmploymentDetails(this)" /> No</label>
-          </div>
+            <label><input type="radio" name="selfEmployed" value="no" onchange="toggleSelfEmploymentDetails(this)" /> No</label>          </div>
         </div>
 
         <!-- SELF-EMPLOYMENT DETAILS - conditionally shown -->
@@ -608,8 +590,7 @@
               <option value="llc">LLC</option>
               <option value="s-corp">S-Corp</option>
               <option value="c-corp">C-Corp</option>
-              <option value="partnership">Partnership</option>
-            </select>
+              <option value="partnership">Partnership</option>            </select>
           </div>
         </div>
       </div>
@@ -617,8 +598,7 @@
 
     <!-- SECTION 4: HOUSEHOLD -->
     <div class="form-section">
-      <div class="section-header" onclick="this.nextElementSibling.classList.toggle('open'); this.querySelector('.section-toggle').classList.toggle('closed')">
-        <h2>4. HOUSEHOLD</h2>
+      <div class="section-header" onclick="this.nextElementSibling.classList.toggle('open'); this.querySelector('.section-toggle').classList.toggle('closed')">        <h2>4. HOUSEHOLD</h2>
         <span class="section-toggle">+</span>
       </div>
       <div class="section-content">
@@ -627,8 +607,7 @@
           <div class="radio-group">
             <label><input type="radio" name="homeOwnershipStatus" value="owner" onchange="toggleHomeownershipDetails(this)" /> Own</label>
             <label><input type="radio" name="homeOwnershipStatus" value="rent" onchange="toggleHomeownershipDetails(this)" /> Rent</label>
-            <label><input type="radio" name="homeOwnershipStatus" value="other" onchange="toggleHomeownershipDetails(this)" /> Other</label>
-          </div>
+            <label><input type="radio" name="homeOwnershipStatus" value="other" onchange="toggleHomeownershipDetails(this)" /> Other</label>          </div>
         </div>
 
         <!-- MORTGAGE DETAILS - conditionally shown for owners -->
@@ -652,8 +631,7 @@
           </div>
           <div class="form-group">
             <label for="hoa">Monthly HOA/Condo Fees (if applicable)</label>
-            <input type="text" id="hoa" placeholder="$" />
-          </div>
+            <input type="text" id="hoa" placeholder="$" />          </div>
         </div>
 
         <!-- RENT DETAILS - conditionally shown for renters -->
@@ -673,14 +651,12 @@
           </div>
           <div class="form-group">
             <label for="rentersInsurance">Monthly Renters Insurance</label>
-            <input type="text" id="rentersInsurance" placeholder="$" />
-          </div>
+            <input type="text" id="rentersInsurance" placeholder="$" />          </div>
         </div>
 
         <div class="form-group">
           <label for="householdMembers">Other Household Members and Income</label>
-          <textarea id="householdMembers" placeholder="List other household members and their approximate income" rows="3"></textarea>
-        </div>
+          <textarea id="householdMembers" placeholder="List other household members and their approximate income" rows="3"></textarea>        </div>
       </div>
     </div>
 
@@ -695,8 +671,7 @@
           <label>Do you have children common to the parties?</label>
           <div class="radio-group">
             <label><input type="radio" name="hasCommonChildren" value="yes" onchange="toggleChildrenDetails(this)" /> Yes</label>
-            <label><input type="radio" name="hasCommonChildren" value="no" onchange="toggleChildrenDetails(this)" /> No</label>
-          </div>
+            <label><input type="radio" name="hasCommonChildren" value="no" onchange="toggleChildrenDetails(this)" /> No</label>          </div>
         </div>
 
         <!-- CHILDREN DETAILS - conditionally shown -->
@@ -704,15 +679,13 @@
           <span class="conditional-section-title">Children Information</span>
           <div class="form-group">
             <label for="childrenNames">Names and Ages of Common Children</label>
-            <textarea id="childrenNames" placeholder="Example: John (8), Sarah (5)" rows="2"></textarea>
-          </div>
+            <textarea id="childrenNames" placeholder="Example: John (8), Sarah (5)" rows="2"></textarea>          </div>
 
           <div class="form-group">
             <label>Health Insurance for Children?</label>
             <div class="radio-group">
               <label><input type="radio" name="childrenHealthIns" value="yes" onchange="toggleChildHealthInsurance(this)" /> Yes</label>
-              <label><input type="radio" name="childrenHealthIns" value="no" onchange="toggleChildHealthInsurance(this)" /> No</label>
-            </div>
+              <label><input type="radio" name="childrenHealthIns" value="no" onchange="toggleChildHealthInsurance(this)" /> No</label>            </div>
           </div>
 
           <!-- CHILD HEALTH INSURANCE - conditionally shown -->
@@ -742,16 +715,14 @@
             </div>
             <div class="form-group">
               <label for="childInsPortion">Your Portion of Cost (if shared)</label>
-              <input type="text" id="childInsPortion" placeholder="$" />
-            </div>
+              <input type="text" id="childInsPortion" placeholder="$" />            </div>
           </div>
 
           <div class="form-group">
             <label>Child Care Costs?</label>
             <div class="radio-group">
               <label><input type="radio" name="childCare" value="yes" onchange="toggleChildCareDetails(this)" /> Yes</label>
-              <label><input type="radio" name="childCare" value="no" onchange="toggleChildCareDetails(this)" /> No</label>
-            </div>
+              <label><input type="radio" name="childCare" value="no" onchange="toggleChildCareDetails(this)" /> No</label>            </div>
           </div>
 
           <!-- CHILD CARE DETAILS - conditionally shown -->
@@ -775,16 +746,14 @@
             </div>
             <div class="form-group">
               <label for="childCareAges">Ages/Names of Children in Care</label>
-              <input type="text" id="childCareAges" placeholder="Which children use this care" />
-            </div>
+              <input type="text" id="childCareAges" placeholder="Which children use this care" />            </div>
           </div>
 
           <div class="form-group">
             <label>Child Support for Other Children?</label>
             <div class="radio-group">
               <label><input type="radio" name="otherChildSupport" value="yes" onchange="toggleOtherChildSupport(this)" /> Yes</label>
-              <label><input type="radio" name="otherChildSupport" value="no" onchange="toggleOtherChildSupport(this)" /> No</label>
-            </div>
+              <label><input type="radio" name="otherChildSupport" value="no" onchange="toggleOtherChildSupport(this)" /> No</label>            </div>
           </div>
 
           <!-- OTHER CHILD SUPPORT - conditionally shown -->
@@ -800,16 +769,14 @@
             </div>
             <div class="form-group">
               <label for="courtOrderFile">Court Order File Number</label>
-              <input type="text" id="courtOrderFile" placeholder="Case number/reference" />
-            </div>
+              <input type="text" id="courtOrderFile" placeholder="Case number/reference" />            </div>
           </div>
 
           <div class="form-group">
             <label>Extraordinary Child Expenses (sports, tutoring, special needs)?</label>
             <div class="radio-group">
               <label><input type="radio" name="extraordinaryExpenses" value="yes" onchange="toggleExtraordinaryExpenses(this)" /> Yes</label>
-              <label><input type="radio" name="extraordinaryExpenses" value="no" onchange="toggleExtraordinaryExpenses(this)" /> No</label>
-            </div>
+              <label><input type="radio" name="extraordinaryExpenses" value="no" onchange="toggleExtraordinaryExpenses(this)" /> No</label>            </div>
           </div>
 
           <!-- EXTRAORDINARY EXPENSES - conditionally shown -->
@@ -821,8 +788,7 @@
             </div>
             <div class="form-group">
               <label for="extraordinaryFrequency">Frequency/Duration</label>
-              <input type="text" id="extraordinaryFrequency" placeholder="e.g., Year-round, seasonal, one-time" />
-            </div>
+              <input type="text" id="extraordinaryFrequency" placeholder="e.g., Year-round, seasonal, one-time" />            </div>
           </div>
         </div>
       </div>
@@ -830,8 +796,7 @@
 
     <!-- SECTION 6: MONTHLY EXPENSES -->
     <div class="form-section">
-      <div class="section-header" onclick="this.nextElementSibling.classList.toggle('open'); this.querySelector('.section-toggle').classList.toggle('closed')">
-        <h2>6. MONTHLY EXPENSES</h2>
+      <div class="section-header" onclick="this.nextElementSibling.classList.toggle('open'); this.querySelector('.section-toggle').classList.toggle('closed')">        <h2>6. MONTHLY EXPENSES</h2>
         <span class="section-toggle">+</span>
       </div>
       <div class="section-content">
@@ -839,8 +804,7 @@
           <label>Housing Costs?</label>
           <div class="radio-group">
             <label><input type="radio" name="hasHousingCosts" value="yes" onchange="toggleHousingExpenses(this)" /> Yes</label>
-            <label><input type="radio" name="hasHousingCosts" value="no" onchange="toggleHousingExpenses(this)" /> No</label>
-          </div>
+            <label><input type="radio" name="hasHousingCosts" value="no" onchange="toggleHousingExpenses(this)" /> No</label>          </div>
         </div>
 
         <!-- HOUSING EXPENSES - conditionally shown -->
@@ -856,16 +820,14 @@
           </div>
           <div class="form-group">
             <label for="taxes">Property Taxes</label>
-            <input type="text" id="taxes" placeholder="$" />
-          </div>
+            <input type="text" id="taxes" placeholder="$" />          </div>
         </div>
 
         <div class="form-group">
           <label>Utilities?</label>
           <div class="radio-group">
             <label><input type="radio" name="hasUtilities" value="yes" onchange="toggleUtilityExpenses(this)" /> Yes</label>
-            <label><input type="radio" name="hasUtilities" value="no" onchange="toggleUtilityExpenses(this)" /> No</label>
-          </div>
+            <label><input type="radio" name="hasUtilities" value="no" onchange="toggleUtilityExpenses(this)" /> No</label>          </div>
         </div>
 
         <!-- UTILITY EXPENSES - conditionally shown -->
@@ -885,16 +847,14 @@
           </div>
           <div class="form-group">
             <label for="internet">Internet/Cable/Phone</label>
-            <input type="text" id="internet" placeholder="$" />
-          </div>
+            <input type="text" id="internet" placeholder="$" />          </div>
         </div>
 
         <div class="form-group">
           <label>Transportation/Vehicle Expenses?</label>
           <div class="radio-group">
             <label><input type="radio" name="hasTransportation" value="yes" onchange="toggleTransportationExpenses(this)" /> Yes</label>
-            <label><input type="radio" name="hasTransportation" value="no" onchange="toggleTransportationExpenses(this)" /> No</label>
-          </div>
+            <label><input type="radio" name="hasTransportation" value="no" onchange="toggleTransportationExpenses(this)" /> No</label>          </div>
         </div>
 
         <!-- TRANSPORTATION EXPENSES - conditionally shown -->
@@ -918,16 +878,14 @@
           </div>
           <div class="form-group">
             <label for="parking">Parking/Tolls</label>
-            <input type="text" id="parking" placeholder="$" />
-          </div>
+            <input type="text" id="parking" placeholder="$" />          </div>
         </div>
 
         <div class="form-group">
           <label>Pet Expenses?</label>
           <div class="radio-group">
             <label><input type="radio" name="hasPets" value="yes" onchange="togglePetExpenses(this)" /> Yes</label>
-            <label><input type="radio" name="hasPets" value="no" onchange="togglePetExpenses(this)" /> No</label>
-          </div>
+            <label><input type="radio" name="hasPets" value="no" onchange="togglePetExpenses(this)" /> No</label>          </div>
         </div>
 
         <!-- PET EXPENSES - conditionally shown -->
@@ -947,8 +905,7 @@
           </div>
           <div class="form-group">
             <label for="petOther">Grooming/Other Pet Expenses</label>
-            <input type="text" id="petOther" placeholder="$" />
-          </div>
+            <input type="text" id="petOther" placeholder="$" />          </div>
         </div>
 
         <div class="sub-section">
@@ -967,16 +924,14 @@
           </div>
           <div class="form-group">
             <label for="miscellaneous">Miscellaneous (subscriptions, memberships, etc.)</label>
-            <textarea id="miscellaneous" placeholder="List any other recurring monthly expenses" rows="3"></textarea>
-          </div>
+            <textarea id="miscellaneous" placeholder="List any other recurring monthly expenses" rows="3"></textarea>          </div>
         </div>
       </div>
     </div>
 
     <!-- SECTION 7: SUPPORTING DOCUMENTS CHECKLIST -->
     <div class="form-section">
-      <div class="section-header" onclick="this.nextElementSibling.classList.toggle('open'); this.querySelector('.section-toggle').classList.toggle('closed')">
-        <h2>7. SUPPORTING DOCUMENTS CHECKLIST</h2>
+      <div class="section-header" onclick="this.nextElementSibling.classList.toggle('open'); this.querySelector('.section-toggle').classList.toggle('closed')">        <h2>7. SUPPORTING DOCUMENTS CHECKLIST</h2>
         <span class="section-toggle">+</span>
       </div>
       <div class="section-content">
@@ -1011,23 +966,20 @@
           </div>
           <div class="checklist-item">
             <input type="checkbox" id="otherDocs" />
-            <label for="otherDocs">Other documentation</label>
-          </div>
+            <label for="otherDocs">Other documentation</label>          </div>
         </div>
       </div>
     </div>
 
     <!-- SECTION 8: ADDITIONAL NOTES -->
     <div class="form-section">
-      <div class="section-header" onclick="this.nextElementSibling.classList.toggle('open'); this.querySelector('.section-toggle').classList.toggle('closed')">
-        <h2>8. ADDITIONAL NOTES</h2>
+      <div class="section-header" onclick="this.nextElementSibling.classList.toggle('open'); this.querySelector('.section-toggle').classList.toggle('closed')">        <h2>8. ADDITIONAL NOTES</h2>
         <span class="section-toggle">+</span>
       </div>
       <div class="section-content">
         <div class="form-group">
           <label for="additionalNotes">Additional Information or Special Circumstances</label>
-          <textarea id="additionalNotes" placeholder="Any additional information about expenses, income changes, or special circumstances" rows="4"></textarea>
-        </div>
+          <textarea id="additionalNotes" placeholder="Any additional information about expenses, income changes, or special circumstances" rows="4"></textarea>        </div>
       </div>
     </div>
 
@@ -1036,8 +988,7 @@
       <div class="form-actions">
         <a href="afi.html" class="btn btn-back">← Back to AFI Template</a>
         <button class="btn btn-secondary">Save as Draft</button>
-        <button class="btn btn-primary">Submit Questionnaire</button>
-      </div>
+        <button class="btn btn-primary">Submit Questionnaire</button>      </div>
     </div>
   </div>
 
@@ -1220,8 +1171,7 @@
       `;
 
       modal.innerHTML = `
-        <div style="
-          background: white;
+        <div style="          background: white;
           border-radius: 8px;
           padding: 30px;
           max-width: 500px;
@@ -1233,8 +1183,7 @@
             <button onclick="this.closest('div').parentElement.remove()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #999;">×</button>
           </div>
 
-          <div style="
-            border: 2px dashed #2e5b8a;
+          <div style="            border: 2px dashed #2e5b8a;
             border-radius: 8px;
             padding: 40px;
             text-align: center;
@@ -1249,13 +1198,11 @@
             <input type="file" id="fileInput2" accept=".csv,.json,.txt" style="display: none;" />
           </div>
 
-          <div style="font-size: 12px; background: #f0f4f8; border-left: 3px solid #2e5b8a; padding: 12px; border-radius: 4px; margin-bottom: 20px;">
-            <strong>Example:</strong> Date | Description | Amount<br>
+          <div style="font-size: 12px; background: #f0f4f8; border-left: 3px solid #2e5b8a; padding: 12px; border-radius: 4px; margin-bottom: 20px;">            <strong>Example:</strong> Date | Description | Amount<br>
             2026-01-15 | Blue Cross Insurance | 450.00
           </div>
 
-          <button onclick="document.getElementById('fileInput2').click()" style="
-            width: 100%;
+          <button onclick="document.getElementById('fileInput2').click()" style="            width: 100%;
             padding: 12px;
             background: #2e5b8a;
             color: white;
@@ -1267,8 +1214,7 @@
             margin-bottom: 10px;
           ">Choose File</button>
 
-          <button onclick="this.closest('div').parentElement.remove()" style="
-            width: 100%;
+          <button onclick="this.closest('div').parentElement.remove()" style="            width: 100%;
             padding: 12px;
             background: white;
             color: #2e5b8a;
@@ -1277,8 +1223,7 @@
             cursor: pointer;
             font-size: 14px;
             font-weight: 600;
-          ">Cancel</button>
-        </div>
+          ">Cancel</button>        </div>
       `;
 
       document.body.appendChild(modal);
@@ -1327,8 +1272,7 @@
       alert(`✅ File loaded!\n\nGoing to AFI Expenses for mapping and import...`);
       window.location.href = 'afi.html#import-data';
     }
-  </script>
-  <!-- Veritas AI Chat Widget -->
+  </script>  <!-- Veritas AI Chat Widget -->
   <script src="ai-chat-config.js"></script>
   <script src="ai-chat-widget.js"></script>
   <!-- Reconciliation Modal -->

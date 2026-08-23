@@ -2,8 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Reset Test Data - Veritas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />  <title>Reset Test Data - Veritas</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -205,8 +204,7 @@
     }
 
     .category-item::before {
-      content: "•";
-      color: #2e5b8a;
+      content: "•";      color: #2e5b8a;
       font-weight: bold;
     }
 
@@ -289,8 +287,7 @@
   <aside class="sidebar">
     <div class="brand">
       <div class="brand-mark">
-        <img src="logo-vfi.jpg" alt="VFI Logo" />
-        <span class="brand-mark-fallback">VFI</span>
+        <img src="logo-vfi.jpg" alt="VFI Logo" />        <span class="brand-mark-fallback">VFI</span>
       </div>
       <div class="brand-text">
         <span class="brand-name">Veritas</span>
@@ -306,8 +303,7 @@
     </nav>
 
     <div class="sidebar-foot">
-      <div class="plan-chip"><span style="color:var(--green)">●</span> Test Utility</div>
-    </div>
+      <div class="plan-chip"><span style="color:var(--green)">●</span> Test Utility</div>    </div>
   </aside>
 
   <!-- ===================== MAIN ===================== -->
@@ -315,8 +311,7 @@
     <div class="reset-container">
       <!-- Header -->
       <div class="reset-header">
-        <div class="reset-title">🔄 Reset Test Data</div>
-        <div class="reset-subtitle">Clear all Document Hub data and start fresh for testing</div>
+        <div class="reset-title">🔄 Reset Test Data</div>        <div class="reset-subtitle">Clear all Document Hub data and start fresh for testing</div>
       </div>
 
       <!-- Current Data Status -->
@@ -343,8 +338,7 @@
         </div>
 
         <div class="reset-section-title" style="margin-top: 24px;">Categories</div>
-        <div class="category-list" id="categoryList">
-          <div class="category-item">Expenses</div>
+        <div class="category-list" id="categoryList">          <div class="category-item">Expenses</div>
           <div class="category-item">Income</div>
           <div class="category-item">Assets</div>
           <div class="category-item">Liabilities</div>
@@ -375,8 +369,7 @@
           <p class="info-text">Clears all documents, items, and mappings from all 10 categories. Recommended for fresh testing.</p>
           <div class="action-buttons">
             <button class="btn-danger" onclick="confirmResetAll()">Clear All Data</button>
-            <button class="btn-secondary" onclick="location.href='document-hub-master.html'">Cancel</button>
-          </div>
+            <button class="btn-secondary" onclick="location.href='document-hub-master.html'">Cancel</button>          </div>
         </div>
 
         <!-- Option 2: Reset Specific Category -->
@@ -398,8 +391,7 @@
           </select>
           <div class="action-buttons">
             <button class="btn-primary" onclick="resetCategory()" style="background: #ff9800;">Clear Selected</button>
-            <button class="btn-secondary" onclick="document.getElementById('categorySelect').value = ''">Clear Selection</button>
-          </div>
+            <button class="btn-secondary" onclick="document.getElementById('categorySelect').value = ''">Clear Selection</button>          </div>
         </div>
 
         <!-- Option 3: Export Data Before Reset -->
@@ -408,8 +400,7 @@
           <p class="info-text">Download all current data as JSON before resetting. Useful for backup or analysis.</p>
           <div class="action-buttons">
             <button class="btn-primary" onclick="exportData()" style="background: #4CAF50;">Export as JSON</button>
-            <button class="btn-secondary" onclick="exportSummary()" style="border-color: #4CAF50; color: #4CAF50;">Export Summary</button>
-          </div>
+            <button class="btn-secondary" onclick="exportSummary()" style="border-color: #4CAF50; color: #4CAF50;">Export Summary</button>          </div>
         </div>
       </div>
 
@@ -419,8 +410,7 @@
 
         <div style="font-size: 13px; line-height: 1.8; color: #666;">
           <p><strong>What gets cleared?</strong></p>
-          <ul style="margin: 8px 0 16px 20px;">
-            <li>All uploaded documents</li>
+          <ul style="margin: 8px 0 16px 20px;">            <li>All uploaded documents</li>
             <li>All extracted items and transactions</li>
             <li>All categorization mappings</li>
             <li>Document statistics and counts</li>
@@ -428,30 +418,26 @@
           </ul>
 
           <p><strong>What doesn't get cleared?</strong></p>
-          <ul style="margin: 8px 0 16px 20px;">
-            <li>Application settings and preferences</li>
+          <ul style="margin: 8px 0 16px 20px;">            <li>Application settings and preferences</li>
             <li>User interface configuration</li>
             <li>Sidebar state</li>
           </ul>
 
           <p><strong>When should I reset?</strong></p>
-          <ul style="margin: 8px 0 16px 20px;">
-            <li>Before starting a new test cycle</li>
+          <ul style="margin: 8px 0 16px 20px;">            <li>Before starting a new test cycle</li>
             <li>When testing with new sample data</li>
             <li>After completing a case review</li>
             <li>To verify fresh upload functionality</li>
           </ul>
 
           <p style="margin-top: 16px; padding-top: 16px; border-top: 1px solid #e5e5e5;">
-            <strong>💡 Tip:</strong> Use "Export Data First" to save your current data before resetting, then you can reload it later if needed.
-          </p>
+            <strong>💡 Tip:</strong> Use "Export Data First" to save your current data before resetting, then you can reload it later if needed.          </p>
         </div>
       </div>
 
       <!-- Footer -->
       <div style="text-align: center; padding: 20px 0; color: #999; font-size: 12px;">
-        Veritas Test Utility · Reset Data Tool v1.0
-      </div>
+        Veritas Test Utility · Reset Data Tool v1.0      </div>
     </div>
   </main>
 
@@ -464,8 +450,7 @@
       </div>
       <div class="modal-buttons">
         <button class="modal-btn-cancel" onclick="cancelReset()">Cancel</button>
-        <button class="modal-btn-confirm" onclick="performReset()">Clear Data</button>
-      </div>
+        <button class="modal-btn-confirm" onclick="performReset()">Clear Data</button>      </div>
     </div>
   </div>
 
@@ -544,8 +529,7 @@
       resetTarget = selected;
       const categoryName = document.getElementById('categorySelect').options[document.getElementById('categorySelect').selectedIndex].text;
       document.getElementById('confirmMessage').textContent =
-        `This will clear all data from the "${categoryName}" category. This action cannot be undone.`;
-      document.getElementById('confirmModal').classList.add('show');
+        `This will clear all data from the "${categoryName}" category. This action cannot be undone.`;      document.getElementById('confirmModal').classList.add('show');
     }
 
     function cancelReset() {

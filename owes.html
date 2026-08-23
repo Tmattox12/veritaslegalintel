@@ -2,8 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Owes-To Analysis — Veritas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />  <title>Owes-To Analysis — Veritas</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -62,8 +61,7 @@
   <aside class="sidebar">
     <div class="brand">
       <div class="brand-mark">
-        <img src="logo-vfi.jpg" alt="VFI Logo" />
-        <span class="brand-mark-fallback">VFI</span>
+        <img src="logo-vfi.jpg" alt="VFI Logo" />        <span class="brand-mark-fallback">VFI</span>
       </div>
       <div class="brand-text">
         <span class="brand-name">Veritas</span>
@@ -91,8 +89,7 @@
       <a class="nav-item" href="red-flags.html"><span class="nav-ico">🚩</span> Red-Flag Detection</a>
       <a class="nav-item" href="export.html"><span class="nav-ico">📄</span> Export & Reports</a>
     </nav>
-    <div class="sidebar-foot"><div class="plan-chip">Firm Plan · 12 seats</div></div>
-  </aside>
+    <div class="sidebar-foot"><div class="plan-chip">Firm Plan · 12 seats</div></div>  </aside>
 
   <!-- ===================== MAIN CONTENT ===================== -->
   <main class="main-content">
@@ -113,13 +110,11 @@
 
             <div class="form-group">
               <label>Creditor / Party Name</label>
-              <input type="text" id="petitionerCreditor" placeholder="Name of creditor or party" />
-            </div>
+              <input type="text" id="petitionerCreditor" placeholder="Name of creditor or party" />            </div>
 
             <div class="form-group">
               <label>Amount Owed</label>
-              <input type="number" id="petitionerAmount" placeholder="0.00" step="0.01" />
-            </div>
+              <input type="number" id="petitionerAmount" placeholder="0.00" step="0.01" />            </div>
 
             <div class="form-group">
               <label>Nature of Debt</label>
@@ -131,8 +126,7 @@
                 <option value="vehicle-loan">Vehicle Loan</option>
                 <option value="student-loan">Student Loan</option>
                 <option value="business-debt">Business Debt</option>
-                <option value="other">Other</option>
-              </select>
+                <option value="other">Other</option>              </select>
             </div>
 
             <div class="form-group">
@@ -141,8 +135,7 @@
             </div>
 
             <div class="button-group">
-              <button class="btn btn-primary" onclick="addPetitionerOwes()">Add Obligation</button>
-            </div>
+              <button class="btn btn-primary" onclick="addPetitionerOwes()">Add Obligation</button>            </div>
           </div>
         </div>
 
@@ -156,13 +149,11 @@
 
             <div class="form-group">
               <label>Creditor / Party Name</label>
-              <input type="text" id="respondentCreditor" placeholder="Name of creditor or party" />
-            </div>
+              <input type="text" id="respondentCreditor" placeholder="Name of creditor or party" />            </div>
 
             <div class="form-group">
               <label>Amount Owed</label>
-              <input type="number" id="respondentAmount" placeholder="0.00" step="0.01" />
-            </div>
+              <input type="number" id="respondentAmount" placeholder="0.00" step="0.01" />            </div>
 
             <div class="form-group">
               <label>Nature of Debt</label>
@@ -174,8 +165,7 @@
                 <option value="vehicle-loan">Vehicle Loan</option>
                 <option value="student-loan">Student Loan</option>
                 <option value="business-debt">Business Debt</option>
-                <option value="other">Other</option>
-              </select>
+                <option value="other">Other</option>              </select>
             </div>
 
             <div class="form-group">
@@ -184,8 +174,7 @@
             </div>
 
             <div class="button-group">
-              <button class="btn btn-primary" onclick="addRespondentOwes()">Add Obligation</button>
-            </div>
+              <button class="btn btn-primary" onclick="addRespondentOwes()">Add Obligation</button>            </div>
           </div>
         </div>
       </div>
@@ -203,15 +192,13 @@
         </div>
         <div class="summary-row" style="border-top: 1px solid rgba(0,0,0,0.1); padding-top: 12px; margin-top: 12px;">
           <span class="summary-label"><strong>Net Difference</strong></span>
-          <span class="summary-value" id="netDifference" style="color: #2e7d32;">$0.00</span>
-        </div>
+          <span class="summary-value" id="netDifference" style="color: #2e7d32;">$0.00</span>        </div>
       </div>
 
       <!-- ===== SAVE SECTION ===== -->
       <div style="margin-top: 20px; padding: 16px; background: white; border-radius: 8px;">
         <button class="btn btn-primary" onclick="saveModuleData()">Save Analysis</button>
-        <button class="btn btn-secondary" onclick="exportData()">Export Data</button>
-      </div>
+        <button class="btn btn-secondary" onclick="exportData()">Export Data</button>      </div>
     </div>
   </main>
 

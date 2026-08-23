@@ -332,6 +332,7 @@ document-hub-expenses.html
 - ✅ logo-handler.js
 
 ### Data Files (3)
+<<<<<<< HEAD
 - ✅ ossandon-extracted-expenses.json
 - ✅ ossandon-extracted-income.json
 - ✅ OSSANDON_AFI_FINAL_AMOUNTS.md
@@ -339,6 +340,15 @@ document-hub-expenses.html
 ### Python Scripts (2 - for reference)
 - ✅ extract_ossandon_expenses.py
 - ✅ extract_ossandon_income.py
+=======
+- ✅ Template Matter-extracted-expenses.json
+- ✅ Template Matter-extracted-income.json
+- ✅ OSSANDON_AFI_FINAL_AMOUNTS.md
+
+### Python Scripts (2 - for reference)
+- ✅ extract_template-matter_expenses.py
+- ✅ extract_template-matter_income.py
+>>>>>>> cbd6749 (Clean stale case data and neutralize templates)
 - ✅ build_document_hub_categories.py
 
 ---

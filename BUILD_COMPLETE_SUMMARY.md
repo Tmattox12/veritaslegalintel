@@ -14,7 +14,11 @@
 ✅ **Processing Timeline** - Visual 5-step progress with bot indicator & timeout  
 ✅ **Multi-file Upload** - Ctrl/Shift click support for batch processing  
 ✅ **localStorage Integration** - Data persistence across all categories  
+<<<<<<< HEAD
 ✅ **AFI Expense Reconciliation** - Complete extraction & mapping for Ossandon case  
+=======
+✅ **AFI Expense Reconciliation** - Complete extraction & mapping for Template Matter case  
+>>>>>>> cbd6749 (Clean stale case data and neutralize templates)
 ✅ **Income Extraction** - W-2, Social Security, Other income data extraction  
 
 ---
@@ -99,7 +103,11 @@
 
 ---
 
+<<<<<<< HEAD
 ## 📊 OSSANDON CASE ANALYSIS
+=======
+## 📊 Template Matter CASE ANALYSIS
+>>>>>>> cbd6749 (Clean stale case data and neutralize templates)
 
 ### Expense Extraction Complete
 **Total AFI Expenses: $17,612.78**
@@ -153,16 +161,26 @@
 - `afi.html` - AFI page (with upload button)
 
 ### Data Files (3)
+<<<<<<< HEAD
 - `ossandon-extracted-expenses.json` - 945 transactions mapped
 - `ossandon-extracted-income.json` - 3 income sources
+=======
+- `Template Matter-extracted-expenses.json` - 945 transactions mapped
+- `Template Matter-extracted-income.json` - 3 income sources
+>>>>>>> cbd6749 (Clean stale case data and neutralize templates)
 - `OSSANDON_AFI_FINAL_AMOUNTS.md` - AFI form ready document
 
 ### Documentation (5)
 - `OSSANDON_ACTION_SUMMARY.txt` - Extraction methodology
 - `OSSANDON_AFI_FINAL_AMOUNTS.md` - Verified AFI totals
 - `chase-freedom-expense-mapping.md` - Merchant mapping guide
+<<<<<<< HEAD
 - `afi-population-template-ossandon.md` - Reconciliation procedures
 - `expense-reconciliation-ossandon.json` - Document inventory
+=======
+- `afi-population-template-Template Matter.md` - Reconciliation procedures
+- `expense-reconciliation-Template Matter.json` - Document inventory
+>>>>>>> cbd6749 (Clean stale case data and neutralize templates)
 
 ---
 
@@ -222,7 +240,11 @@
 ### What's Next
 - Test full workflow end-to-end
 - Integrate search/filter into category pages
+<<<<<<< HEAD
 - Populate income reconciliation with Ossandon data
+=======
+- Populate income reconciliation with Template Matter data
+>>>>>>> cbd6749 (Clean stale case data and neutralize templates)
 - Deploy to production
 - User training & documentation
 

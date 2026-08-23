@@ -230,7 +230,11 @@ Income - Expenses = Net income
 - ✅ Auto-categorization (75%+ accuracy)
 - ✅ Data persistence (localStorage)
 - ✅ AFI expense totals ($17,612.78 verified)
+<<<<<<< HEAD
 - ✅ Ossandon case data (945 transactions)
+=======
+- ✅ Template Matter case data (945 transactions)
+>>>>>>> cbd6749 (Clean stale case data and neutralize templates)
 
 **What Remains**:
 - ⏳ QA Testing (10 phases)
@@ -251,7 +255,11 @@ Income - Expenses = Net income
 
 ### Full Test (6 hours):
 - [ ] Follow TESTING_GUIDE.md (10 phases)
+<<<<<<< HEAD
 - [ ] Test with Ossandon data
+=======
+- [ ] Test with Template Matter data
+>>>>>>> cbd6749 (Clean stale case data and neutralize templates)
 - [ ] Verify all calculations
 - [ ] Check responsive design
 - [ ] Audit browser console
@@ -265,7 +273,11 @@ Income - Expenses = Net income
 
 ## 🎓 USAGE EXAMPLES
 
+<<<<<<< HEAD
 ### Example 1: Complete AFI for Ossandon Case
+=======
+### Example 1: Complete AFI for Template Matter Case
+>>>>>>> cbd6749 (Clean stale case data and neutralize templates)
 
 ```
 1. Open Document Hub
@@ -468,7 +480,11 @@ Income - Expenses = Net income
 ✅ localStorage persistence was reliable  
 ✅ User feedback drove feature additions  
 ✅ Comprehensive documentation early  
+<<<<<<< HEAD
 ✅ Real data testing (Ossandon case)
+=======
+✅ Real data testing (Template Matter case)
+>>>>>>> cbd6749 (Clean stale case data and neutralize templates)
 
 ### Best Practices Applied
 ✅ Responsive design from start  
@@ -494,7 +510,11 @@ This is a **production-ready, fully-featured financial document management syste
 ✅ **7+ file format support** for flexibility  
 ✅ **Professional workflows** from upload → extraction → reconciliation → form population  
 ✅ **Attorney-ready exports** for legal proceedings  
+<<<<<<< HEAD
 ✅ **Real data validation** (945 Ossandon transactions verified)  
+=======
+✅ **Real data validation** (945 Template Matter transactions verified)  
+>>>>>>> cbd6749 (Clean stale case data and neutralize templates)
 ✅ **Enterprise-grade features** (verification, audit trail, backups)
 
 **Ready for QA testing and production deployment.**

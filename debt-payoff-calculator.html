@@ -2,8 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Debt Payoff Analysis - Veritas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />  <title>Debt Payoff Analysis - Veritas</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -50,8 +49,7 @@
   <aside class="sidebar">
     <div class="sidebar-head">
       <div class="logo-section">
-        <span class="logo-text">⚖️ VERITAS</span>
-        <span class="logo-sub">Legal Intelligence</span>
+        <span class="logo-text">⚖️ VERITAS</span>        <span class="logo-sub">Legal Intelligence</span>
       </div>
     </div>
     <nav class="nav">
@@ -63,8 +61,7 @@
       <a class="nav-item" href="spousal.html"><span class="nav-ico">👥</span> Spousal Support</a>
     </nav>
     <div class="sidebar-foot">
-      <div class="plan-chip"><span style="color:var(--green)">●</span> Secure Connection</div>
-    </div>
+      <div class="plan-chip"><span style="color:var(--green)">●</span> Secure Connection</div>    </div>
   </aside>
 
   <main class="main">
@@ -90,15 +87,13 @@
 
     <div class="debt-container">
       <div class="debt-header">
-        <h1 class="debt-title">💳 Debt Payoff Analysis</h1>
-        <p class="debt-subtitle">Analyze which party pays debts faster, interest implications, and division impact on cash flow</p>
+        <h1 class="debt-title">💳 Debt Payoff Analysis</h1>        <p class="debt-subtitle">Analyze which party pays debts faster, interest implications, and division impact on cash flow</p>
       </div>
 
       <div class="button-group">
         <button class="btn btn-primary" onclick="calculatePayoff()">📊 Calculate Payoff Scenarios</button>
         <button class="btn btn-secondary" onclick="exportResults()">📋 Export Analysis</button>
-        <button class="btn btn-secondary" onclick="printReport()">🖨️ Print Report</button>
-      </div>
+        <button class="btn btn-secondary" onclick="printReport()">🖨️ Print Report</button>      </div>
 
       <div class="kpi-row">
         <div class="kpi-card">
@@ -114,8 +109,7 @@
           <div class="kpi-label">Average Interest Rate</div>
         </div>
         <div class="kpi-card">
-          <div class="kpi-value" id="payoffMonthsKPI">0</div>
-          <div class="kpi-label">Months to Payoff</div>
+          <div class="kpi-value" id="payoffMonthsKPI">0</div>          <div class="kpi-label">Months to Payoff</div>
         </div>
       </div>
 
@@ -141,8 +135,7 @@
             <select class="form-select" id="debtOwner">
               <option value="joint">Joint/Community</option>
               <option value="party1">Party A</option>
-              <option value="party2">Party B</option>
-            </select>
+              <option value="party2">Party B</option>            </select>
           </div>
         </div>
 
@@ -169,8 +162,7 @@
               <option value="equal">Equal Split</option>
               <option value="income-proportional">Income Proportional</option>
               <option value="snowball">Debt Snowball (Smallest First)</option>
-              <option value="avalanche">Debt Avalanche (Highest Rate)</option>
-            </select>
+              <option value="avalanche">Debt Avalanche (Highest Rate)</option>            </select>
           </div>
         </div>
       </div>
@@ -179,8 +171,7 @@
 
       <div class="input-panel">
         <div class="panel-title">⚠️ Settlement Considerations</div>
-        <div style="font-size: 13px; color: #666; line-height: 1.6;">
-          <strong>Who Pays What:</strong><br>
+        <div style="font-size: 13px; color: #666; line-height: 1.6;">          <strong>Who Pays What:</strong><br>
           • Each debt assigned to responsible party<br>
           • Community debts may be split 50/50 or proportionally<br>
           • Payment capacity affects division feasibility<br><br>
@@ -231,8 +222,7 @@
           <td>$${debt.balance.toLocaleString('en-US', {minimumFractionDigits: 2})}</td>
           <td>${debt.rate}%</td>
           <td>${debt.owner === 'party1' ? 'Party A' : debt.owner === 'party2' ? 'Party B' : 'Joint'}</td>
-          <td><button class="btn btn-secondary" style="width: 60px; padding: 4px;" onclick="removeDebt(${debt.id})">Delete</button></td>
-        </tr>`;
+          <td><button class="btn btn-secondary" style="width: 60px; padding: 4px;" onclick="removeDebt(${debt.id})">Delete</button></td>        </tr>`;
       });
 
       html += '</tbody></table>';

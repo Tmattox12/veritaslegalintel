@@ -2,8 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Settlement Modeling — Veritas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />  <title>Settlement Modeling — Veritas</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -76,8 +75,7 @@
   <aside class="sidebar">
     <div class="brand">
       <div class="brand-mark">
-        <img src="logo-vfi.jpg" alt="VFI Logo" />
-        <span class="brand-mark-fallback">VFI</span>
+        <img src="logo-vfi.jpg" alt="VFI Logo" />        <span class="brand-mark-fallback">VFI</span>
       </div>
       <div class="brand-text">
         <span class="brand-name">Veritas</span>
@@ -115,8 +113,7 @@
     </nav>
 
     <div class="sidebar-foot">
-      <div class="plan-chip"><span style="color:var(--green)">●</span> Secure Connection · encrypted &amp; confidential</div>
-    </div>
+      <div class="plan-chip"><span style="color:var(--green)">●</span> Secure Connection · encrypted &amp; confidential</div>    </div>
   </aside>
 
   <!-- ===================== MAIN ===================== -->
@@ -127,16 +124,14 @@
         <button class="matter-btn">
           <strong>Ossandon v. Ossandon</strong>
           <span class="case-no">No. D2024-1669 · Pima County, AZ</span>
-          <span class="chev">▾</span>
-        </button>
+          <span class="chev">▾</span>        </button>
       </div>
       <div class="topbar-right">
         <div class="user">
           <div class="avatar">TH</div>
           <div class="user-meta">
             <span class="user-name">Workspace User</span>
-            <span class="user-role">Ossandon Matter</span>
-          </div>
+            <span class="user-role">Ossandon Matter</span>          </div>
         </div>
       </div>
     </header>
@@ -146,8 +141,7 @@
         <div>
           <h1>Settlement Modeling</h1>
           <p class="sub">Interactive scenarios · spousal maintenance + child support + asset division</p>
-          <div id="settlementAfiContextLine" style="margin-top:8px;padding:6px 10px;border:1px solid #d7e0ec;border-radius:8px;background:#f7f9fc;color:#425c7f;font-size:11px;line-height:1.4;display:none"></div>
-        </div>
+          <div id="settlementAfiContextLine" style="margin-top:8px;padding:6px 10px;border:1px solid #d7e0ec;border-radius:8px;background:#f7f9fc;color:#425c7f;font-size:11px;line-height:1.4;display:none"></div>        </div>
       </section>
 
       <!-- Current Positions -->
@@ -167,8 +161,7 @@
           </div>
           <div class="position-seg their-demand">
             <span class="position-seg-small">Their Demand</span>
-            <div class="position-seg-big" id="theirDemandTotal">$3.28M</div>
-          </div>
+            <div class="position-seg-big" id="theirDemandTotal">$3.28M</div>          </div>
         </div>
         <div class="settlement-summary">
           <div class="summary-row">
@@ -184,36 +177,31 @@
             <span class="summary-value">50/50 marital estate</span>
           </div>
         </div>
-        <p class="panel-note" style="font-size:11.5px;color:#617088;margin:10px 0 0;">Estate basis: <strong>BeachFleischman DOS liquid schedule</strong> ($1,763,809, from the Estate module). The Equitable Distribution page uses a fuller comprehensive-inventory total (~$1.93M); the totals differ by source, and both are correct.</p>
-      </div>
+        <p class="panel-note" style="font-size:11.5px;color:#617088;margin:10px 0 0;">Estate basis: <strong>BeachFleischman DOS liquid schedule</strong> ($1,763,809, from the Estate module). The Equitable Distribution page uses a fuller comprehensive-inventory total (~$1.93M); the totals differ by source, and both are correct.</p>      </div>
 
       <!-- Settlement Terms Input -->
       <div class="settlement-grid">
         <!-- Paying Spouse (Luis) -->
         <div class="party-card paying-spouse">
           <h3>💼 Luis — Payment Terms</h3>
-
           <div class="settlement-term">
             <div class="term-label">Spousal Maintenance (Monthly)</div>
             <div class="term-row">
               <input type="number" id="luisSpousal" class="term-input" value="3100" onchange="calculateSettlement()">
-              <span class="term-value">$3,100/mo</span>
-            </div>
+              <span class="term-value">$3,100/mo</span>            </div>
             <div class="slider-group">
               <div class="slider-label">
                 <span>Duration</span>
                 <span id="spousalDurationDisplay">60 months</span>
               </div>
-              <input type="range" id="luisSpousalDuration" min="12" max="120" value="60" step="12" class="slider-input" onchange="calculateSettlement()">
-            </div>
+              <input type="range" id="luisSpousalDuration" min="12" max="120" value="60" step="12" class="slider-input" onchange="calculateSettlement()">            </div>
           </div>
 
           <div class="settlement-term">
             <div class="term-label">Child Support (Monthly × 3 children)</div>
             <div class="term-row">
               <input type="number" id="luisChildSupport" class="term-input" value="1742" onchange="calculateSettlement()">
-              <span class="term-value">$1,742/mo</span>
-            </div>
+              <span class="term-value">$1,742/mo</span>            </div>
             <p class="note">Typically continues until child reaches 18 or age 23 (full-time school). AZ §25-320.</p>
           </div>
 
@@ -221,8 +209,7 @@
             <div class="term-label">Cash Adjustment to Supported Spouse</div>
             <div class="term-row">
               <input type="number" id="luisCashAdj" class="term-input" value="150000" onchange="calculateSettlement()">
-              <span class="term-value" id="luisCashDisplay">$150,000</span>
-            </div>
+              <span class="term-value" id="luisCashDisplay">$150,000</span>            </div>
             <p class="note">Equalization payment to balance unequal asset division or spousal credits.</p>
           </div>
 
@@ -233,15 +220,13 @@
                 <span>Luis receives</span>
                 <span id="luisAssetPercentDisplay">45%</span>
               </div>
-              <input type="range" id="luisAssetPercent" min="40" max="60" value="45" step="1" class="slider-input" onchange="calculateSettlement()">
-            </div>
+              <input type="range" id="luisAssetPercent" min="40" max="60" value="45" step="1" class="slider-input" onchange="calculateSettlement()">            </div>
           </div>
         </div>
 
         <!-- Coni (Receiving) -->
         <div class="party-card coni">
           <h3>💰 Coni — Receiving Terms</h3>
-
           <div class="settlement-term">
             <div class="term-label">Spousal Maintenance (Monthly)</div>
             <div class="term-row">
@@ -255,16 +240,14 @@
             <div class="term-label">Child Support (Monthly × 3 children)</div>
             <div class="term-row">
               <input type="number" id="coniChildSupport" class="term-input" value="1742" disabled>
-              <span class="term-value">$1,742/mo</span>
-            </div>
+              <span class="term-value">$1,742/mo</span>            </div>
           </div>
 
           <div class="settlement-term">
             <div class="term-label">Cash Received from Luis</div>
             <div class="term-row">
               <input type="number" id="coniCashAdj" class="term-input" value="150000" disabled>
-              <span class="term-value" id="coniCashDisplay">$150,000</span>
-            </div>
+              <span class="term-value" id="coniCashDisplay">$150,000</span>            </div>
           </div>
 
           <div class="settlement-term">
@@ -274,8 +257,7 @@
                 <span>Coni receives</span>
                 <span id="coniAssetPercentDisplay">55%</span>
               </div>
-              <input type="range" id="coniAssetPercent" min="40" max="60" value="55" step="1" class="slider-input" onchange="calculateSettlement()">
-            </div>
+              <input type="range" id="coniAssetPercent" min="40" max="60" value="55" step="1" class="slider-input" onchange="calculateSettlement()">            </div>
           </div>
         </div>
       </div>
@@ -290,8 +272,7 @@
           <div class="scenario-controls">
             <button class="btn-scenario active" onclick="setHorizon(5)">5 years</button>
             <button class="btn-scenario" onclick="setHorizon(10)">10 years</button>
-            <button class="btn-scenario" onclick="setHorizon(20)">20 years</button>
-          </div>
+            <button class="btn-scenario" onclick="setHorizon(20)">20 years</button>          </div>
         </div>
 
         <div class="settlement-grid">
@@ -319,8 +300,7 @@
               Child support received: +$104,520<br>
               Cash from Luis: +$150,000<br>
               Assets received: +$550,000<br>
-              <strong>Net: +$186,200 (received)</strong>
-            </div>
+              <strong>Net: +$186,200 (received)</strong>            </div>
           </div>
         </div>
       </div>
@@ -337,8 +317,7 @@
           <span class="tag">All terms adjusted from baseline</span>
         </div>
         <div style="overflow-x: auto;">
-          <table class="comparison-table" id="comparisonTable">
-            <thead>
+          <table class="comparison-table" id="comparisonTable">            <thead>
               <tr>
                 <th>Scenario</th>
                 <th class="amount">Spousal /mo</th>
@@ -348,8 +327,7 @@
                 <th class="amount">Luis 5-Yr Net</th>
               </tr>
             </thead>
-            <tbody id="comparisonBody">
-            </tbody>
+            <tbody id="comparisonBody">            </tbody>
           </table>
         </div>
         <p class="note">Each row shows how the outcome shifts as terms change. Hover to see full details. Click to load as active scenario.</p>
@@ -361,8 +339,7 @@
           <h3>⚖ vs. Current Positions</h3>
           <span class="tag">Settlement Position Snapshot · 7/2/26</span>
         </div>
-        <div style="overflow-x: auto;">
-          <table class="comparison-table">
+        <div style="overflow-x: auto;">          <table class="comparison-table">
             <thead>
               <tr>
                 <th>Party</th>
@@ -382,8 +359,7 @@
                 <td class="label">Coni</td>
                 <td class="amount">+$231,600</td>
                 <td class="amount" id="coniCurrentScen">+$186,200</td>
-                <td class="amount" id="coniDelta">−$45,400 (against)</td>
-              </tr>
+                <td class="amount" id="coniDelta">−$45,400 (against)</td>              </tr>
             </tbody>
           </table>
         </div>
@@ -393,8 +369,7 @@
 
       <footer class="foot">
         <span>Veritas · Settlement Modeling</span>
-        <span class="foot-dim">Scenarios illustrative · does not account for tax treatment, inflation, or child-rearing cost escalation</span>
-      </footer>
+        <span class="foot-dim">Scenarios illustrative · does not account for tax treatment, inflation, or child-rearing cost escalation</span>      </footer>
     </div>
   </main>
 
@@ -408,4 +383,3 @@
   <script src="logo-handler.js"></script>
 </body>
 </html>
-

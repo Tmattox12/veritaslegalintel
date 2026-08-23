@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /**
  * Sample Reconciliation Data for Veritas Template
  * Based on Anderson v. Anderson sample case
@@ -203,3 +204,7 @@ function calculateReconTotals() {
 }
 
 const RECON_SUMMARY = calculateReconTotals();
+=======
+/* Empty transaction-reconciliation template. Populate from uploaded documents. */
+const reconData = {};
+>>>>>>> cbd6749 (Clean stale case data and neutralize templates)

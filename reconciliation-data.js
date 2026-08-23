@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 /**
  * Veritas Reconciliation Data
  * Sample data for different expense categories
@@ -382,3 +383,7 @@ const RECONCILIATION_DATA = {
     ]
   }
 };
+=======
+/* Empty reconciliation template. Populate from uploaded documents for the active matter. */
+const RECONCILIATION_DATA = {};
+>>>>>>> cbd6749 (Clean stale case data and neutralize templates)

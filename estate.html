@@ -1,8 +1,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Estate & Worksheets — Veritas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />  <title>Estate & Worksheets — Veritas</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -15,8 +14,7 @@
   <aside class="sidebar">
     <div class="brand">
       <div class="brand-mark">
-        <img src="logo-vfi.jpg" alt="VFI Logo" />
-        <span class="brand-mark-fallback">VFI</span>
+        <img src="logo-vfi.jpg" alt="VFI Logo" />        <span class="brand-mark-fallback">VFI</span>
       </div>
       <div class="brand-text">
         <span class="brand-name">Veritas</span>
@@ -54,8 +52,7 @@
     </nav>
 
     <div class="sidebar-foot">
-      <div class="plan-chip"><span style="color:var(--green)">●</span> Secure Connection · encrypted &amp; confidential</div>
-    </div>
+      <div class="plan-chip"><span style="color:var(--green)">●</span> Secure Connection · encrypted &amp; confidential</div>    </div>
   </aside>
 
   <!-- ===================== MAIN ===================== -->
@@ -66,16 +63,14 @@
         <button class="matter-btn">
           <strong>Matter v. Case</strong>
           <span class="case-no">No. [Case Number] · [Jurisdiction]</span>
-          <span class="chev">▾</span>
-        </button>
+          <span class="chev">▾</span>        </button>
       </div>
       <div class="topbar-right">
         <div class="user">
           <div class="avatar">TH</div>
           <div class="user-meta">
             <span class="user-name">Workspace User</span>
-            <span class="user-role">Ossandon Matter</span>
-          </div>
+            <span class="user-role">Ossandon Matter</span>          </div>
         </div>
       </div>
     </header>
@@ -87,8 +82,7 @@
           <p class="sub">Date-of-service inventory (<strong>06/23/2024</strong>) · AZ guideline worksheets · document comparison</p>
         </div>
         <div class="head-actions">
-          <button class="btn ghost" id="printBtn">Export packet</button>
-        </div>
+          <button class="btn ghost" id="printBtn">Export packet</button>        </div>
       </section>
 
       <!-- KPI strip -->
@@ -107,8 +101,7 @@
           <span style="font-size:12.5px;color:#5b6472"><strong>Save the key inventory schedules:</strong></span>
           <button class="btn ghost sm" id="invWordBtn">⤓ Word (.docx)</button>
           <button class="btn ghost sm" id="invPdfBtn">⎙ PDF</button>
-          <span style="font-size:11.5px;color:#8a8f98">Rule 49 schedule · Marital estate · Supported Spouse disclosed · Supported Spouse DOS estimate · Paying Spouse liabilities</span>
-        </div>
+          <span style="font-size:11.5px;color:#8a8f98">Rule 49 schedule · Marital estate · Supported Spouse disclosed · Supported Spouse DOS estimate · Paying Spouse liabilities</span>        </div>
         <div class="est-grid">
           <div class="est-col-main">
             <div class="panel">
@@ -117,8 +110,7 @@
                 <span class="tag">Court-form format</span>
               </div>
               <p class="panel-note">The marital estate re-expressed in the mandatory <strong>Arizona Inventory of Property and Debts</strong> layout — <em>Description · Date Acquired · Value at Date of Service · Current Value · Contested Position [CP or SP] · Proposed Allocation</em>. Values are our recommended figures under §25-211 / §25-318.</p>
-              <div id="azSchedule"></div>
-            </div>
+              <div id="azSchedule"></div>            </div>
 
             <div class="panel">
               <div class="panel-head">
@@ -126,8 +118,7 @@
                 <span class="tag">§25-211 · §25-318 · Nelson · Koelsch</span>
               </div>
               <p class="panel-note">The figure to <strong>use</strong> for each contested asset under Arizona law — character fixed at service (§25-211), community share valued to division with passive growth, post-DOS contributions/effort carved out as separate (§25-213) — with every source number compared to ours.</p>
-              <div id="assetVal"></div>
-            </div>
+              <div id="assetVal"></div>            </div>
 
             <div class="panel">
               <div class="panel-head">
@@ -136,8 +127,7 @@
               </div>
               <p class="panel-note">Per expert findings, from the case Inventory of Property and Debts and supporting statements. Community character fixed at service — <strong>A.R.S. §25-211</strong>.</p>
               <table class="est-table" id="maritalAssets"></table>
-              <div id="capMarital"></div>
-            </div>
+              <div id="capMarital"></div>            </div>
 
             <div class="panel">
               <div class="panel-head">
@@ -146,8 +136,7 @@
               </div>
               <p class="panel-note"><strong>These are end-November 2025 balances</strong> (the checking row is the 11/01/2025 opening) from Wife's April 2026 Rule 49 disclosure — roughly <strong>17 months after the 06/23/2024 date of service</strong>, not DOS figures. Wife produced <strong>no 06/23/2024 statements</strong>, so DOS positions are reconstructed in the panel below. Shown here for §25-319(A) "sufficient property" &amp; §25-319(B) income from property. <em>The BeachFleischman schedule does not value these personal accounts — its June-2024 schedule is the marital estate only.</em></p>
               <table class="est-table" id="coniAssets"></table>
-              <div id="capConiDisc"></div>
-            </div>
+              <div id="capConiDisc"></div>            </div>
 
             <div class="panel">
               <div class="panel-head">
@@ -155,32 +144,28 @@
                 <span class="tag amber-tag">Reconstructed</span>
               </div>
               <p class="panel-note">Wife did <strong>not</strong> produce 06/23/2024 statements. These are our back-cast positions from the figures she did disclose — a provable floor, a working estimate, and an adverse-inference ceiling (<strong>Rule 49 · Rule 65</strong>).</p>
-              <div id="coniDosEst"></div>
-            </div>
+              <div id="coniDosEst"></div>            </div>
 
             <div class="panel">
               <div class="panel-head">
                 <h3>⊟ Luis — Liabilities at Date of Service</h3>
                 <span class="tag">Inventory §N · itemized</span>
               </div>
-              <div id="luisLiab"></div>
-            </div>
+              <div id="luisLiab"></div>            </div>
 
             <div class="panel">
               <div class="panel-head">
                 <h3>⊟ Supported Spouse — Liabilities at Date of Service</h3>
                 <span class="tag">Inventory §N · itemized</span>
               </div>
-              <div id="coniLiab"></div>
-            </div>
+              <div id="coniLiab"></div>            </div>
 
             <div class="panel">
               <div class="panel-head">
                 <h3>⊟ Household &amp; Personal Property</h3>
                 <span class="tag">Joint inventory · furniture &amp; household goods</span>
               </div>
-              <div id="hhInv"></div>
-            </div>
+              <div id="hhInv"></div>            </div>
           </div>
 
           <div class="est-col-rail">
@@ -191,8 +176,7 @@
             </div>
             <div class="panel">
               <div class="panel-head"><h3>⚑ Estate Flags</h3></div>
-              <ul class="flag-list" id="estFlags"></ul>
-            </div>
+              <ul class="flag-list" id="estFlags"></ul>            </div>
           </div>
         </div>
 
@@ -222,8 +206,7 @@
           </div>
           <p class="panel-note">Everything still outstanding to lock the date-of-service estate and the equalization math. Click an item to mark it done.</p>
           <div id="todoList"></div>
-          <div id="todoAsk"></div>
-        </div>
+          <div id="todoAsk"></div>        </div>
       </section>
 
       <!-- ============ TAB: WORKSHEETS ============ -->
@@ -276,16 +259,14 @@
         </div>
         <div class="panel">
           <div class="panel-head"><h3>Already analyzed &amp; compared</h3></div>
-          <ul class="analyzed-list" id="analyzedList"></ul>
-        </div>
+          <ul class="analyzed-list" id="analyzedList"></ul>        </div>
       </section>
 
       <div class="foot">
         <span>Veritas — Family Law Financial Intelligence</span>
         <span class="foot-dim">Figures traced to record.</span>
       </div>
-      <div style="text-align:center;font-size:10.5px;font-weight:700;letter-spacing:.5px;color:#8a6d3b;background:#fbf6e9;border-top:1px solid #e6d9b8;padding:8px 10px;text-transform:uppercase">Attorney-Client Privileged · Attorney Work Product · Confidential</div>
-    </div>
+      <div style="text-align:center;font-size:10.5px;font-weight:700;letter-spacing:.5px;color:#8a6d3b;background:#fbf6e9;border-top:1px solid #e6d9b8;padding:8px 10px;text-transform:uppercase">Attorney-Client Privileged · Attorney Work Product · Confidential</div>    </div>
   </main>
 
   <script src="api-client.js"></script>

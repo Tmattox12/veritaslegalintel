@@ -2,8 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AFI Form Populator - Veritas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />  <title>AFI Form Populator - Veritas</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -394,8 +393,7 @@
   <aside class="sidebar">
     <div class="brand">
       <div class="brand-mark">
-        <img src="logo-vfi.jpg" alt="VFI Logo" />
-        <span class="brand-mark-fallback">VFI</span>
+        <img src="logo-vfi.jpg" alt="VFI Logo" />        <span class="brand-mark-fallback">VFI</span>
       </div>
       <div class="brand-text">
         <span class="brand-name">Veritas</span>
@@ -413,8 +411,7 @@
     </nav>
 
     <div class="sidebar-foot">
-      <div class="plan-chip"><span style="color:var(--green)">●</span> AFI Tool</div>
-    </div>
+      <div class="plan-chip"><span style="color:var(--green)">●</span> AFI Tool</div>    </div>
   </aside>
 
   <!-- ===================== MAIN ===================== -->
@@ -422,8 +419,7 @@
     <!-- Header -->
     <div class="populator-header">
       <div class="populator-container">
-        <div class="populator-title">📝 AFI Form Populator</div>
-        <div class="populator-subtitle">Auto-populate AFI form with verified income and expense data</div>
+        <div class="populator-title">📝 AFI Form Populator</div>        <div class="populator-subtitle">Auto-populate AFI form with verified income and expense data</div>
       </div>
     </div>
 
@@ -431,54 +427,46 @@
     <div class="populator-container">
       <!-- Info Box -->
       <div class="info-box">
-        ℹ️ This tool imports verified expense data from the Document Hub and income data from the Income Reconciliation tool to auto-populate AFI form lines. All amounts are form-ready for attorney review.
-      </div>
+        ℹ️ This tool imports verified expense data from the Document Hub and income data from the Income Reconciliation tool to auto-populate AFI form lines. All amounts are form-ready for attorney review.      </div>
 
       <!-- Data Import Status -->
       <div class="populator-card">
         <div class="card-title">📥 Data Import Status</div>
-
         <div class="import-section">
           <div class="import-status">
             <span class="status-label">AFI Expense Data</span>
             <span class="status-value">
-              <span id="expenseStatus" class="status-pending">Pending Import</span>
-            </span>
+              <span id="expenseStatus" class="status-pending">Pending Import</span>            </span>
           </div>
 
           <div class="import-status">
             <span class="status-label">Income Data (W-2)</span>
             <span class="status-value">
-              <span id="w2Status" class="status-pending">Pending</span>
-            </span>
+              <span id="w2Status" class="status-pending">Pending</span>            </span>
           </div>
 
           <div class="import-status">
             <span class="status-label">Income Data (Social Security)</span>
             <span class="status-value">
-              <span id="ssStatus" class="status-pending">Pending</span>
-            </span>
+              <span id="ssStatus" class="status-pending">Pending</span>            </span>
           </div>
 
           <div class="import-status">
             <span class="status-label">Other Income (Verified)</span>
             <span class="status-value">
-              <span class="status-success">✓ Ready</span>
-            </span>
+              <span class="status-success">✓ Ready</span>            </span>
           </div>
         </div>
 
         <div class="action-buttons" style="margin-top: 16px;">
           <button class="btn-primary" onclick="importFromHub()">📥 Import Expense Data</button>
           <button class="btn-primary" onclick="importFromReconciliation()">📥 Import Income Data</button>
-          <button class="btn-secondary" onclick="clearAllData()">Clear Form</button>
-        </div>
+          <button class="btn-secondary" onclick="clearAllData()">Clear Form</button>        </div>
       </div>
 
       <!-- AFI FORM SECTION -->
       <div class="populator-card">
         <div class="card-title">🧾 AFI FORM - EXPENSE LINES</div>
-
         <div class="form-section">
           <div class="form-section-title">AFI Lines 1-8: Expenses</div>
 
@@ -489,8 +477,7 @@
               <span class="verification-badge badge-pending" id="badge1">Pending</span>
             </div>
             <input type="number" id="line1" class="form-input pending" placeholder="$0.00" step="0.01" />
-            <button class="line-verify-btn" onclick="verifyLine(1)">Verify</button>
-          </div>
+            <button class="line-verify-btn" onclick="verifyLine(1)">Verify</button>          </div>
 
           <!-- Line 2: Childcare -->
           <div class="line-item">
@@ -499,8 +486,7 @@
               <span class="verification-badge badge-pending" id="badge2">Pending</span>
             </div>
             <input type="number" id="line2" class="form-input pending" placeholder="$0.00" step="0.01" />
-            <button class="line-verify-btn" onclick="verifyLine(2)">Verify</button>
-          </div>
+            <button class="line-verify-btn" onclick="verifyLine(2)">Verify</button>          </div>
 
           <!-- Line 3: Medical/Dental -->
           <div class="line-item">
@@ -509,8 +495,7 @@
               <span class="verification-badge badge-pending" id="badge3">Pending</span>
             </div>
             <input type="number" id="line3" class="form-input pending" placeholder="$0.00" step="0.01" />
-            <button class="line-verify-btn" onclick="verifyLine(3)">Verify</button>
-          </div>
+            <button class="line-verify-btn" onclick="verifyLine(3)">Verify</button>          </div>
 
           <!-- Line 4: Education -->
           <div class="line-item">
@@ -519,8 +504,7 @@
               <span class="verification-badge badge-pending" id="badge4">Pending</span>
             </div>
             <input type="number" id="line4" class="form-input pending" placeholder="$0.00" step="0.01" />
-            <button class="line-verify-btn" onclick="verifyLine(4)">Verify</button>
-          </div>
+            <button class="line-verify-btn" onclick="verifyLine(4)">Verify</button>          </div>
 
           <!-- Line 5: Housing -->
           <div class="line-item">
@@ -529,8 +513,7 @@
               <span class="verification-badge badge-pending" id="badge5">Pending</span>
             </div>
             <input type="number" id="line5" class="form-input pending" placeholder="$0.00" step="0.01" />
-            <button class="line-verify-btn" onclick="verifyLine(5)">Verify</button>
-          </div>
+            <button class="line-verify-btn" onclick="verifyLine(5)">Verify</button>          </div>
 
           <!-- Line 6: Utilities -->
           <div class="line-item">
@@ -539,8 +522,7 @@
               <span class="verification-badge badge-pending" id="badge6">Pending</span>
             </div>
             <input type="number" id="line6" class="form-input pending" placeholder="$0.00" step="0.01" />
-            <button class="line-verify-btn" onclick="verifyLine(6)">Verify</button>
-          </div>
+            <button class="line-verify-btn" onclick="verifyLine(6)">Verify</button>          </div>
 
           <!-- Line 7: Transportation -->
           <div class="line-item">
@@ -549,8 +531,7 @@
               <span class="verification-badge badge-pending" id="badge7">Pending</span>
             </div>
             <input type="number" id="line7" class="form-input pending" placeholder="$0.00" step="0.01" />
-            <button class="line-verify-btn" onclick="verifyLine(7)">Verify</button>
-          </div>
+            <button class="line-verify-btn" onclick="verifyLine(7)">Verify</button>          </div>
 
           <!-- Line 8: Food -->
           <div class="line-item">
@@ -559,8 +540,7 @@
               <span class="verification-badge badge-pending" id="badge8">Pending</span>
             </div>
             <input type="number" id="line8" class="form-input pending" placeholder="$0.00" step="0.01" />
-            <button class="line-verify-btn" onclick="verifyLine(8)">Verify</button>
-          </div>
+            <button class="line-verify-btn" onclick="verifyLine(8)">Verify</button>          </div>
         </div>
 
         <!-- Monthly Expense Calculation -->
@@ -571,15 +551,13 @@
           </div>
           <div class="monthly-calc">
             <span>Annual Total ÷ 12 months</span>
-            <span>= $<span id="monthlyCalc">0.00</span>/month</span>
-          </div>
+            <span>= $<span id="monthlyCalc">0.00</span>/month</span>          </div>
         </div>
       </div>
 
       <!-- INCOME SECTION -->
       <div class="populator-card">
         <div class="card-title">💰 INCOME SECTION</div>
-
         <div class="form-section">
           <div class="form-section-title">Income Sources & Totals</div>
 
@@ -587,20 +565,17 @@
             <div class="form-field">
               <label class="form-label">W-2 Employment Income (Annual)</label>
               <input type="number" id="incomeW2" class="form-input pending" placeholder="$0.00" step="0.01" />
-              <span class="verification-badge badge-pending" id="w2Badge">Pending</span>
-            </div>
+              <span class="verification-badge badge-pending" id="w2Badge">Pending</span>            </div>
 
             <div class="form-field">
               <label class="form-label">Social Security (Annual)</label>
               <input type="number" id="incomeSS" class="form-input pending" placeholder="$0.00" step="0.01" />
-              <span class="verification-badge badge-pending" id="ssBadge">Pending</span>
-            </div>
+              <span class="verification-badge badge-pending" id="ssBadge">Pending</span>            </div>
 
             <div class="form-field">
               <label class="form-label">Other Income (Annual)</label>
               <input type="number" id="incomeOther" class="form-input verified" value="821913.50" step="0.01" readonly />
-              <span class="verification-badge badge-verified">✓ Verified</span>
-            </div>
+              <span class="verification-badge badge-verified">✓ Verified</span>            </div>
 
             <div class="form-field">
               <label class="form-label">TOTAL ANNUAL INCOME</label>
@@ -612,8 +587,7 @@
           <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid #e5e5e5;">
             <div class="form-label" style="color: #2e5b8a;">Monthly Income (Average)</div>
             <div style="font-size: 20px; font-weight: 700; color: #2e5b8a; margin-top: 8px;">
-              $<span id="monthlyIncome">68492.79</span>/month
-            </div>
+              $<span id="monthlyIncome">68492.79</span>/month            </div>
           </div>
         </div>
       </div>
@@ -621,12 +595,10 @@
       <!-- RECONCILIATION SUMMARY -->
       <div class="populator-card">
         <div class="card-title">📊 AFI RECONCILIATION SUMMARY</div>
-
         <div class="summary-grid">
           <div class="summary-box">
             <div class="summary-label">Total Annual Expenses</div>
-            <div class="summary-value">$<span id="summaryExpenses">0.00</span></div>
-            <div class="summary-note">8 AFI expense categories</div>
+            <div class="summary-value">$<span id="summaryExpenses">0.00</span></div>            <div class="summary-note">8 AFI expense categories</div>
           </div>
 
           <div class="summary-box">
@@ -644,8 +616,7 @@
           <div class="summary-box" style="border-left-color: #ff9800;">
             <div class="summary-label">Monthly Net Income</div>
             <div class="summary-value" style="color: #ff9800;">$<span id="summaryMonthlyNet">68492.79</span></div>
-            <div class="summary-note">÷ 12 months</div>
-          </div>
+            <div class="summary-note">÷ 12 months</div>          </div>
         </div>
       </div>
 
@@ -665,8 +636,7 @@
             <div><input type="checkbox" id="check2" /> Social Security income verified</div>
             <div><input type="checkbox" id="check3" /> Other income verified against payment records</div>
             <div><input type="checkbox" id="check4" /> All AFI expenses reconciled to source documents</div>
-            <div><input type="checkbox" id="check5" /> All amounts cross-checked for accuracy</div>
-          </div>
+            <div><input type="checkbox" id="check5" /> All amounts cross-checked for accuracy</div>          </div>
         </div>
       </div>
 
@@ -683,8 +653,7 @@
 
         <div style="margin-top: 16px; padding: 16px; background: #f9f9f9; border-radius: 6px; font-size: 12px; color: #666; line-height: 1.6;">
           <p><strong>Next Steps:</strong></p>
-          <ol style="margin: 8px 0 0 20px;">
-            <li>Import expense data from Document Hub</li>
+          <ol style="margin: 8px 0 0 20px;">            <li>Import expense data from Document Hub</li>
             <li>Import income data from Income Reconciliation</li>
             <li>Review all line items and verify amounts</li>
             <li>Add any necessary notes or explanations</li>
@@ -696,8 +665,7 @@
 
       <!-- Footer -->
       <div style="text-align: center; padding: 20px 0; color: #999; font-size: 12px;">
-        Veritas Financial Intelligence · AFI Form Populator v1.0<br>
-        Form-ready data for family law proceedings
+        Veritas Financial Intelligence · AFI Form Populator v1.0<br>        Form-ready data for family law proceedings
       </div>
     </div>
   </main>
@@ -798,8 +766,7 @@
         input.classList.remove('pending');
         document.getElementById('w2Badge').className = 'verification-badge badge-verified';
         document.getElementById('w2Badge').textContent = '✓ Verified';
-        document.getElementById('w2Status').innerHTML = '<span class="status-success">✓ Ready</span>';
-      }
+        document.getElementById('w2Status').innerHTML = '<span class="status-success">✓ Ready</span>';      }
       updateCalculations();
     }
 
@@ -810,8 +777,7 @@
         input.classList.remove('pending');
         document.getElementById('ssBadge').className = 'verification-badge badge-verified';
         document.getElementById('ssBadge').textContent = '✓ Verified';
-        document.getElementById('ssStatus').innerHTML = '<span class="status-success">✓ Ready</span>';
-      }
+        document.getElementById('ssStatus').innerHTML = '<span class="status-success">✓ Ready</span>';      }
       updateCalculations();
     }
 
@@ -894,8 +860,7 @@
 
     function clearAllData() {
       if (confirm('Are you sure? This will clear all form data.')) {
-        for (let i = 1; i <= 8; i++) {
-          document.getElementById('line' + i).value = '';
+        for (let i = 1; i <= 8; i++) {          document.getElementById('line' + i).value = '';
         }
         document.getElementById('incomeW2').value = '';
         document.getElementById('incomeSS').value = '';
@@ -906,8 +871,7 @@
     }
 
     function exportToPDF() {
-      alert('PDF export: This functionality opens the print dialog to save as PDF (Ctrl+P → Save as PDF)');
-      window.print();
+      alert('PDF export: This functionality opens the print dialog to save as PDF (Ctrl+P → Save as PDF)');      window.print();
     }
 
     function printForm() {

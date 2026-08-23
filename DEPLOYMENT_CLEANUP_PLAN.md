@@ -3,13 +3,18 @@
 
 **Date**: August 20, 2026  
 **Status**: Ready for Execution  
+<<<<<<< HEAD
 **Objective**: Remove all case-specific data (Ossandon, Coni, Luis) and prepare for domain deployment
+=======
+**Objective**: Remove all case-specific data (Template Matter, Parent B, Parent A) and prepare for domain deployment
+>>>>>>> cbd6749 (Clean stale case data and neutralize templates)
 
 ---
 
 ## 📋 CASE DATA INVENTORY
 
 ### Files to DELETE (Case-Specific Data)
+<<<<<<< HEAD
 These files contain ONLY Ossandon/Coni/Luis case data and should be completely removed:
 
 **Case Documentation** (21 files found):
@@ -20,6 +25,18 @@ These files contain ONLY Ossandon/Coni/Luis case data and should be completely r
 - ❌ `expense-reconciliation-ossandon.json` - Ossandon inventory
 - ❌ `extract_ossandon_income.py` - Ossandon extraction script
 - ❌ `extract_ossandon_expenses.py` - Ossandon extraction script
+=======
+These files contain ONLY Template Matter/Parent B/Parent A case data and should be completely removed:
+
+**Case Documentation** (21 files found):
+- ❌ `afi-Template Matter-completed.json` - Template Matter case template
+- ❌ `afi-population-template-Template Matter.md` - Template Matter extraction guide
+- ❌ `OSSANDON_ACTION_SUMMARY.txt` - Template Matter case analysis
+- ❌ `chase-freedom-expense-mapping.md` - Template Matter Chase CC mapping
+- ❌ `expense-reconciliation-Template Matter.json` - Template Matter inventory
+- ❌ `extract_template-matter_income.py` - Template Matter extraction script
+- ❌ `extract_template-matter_expenses.py` - Template Matter extraction script
+>>>>>>> cbd6749 (Clean stale case data and neutralize templates)
 - ❌ `_archive/afi-versions/*` - Old AFI versions (archive folder)
 - ❌ `spousal-OLD-BACKUP.html` - Backup file
 
@@ -30,9 +47,15 @@ These files contain ONLY Ossandon/Coni/Luis case data and should be completely r
 ### Core Application Files (KEEP but CLEAN)
 
 #### 1. **index.html** (Main Dashboard)
+<<<<<<< HEAD
 **Location**: Line references to "Ossandon" cases  
 **Action**: 
 - Search for: "ossandon", "coni", "luis" (case-insensitive)
+=======
+**Location**: Line references to "Template Matter" cases  
+**Action**: 
+- Search for: "Template Matter", "Parent B", "Parent A" (case-insensitive)
+>>>>>>> cbd6749 (Clean stale case data and neutralize templates)
 - Replace placeholder case names with generic "Sample Case" or remove
 - Keep all UI/navigation structure intact
 
@@ -52,14 +75,22 @@ These files may have case references in comments or sample data:
 **Action**: Remove any hardcoded case-specific test data, keep templates
 
 #### 3. **income-reconciliation.html**
+<<<<<<< HEAD
 **Current Content**: Shows Ossandon data
 - Helping Hearts Income: $821,913.50 (Ossandon-specific)
 - Fleet Feet W-2: $2.00 (Ossandon-specific)
 - Nico Social Security: (Ossandon-specific)
+=======
+**Current Content**: Shows Template Matter data
+- Helping Hearts Income: $821,913.50 (Template Matter-specific)
+- Fleet Feet W-2: $2.00 (Template Matter-specific)
+- Nico Social Security: (Template Matter-specific)
+>>>>>>> cbd6749 (Clean stale case data and neutralize templates)
 
 **Action**: Clear all sample data, show empty template with explanatory text
 
 #### 4. **afi.html & afi-form-populator.html**
+<<<<<<< HEAD
 **Current Content**: Ossandon expense mappings
 **Action**: Remove case-specific totals, show blank AFI template
 
@@ -67,6 +98,15 @@ These files may have case references in comments or sample data:
 - `BUILD_COMPLETE_SUMMARY.md` - Remove Ossandon statistics
 - `EXECUTIVE_SUMMARY.txt` - Remove case references
 - `DEPLOYMENT_STATUS.md` - Remove Ossandon from examples
+=======
+**Current Content**: Template Matter expense mappings
+**Action**: Remove case-specific totals, show blank AFI template
+
+#### 5. **Documentation Files to CLEAN** (not delete)
+- `BUILD_COMPLETE_SUMMARY.md` - Remove Template Matter statistics
+- `EXECUTIVE_SUMMARY.txt` - Remove case references
+- `DEPLOYMENT_STATUS.md` - Remove Template Matter from examples
+>>>>>>> cbd6749 (Clean stale case data and neutralize templates)
 - `ARCHITECTURE_OVERVIEW.md` - Remove case-specific workflows
 - `README.md` (if exists) - Update with generic description
 
@@ -77,11 +117,19 @@ These files may have case references in comments or sample data:
 These phrases appear throughout files and must be removed/replaced:
 
 ### Case Names
+<<<<<<< HEAD
 - ❌ "Ossandon" → Remove or replace with "[Case Name]"
 - ❌ "Coni" → Remove or replace with "[Party Name]"
 - ❌ "Luis" → Remove or replace with "[Party Name]"
 - ❌ "Nico" → Remove or replace with "[Party Name]"
 - ❌ "Petitioner v. Respondent" → Keep as template text
+=======
+- ❌ "Template Matter" → Remove or replace with "[Case Name]"
+- ❌ "Parent B" → Remove or replace with "[Party Name]"
+- ❌ "Parent A" → Remove or replace with "[Party Name]"
+- ❌ "Nico" → Remove or replace with "[Party Name]"
+- ❌ "[Case Name]" → Keep as template text
+>>>>>>> cbd6749 (Clean stale case data and neutralize templates)
 
 ### Specific Data
 - ❌ "$821,913.50" (Helping Hearts income)
@@ -95,7 +143,11 @@ These phrases appear throughout files and must be removed/replaced:
 - ❌ "Ws Chase Freedom CC" (specific statements)
 - ❌ "2024.11.06 Nico SS Income.pdf"
 - ❌ "2025 W2 FF.pdf"
+<<<<<<< HEAD
 - ❌ Any actual PDF filenames from Ossandon case
+=======
+- ❌ Any actual PDF filenames from Template Matter case
+>>>>>>> cbd6749 (Clean stale case data and neutralize templates)
 
 ---
 
@@ -126,6 +178,7 @@ Documentation (cleaned)
 
 ```
 DELETE THESE FILES:
+<<<<<<< HEAD
 ├── afi-ossandon-completed.json
 ├── afi-population-template-ossandon.md
 ├── OSSANDON_ACTION_SUMMARY.txt
@@ -133,6 +186,15 @@ DELETE THESE FILES:
 ├── expense-reconciliation-ossandon.json
 ├── extract_ossandon_income.py
 ├── extract_ossandon_expenses.py
+=======
+├── afi-Template Matter-completed.json
+├── afi-population-template-Template Matter.md
+├── OSSANDON_ACTION_SUMMARY.txt
+├── chase-freedom-expense-mapping.md
+├── expense-reconciliation-Template Matter.json
+├── extract_template-matter_income.py
+├── extract_template-matter_expenses.py
+>>>>>>> cbd6749 (Clean stale case data and neutralize templates)
 ├── spousal-OLD-BACKUP.html
 ├── _archive/                    (entire directory)
 └── .regulations-cache/          (entire directory)
@@ -190,9 +252,15 @@ Line 3: Medical/Dental      [Awaiting data]
 - [ ] Delete 9 case-specific files
 - [ ] Delete `_archive/` folder
 - [ ] Delete `.regulations-cache/` folder
+<<<<<<< HEAD
 - [ ] Search and remove all "Ossandon" references
 - [ ] Search and remove all "Coni" references
 - [ ] Search and remove all "Luis" references
+=======
+- [ ] Search and remove all "Template Matter" references
+- [ ] Search and remove all "Parent B" references
+- [ ] Search and remove all "Parent A" references
+>>>>>>> cbd6749 (Clean stale case data and neutralize templates)
 - [ ] Remove specific financial data ($821,913.50, etc.)
 - [ ] Remove case-specific filenames from documentation
 
@@ -204,7 +272,11 @@ Line 3: Medical/Dental      [Awaiting data]
 - [ ] Test that localStorage is empty on fresh load
 
 ### Phase 3: Documentation Update (1 hour)
+<<<<<<< HEAD
 - [ ] Update BUILD_COMPLETE_SUMMARY.md - remove Ossandon stats
+=======
+- [ ] Update BUILD_COMPLETE_SUMMARY.md - remove Template Matter stats
+>>>>>>> cbd6749 (Clean stale case data and neutralize templates)
 - [ ] Update EXECUTIVE_SUMMARY.txt - remove case references
 - [ ] Update DEPLOYMENT_STATUS.md - generic instructions
 - [ ] Create USAGE_GUIDE.md - how to use the system
@@ -259,9 +331,15 @@ Line 3: Medical/Dental      [Awaiting data]
 ## 📋 FINAL VERIFICATION CHECKLIST
 
 Before going live:
+<<<<<<< HEAD
 - [ ] No file named "ossandon*" anywhere
 - [ ] No file named "coni*" anywhere
 - [ ] No file named "luis*" anywhere
+=======
+- [ ] No file named "Template Matter*" anywhere
+- [ ] No file named "Parent B*" anywhere
+- [ ] No file named "Parent A*" anywhere
+>>>>>>> cbd6749 (Clean stale case data and neutralize templates)
 - [ ] No $821,913.50 in any HTML file
 - [ ] No $17,612.78 in any HTML file
 - [ ] No "Chase Freedom CC 5013" references

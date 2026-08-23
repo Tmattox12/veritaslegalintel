@@ -2,8 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Child Support Calculator - Veritas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />  <title>Child Support Calculator - Veritas</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -420,8 +419,7 @@
   <aside class="sidebar">
     <div class="sidebar-head">
       <div class="logo-section">
-        <span class="logo-text">⚖️ VERITAS</span>
-        <span class="logo-sub">Legal Intelligence</span>
+        <span class="logo-text">⚖️ VERITAS</span>        <span class="logo-sub">Legal Intelligence</span>
       </div>
     </div>
 
@@ -450,8 +448,7 @@
     </nav>
 
     <div class="sidebar-foot">
-      <div class="plan-chip"><span style="color:var(--green)">●</span> Secure Connection · encrypted &amp; confidential</div>
-    </div>
+      <div class="plan-chip"><span style="color:var(--green)">●</span> Secure Connection · encrypted &amp; confidential</div>    </div>
   </aside>
 
   <!-- ===================== MAIN ===================== -->
@@ -480,8 +477,7 @@
       <!-- Header -->
       <div class="calc-header">
         <div>
-          <h1 class="calc-title">🧒 Child Support Calculator</h1>
-          <p class="calc-subtitle">Calculate child support obligations based on state guidelines, income, and custody arrangement</p>
+          <h1 class="calc-title">🧒 Child Support Calculator</h1>          <p class="calc-subtitle">Calculate child support obligations based on state guidelines, income, and custody arrangement</p>
         </div>
       </div>
 
@@ -508,22 +504,19 @@
           <div class="kpi-label">Combined Income</div>
         </div>
         <div class="kpi-card">
-          <div class="kpi-value" id="supportAmountKPI">$0</div>
-          <div class="kpi-label">Monthly Support</div>
+          <div class="kpi-value" id="supportAmountKPI">$0</div>          <div class="kpi-label">Monthly Support</div>
         </div>
       </div>
 
       <!-- Warning & Guideline Info -->
       <div class="warning-box">
-        <div class="warning-title">⚠️ Important: Professional Review Recommended</div>
-        <div class="warning-text">
+        <div class="warning-title">⚠️ Important: Professional Review Recommended</div>        <div class="warning-text">
           Child support calculations vary significantly by state and depend on specific guidelines, deviations, and circumstances. This calculator provides estimates based on general income shares model. Always verify with your state's specific guidelines and consult with a family law attorney for accuracy. Results should be reviewed and confirmed by a legal professional.
         </div>
       </div>
 
       <!-- State Selection & Guidelines -->
-      <div class="input-panel" style="margin-bottom: 30px;">
-        <div class="panel-title">Select State & Guidelines</div>
+      <div class="input-panel" style="margin-bottom: 30px;">        <div class="panel-title">Select State & Guidelines</div>
 
         <div class="form-group">
           <label class="form-label">State (for specific guidelines)</label>
@@ -545,13 +538,11 @@
             <option value="nv">Nevada</option>
             <option value="or">Oregon</option>
             <option value="utc">Utah</option>
-            <option value="other">Other State / Generic Model</option>
-          </select>
+            <option value="other">Other State / Generic Model</option>          </select>
           <div class="help-text">Each state has different formulas. Select to see state-specific guidelines.</div>
         </div>
 
-        <div id="guidelineInfo"></div>
-      </div>
+        <div id="guidelineInfo"></div>      </div>
 
       <!-- Main Input Grid -->
       <div class="input-grid">
@@ -561,31 +552,26 @@
 
           <div class="form-group">
             <label class="form-label">Parent A Name (Optional)</label>
-            <input type="text" class="form-input" id="parentAName" placeholder="e.g., Sarah">
-          </div>
+            <input type="text" class="form-input" id="parentAName" placeholder="e.g., Sarah">          </div>
 
           <div class="form-group">
             <label class="form-label">Gross Monthly Income</label>
-            <input type="number" class="form-input" id="parentAIncome" placeholder="0.00" step="0.01" onchange="updateKPIs()">
-            <div class="help-text">W-2, self-employment, Social Security, disability, etc.</div>
+            <input type="number" class="form-input" id="parentAIncome" placeholder="0.00" step="0.01" onchange="updateKPIs()">            <div class="help-text">W-2, self-employment, Social Security, disability, etc.</div>
           </div>
 
           <div class="form-group">
             <label class="form-label">Child Daycare Expenses</label>
-            <input type="number" class="form-input" id="parentADaycare" placeholder="0.00" step="0.01">
-            <div class="help-text">Work-related childcare only</div>
+            <input type="number" class="form-input" id="parentADaycare" placeholder="0.00" step="0.01">            <div class="help-text">Work-related childcare only</div>
           </div>
 
           <div class="form-group">
             <label class="form-label">Health Insurance Premium (Monthly)</label>
-            <input type="number" class="form-input" id="parentAHealth" placeholder="0.00" step="0.01">
-            <div class="help-text">For child coverage</div>
+            <input type="number" class="form-input" id="parentAHealth" placeholder="0.00" step="0.01">            <div class="help-text">For child coverage</div>
           </div>
 
           <div class="form-group">
             <label class="form-label">Parenting Time %</label>
-            <input type="number" class="form-input" id="parentATimePercent" placeholder="50" min="0" max="100" step="0.5">
-            <div class="help-text">Percentage of overnights per year</div>
+            <input type="number" class="form-input" id="parentATimePercent" placeholder="50" min="0" max="100" step="0.5">            <div class="help-text">Percentage of overnights per year</div>
           </div>
         </div>
 
@@ -595,31 +581,26 @@
 
           <div class="form-group">
             <label class="form-label">Parent B Name (Optional)</label>
-            <input type="text" class="form-input" id="parentBName" placeholder="e.g., David">
-          </div>
+            <input type="text" class="form-input" id="parentBName" placeholder="e.g., David">          </div>
 
           <div class="form-group">
             <label class="form-label">Gross Monthly Income</label>
-            <input type="number" class="form-input" id="parentBIncome" placeholder="0.00" step="0.01" onchange="updateKPIs()">
-            <div class="help-text">W-2, self-employment, Social Security, disability, etc.</div>
+            <input type="number" class="form-input" id="parentBIncome" placeholder="0.00" step="0.01" onchange="updateKPIs()">            <div class="help-text">W-2, self-employment, Social Security, disability, etc.</div>
           </div>
 
           <div class="form-group">
             <label class="form-label">Child Daycare Expenses</label>
-            <input type="number" class="form-input" id="parentBDaycare" placeholder="0.00" step="0.01">
-            <div class="help-text">Work-related childcare only</div>
+            <input type="number" class="form-input" id="parentBDaycare" placeholder="0.00" step="0.01">            <div class="help-text">Work-related childcare only</div>
           </div>
 
           <div class="form-group">
             <label class="form-label">Health Insurance Premium (Monthly)</label>
-            <input type="number" class="form-input" id="parentBHealth" placeholder="0.00" step="0.01">
-            <div class="help-text">For child coverage</div>
+            <input type="number" class="form-input" id="parentBHealth" placeholder="0.00" step="0.01">            <div class="help-text">For child coverage</div>
           </div>
 
           <div class="form-group">
             <label class="form-label">Parenting Time %</label>
-            <input type="number" class="form-input" id="parentBTimePercent" placeholder="50" min="0" max="100" step="0.5">
-            <div class="help-text">Percentage of overnights per year</div>
+            <input type="number" class="form-input" id="parentBTimePercent" placeholder="50" min="0" max="100" step="0.5">            <div class="help-text">Percentage of overnights per year</div>
           </div>
         </div>
       </div>
@@ -637,8 +618,7 @@
             <div class="custody-label">Primary: Parent A</div>
             <div class="custody-desc">Parent B has limited parenting time</div>
           </div>
-          <div class="custody-option" onclick="selectCustody('primary-b', this)" data-custody="primary-b">
-            <div class="custody-label">Primary: Parent B</div>
+          <div class="custody-option" onclick="selectCustody('primary-b', this)" data-custody="primary-b">            <div class="custody-label">Primary: Parent B</div>
             <div class="custody-desc">Parent A has limited parenting time</div>
           </div>
         </div>
@@ -650,21 +630,18 @@
 
         <div class="form-group">
           <label class="form-label">Number of Children</label>
-          <input type="number" class="form-input" id="numChildren" placeholder="1" min="1" step="1">
-          <div class="help-text">Support amount may vary by number of children in guideline</div>
+          <input type="number" class="form-input" id="numChildren" placeholder="1" min="1" step="1">          <div class="help-text">Support amount may vary by number of children in guideline</div>
         </div>
 
         <div class="form-group">
           <label class="form-label">Ages of Children (Optional)</label>
-          <input type="text" class="form-input" id="childAges" placeholder="e.g., 8, 11, 14">
-          <div class="help-text">Some states adjust for child age</div>
+          <input type="text" class="form-input" id="childAges" placeholder="e.g., 8, 11, 14">          <div class="help-text">Some states adjust for child age</div>
         </div>
       </div>
 
       <!-- Results Panel -->
       <div class="results-panel" id="resultsPanel" style="display:none;">
         <div class="result-title">💰 Child Support Calculation Results</div>
-
         <div class="result-row">
           <div>
             <div class="result-label">Payor (Obligor)</div>
@@ -672,8 +649,7 @@
           </div>
           <div>
             <div class="result-label">Monthly Support Obligation</div>
-            <div class="result-value" id="supportAmount">$0</div>
-          </div>
+            <div class="result-value" id="supportAmount">$0</div>          </div>
         </div>
 
         <div class="result-row">
@@ -690,8 +666,7 @@
         <div style="margin-top: 20px; padding-top: 20px; border-top: 2px solid rgba(255,255,255,0.3);">
           <div class="guideline-info">
             <div class="guideline-title">Calculation Method</div>
-            <div class="guideline-text" id="calculationMethod">
-              Based on Income Shares Model (used by most states). Each parent's share of support is proportional to their income.
+            <div class="guideline-text" id="calculationMethod">              Based on Income Shares Model (used by most states). Each parent's share of support is proportional to their income.
             </div>
           </div>
         </div>
@@ -719,8 +694,7 @@
           </div>
           <div class="summary-row total">
             <span class="summary-label">Calculated Support</span>
-            <span class="summary-value" id="partyASupport">$0</span>
-          </div>
+            <span class="summary-value" id="partyASupport">$0</span>          </div>
         </div>
 
         <div class="party-summary">
@@ -743,8 +717,7 @@
           </div>
           <div class="summary-row total">
             <span class="summary-label">Calculated Support</span>
-            <span class="summary-value" id="partyBSupport">$0</span>
-          </div>
+            <span class="summary-value" id="partyBSupport">$0</span>          </div>
         </div>
       </div>
 
@@ -758,8 +731,7 @@
         </div>
 
         <!-- Guidelines Tab -->
-        <div id="guidelines" class="tab-content active">
-          <div class="panel-title">State Guideline Information</div>
+        <div id="guidelines" class="tab-content active">          <div class="panel-title">State Guideline Information</div>
 
           <div class="guideline-info">
             <div class="guideline-title">Income Shares Model (Most Common)</div>
@@ -772,15 +744,13 @@
               5. Adjust for childcare, health insurance, parenting time<br><br>
               <strong>Example:</strong> Combined income $6,000/month, guideline 20% = $1,200 support<br>
               Parent A earns 60% ($3,600) → pays 60% of $1,200 = $720<br>
-              Parent B earns 40% ($2,400) → pays 40% of $1,200 = $480
-            </div>
+              Parent B earns 40% ($2,400) → pays 40% of $1,200 = $480            </div>
           </div>
 
           <div class="guideline-info">
             <div class="guideline-title">State-Specific Variations</div>
             <div class="guideline-text">
-              <strong>California:</strong> Guideline percentage increases with more children (20% → 25% → 30% → 35%)<br>
-              <strong>Texas:</strong> Cap on guideline calculations (~$310k combined income) with percentage-based model<br>
+              <strong>California:</strong> Guideline percentage increases with more children (20% → 25% → 30% → 35%)<br>              <strong>Texas:</strong> Cap on guideline calculations (~$310k combined income) with percentage-based model<br>
               <strong>Florida:</strong> Percentage varies; mandatory review if 3+ years or substantial change<br>
               <strong>New York:</strong> Guideline applied to combined parental income; can deviate for shared custody<br>
               <strong>Most States:</strong> Similar income shares model with state-specific adjustments
@@ -793,8 +763,7 @@
         </div>
 
         <!-- Adjustments Tab -->
-        <div id="adjustments" class="tab-content">
-          <div class="panel-title">Common Adjustments & Deviations</div>
+        <div id="adjustments" class="tab-content">          <div class="panel-title">Common Adjustments & Deviations</div>
 
           <div class="guideline-info">
             <div class="guideline-title">Mandatory Adjustments (Included in Calculation)</div>
@@ -802,8 +771,7 @@
               ✓ <strong>Childcare:</strong> Work-related daycare expenses (added to guideline)<br>
               ✓ <strong>Health Insurance:</strong> Cost of child's health/dental insurance (added to guideline)<br>
               ✓ <strong>Parenting Time Adjustments:</strong> Custody arrangement and overnights<br>
-              ✓ <strong>Income Calculation:</strong> Varies by state (gross wages, self-employment, bonuses, etc.)<br>
-            </div>
+              ✓ <strong>Income Calculation:</strong> Varies by state (gross wages, self-employment, bonuses, etc.)<br>            </div>
           </div>
 
           <div class="guideline-info">
@@ -823,19 +791,16 @@
           <div class="warning-box">
             <div class="warning-title">Important: Guideline Presumed Correct Unless Unjust</div>
             <div class="warning-text">
-              Most state laws presume the guideline amount is correct and appropriate. Courts can only deviate if they make specific findings that application would be "unjust and inappropriate." Deviation must be documented in writing with specific reasoning.
-            </div>
+              Most state laws presume the guideline amount is correct and appropriate. Courts can only deviate if they make specific findings that application would be "unjust and inappropriate." Deviation must be documented in writing with specific reasoning.            </div>
           </div>
         </div>
 
         <!-- Scenarios Tab -->
-        <div id="scenarios" class="tab-content">
-          <div class="panel-title">Scenario Comparison</div>
+        <div id="scenarios" class="tab-content">          <div class="panel-title">Scenario Comparison</div>
 
           <div class="note-box">
             <strong>How to use:</strong> Enter different income scenarios to see how support changes. Useful for determining impact of:
-            <ul style="margin-top: 8px; margin-left: 20px;">
-              <li>Job changes or raises</li>
+            <ul style="margin-top: 8px; margin-left: 20px;">              <li>Job changes or raises</li>
               <li>Different custody arrangements</li>
               <li>Additional childcare costs</li>
               <li>Insurance premium changes</li>
@@ -846,8 +811,7 @@
         </div>
 
         <!-- Resources Tab -->
-        <div id="resources" class="tab-content">
-          <div class="panel-title">Additional Resources & Information</div>
+        <div id="resources" class="tab-content">          <div class="panel-title">Additional Resources & Information</div>
 
           <div class="guideline-info">
             <div class="guideline-title">Court Modifications</div>
@@ -871,8 +835,7 @@
           </div>
 
           <div class="warning-box">
-            <div class="warning-title">⚠️ Consult an Attorney</div>
-            <div class="warning-text">
+            <div class="warning-title">⚠️ Consult an Attorney</div>            <div class="warning-text">
               This calculator provides general estimates based on common guidelines. Child support laws vary significantly by state and depend on specific circumstances. Always consult with a family law attorney licensed in your state to ensure accuracy and compliance with your specific situation and state law.
             </div>
           </div>
@@ -1019,8 +982,7 @@
     function updateGuidelines() {
       const state = document.getElementById('stateSelect').value;
       const guidelinesInfo = {
-        'ca': '<div class="guideline-title">California Child Support Guidelines</div><div class="guideline-text"><strong>Formula:</strong> Percentage based on combined parental income<br><strong>Percentage:</strong> Increases by number of children (20% → 25% → 30% → 35%)<br><strong>Special:</strong> Includes hardship deduction, tax considerations<br><strong>Review:</strong> Every 3 years or material change of 10%+</div>',
-        'tx': '<div class="guideline-title">Texas Child Support Guidelines</div><div class="guideline-text"><strong>Formula:</strong> Percentage of obligor income<br><strong>Percentage:</strong> 20% (1 child) to 40% (6+ children)<br><strong>Cap:</strong> Applies to first $310k of combined income (2024)<br><strong>Deviation:</strong> Requires specific findings if different</div>',
+        'ca': '<div class="guideline-title">California Child Support Guidelines</div><div class="guideline-text"><strong>Formula:</strong> Percentage based on combined parental income<br><strong>Percentage:</strong> Increases by number of children (20% → 25% → 30% → 35%)<br><strong>Special:</strong> Includes hardship deduction, tax considerations<br><strong>Review:</strong> Every 3 years or material change of 10%+</div>',        'tx': '<div class="guideline-title">Texas Child Support Guidelines</div><div class="guideline-text"><strong>Formula:</strong> Percentage of obligor income<br><strong>Percentage:</strong> 20% (1 child) to 40% (6+ children)<br><strong>Cap:</strong> Applies to first $310k of combined income (2024)<br><strong>Deviation:</strong> Requires specific findings if different</div>',
         'ny': '<div class="guideline-title">New York Child Support Guidelines</div><div class="guideline-text"><strong>Formula:</strong> Percentage of combined parental income<br><strong>Percentage:</strong> 17-25% depending on income level<br><strong>Cap:</strong> $184k combined income (2024)<br><strong>Shared Custody:</strong> Significant deviation if 50%+ overnights</div>',
         'fl': '<div class="guideline-title">Florida Child Support Guidelines</div><div class="guideline-text"><strong>Formula:</strong> Percentage of combined parental income<br><strong>Percentage:</strong> 20% (1 child) to 50% (5+ children)<br><strong>Adjustment:</strong> For parental time-sharing<br><strong>Review:</strong> Mandatory every 3 years</div>',
         'other': '<div class="guideline-title">Income Shares Model (General)</div><div class="guideline-text"><strong>Formula:</strong> Percentage of combined parental income<br><strong>Typical Percentage:</strong> 20-35% depending on children<br><strong>Adjustments:</strong> Childcare, health insurance, custody<br><strong>Note:</strong> Most states use this or similar model</div>'
