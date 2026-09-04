@@ -421,7 +421,7 @@
       <div class="calculation-grid">
         <div class="calculation-card">
           <div class="card-label">2026 Run-Rate</div>
-          <div class="card-value" data-calc-id="[Party B]:runrate">$78,169</div>          <div class="card-note">Click to view check stubs report</div>
+          <div class="card-value" data-calc-id="[Party B]:runrate">[amount]</div>          <div class="card-note">Click to view check stubs report</div>
         </div>
 
         <div class="calculation-card">
@@ -431,7 +431,7 @@
 
         <div class="calculation-card">
           <div class="card-label">Earning Capacity</div>
-          <div class="card-value" data-calc-id="[Party B]:capacity">$45,480</div>          <div class="card-note">Click to view vocational expert report</div>
+          <div class="card-value" data-calc-id="[Party B]:capacity">[amount]</div>          <div class="card-note">Click to view vocational expert report</div>
         </div>
       </div>
 
@@ -1239,13 +1239,13 @@ DocumentLinking.makeNumberClickable(el, '[Party A]:w2');</pre>
         },
         {
           id: '[Party B]:runrate',
-          displayValue: '$78,169',          description: '2026 Run-Rate Income (Supported Spouse)',
+          displayValue: '[amount]',          description: '2026 Run-Rate Income (Supported Spouse)',
           category: 'income',
           method: 'Annualized from 2026 actual deposits across both employers',
           breakdown: [
             { k: '[Employer A] (normalized)', v: '$62,563' },
             { k: '[Employer B]', v: '$15,606' },
-            { k: '2026 combined run-rate', v: '$78,169', tot: true }          ],
+            { k: '2026 combined run-rate', v: '[amount]', tot: true }          ],
           exhibits: [
             {
               name: 'Check Stubs Report (2026)',
@@ -1290,13 +1290,13 @@ DocumentLinking.makeNumberClickable(el, '[Party A]:w2');</pre>
         },
         {
           id: '[Party B]:capacity',
-          displayValue: '$45,480',
+          displayValue: '[amount]',
           description: 'Earning Capacity (Vocational Expert)',
           category: 'income',
           method: 'Open-market earning capacity per [Party A]\'s vocational expert (Exhibit E)',
           breakdown: [
             { k: 'Vocational expert determination', v: 'Full-time employment' },
-            { k: 'Annual salary potential', v: '$45,480', tot: true },
+            { k: 'Annual salary potential', v: '[amount]', tot: true },
             { k: 'Monthly equivalent', v: '$3,750' }
           ],
           exhibits: [
@@ -1309,7 +1309,7 @@ DocumentLinking.makeNumberClickable(el, '[Party A]:w2');</pre>
               period: '03/13/2026',
               flag: 'Report not yet in workspace - figure from [Party A] memos',
               rows: [
-                { k: 'Open-market earning capacity', v: '$45,480', hi: true }
+                { k: 'Open-market earning capacity', v: '[amount]', hi: true }
               ]
             }
           ]
@@ -1379,7 +1379,7 @@ DocumentLinking.makeNumberClickable(el, '[Party A]:w2');</pre>
           breakdown: [
             { k: 'Combined household need (mid)', v: '$4,150.01' },
             { k: '[Party A] income', v: '[amount]' },
-            { k: 'Supported Spouse income', v: '$78,169' },
+            { k: 'Supported Spouse income', v: '[amount]' },
             { k: 'Income gap percentage', v: '40.1%' },
             { k: 'Monthly support (40.1% × $4,150)', v: '$1,663', tot: false },
             { k: 'Duration (101 months)', v: '~21 years' },

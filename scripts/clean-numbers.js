@@ -1,9 +1,12 @@
 const fs = require('fs');
 const path = require('path');
 
-// Replace specific dollar amounts with [amount] placeholder
+// Replace all dollar amounts and numeric examples with placeholders
 const replacements = [
-  // Specific amounts seen in explanations
+  // Dollar amounts
+  { pattern: /\[amount]/g, replacement: '[amount]' },
+  { pattern: /\[amount]/g, replacement: '[amount]' },
+  { pattern: /\[amount]/g, replacement: '[amount]' },
   { pattern: /\[amount]/g, replacement: '[amount]' },
   { pattern: /\[amount]/g, replacement: '[amount]' },
   { pattern: /\[amount]/g, replacement: '[amount]' },
@@ -11,16 +14,16 @@ const replacements = [
   { pattern: /\$2,015\.70/g, replacement: '[amount]' },
   { pattern: /\$3,425\.70/g, replacement: '[amount]' },
   { pattern: /\$1,060\.80/g, replacement: '[amount]' },
-  // Dollar amounts in context of examples
   { pattern: /\$6,000\/month/g, replacement: '[monthly amount]' },
   { pattern: /\[support amount]/g, replacement: '[support amount]' },
-  { pattern: /\[share amounts]/g, replacement: '[share amounts]' },
-  { pattern: /\[share amounts]/g, replacement: '[share amounts]' },
   { pattern: /\[amount]/g, replacement: '[amount]' },
   { pattern: /\[amount]/g, replacement: '[amount]' },
   { pattern: /\[amount]/g, replacement: '[amount]' },
   { pattern: /\[amount]/g, replacement: '[amount]' },
   { pattern: /\[amount]/g, replacement: '[amount]' },
+  // Percentages and shares
+  { pattern: /[share percentage]/g, replacement: '[share percentage]' },
+  { pattern: /[percentage]/g, replacement: '[percentage]' },
 ];
 
 function cleanFile(filePath) {
@@ -63,6 +66,6 @@ function cleanDirectory(dir) {
   return count;
 }
 
-console.log('Removing remaining dollar amounts...\n');
+console.log('Removing all dollar amounts and numeric examples...\n');
 const cleaned = cleanDirectory(path.join(__dirname, '..'));
 console.log(`\n✓ Cleaned ${cleaned} files`);

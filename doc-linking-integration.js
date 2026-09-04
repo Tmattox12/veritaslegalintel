@@ -351,7 +351,7 @@ function integrateIncomeImputationModule() {
         flag: 'Sample data - in production this would reference the actual vocational expert report.',
         rows: [
           { k: 'Vocational expert', v: 'Brad H. Taft' },
-          { k: 'Open-market earning capacity', v: '$45,480', hi: true },
+          { k: 'Open-market earning capacity', v: '[amount]', hi: true },
           { k: 'Monthly equivalent', v: '$3,750' }
         ]
       }
@@ -473,16 +473,16 @@ function exampleHTMLStructure() {
         <h3>Respondent Income</h3>
 <<<<<<< HEAD
         <div id="coniRunrate" class="income-cell" data-calc-id="[Party B]:runrate">
-          $78,169
+          [amount]
         </div>
         <div id="coniCapacity" class="income-cell" data-calc-id="[Party B]:capacity">
 =======
         <div id="partyBRunrate" class="income-cell" data-calc-id="Parent B:runrate">
-          $78,169
+          [amount]
         </div>
         <div id="partyBCapacity" class="income-cell" data-calc-id="Parent B:capacity">
 >>>>>>> cbd6749 (Clean stale case data and neutralize templates)
-          $45,480
+          [amount]
         </div>
       </div>
 
