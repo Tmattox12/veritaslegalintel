@@ -61,6 +61,124 @@ function resetForm() {
   }
 }
 
+function saveDraft() {
+  const formData = {
+    caseNumber: document.getElementById('caseNumber').value,
+    petitioner: {
+      name: document.getElementById('petitioner').value,
+      age: document.getElementById('petitionerAge').value,
+      income: document.getElementById('petitionerIncome').value,
+      employment: document.getElementById('petitionerEmployment').value,
+    },
+    respondent: {
+      name: document.getElementById('respondent').value,
+      age: document.getElementById('respondentAge').value,
+      income: document.getElementById('respondentIncome').value,
+      employment: document.getElementById('respondentEmployment').value,
+    },
+    marriage: {
+      date: document.getElementById('marriageDate').value,
+      length: document.getElementById('marriageLength').value,
+      separationDate: document.getElementById('separationDate').value,
+    },
+    children: Array.from(document.getElementById('childrenContainer').querySelectorAll('.child-entry')).map(entry => ({
+      name: entry.querySelector('.childName').value,
+      dob: entry.querySelector('.childDOB').value,
+    })),
+    custody: Array.from(document.querySelectorAll('input[name="custody"]:checked')).map(x => x.value),
+    childSupport: document.getElementById('childSupport').value,
+    alimony: document.getElementById('alimony').value,
+    assets: {
+      estimated: document.getElementById('estimatedEstate').value,
+    },
+    liabilities: {
+      estimated: document.getElementById('estimatedDebt').value,
+    },
+    notes: document.getElementById('notes').value,
+    timestamp: new Date().toISOString(),
+  };
+
+  localStorage.setItem('caseIntakeDraft', JSON.stringify(formData));
+
+  // Show success message
+  const msg = document.createElement('div');
+  msg.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #e3f2ea;
+    border: 1px solid #2e7d32;
+    color: #2e7d32;
+    padding: 16px 24px;
+    border-radius: 8px;
+    z-index: 9999;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  `;
+  msg.textContent = '✓ Draft saved successfully!';
+  document.body.appendChild(msg);
+
+  setTimeout(() => msg.remove(), 3000);
+}
+
+function loadDraft() {
+  const draft = localStorage.getItem('caseIntakeDraft');
+  if (draft) {
+    try {
+      const data = JSON.parse(draft);
+
+      // Fill in basic fields
+      if (data.caseNumber) document.getElementById('caseNumber').value = data.caseNumber;
+      if (data.petitioner) {
+        if (data.petitioner.name) document.getElementById('petitioner').value = data.petitioner.name;
+        if (data.petitioner.age) document.getElementById('petitionerAge').value = data.petitioner.age;
+        if (data.petitioner.income) document.getElementById('petitionerIncome').value = data.petitioner.income;
+        if (data.petitioner.employment) document.getElementById('petitionerEmployment').value = data.petitioner.employment;
+      }
+      if (data.respondent) {
+        if (data.respondent.name) document.getElementById('respondent').value = data.respondent.name;
+        if (data.respondent.age) document.getElementById('respondentAge').value = data.respondent.age;
+        if (data.respondent.income) document.getElementById('respondentIncome').value = data.respondent.income;
+        if (data.respondent.employment) document.getElementById('respondentEmployment').value = data.respondent.employment;
+      }
+      if (data.marriage) {
+        if (data.marriage.date) document.getElementById('marriageDate').value = data.marriage.date;
+        if (data.marriage.length) document.getElementById('marriageLength').value = data.marriage.length;
+        if (data.marriage.separationDate) document.getElementById('separationDate').value = data.marriage.separationDate;
+      }
+
+      // Fill custody checkboxes
+      if (data.custody && Array.isArray(data.custody)) {
+        data.custody.forEach(val => {
+          const checkbox = document.querySelector(`input[name="custody"][value="${val}"]`);
+          if (checkbox) checkbox.checked = true;
+        });
+      }
+
+      if (data.childSupport) document.getElementById('childSupport').value = data.childSupport;
+      if (data.alimony) document.getElementById('alimony').value = data.alimony;
+      if (data.assets && data.assets.estimated) document.getElementById('estimatedEstate').value = data.assets.estimated;
+      if (data.liabilities && data.liabilities.estimated) document.getElementById('estimatedDebt').value = data.liabilities.estimated;
+      if (data.notes) document.getElementById('notes').value = data.notes;
+
+      // Restore children
+      if (data.children && Array.isArray(data.children)) {
+        data.children.forEach(child => {
+          addChildEntry();
+          const container = document.getElementById('childrenContainer');
+          const lastChild = container.querySelector('.child-entry:last-child');
+          lastChild.querySelector('.childName').value = child.name || '';
+          lastChild.querySelector('.childDOB').value = child.dob || '';
+        });
+      }
+
+      console.log('✓ Draft loaded');
+    } catch (e) {
+      console.error('Error loading draft:', e);
+    }
+  }
+}
+
 function handleSubmit(event) {
   event.preventDefault();
 
@@ -100,6 +218,7 @@ function handleSubmit(event) {
   };
 
   localStorage.setItem('caseIntake', JSON.stringify(formData));
+  localStorage.removeItem('caseIntakeDraft'); // Clear draft after creating case
 
   const successMsg = document.getElementById('successMessage');
   successMsg.classList.add('show');
@@ -108,3 +227,6 @@ function handleSubmit(event) {
     window.location.href = 'index.html';
   }, 1500);
 }
+
+// Load draft on page load
+window.addEventListener('DOMContentLoaded', loadDraft);
