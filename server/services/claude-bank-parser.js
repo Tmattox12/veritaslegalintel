@@ -22,7 +22,7 @@ const AFI_CATEGORIES = [
 ];
 
 async function parseBankStatement(pdfText) {
-  const prompt = `You are a bank statement parsing expert. Extract ALL information from the provided bank statement text and return it as JSON.
+  const prompt = `You are a financial statement parsing expert. Extract ALL information from the provided bank or credit card statement text and return it as JSON.
 
 STRICTLY return valid JSON with this structure:
 {

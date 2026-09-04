@@ -153,8 +153,8 @@ async function loadUploadedDocuments() {
     const response = await fetch(`/api/matters/${currentMatterId}/documents`);
     const documents = await response.json();
 
-    // Filter for bank statements only
-    const bankStatements = documents.filter(d => d.category === 'bank_statement');
+    // Filter for financial statements (bank statements, credit card statements, etc.)
+    const bankStatements = documents.filter(d => d.category === 'financial_statement');
 
     // Group by document for display
     const container = document.querySelector('.category-section') || createCategorySection();

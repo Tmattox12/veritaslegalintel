@@ -52,7 +52,7 @@ router.post('/:matterId/upload', upload.single('file'), async (req, res) => {
       req.db.run(
         `INSERT INTO documents (id, matter_id, filename, content_type, category, uploaded_by, uploaded_at)
          VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)`,
-        [docId, matterId, req.file.originalname, 'application/pdf', 'bank_statement', userId],
+        [docId, matterId, req.file.originalname, 'application/pdf', 'financial_statement', userId],
         (err) => {
           if (err) reject(err);
           else resolve();
