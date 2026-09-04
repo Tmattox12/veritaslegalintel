@@ -1,0 +1,84 @@
+{
+  "firm": {
+    "id": "firm-demo-001",
+    "name": "Demo Law Firm",
+    "slug": "demo-law-firm"
+  },
+  "users": [
+    {
+      "id": "user-partner-001",
+      "email": "partner@demolaw.example",
+      "name": "Alice Partner",
+      "role": "partner"
+    },
+    {
+      "id": "user-associate-001",
+      "email": "associate@demolaw.example",
+      "name": "Bob Associate",
+      "role": "associate"
+    },
+    {
+      "id": "user-paralegal-001",
+      "email": "paralegal@demolaw.example",
+      "name": "Carol Paralegal",
+      "role": "paralegal"
+    }
+  ],
+  "matters": [
+    {
+      "id": "matter-001",
+      "name": "Smith v. Smith",
+      "clientName": "John Smith",
+      "status": "active",
+      "assignedUsers": ["user-partner-001", "user-associate-001"]
+    },
+    {
+      "id": "matter-002",
+      "name": "Johnson Divorce",
+      "clientName": "Sarah Johnson",
+      "status": "active",
+      "assignedUsers": ["user-associate-001", "user-paralegal-001"]
+    },
+    {
+      "id": "matter-003",
+      "name": "Williams Estate",
+      "clientName": "Robert Williams",
+      "status": "inactive",
+      "assignedUsers": ["user-partner-001"]
+    }
+  ],
+  "documents": [
+    {
+      "id": "doc-001",
+      "matterId": "matter-001",
+      "filename": "smith-tax-return-2023.pdf",
+      "contentType": "application/pdf",
+      "uploadedBy": "user-associate-001",
+      "uploadedAt": "2025-01-15T10:30:00Z"
+    },
+    {
+      "id": "doc-002",
+      "matterId": "matter-001",
+      "filename": "smith-bank-statements.csv",
+      "contentType": "text/csv",
+      "uploadedBy": "user-partner-001",
+      "uploadedAt": "2025-01-14T14:22:00Z"
+    },
+    {
+      "id": "doc-003",
+      "matterId": "matter-002",
+      "filename": "johnson-discovery-responses.pdf",
+      "contentType": "application/pdf",
+      "uploadedBy": "user-paralegal-001",
+      "uploadedAt": "2025-01-13T09:15:00Z"
+    },
+    {
+      "id": "doc-004",
+      "matterId": "matter-002",
+      "filename": "johnson-paystubs.pdf",
+      "contentType": "application/pdf",
+      "uploadedBy": "user-associate-001",
+      "uploadedAt": "2025-01-12T16:45:00Z"
+    }
+  ]
+}
