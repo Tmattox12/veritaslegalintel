@@ -10,7 +10,7 @@ const SAMPLE_CASE = {
   caseNumber: "DV-2024-12345",
   court: "Superior Court, Maricopa County",
   county: "Maricopa",
-  state: "AZ",
+  state: "[State]",
   dateOfService: "2024-06-15",
 
   parties: {
@@ -180,12 +180,12 @@ const SAMPLE_CASE = {
     spousalSupport: {
       guideline: 2850,
       duration: "11 years (long-term marriage)",
-      notes: "Calculated per AZ §25-319 using combined parental income method"
+      notes: "Calculated per [State] §25-319 using combined parental income method"
     },
     childSupport: {
       guideline: 1620,
       perChild: 810,
-      notes: "Calculated per AZ child support worksheetfor 2 children"
+      notes: "Calculated per [State] child support worksheetfor 2 children"
     }
   }
 };

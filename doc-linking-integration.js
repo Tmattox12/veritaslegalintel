@@ -102,7 +102,7 @@ function integrateChildSupportModule() {
     displayValue: '$257,800',
     description: 'Combined Parental Income (Child Support)',
     category: 'income',
-    method: 'Sum of both parents\' adjusted gross incomes per AZ §25-320',
+    method: 'Sum of both parents\' adjusted gross incomes per [State] §25-320',
     breakdown: [
       { k: 'Petitioner base + bonus', v: '$167,200' },
       { k: 'Respondent 2026 run-rate', v: '$72,400' },
@@ -393,7 +393,7 @@ function integrateAFIModule() {
           { label: 'Lease start date', value: '01/01/2025', ref: 'Section 1 - Term', pg: 1 }
         ],
         rows: [
-          { k: 'Property', v: '123 Main St, Tucson, AZ' },
+          { k: 'Property', v: '123 Main St, Tucson, [State]' },
           { k: 'Monthly rent', v: '$1,850', hi: true },
 <<<<<<< HEAD
           { k: 'Tenant', v: 'Sarah Anderson' }
@@ -455,10 +455,10 @@ function exampleHTMLStructure() {
       <div class="income-section">
         <h3>Petitioner Income</h3>
 <<<<<<< HEAD
-        <div id="luisW2Base" class="income-cell" data-calc-id="luis:w2">
+        <div id="luisW2Base" class="income-cell" data-calc-id="[Party A]:w2">
           $236,819
         </div>
-        <div id="luisWithBonus" class="income-cell" data-calc-id="luis:bonus">
+        <div id="luisWithBonus" class="income-cell" data-calc-id="[Party A]:bonus">
 =======
         <div id="partyAW2Base" class="income-cell" data-calc-id="Parent A:w2">
           $236,819
@@ -472,10 +472,10 @@ function exampleHTMLStructure() {
       <div class="income-section">
         <h3>Respondent Income</h3>
 <<<<<<< HEAD
-        <div id="coniRunrate" class="income-cell" data-calc-id="coni:runrate">
+        <div id="coniRunrate" class="income-cell" data-calc-id="[Party B]:runrate">
           $78,169
         </div>
-        <div id="coniCapacity" class="income-cell" data-calc-id="coni:capacity">
+        <div id="coniCapacity" class="income-cell" data-calc-id="[Party B]:capacity">
 =======
         <div id="partyBRunrate" class="income-cell" data-calc-id="Parent B:runrate">
           $78,169

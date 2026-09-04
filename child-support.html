@@ -150,7 +150,7 @@
           <div class="avatar">TH</div>
           <div class="user-meta">
             <span class="user-name">Workspace User</span>
-            <span class="user-role">Ossandon Matter</span>          </div>
+            <span class="user-role">Matter</span>          </div>
         </div>
       </div>
     </header>
@@ -159,7 +159,7 @@
       <section class="page-head">
         <div>
           <h1>Child Support Calculator</h1>
-          <p class="sub">AZ §25-320 Income-Shares Model · 2022 Guidelines · Presumptive Amount</p>
+          <p class="sub">[State] §25-320 Income-Shares Model · 2022 Guidelines · Presumptive Amount</p>
         </div>
         <div class="head-actions">
           <a class="btn subtle" href="child-support-reimbursement.html">Open reimbursement claim page</a>
@@ -170,7 +170,7 @@
       <div class="panel" style="border-left:5px solid #2e7d32;background:linear-gradient(180deg,#f3fbf7 0%,#fff 100%);">
         <div class="panel-head">
           <h3 style="color:#2e7d32;">📊 Presumptive Child Support</h3>
-          <span class="tag" style="background:#e6f3ec;color:#2e7d32;">AZ §25-320 Income-Shares Model</span>
+          <span class="tag" style="background:#e6f3ec;color:#2e7d32;">[State] §25-320 Income-Shares Model</span>
           <a class="btn subtle" href="child-support-reimbursement.html">Reimbursement claim</a>
           <button class="btn ghost" id="csResetBtn" type="button">Reset numbers</button>
           <button class="btn ghost" id="csPrintBtn" type="button">Print / Export PDF</button>
@@ -185,7 +185,7 @@
             <div id="csSelectionSaveLine" style="margin-top:6px;font-size:11px;color:#4d5f78;">Selection status: waiting for first save.</div>
             <div id="csTopIncomeBreakdown" style="margin-top:8px;padding:10px;border:1px solid #dce7f3;border-radius:10px;background:#f8fbff;color:#213b5a;font-size:12px;line-height:1.45;"></div>
             <div class="note" style="margin-top:12px;background:transparent;padding:0;">
-              Presumptive amount under AZ §25-320 using the income-shares model for the Ossandon matter. This screen supports spousal-maintenance reallocation, other-child-support adjustments, child medical coverage, work-related child care, extraordinary child expenses, transportation / exchange costs, and direct-pay credits.            </div>
+              Presumptive amount under [State] §25-320 using the income-shares model for the Matter. This screen supports spousal-maintenance reallocation, other-child-support adjustments, child medical coverage, work-related child care, extraordinary child expenses, transportation / exchange costs, and direct-pay credits.            </div>
           </div>
         </div>
         <div class="formula-note">
@@ -207,14 +207,14 @@
         <div class="workpaper-panel" data-cs-workpaper-panel="forward">
           <div class="income-row">
             <span class="income-label">Work-related child care credit paid by Parent A ($/mo)<br><span style="font-size:11px;color:#999">credited against Parent A's support share; latest complete 12-month average from the new Chase3394 workbook</span><br><span style="font-size:10px;color:#1c6b52">Support: <a href="../recent%20luis%20child%20care%20and%20uber%20_%20Chase3394_Activity_20260810%20TAMARA.xlsx" target="_blank" rel="noopener">Chase3394 childcare/Uber workbook ↗</a></span></span>
-            <input type="number" id="nicoChildCare" class="income-input" placeholder="0">
+            <input type="number" id="[Child]ChildCare" class="income-input" placeholder="0">
           </div>
           <div class="income-row" style="align-items:flex-start;grid-template-columns:1fr;gap:8px;">
-            <span class="income-label">Nico caregiver credit controls</span>
+            <span class="income-label">[Child] caregiver credit controls</span>
             <div style="display:flex;gap:8px;flex-wrap:wrap;">
-              <button id="applyNicoCaregiverWorkpaperBtn" class="btn ghost" type="button">Apply latest 12-month average credit</button>
+              <button id="apply[Child]CaregiverWorkpaperBtn" class="btn ghost" type="button">Apply latest 12-month average credit</button>
             </div>
-            <span id="nicoCaregiverWorkpaperStatus" style="font-size:11px;color:#5b6472"></span>          </div>
+            <span id="[Child]CaregiverWorkpaperStatus" style="font-size:11px;color:#5b6472"></span>          </div>
           <div class="workpaper-summary">
             <div class="workpaper-card">
               <h5>Named caregiver total</h5>
@@ -230,13 +230,13 @@
             <div class="workpaper-card">
               <h5>Temp-orders reimbursement</h5>
               <div class="value">$2,015.70</div>
-              <div class="sub">Coni's 30% share of the latest 12-month named caregiver payments under the 70/30 order.</div>
+              <div class="sub">[Party B]'s 30% share of the latest 12-month named caregiver payments under the 70/30 order.</div>
               <button type="button" class="recon-link" data-recon="caregiver-reimbursement" style="margin-top:8px;background:none;border:none;color:#4b7c99;font-size:11px;font-weight:600;cursor:pointer;padding:0;text-decoration:underline;">View reconciliation →</button>
             </div>
           </div>
             <div class="workpaper-card" style="margin-top:12px;">
               <h5>Raw workbook reconciliation</h5>
-              <div class="sub" style="margin-bottom:8px">The screenshot draft did not fully tie to the Luis raw personal account. Verified raw-payee totals are below; 6761/shared-account items are excluded for now.</div>
+              <div class="sub" style="margin-bottom:8px">The screenshot draft did not fully tie to the [Party A] raw personal account. Verified raw-payee totals are below; 6761/shared-account items are excluded for now.</div>
               <div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;font-size:12px;line-height:1.5;">
                 <div>Doreen Hatcher: <strong>$5,854.00</strong></div>
                 <div>Martha Grijalva: <strong>$240.00</strong></div>
@@ -253,7 +253,7 @@
         <div class="workpaper-panel" data-cs-workpaper-panel="reimbursement" hidden>
           <div class="workpaper-summary" style="grid-template-columns: repeat(2, minmax(0, 1fr));">
             <div class="workpaper-card">
-              <h5>Coni reimbursement due</h5>
+              <h5>[Party B] reimbursement due</h5>
               <div class="value">$2,015.70</div>              <div class="sub">30% of the latest 12-month named caregiver payments under the temp-orders split.</div>
             </div>
             <div class="workpaper-card">
@@ -277,22 +277,22 @@
             <div class="workpaper-card">
               <h5>Anissa Ochoa</h5>
               <div class="value">$1,868.50</div>
-              <div class="sub">Zelle payments in the raw Luis account workbook.</div>
+              <div class="sub">Zelle payments in the raw [Party A] account workbook.</div>
             </div>
             <div class="workpaper-card">
               <h5>Martha Grijalva</h5>
               <div class="value">$240.00</div>
-              <div class="sub">Zelle payments in the raw Luis account workbook.</div>
+              <div class="sub">Zelle payments in the raw [Party A] account workbook.</div>
             </div>
             <div class="workpaper-card">
               <h5>Doreen Hatcher</h5>
               <div class="value">$5,674.50</div>
-              <div class="sub">Zelle payments in the raw Luis account workbook.</div>
+              <div class="sub">Zelle payments in the raw [Party A] account workbook.</div>
             </div>
             <div class="workpaper-card">
               <h5>Edward Perez</h5>
               <div class="value">$100.00</div>
-              <div class="sub">Zelle payments in the raw Luis account workbook.</div>
+              <div class="sub">Zelle payments in the raw [Party A] account workbook.</div>
             </div>
           </div>
           <div class="note" style="margin-bottom:0">Use this tab for the reimbursement claim only. The calculator's forward childcare line should stay at the 2025 average amount above, and the separate reimbursement claim page can hold the running child-care plus phone-share claim through the 08/18/2026 hearing.</div>
@@ -315,7 +315,7 @@
             <input type="number" id="youngerTransport" class="income-input" placeholder="0">
           </div>
           <div class="income-row">
-            <span class="income-label">Children's cell phones / device costs paid directly by Parent A ($/mo)<br><span style="font-size:11px;color:#999">Joaquin $132 + Martin $76 = $208/mo base; future phone credit auto-applies at Constanza&apos;s selected income-share %</span><br><span style="font-size:10px;color:#1c6b52">Support: <a href="../LUIS_CHILD_CELL_PHONES_WORKPAPER_2026-08-10.md" target="_blank" rel="noopener">child phone workpaper ↗</a> · <button type="button" class="recon-link" data-recon="child-phones" style="background:none;border:none;color:#4b7c99;font-size:10px;font-weight:600;cursor:pointer;padding:0;text-decoration:underline;">View reconciliation →</button></span></span>
+            <span class="income-label">Children's cell phones / device costs paid directly by Parent A ($/mo)<br><span style="font-size:11px;color:#999">Joaquin $132 + Martin $76 = $208/mo base; future phone credit auto-applies at [Third Party]&apos;s selected income-share %</span><br><span style="font-size:10px;color:#1c6b52">Support: <a href="../LUIS_CHILD_CELL_PHONES_WORKPAPER_2026-08-10.md" target="_blank" rel="noopener">child phone workpaper ↗</a> · <button type="button" class="recon-link" data-recon="child-phones" style="background:none;border:none;color:#4b7c99;font-size:10px;font-weight:600;cursor:pointer;padding:0;text-decoration:underline;">View reconciliation →</button></span></span>
             <input type="number" id="childPhones" class="income-input" placeholder="0">
           </div>
           <div class="income-row">
@@ -424,7 +424,7 @@
               <tbody id="childProfileRows"></tbody>
             </table>
           </div>
-          <p class="note" id="childProfileFootnote">Per-child inclusion is shown for audit. Calculator still uses AZ schedule with up to 4 children.</p>        </details>
+          <p class="note" id="childProfileFootnote">Per-child inclusion is shown for audit. Calculator still uses [State] schedule with up to 4 children.</p>        </details>
       </div>
 
       <!-- Number of Children (compact, inline with intake) -->
@@ -435,7 +435,7 @@
 
       <!-- Income Selection (spousal-style scenario cards) -->
       <div class="cs-grid">
-        <!-- Luis -->
+        <!-- [Party A] -->
         <div class="party-card">
           <h3>💰 Parent A Income Selection</h3>
           <p class="panel-note" style="margin:-4px 0 12px">Set on the Income Engine and flows here automatically.</p>
@@ -455,7 +455,7 @@
           <input type="hidden" id="luisInvestment"><input type="hidden" id="luisSS"><input type="hidden" id="luisUnemployment">
         </div>
 
-        <!-- Coni -->
+        <!-- [Party B] -->
         <div class="party-card">
           <h3>💰 Parent B Income Selection</h3>
           <p class="panel-note" style="margin:-4px 0 12px">Set on the Income Engine and flows here automatically.</p>
@@ -483,7 +483,7 @@
       <section id="csAdvancedPanel" class="advanced-tools" hidden>
       <div class="panel">
         <div class="panel-head">
-          <h3>📊 Calculation Breakdown</h3>          <span class="tag">AZ §25-320 steps</span>
+          <h3>📊 Calculation Breakdown</h3>          <span class="tag">[State] §25-320 steps</span>
         </div>
         <div class="calculation-panel">
           <div class="calc-step">
@@ -535,10 +535,10 @@
       <!-- Guideline Table -->
       <div class="panel">
         <div class="panel-head">
-          <h3>⚖ 2022 AZ Child Support Schedule</h3>
+          <h3>⚖ 2022 [State] Child Support Schedule</h3>
           <span class="tag">For reference</span>
         </div>
-        <p class="panel-note">Basic Child Support Obligation (BCSO) anchors used by this calculator, taken from the parties' own 4/27/26 and 5/14/26 worksheets. The published AZ Schedule tops out at $30,000/mo combined income; above that ceiling the $30k row is presumptive. 2- and 1-child figures are extrapolated from the confirmed 3-child anchor (exact AZ Schedule values still to be verified).</p>
+        <p class="panel-note">Basic Child Support Obligation (BCSO) anchors used by this calculator, taken from the parties' own 4/27/26 and 5/14/26 worksheets. The published [State] Schedule tops out at $30,000/mo combined income; above that ceiling the $30k row is presumptive. 2- and 1-child figures are extrapolated from the confirmed 3-child anchor (exact [State] Schedule values still to be verified).</p>
         <div style="overflow-x: auto;">          <table class="guideline-table">
             <thead>
               <tr>
@@ -566,12 +566,12 @@
             </tbody>
           </table>
         </div>
-        <p class="note">Between the confirmed point and the $30k cap the calculator interpolates the 3-child BCSO; the 2-child (×0.849) and 1-child (×0.553) columns scale from it. Above $30,000/mo combined the $30k row applies presumptively (the party seeking more carries the burden). Exact AZ Schedule values remain pending verification per case documentation.</p>      </div>
+        <p class="note">Between the confirmed point and the $30k cap the calculator interpolates the 3-child BCSO; the 2-child (×0.849) and 1-child (×0.553) columns scale from it. Above $30,000/mo combined the $30k row applies presumptively (the party seeking more carries the burden). Exact [State] Schedule values remain pending verification per case documentation.</p>      </div>
       </section>
 
       <footer class="foot">
         <span>Veritas · Child Support Calculator</span>
-        <span class="foot-dim">AZ §25-320 Guidelines · 2022 Model · Non-binding reference only</span>      </footer>
+        <span class="foot-dim">[State] §25-320 Guidelines · 2022 Model · Non-binding reference only</span>      </footer>
     </div>
   </main>
 

@@ -122,8 +122,8 @@
       <div class="matter-switcher">
         <span class="matter-label">Active Matter</span>
         <button class="matter-btn">
-          <strong>Ossandon v. Ossandon</strong>
-          <span class="case-no">No. D2024-1669 · Pima County, AZ</span>
+          <strong>[Party A] v. [Party B]</strong>
+          <span class="case-no">No. [Case No.] · [County], [State]</span>
           <span class="chev">▾</span>        </button>
       </div>
       <div class="topbar-right">
@@ -131,7 +131,7 @@
           <div class="avatar">TH</div>
           <div class="user-meta">
             <span class="user-name">Workspace User</span>
-            <span class="user-role">Ossandon Matter</span>          </div>
+            <span class="user-role">Matter</span>          </div>
         </div>
       </div>
     </header>
@@ -177,13 +177,13 @@
             <span class="summary-value">50/50 marital estate</span>
           </div>
         </div>
-        <p class="panel-note" style="font-size:11.5px;color:#617088;margin:10px 0 0;">Estate basis: <strong>BeachFleischman DOS liquid schedule</strong> ($1,763,809, from the Estate module). The Equitable Distribution page uses a fuller comprehensive-inventory total (~$1.93M); the totals differ by source, and both are correct.</p>      </div>
+        <p class="panel-note" style="font-size:11.5px;color:#617088;margin:10px 0 0;">Estate basis: <strong>[Expert] DOS liquid schedule</strong> ($1,763,809, from the Estate module). The Equitable Distribution page uses a fuller comprehensive-inventory total (~$1.93M); the totals differ by source, and both are correct.</p>      </div>
 
       <!-- Settlement Terms Input -->
       <div class="settlement-grid">
-        <!-- Paying Spouse (Luis) -->
+        <!-- Paying Spouse ([Party A]) -->
         <div class="party-card paying-spouse">
-          <h3>💼 Luis — Payment Terms</h3>
+          <h3>💼 [Party A] — Payment Terms</h3>
           <div class="settlement-term">
             <div class="term-label">Spousal Maintenance (Monthly)</div>
             <div class="term-row">
@@ -202,7 +202,7 @@
             <div class="term-row">
               <input type="number" id="luisChildSupport" class="term-input" value="1742" onchange="calculateSettlement()">
               <span class="term-value">$1,742/mo</span>            </div>
-            <p class="note">Typically continues until child reaches 18 or age 23 (full-time school). AZ §25-320.</p>
+            <p class="note">Typically continues until child reaches 18 or age 23 (full-time school). [State] §25-320.</p>
           </div>
 
           <div class="settlement-term">
@@ -214,26 +214,26 @@
           </div>
 
           <div class="settlement-term">
-            <div class="term-label">Asset Division (Luis's Share)</div>
+            <div class="term-label">Asset Division ([Party A]'s Share)</div>
             <div class="slider-group">
               <div class="slider-label">
-                <span>Luis receives</span>
+                <span>[Party A] receives</span>
                 <span id="luisAssetPercentDisplay">45%</span>
               </div>
               <input type="range" id="luisAssetPercent" min="40" max="60" value="45" step="1" class="slider-input" onchange="calculateSettlement()">            </div>
           </div>
         </div>
 
-        <!-- Coni (Receiving) -->
-        <div class="party-card coni">
-          <h3>💰 Coni — Receiving Terms</h3>
+        <!-- [Party B] (Receiving) -->
+        <div class="party-card [Party B]">
+          <h3>💰 [Party B] — Receiving Terms</h3>
           <div class="settlement-term">
             <div class="term-label">Spousal Maintenance (Monthly)</div>
             <div class="term-row">
               <input type="number" id="coniSpousal" class="term-input" value="3100" disabled>
               <span class="term-value">$3,100/mo</span>
             </div>
-            <p class="note" style="margin-bottom: 0;">Duration linked to Luis's term.</p>
+            <p class="note" style="margin-bottom: 0;">Duration linked to [Party A]'s term.</p>
           </div>
 
           <div class="settlement-term">
@@ -244,17 +244,17 @@
           </div>
 
           <div class="settlement-term">
-            <div class="term-label">Cash Received from Luis</div>
+            <div class="term-label">Cash Received from [Party A]</div>
             <div class="term-row">
               <input type="number" id="coniCashAdj" class="term-input" value="150000" disabled>
               <span class="term-value" id="coniCashDisplay">$150,000</span>            </div>
           </div>
 
           <div class="settlement-term">
-            <div class="term-label">Asset Division (Coni's Share)</div>
+            <div class="term-label">Asset Division ([Party B]'s Share)</div>
             <div class="slider-group">
               <div class="slider-label">
-                <span>Coni receives</span>
+                <span>[Party B] receives</span>
                 <span id="coniAssetPercentDisplay">55%</span>
               </div>
               <input type="range" id="coniAssetPercent" min="40" max="60" value="55" step="1" class="slider-input" onchange="calculateSettlement()">            </div>
@@ -276,29 +276,29 @@
         </div>
 
         <div class="settlement-grid">
-          <!-- Luis Outcome -->
-          <div class="outcome-box luis">
-            <h4>Luis Net Position</h4>
+          <!-- [Party A] Outcome -->
+          <div class="outcome-box [Party A]">
+            <h4>[Party A] Net Position</h4>
             <div class="outcome-amount" id="luisNetPosition">−$186,200</div>
             <div class="outcome-breakdown" id="luisBreakdown">
               <strong>Over 5 years:</strong><br>
               Spousal maintenance: −$186,000<br>
               Child support: −$104,520<br>
-              Cash to Coni: −$150,000<br>
+              Cash to [Party B]: −$150,000<br>
               Assets received: +$450,000<br>
               <strong>Net: −$186,200 (to be paid out)</strong>
             </div>
           </div>
 
-          <!-- Coni Outcome -->
-          <div class="outcome-box coni">
-            <h4>Coni Net Position</h4>
+          <!-- [Party B] Outcome -->
+          <div class="outcome-box [Party B]">
+            <h4>[Party B] Net Position</h4>
             <div class="outcome-amount" id="coniNetPosition">+$186,200</div>
             <div class="outcome-breakdown" id="coniBreakdown">
               <strong>Over 5 years:</strong><br>
               Spousal maintenance received: +$186,000<br>
               Child support received: +$104,520<br>
-              Cash from Luis: +$150,000<br>
+              Cash from [Party A]: +$150,000<br>
               Assets received: +$550,000<br>
               <strong>Net: +$186,200 (received)</strong>            </div>
           </div>
@@ -323,8 +323,8 @@
                 <th class="amount">Spousal /mo</th>
                 <th class="amount">Child Supp /mo</th>
                 <th class="amount">Cash Adj</th>
-                <th class="amount">Luis Share %</th>
-                <th class="amount">Luis 5-Yr Net</th>
+                <th class="amount">[Party A] Share %</th>
+                <th class="amount">[Party A] 5-Yr Net</th>
               </tr>
             </thead>
             <tbody id="comparisonBody">            </tbody>
@@ -350,13 +350,13 @@
             </thead>
             <tbody>
               <tr>
-                <td class="label">Luis</td>
+                <td class="label">[Party A]</td>
                 <td class="amount">−$231,600</td>
                 <td class="amount" id="luisCurrentScen">−$186,200</td>
                 <td class="amount" id="luisDelta">+$45,400 (in favor)</td>
               </tr>
               <tr>
-                <td class="label">Coni</td>
+                <td class="label">[Party B]</td>
                 <td class="amount">+$231,600</td>
                 <td class="amount" id="coniCurrentScen">+$186,200</td>
                 <td class="amount" id="coniDelta">−$45,400 (against)</td>              </tr>

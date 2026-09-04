@@ -22,8 +22,8 @@ const RECONCILIATION_DATA_ENHANCED = {
     expenseCategory: "Child Health Insurance (Self Employed)",
     caseInfo: {
       caseName: "Petitioner v. Respondent",
-      caseNumber: "D2024-1669",
-      county: "Pima County, AZ",
+      caseNumber: "[Case No.]",
+      county: "[County], [State]",
       reportDate: "2026-06-15"
     },
     data: {
@@ -150,8 +150,8 @@ const RECONCILIATION_DATA_ENHANCED = {
     expenseCategory: "Child Health Insurance (Employer Provided)",
     caseInfo: {
       caseName: "Petitioner v. Respondent",
-      caseNumber: "D2024-1669",
-      county: "Pima County, AZ",
+      caseNumber: "[Case No.]",
+      county: "[County], [State]",
       reportDate: "2026-06-15"
     },
     data: {
@@ -322,8 +322,8 @@ const RECONCILIATION_DATA_ENHANCED = {
     expenseCategory: "Child Health Insurance (Shared)",
     caseInfo: {
       caseName: "Petitioner v. Respondent",
-      caseNumber: "D2024-1669",
-      county: "Pima County, AZ",
+      caseNumber: "[Case No.]",
+      county: "[County], [State]",
       reportDate: "2026-06-15"
     },
     data: {
@@ -432,8 +432,8 @@ const RECONCILIATION_DATA_ENHANCED = {
     expenseCategory: "Child Care (Daycare/Preschool)",
     caseInfo: {
       caseName: "Petitioner v. Respondent",
-      caseNumber: "D2024-1669",
-      county: "Pima County, AZ",
+      caseNumber: "[Case No.]",
+      county: "[County], [State]",
       reportDate: "2026-06-15"
     },
     data: {
@@ -541,8 +541,8 @@ const RECONCILIATION_DATA_ENHANCED = {
     expenseCategory: "Medical/Dental (Unreimbursed)",
     caseInfo: {
       caseName: "Petitioner v. Respondent",
-      caseNumber: "D2024-1669",
-      county: "Pima County, AZ",
+      caseNumber: "[Case No.]",
+      county: "[County], [State]",
       reportDate: "2026-06-15"
     },
     data: {
@@ -639,8 +639,8 @@ const RECONCILIATION_DATA_ENHANCED = {
     expenseCategory: "Education (School & Supplies)",
     caseInfo: {
       caseName: "Petitioner v. Respondent",
-      caseNumber: "D2024-1669",
-      county: "Pima County, AZ",
+      caseNumber: "[Case No.]",
+      county: "[County], [State]",
       reportDate: "2026-06-15"
     },
     data: {
@@ -748,8 +748,8 @@ const RECONCILIATION_DATA_ENHANCED = {
     expenseCategory: "Housing (Mortgage & Property Taxes)",
     caseInfo: {
       caseName: "Petitioner v. Respondent",
-      caseNumber: "D2024-1669",
-      county: "Pima County, AZ",
+      caseNumber: "[Case No.]",
+      county: "[County], [State]",
       reportDate: "2026-06-15"
     },
     data: {

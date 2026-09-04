@@ -18,7 +18,7 @@
     if (!text || typeof text !== 'string') return text;
 
     let cleaned = text;
-    cleaned = cleaned.replace(/\b(?:Anderson|Ossandon|Osandon|Constanza|Coni|Luis)\b/gi, (match) => {
+    cleaned = cleaned.replace(/\b(?:Anderson|[Party Name]|Osandon|[Third Party]|[Party B]|[Party A])\b/gi, (match) => {
       const normalized = match.toLowerCase();
       if (normalized === partyTerms[5].toLowerCase()) return 'Parent A';
       if ([partyTerms[3], partyTerms[4]].some((term) => normalized === term.toLowerCase())) return 'Parent B';
@@ -30,8 +30,8 @@
     cleaned = cleaned.replace(/\bNo\.\s*\[Case Number\]\b/gi, 'No. [Case Number]');
     cleaned = cleaned.replace(/\bPima\s+County\b/gi, '[County]');
     cleaned = cleaned.replace(/\b[A-Z][a-z]+\s+County\b/g, '[County]');
-    cleaned = cleaned.replace(/\b(?:PARENT|PAYING|SUPPORTED)\s+SPOUSE\s*[-—]\s*(?:LUIS|CONSTANZA|PARENT\s*A|PARENT\s*B)/gi, 'PAYING SPOUSE — Parent A');
-    cleaned = cleaned.replace(/\b(?:CONI|LUIS)\s+0%\s*·\s*(?:LUIS|CONI)\s+0%\b/gi, 'Parent A 0% · Parent B 0%');
+    cleaned = cleaned.replace(/\b(?:PARENT|PAYING|SUPPORTED)\s+SPOUSE\s*[-—]\s*(?:[Party A]|[Third Party]|PARENT\s*A|PARENT\s*B)/gi, 'PAYING SPOUSE — Parent A');
+    cleaned = cleaned.replace(/\b(?:[Party B]|[Party A])\s+0%\s*·\s*(?:[Party A]|[Party B])\s+0%\b/gi, 'Parent A 0% · Parent B 0%');
     return cleaned;
   }
 

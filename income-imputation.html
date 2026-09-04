@@ -144,8 +144,8 @@
       <div class="matter-switcher">
         <span class="matter-label">Active Matter</span>
         <button class="matter-btn">
-          <strong>Ossandon v. Ossandon</strong>
-          <span class="case-no">No. D2024-1669 · Pima County, AZ</span>
+          <strong>[Party A] v. [Party B]</strong>
+          <span class="case-no">No. [Case No.] · [County], [State]</span>
           <span class="chev">▾</span>        </button>
       </div>
       <div class="topbar-right">
@@ -153,7 +153,7 @@
           <div class="avatar">TH</div>
           <div class="user-meta">
             <span class="user-name">Workspace User</span>
-            <span class="user-role">Ossandon Matter</span>          </div>
+            <span class="user-role">Matter</span>          </div>
         </div>
       </div>
     </header>
@@ -168,13 +168,13 @@
       <!-- Selected-income summary header (single source of truth for downstream calcs) -->
       <div id="incomeEngineSummary" class="ie-summary">
         <div class="ie-sum-col ie-sum-paying">
-          <div class="ie-sum-role">Paying spouse — Luis</div>
+          <div class="ie-sum-role">Paying spouse — [Party A]</div>
           <div class="ie-sum-amt" id="ieSumLuisAnnual">$0</div>
           <div class="ie-sum-sub"><span id="ieSumLuisMonthly">$0</span>/mo · <span id="ieSumLuisPct">0%</span> of combined</div>
           <div class="ie-sum-label" id="ieSumLuisLabel">—</div>
         </div>
         <div class="ie-sum-col ie-sum-supported">
-          <div class="ie-sum-role">Supported spouse — Constanza</div>
+          <div class="ie-sum-role">Supported spouse — [Third Party]</div>
           <div class="ie-sum-amt" id="ieSumConiAnnual">$0</div>
           <div class="ie-sum-sub"><span id="ieSumConiMonthly">$0</span>/mo · <span id="ieSumConiPct">0%</span> of combined</div>
           <div class="ie-sum-label" id="ieSumConiLabel">—</div>
@@ -183,7 +183,7 @@
           <div class="ie-sum-role">Combined income</div>
           <div class="ie-sum-amt" id="ieSumCombinedAnnual">$0</div>
           <div class="ie-sum-sub"><span id="ieSumCombinedMonthly">$0</span>/mo</div>
-          <div class="ie-sum-split"><span id="ieSumSplitConi">Coni 0%</span> · <span id="ieSumSplitLuis">Luis 0%</span></div>          <div class="ie-sum-label">Income share drives extraordinary / child-expense allocation</div>
+          <div class="ie-sum-split"><span id="ieSumSplitConi">[Party B] 0%</span> · <span id="ieSumSplitLuis">[Party A] 0%</span></div>          <div class="ie-sum-label">Income share drives extraordinary / child-expense allocation</div>
         </div>
       </div>
 
@@ -195,11 +195,11 @@
         <p class="income-group-note">Use this section to include income beyond employer cards. Values here are part of the same master income selection and flow automatically to AFI, spousal, and child support.</p>
         <div class="note" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;align-items:end;">
           <label style="display:grid;gap:4px;">
-            <span style="font-size:12px;font-weight:700;color:#1c3f66;">Luis other annual income</span>
+            <span style="font-size:12px;font-weight:700;color:#1c3f66;">[Party A] other annual income</span>
             <input id="iePayingOtherAnnual" type="number" min="0" step="1" placeholder="0" style="padding:8px;border:1px solid #d4dce8;border-radius:8px;">
           </label>
           <label style="display:grid;gap:4px;">
-            <span style="font-size:12px;font-weight:700;color:#1c3f66;">Coni CD interest annual income</span>
+            <span style="font-size:12px;font-weight:700;color:#1c3f66;">[Party B] CD interest annual income</span>
             <input id="ieSupportedInterestAnnual" type="number" min="0" step="1" placeholder="0" style="padding:8px;border:1px solid #d4dce8;border-radius:8px;">
           </label>
           <label style="display:grid;gap:4px;">
@@ -211,14 +211,14 @@
             </select>
           </label>
           <label style="display:grid;gap:4px;">
-            <span style="font-size:12px;font-weight:700;color:#1c3f66;">Coni other annual income</span>
+            <span style="font-size:12px;font-weight:700;color:#1c3f66;">[Party B] other annual income</span>
             <input id="ieSupportedOtherAnnual" type="number" min="0" step="1" placeholder="0" style="padding:8px;border:1px solid #d4dce8;border-radius:8px;">
           </label>
           <label style="display:grid;gap:4px;">
             <span style="font-size:12px;font-weight:700;color:#1c3f66;">Asset-share recipient</span>
             <select id="ieAssetShareRecipient" style="padding:8px;border:1px solid #d4dce8;border-radius:8px;">
-              <option value="supported">Coni</option>
-              <option value="paying">Luis</option>
+              <option value="supported">[Party B]</option>
+              <option value="paying">[Party A]</option>
             </select>
           </label>
           <label style="display:grid;gap:4px;">
@@ -267,12 +267,12 @@
           <span class="tag">Earning capacity vs. claimed $0</span>
         </div>
 
-        <div class="income-group-title">Primary earned income (Helping Hearts)</div>
+        <div class="income-group-title">Primary earned income ([Employer A])</div>
         <p class="income-group-note">Select one HH basis. Use the tax/non-tax toggle on HH cards when you need tax-equivalent comparability.</p>
         <div id="primaryEarnedCards" class="income-grid"></div>
 
-        <div class="income-group-title" style="margin-top:10px;">Secondary earned income (Fleet Feet)</div>
-        <p class="income-group-note">Select one Fleet Feet basis. Primary + secondary rolls into the earned-income total card below.</p>
+        <div class="income-group-title" style="margin-top:10px;">Secondary earned income ([Employer B])</div>
+        <p class="income-group-note">Select one [Employer B] basis. Primary + secondary rolls into the earned-income total card below.</p>
         <div id="secondaryEarnedCards" class="income-grid"></div>
 
         <div class="income-group-title" style="margin-top:10px;">Total earned income comparison</div>
@@ -305,7 +305,7 @@
           <h3>🏛 Property / Investment Income <span style="font-weight:600;font-size:12px;color:#5b6472;">(supported spouse)</span></h3>
           <span class="tag">§25-319(B) return on assets</span>
         </div>
-        <p class="income-group-note">Property income is treated like any other income type — pick one basis to attribute a return on Constanza's assets (net of 25% tax). The "½ estate" options use her <strong>50% share of the net marital estate</strong> as valued on the <a href="equitable-distribution.html">Asset page ↗</a>. The selected figure rolls to Spousal &amp; AFI automatically. <span class="dim">Not legal advice — defer to Holly.</span></p>
+        <p class="income-group-note">Property income is treated like any other income type — pick one basis to attribute a return on [Third Party]'s assets (net of 25% tax). The "½ estate" options use her <strong>50% share of the net marital estate</strong> as valued on the <a href="equitable-distribution.html">Asset page ↗</a>. The selected figure rolls to Spousal &amp; AFI automatically. <span class="dim">Not legal advice — defer to Holly.</span></p>
         <div id="estateIncomeCards" class="income-grid"></div>      </div>
 
       <div class="panel">
@@ -403,13 +403,13 @@
             <th class="amount">Aggressive</th>
           </tr>
           <tr>
-            <td><strong>Luis</strong></td>
+            <td><strong>[Party A]</strong></td>
             <td class="amount">$236,819<br>(W-2 base)</td>
             <td class="amount">$236,819<br>(bonus separate)</td>
             <td class="amount">$336,819<br>(+$100k bonus)</td>
           </tr>
           <tr>
-            <td><strong>Coni</strong></td>
+            <td><strong>[Party B]</strong></td>
             <td class="amount">$45,480<br>(vocational floor)</td>
             <td class="amount">$66,086<br>(documented 2026)</td>
             <td class="amount">$78,169<br>(run-rate)</td>
@@ -418,8 +418,8 @@
 
         <div class="note" style="margin-top: 16px;">
           <strong>Rationale:</strong><br>
-          • <strong>Luis:</strong> Use the $236,819 W-2 base; the $100,000 bonus is contested (separate property, Memo 17) and layered in only for the aggressive case.<br>
-          • <strong>Coni:</strong> Impute at least her documented $66,086 (2026 paystubs) — opposing counsel's $0 is untenable against the pay records. The $45,480 vocational floor is the conservative minimum.        </div>
+          • <strong>[Party A]:</strong> Use the $236,819 W-2 base; the $100,000 bonus is contested (separate property, Memo 17) and layered in only for the aggressive case.<br>
+          • <strong>[Party B]:</strong> Impute at least her documented $66,086 (2026 paystubs) — opposing counsel's $0 is untenable against the pay records. The $45,480 vocational floor is the conservative minimum.        </div>
       </div>
 
       <!-- AI Missing Paystub Estimator -->

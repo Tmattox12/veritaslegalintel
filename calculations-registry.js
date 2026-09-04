@@ -143,7 +143,7 @@ const CalculationsRegistry = {
 
   // Support calculations (simple guidelines)
   spousalMaintenanceSample: {
-    formula: "AZ §25-319",
+    formula: "[State] §25-319",
     petitionerIncome: 185400,
     respondentIncome: 72400,
     combinedIncome: 257800,
@@ -153,7 +153,7 @@ const CalculationsRegistry = {
   },
 
   childSupportSample: {
-    formula: "AZ Child Support Worksheet",
+    formula: "[State] Child Support Worksheet",
     numChildren: 2,
     combinedParentalIncome: 257800,
     guideline: 1620,

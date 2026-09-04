@@ -63,8 +63,8 @@
       <div class="matter-switcher">
         <span class="matter-label">Active Matter</span>
         <button class="matter-btn">
-          <strong>Ossandon v. Ossandon</strong>
-          <span class="case-no">No. D2024-1669 · Pima County, AZ</span>
+          <strong>[Party A] v. [Party B]</strong>
+          <span class="case-no">No. [Case No.] · [County], [State]</span>
           <span class="chev">▾</span>        </button>
       </div>
       <div class="topbar-right">
@@ -72,7 +72,7 @@
           <div class="avatar">TH</div>
           <div class="user-meta">
             <span class="user-name">Workspace User</span>
-            <span class="user-role">Ossandon Matter</span>          </div>
+            <span class="user-role">Matter</span>          </div>
         </div>
       </div>
     </header>
@@ -81,7 +81,7 @@
       <section class="page-head">
         <div>
           <h1>Spousal Maintenance</h1>
-          <p class="sub">AZ §25-319 guideline formula · <strong><span id="factYearsInline">21</span>-year</strong> marriage · <strong><span id="factChildrenInline">2</span></strong> children · supported spouse analysis</p>
+          <p class="sub">[State] §25-319 guideline formula · <strong><span id="factYearsInline">21</span>-year</strong> marriage · <strong><span id="factChildrenInline">2</span></strong> children · supported spouse analysis</p>
         </div>
         <div class="head-actions">
           <a href="dashboard-spousal.html" class="btn ghost">📊 Dashboard</a>
@@ -166,7 +166,7 @@
 
         <div class="formula-note">
           Recipient Need <b id="fNeed">$0</b> · Income Gap <b id="fGap">0%</b> · Result <b id="fMonthly">$0</b>/mo
-          <span class="dim" id="fNeedNote" title="AZ §25-319 guideline formula: Recipient Need = One-Adult BLS + (Indivisible BLS × recipient income share). Maintenance = min(Recipient Need - Recipient Income, cap).">· Need uses <a href="https://www.bls.gov/cex/" target="_blank" title="Bureau of Labor Statistics Consumer Expenditure Survey">BLS</a> one-adult + income-shared indivisible costs <a href="https://www.bls.gov/fls/flsresearch.htm" target="_blank" class="source-icon" title="View BLS research methodology">📎</a></span>
+          <span class="dim" id="fNeedNote" title="[State] §25-319 guideline formula: Recipient Need = One-Adult BLS + (Indivisible BLS × recipient income share). Maintenance = min(Recipient Need - Recipient Income, cap).">· Need uses <a href="https://www.bls.gov/cex/" target="_blank" title="Bureau of Labor Statistics Consumer Expenditure Survey">BLS</a> one-adult + income-shared indivisible costs <a href="https://www.bls.gov/fls/flsresearch.htm" target="_blank" class="source-icon" title="View BLS research methodology">📎</a></span>
           <span class="dim" id="fNeedBasis">· Basis: BLS Mid</span>
           <span class="dim" id="fNeedTestMode">· Need test: Included</span>
         </div>
@@ -246,7 +246,7 @@
             <div class="issue-list" id="spFeeIssues"></div>
 
             <div class="panel-head panel-subhead" style="padding:10px 0 4px;border:none">
-              <h3 style="font-size:16px">Reimbursements & Amounts Owed Back to Luis</h3>
+              <h3 style="font-size:16px">Reimbursements & Amounts Owed Back to [Party A]</h3>
               <span class="tag" id="spCreditCount">—</span>
             </div>
             <div class="issue-list" id="spCreditIssues"></div>
@@ -278,7 +278,7 @@
             <option value="property-income">💰 Property Income Impact (§25-319(B) reduction scenarios)</option>
             <option value="income-matrix">📈 Income Scenario Matrix (Sensitivity analysis)</option>
             <option value="deviation">📝 Deviation Analysis (Arguments for increase/decrease)</option>
-            <option value="expert-compare">🔍 Expert Comparison (Coni vs Miessner)</option>          </select>
+            <option value="expert-compare">🔍 Expert Comparison ([Party B] vs Miessner)</option>          </select>
         </div>
 
         <details class="collapsed-panel">
@@ -332,10 +332,10 @@
         <div class="panel">
           <div class="panel-head">
             <h3>Income Scenario Cross-Tab</h3>
-            <span class="tag">All Coni income options × All Luis income options = Maintenance outcomes</span>
+            <span class="tag">All [Party B] income options × All [Party A] income options = Maintenance outcomes</span>
           </div>
           <div id="incomeMatrixAnalysis" class="matrix-content">
-            <p class="note-info">See how every combination of income scenarios affects maintenance. Rows = Coni income, Columns = Luis income.</p>
+            <p class="note-info">See how every combination of income scenarios affects maintenance. Rows = [Party B] income, Columns = [Party A] income.</p>
             <div id="incomeMatrix"></div>          </div>
         </div>
       </div><!-- End tab-income-matrix -->
@@ -357,10 +357,10 @@
         <div class="panel">
           <div class="panel-head">
             <h3>Expert Report Comparison</h3>
-            <span class="tag">Miessner claims vs. Luis position vs. AFI actual vs. guideline</span>
+            <span class="tag">Miessner claims vs. [Party A] position vs. AFI actual vs. guideline</span>
           </div>
           <div id="expertComparisonAnalysis" class="expert-content">
-            <p class="note-info">Compares Miessner's expense claims (which drive her income analysis) against documented actual expenses and Luis's positions.</p>
+            <p class="note-info">Compares Miessner's expense claims (which drive her income analysis) against documented actual expenses and [Party A]'s positions.</p>
             <div id="expertComparison"></div>          </div>
         </div>
       </div><!-- End tab-expert-compare -->
@@ -378,7 +378,7 @@
 
       <footer class="foot">
         <span>Veritas · Spousal Maintenance</span>
-        <span class="foot-dim">AZ 2023+ guideline formula · figures illustrative · work product — privileged</span>
+        <span class="foot-dim">[State] 2023+ guideline formula · figures illustrative · work product — privileged</span>
       </footer>
       <div style="text-align:center;font-size:10.5px;font-weight:700;letter-spacing:.5px;color:#8a6d3b;background:#fbf6e9;border-top:1px solid #e6d9b8;padding:8px 10px;text-transform:uppercase">Attorney-Client Privileged · Attorney Work Product · Confidential</div>    </div>
   </main>

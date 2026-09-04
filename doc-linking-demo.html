@@ -408,12 +408,12 @@
       <div class="calculation-grid">
         <div class="calculation-card">
           <div class="card-label">W-2 Base Only</div>
-          <div class="card-value" data-calc-id="luis:w2">$236,819</div>          <div class="card-note">Click to view pay stubs</div>
+          <div class="card-value" data-calc-id="[Party A]:w2">$236,819</div>          <div class="card-note">Click to view pay stubs</div>
         </div>
 
         <div class="calculation-card">
           <div class="card-label">Base + Contested Bonus</div>
-          <div class="card-value" data-calc-id="luis:bonus">$336,819</div>          <div class="card-note">Click to view asset tracing memo</div>
+          <div class="card-value" data-calc-id="[Party A]:bonus">$336,819</div>          <div class="card-note">Click to view asset tracing memo</div>
         </div>
       </div>
 
@@ -421,17 +421,17 @@
       <div class="calculation-grid">
         <div class="calculation-card">
           <div class="card-label">2026 Run-Rate</div>
-          <div class="card-value" data-calc-id="coni:runrate">$78,169</div>          <div class="card-note">Click to view check stubs report</div>
+          <div class="card-value" data-calc-id="[Party B]:runrate">$78,169</div>          <div class="card-note">Click to view check stubs report</div>
         </div>
 
         <div class="calculation-card">
           <div class="card-label">Expert Report</div>
-          <div class="card-value" data-calc-id="coni:expert">$59,820</div>          <div class="card-note">Click to view comparative expert report</div>
+          <div class="card-value" data-calc-id="[Party B]:expert">$59,820</div>          <div class="card-note">Click to view comparative expert report</div>
         </div>
 
         <div class="calculation-card">
           <div class="card-label">Earning Capacity</div>
-          <div class="card-value" data-calc-id="coni:capacity">$45,480</div>          <div class="card-note">Click to view vocational expert report</div>
+          <div class="card-value" data-calc-id="[Party B]:capacity">$45,480</div>          <div class="card-note">Click to view vocational expert report</div>
         </div>
       </div>
 
@@ -481,9 +481,9 @@ const manager = DocumentLinking.initializeDocumentLinking(caseId, 'moduleName');
       <h3>Step 3: Register Calculations</h3>
       <pre>// Register one or more calculations
 manager.registerCalculation({
-  id: 'luis:w2',
+  id: '[Party A]:w2',
   displayValue: '$236,819',
-  description: 'W-2 Base Income (Luis)',
+  description: 'W-2 Base Income ([Party A])',
   category: 'income',
   method: 'Recurring W-2 base salary from primary employment',
   breakdown: [
@@ -506,11 +506,11 @@ manager.registerCalculation({
 DocumentLinking.autoLinkNumbers();
 
 // Method 2: HTML attribute
-&lt;div data-calc-id="luis:w2"&gt;$236,819&lt;/div&gt;
+&lt;div data-calc-id="[Party A]:w2"&gt;$236,819&lt;/div&gt;
 
 // Method 3: Manual element linking
 const el = document.getElementById('myValue');
-DocumentLinking.makeNumberClickable(el, 'luis:w2');</pre>
+DocumentLinking.makeNumberClickable(el, '[Party A]:w2');</pre>
       <h3>Step 5: Users Click to View Documents</h3>
       <p>When users click a linked value, a modal opens showing:</p>
       <ul class="feature-list">
@@ -539,7 +539,7 @@ DocumentLinking.makeNumberClickable(el, 'luis:w2');</pre>
           <tr>
             <td><code>id</code></td>
             <td>string</td>
-            <td>Unique identifier (e.g., 'luis:w2')</td>          </tr>
+            <td>Unique identifier (e.g., '[Party A]:w2')</td>          </tr>
           <tr>
             <td><code>displayValue</code></td>
             <td>string</td>
@@ -1189,9 +1189,9 @@ DocumentLinking.makeNumberClickable(el, 'luis:w2');</pre>
       // Register demo calculations
       const calculations = [
         {
-          id: 'luis:w2',
+          id: '[Party A]:w2',
           displayValue: '$236,819',
-          description: 'W-2 Base Income (Luis)',
+          description: 'W-2 Base Income ([Party A])',
           category: 'income',
           method: 'Recurring W-2 base salary from primary employment',
           breakdown: [
@@ -1213,7 +1213,7 @@ DocumentLinking.makeNumberClickable(el, 'luis:w2');</pre>
           ]
         },
         {
-          id: 'luis:bonus',          displayValue: '$336,819',
+          id: '[Party A]:bonus',          displayValue: '$336,819',
           description: 'W-2 Base + Contested Work Bonus',
           category: 'income',
           method: 'Base salary plus 2025 work bonus (contested as separate property)',
@@ -1238,13 +1238,13 @@ DocumentLinking.makeNumberClickable(el, 'luis:w2');</pre>
           ]
         },
         {
-          id: 'coni:runrate',
+          id: '[Party B]:runrate',
           displayValue: '$78,169',          description: '2026 Run-Rate Income (Supported Spouse)',
           category: 'income',
           method: 'Annualized from 2026 actual deposits across both employers',
           breakdown: [
-            { k: 'Helping Hearts (normalized)', v: '$62,563' },
-            { k: 'Fleet Feet', v: '$15,606' },
+            { k: '[Employer A] (normalized)', v: '$62,563' },
+            { k: '[Employer B]', v: '$15,606' },
             { k: '2026 combined run-rate', v: '$78,169', tot: true }          ],
           exhibits: [
             {
@@ -1255,20 +1255,20 @@ DocumentLinking.makeNumberClickable(el, 'luis:w2');</pre>
               docTitle: 'Check Stubs Report',
               period: 'Generated 04/01/2026',
               rows: [
-                { k: 'Helping Hearts YTD', v: '$62,563.00', hi: true },
-                { k: 'Fleet Feet YTD', v: '$15,606.00', hi: true }              ],
+                { k: '[Employer A] YTD', v: '$62,563.00', hi: true },
+                { k: '[Employer B] YTD', v: '$15,606.00', hi: true }              ],
               foot: 'Aggregated 2026 deposits showing both income streams.'
             }
           ]
         },
         {
-          id: 'coni:expert',
+          id: '[Party B]:expert',
           displayValue: '$59,820',          description: 'Expert Report Income Estimate (Miessner)',
           category: 'income',
-          method: 'From BeachFleischman expert report Schedule 2',
+          method: 'From [Expert] expert report Schedule 2',
           breakdown: [
-            { k: 'Helping Hearts Caregivers', v: '$3,976 /mo' },
-            { k: 'Fleet Feet', v: '$1,009 /mo' },
+            { k: '[Employer A] Caregivers', v: '$3,976 /mo' },
+            { k: '[Employer B]', v: '$1,009 /mo' },
             { k: 'Total gross monthly', v: '$4,985 /mo' },
             { k: 'Annualized (×12)', v: '$59,820', tot: true }
           ],
@@ -1277,23 +1277,23 @@ DocumentLinking.makeNumberClickable(el, 'luis:w2');</pre>
               name: 'Miessner Preliminary Report',
               kind: 'report',
               page: 'Schedule 2',
-              payer: 'BeachFleischman PLLC',
+              payer: '[Expert] PLLC',
               docTitle: 'Preliminary Expert Report',
               period: '03/13/2026',
               highlights: [
-                { label: 'Helping Hearts monthly', value: '$3,976', ref: 'Schedule 2', pg: 55 },
-                { label: 'Fleet Feet monthly', value: '$1,009', ref: 'Schedule 2', pg: 55 }
+                { label: '[Employer A] monthly', value: '$3,976', ref: 'Schedule 2', pg: 55 },
+                { label: '[Employer B] monthly', value: '$1,009', ref: 'Schedule 2', pg: 55 }
               ],
               foot: 'Expert income opinion from wife\'s expert report.'
             }
           ]
         },
         {
-          id: 'coni:capacity',
+          id: '[Party B]:capacity',
           displayValue: '$45,480',
           description: 'Earning Capacity (Vocational Expert)',
           category: 'income',
-          method: 'Open-market earning capacity per Luis\'s vocational expert (Exhibit E)',
+          method: 'Open-market earning capacity per [Party A]\'s vocational expert (Exhibit E)',
           breakdown: [
             { k: 'Vocational expert determination', v: 'Full-time employment' },
             { k: 'Annual salary potential', v: '$45,480', tot: true },
@@ -1307,7 +1307,7 @@ DocumentLinking.makeNumberClickable(el, 'luis:w2');</pre>
               payer: 'Brad H. Taft',
               docTitle: 'Vocational Expert Report',
               period: '03/13/2026',
-              flag: 'Report not yet in workspace - figure from Luis memos',
+              flag: 'Report not yet in workspace - figure from [Party A] memos',
               rows: [
                 { k: 'Open-market earning capacity', v: '$45,480', hi: true }
               ]
@@ -1319,7 +1319,7 @@ DocumentLinking.makeNumberClickable(el, 'luis:w2');</pre>
           displayValue: '$657.58/mo',
           description: 'CD Interest Income (3.92% fixed)',
           category: 'income',
-          method: 'Fixed interest on Chase CD ••2285 (Coni\'s home proceeds share)',
+          method: 'Fixed interest on Chase CD ••2285 ([Party B]\'s home proceeds share)',
           breakdown: [
             { k: 'Principal (CD ••2285)', v: '$268,400.36' },
             { k: 'Interest rate', v: '3.92% fixed' },
@@ -1329,10 +1329,10 @@ DocumentLinking.makeNumberClickable(el, 'luis:w2');</pre>
           ],
           exhibits: [
             {
-              name: 'BeachFleischman Findings Letter',
+              name: '[Expert] Findings Letter',
               kind: 'report',
               page: 'pp.6-7',
-              payer: 'BeachFleischman PLLC',
+              payer: '[Expert] PLLC',
               docTitle: 'Findings Letter (Yeanoplos)',
               period: '06/29/2026',
               highlights: [
@@ -1357,10 +1357,10 @@ DocumentLinking.makeNumberClickable(el, 'luis:w2');</pre>
           ],
           exhibits: [
             {
-              name: 'BeachFleischman Findings Letter',
+              name: '[Expert] Findings Letter',
               kind: 'report',
               page: 'p.7',
-              payer: 'BeachFleischman PLLC',
+              payer: '[Expert] PLLC',
               docTitle: 'Findings Letter (Yeanoplos)',
               period: '06/29/2026',
               highlights: [
@@ -1375,10 +1375,10 @@ DocumentLinking.makeNumberClickable(el, 'luis:w2');</pre>
           displayValue: '$2,450',
           description: 'Monthly Spousal Support Obligation',
           category: 'calculation',
-          method: 'AZ §25-319(B) formula: Combined Need × Income Gap %',
+          method: '[State] §25-319(B) formula: Combined Need × Income Gap %',
           breakdown: [
             { k: 'Combined household need (mid)', v: '$4,150.01' },
-            { k: 'Luis income', v: '$236,819' },
+            { k: '[Party A] income', v: '$236,819' },
             { k: 'Supported Spouse income', v: '$78,169' },
             { k: 'Income gap percentage', v: '40.1%' },
             { k: 'Monthly support (40.1% × $4,150)', v: '$1,663', tot: false },
@@ -1387,7 +1387,7 @@ DocumentLinking.makeNumberClickable(el, 'luis:w2');</pre>
           ],
           exhibits: [
             {
-              name: 'AZ Revised Statutes §25-319(B)',
+              name: '[State] Revised Statutes §25-319(B)',
               kind: 'filing',
               page: '§25-319(B)',
               payer: 'Arizona Legislature',
