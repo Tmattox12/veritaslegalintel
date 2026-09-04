@@ -742,15 +742,15 @@
               3. Apply guideline percentage to combined income<br>
               4. Each parent pays their share based on income %<br>
               5. Adjust for childcare, health insurance, parenting time<br><br>
-              <strong>Example:</strong> Combined income $6,000/month, guideline 20% = $1,200 support<br>
-              Parent A earns 60% ($3,600) → pays 60% of $1,200 = $720<br>
-              Parent B earns 40% ($2,400) → pays 40% of $1,200 = $480            </div>
+              <strong>Example:</strong> Combined income [monthly amount], guideline 20% = [support amount]<br>
+              Parent A earns 60% ([share amounts]<br>
+              Parent B earns 40% ([share amounts]            </div>
           </div>
 
           <div class="guideline-info">
             <div class="guideline-title">State-Specific Variations</div>
             <div class="guideline-text">
-              <strong>California:</strong> Guideline percentage increases with more children (20% → 25% → 30% → 35%)<br>              <strong>Texas:</strong> Cap on guideline calculations (~$310k combined income) with percentage-based model<br>
+              <strong>California:</strong> Guideline percentage increases with more children (20% → 25% → 30% → 35%)<br>              <strong>Texas:</strong> Cap on guideline calculations (~[amount] combined income) with percentage-based model<br>
               <strong>Florida:</strong> Percentage varies; mandatory review if 3+ years or substantial change<br>
               <strong>New York:</strong> Guideline applied to combined parental income; can deviate for shared custody<br>
               <strong>Most States:</strong> Similar income shares model with state-specific adjustments
@@ -982,8 +982,8 @@
     function updateGuidelines() {
       const state = document.getElementById('stateSelect').value;
       const guidelinesInfo = {
-        'ca': '<div class="guideline-title">California Child Support Guidelines</div><div class="guideline-text"><strong>Formula:</strong> Percentage based on combined parental income<br><strong>Percentage:</strong> Increases by number of children (20% → 25% → 30% → 35%)<br><strong>Special:</strong> Includes hardship deduction, tax considerations<br><strong>Review:</strong> Every 3 years or material change of 10%+</div>',        'tx': '<div class="guideline-title">Texas Child Support Guidelines</div><div class="guideline-text"><strong>Formula:</strong> Percentage of obligor income<br><strong>Percentage:</strong> 20% (1 child) to 40% (6+ children)<br><strong>Cap:</strong> Applies to first $310k of combined income (2024)<br><strong>Deviation:</strong> Requires specific findings if different</div>',
-        'ny': '<div class="guideline-title">New York Child Support Guidelines</div><div class="guideline-text"><strong>Formula:</strong> Percentage of combined parental income<br><strong>Percentage:</strong> 17-25% depending on income level<br><strong>Cap:</strong> $184k combined income (2024)<br><strong>Shared Custody:</strong> Significant deviation if 50%+ overnights</div>',
+        'ca': '<div class="guideline-title">California Child Support Guidelines</div><div class="guideline-text"><strong>Formula:</strong> Percentage based on combined parental income<br><strong>Percentage:</strong> Increases by number of children (20% → 25% → 30% → 35%)<br><strong>Special:</strong> Includes hardship deduction, tax considerations<br><strong>Review:</strong> Every 3 years or material change of 10%+</div>',        'tx': '<div class="guideline-title">Texas Child Support Guidelines</div><div class="guideline-text"><strong>Formula:</strong> Percentage of obligor income<br><strong>Percentage:</strong> 20% (1 child) to 40% (6+ children)<br><strong>Cap:</strong> Applies to first [amount] of combined income (2024)<br><strong>Deviation:</strong> Requires specific findings if different</div>',
+        'ny': '<div class="guideline-title">New York Child Support Guidelines</div><div class="guideline-text"><strong>Formula:</strong> Percentage of combined parental income<br><strong>Percentage:</strong> 17-25% depending on income level<br><strong>Cap:</strong> [amount] combined income (2024)<br><strong>Shared Custody:</strong> Significant deviation if 50%+ overnights</div>',
         'fl': '<div class="guideline-title">Florida Child Support Guidelines</div><div class="guideline-text"><strong>Formula:</strong> Percentage of combined parental income<br><strong>Percentage:</strong> 20% (1 child) to 50% (5+ children)<br><strong>Adjustment:</strong> For parental time-sharing<br><strong>Review:</strong> Mandatory every 3 years</div>',
         'other': '<div class="guideline-title">Income Shares Model (General)</div><div class="guideline-text"><strong>Formula:</strong> Percentage of combined parental income<br><strong>Typical Percentage:</strong> 20-35% depending on children<br><strong>Adjustments:</strong> Childcare, health insurance, custody<br><strong>Note:</strong> Most states use this or similar model</div>'
       };

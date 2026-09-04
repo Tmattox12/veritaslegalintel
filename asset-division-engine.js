@@ -123,7 +123,7 @@ class AssetDivisionEngine {
       realEstate: {
         type: 'Real Estate',
         taxTreatment: '§1041: No transfer tax; Stepped-up basis for appreciation',
-        futureImpact: 'Capital gains tax only on post-divorce appreciation (max $250k single exclusion)',
+        futureImpact: 'Capital gains tax only on post-divorce appreciation (max [amount] single exclusion)',
         planning: 'Primary residence most tax-efficient; Document stepped-up basis'
       },
       investments: {
@@ -155,7 +155,7 @@ class AssetDivisionEngine {
         'Spousal IRA Rollover Rules'
       ],
       realEstate: [
-        'Section 121: Capital Gains Exclusion ($250k single)',
+        'Section 121: Capital Gains Exclusion ([amount] single)',
         'Basis Carry-Over in Divorce',
         'Depreciation Recapture on Rental Property',
         'State Transfer Tax Issues'
@@ -356,7 +356,7 @@ class TaxImplicationAnalyzer {
       ],
       futureConsequences: [
         isPrimary ?
-          'Capital gains exclusion: Up to $250k single / $500k if still joint' :
+          'Capital gains exclusion: Up to [amount] single / [amount] if still joint' :
           'Depreciation recapture: 25% rate on recaptured depreciation',
         'Capital gains on appreciation after divorce: 15-20% rate',
         'Mortgage interest: Deductible if primary or one other home',

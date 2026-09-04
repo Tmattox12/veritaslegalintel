@@ -408,12 +408,12 @@
       <div class="calculation-grid">
         <div class="calculation-card">
           <div class="card-label">W-2 Base Only</div>
-          <div class="card-value" data-calc-id="[Party A]:w2">$236,819</div>          <div class="card-note">Click to view pay stubs</div>
+          <div class="card-value" data-calc-id="[Party A]:w2">[amount]</div>          <div class="card-note">Click to view pay stubs</div>
         </div>
 
         <div class="calculation-card">
           <div class="card-label">Base + Contested Bonus</div>
-          <div class="card-value" data-calc-id="[Party A]:bonus">$336,819</div>          <div class="card-note">Click to view asset tracing memo</div>
+          <div class="card-value" data-calc-id="[Party A]:bonus">[amount]</div>          <div class="card-note">Click to view asset tracing memo</div>
         </div>
       </div>
 
@@ -482,12 +482,12 @@ const manager = DocumentLinking.initializeDocumentLinking(caseId, 'moduleName');
       <pre>// Register one or more calculations
 manager.registerCalculation({
   id: '[Party A]:w2',
-  displayValue: '$236,819',
+  displayValue: '[amount]',
   description: 'W-2 Base Income ([Party A])',
   category: 'income',
   method: 'Recurring W-2 base salary from primary employment',
   breakdown: [
-    { k: 'Annual base', v: '$236,819' },
+    { k: 'Annual base', v: '[amount]' },
     { k: 'Monthly', v: '$19,735', tot: true }  ],
   exhibits: [
     {
@@ -506,7 +506,7 @@ manager.registerCalculation({
 DocumentLinking.autoLinkNumbers();
 
 // Method 2: HTML attribute
-&lt;div data-calc-id="[Party A]:w2"&gt;$236,819&lt;/div&gt;
+&lt;div data-calc-id="[Party A]:w2"&gt;[amount]&lt;/div&gt;
 
 // Method 3: Manual element linking
 const el = document.getElementById('myValue');
@@ -543,7 +543,7 @@ DocumentLinking.makeNumberClickable(el, '[Party A]:w2');</pre>
           <tr>
             <td><code>displayValue</code></td>
             <td>string</td>
-            <td>The number shown to user ($236,819)</td>          </tr>
+            <td>The number shown to user ([amount])</td>          </tr>
           <tr>
             <td><code>description</code></td>
             <td>string</td>
@@ -719,7 +719,7 @@ DocumentLinking.makeNumberClickable(el, '[Party A]:w2');</pre>
         </li>
       </ol>
 
-      <button class="btn" onclick="alert('Try clicking the numbers above! For example, click the $236,819 value.')">
+      <button class="btn" onclick="alert('Try clicking the numbers above! For example, click the [amount] value.')">
         ← Click Numbers Above to See Demo      </button>
     </div>
 
@@ -1190,12 +1190,12 @@ DocumentLinking.makeNumberClickable(el, '[Party A]:w2');</pre>
       const calculations = [
         {
           id: '[Party A]:w2',
-          displayValue: '$236,819',
+          displayValue: '[amount]',
           description: 'W-2 Base Income ([Party A])',
           category: 'income',
           method: 'Recurring W-2 base salary from primary employment',
           breakdown: [
-            { k: 'Annual base salary', v: '$236,819' },            { k: 'Monthly equivalent', v: '$19,735', tot: true }
+            { k: 'Annual base salary', v: '[amount]' },            { k: 'Monthly equivalent', v: '$19,735', tot: true }
           ],
           exhibits: [
             {
@@ -1209,17 +1209,17 @@ DocumentLinking.makeNumberClickable(el, '[Party A]:w2');</pre>
                 { k: 'Base earnings', v: '$9,108.42', hi: true },
                 { k: 'YTD gross', v: '$118,409.50' }
               ],
-              foot: 'Most recent stub shows $9,108.42 per pay period, annualizing to $236,819/year.'            }
+              foot: 'Most recent stub shows $9,108.42 per pay period, annualizing to [amount]/year.'            }
           ]
         },
         {
-          id: '[Party A]:bonus',          displayValue: '$336,819',
+          id: '[Party A]:bonus',          displayValue: '[amount]',
           description: 'W-2 Base + Contested Work Bonus',
           category: 'income',
           method: 'Base salary plus 2025 work bonus (contested as separate property)',
           breakdown: [
-            { k: 'W-2 base', v: '$236,819' },            { k: 'Work bonus (2025)', v: '$100,000' },
-            { k: 'Total with bonus', v: '$336,819', tot: true }
+            { k: 'W-2 base', v: '[amount]' },            { k: 'Work bonus (2025)', v: '[amount]' },
+            { k: 'Total with bonus', v: '[amount]', tot: true }
           ],
           exhibits: [
             {
@@ -1231,7 +1231,7 @@ DocumentLinking.makeNumberClickable(el, '[Party A]:w2');</pre>
               period: 'Q4 2025',
               rows: [
                 { k: 'Base earnings', v: '$9,108.42' },
-                { k: 'Bonus (2025)', v: '$100,000.00', hi: true }
+                { k: 'Bonus (2025)', v: '[amount].00', hi: true }
               ],
               foot: 'Bonus funded 4Runner purchase - see Memo 17 for separate property argument'
             }
@@ -1378,7 +1378,7 @@ DocumentLinking.makeNumberClickable(el, '[Party A]:w2');</pre>
           method: '[State] §25-319(B) formula: Combined Need × Income Gap %',
           breakdown: [
             { k: 'Combined household need (mid)', v: '$4,150.01' },
-            { k: '[Party A] income', v: '$236,819' },
+            { k: '[Party A] income', v: '[amount]' },
             { k: 'Supported Spouse income', v: '$78,169' },
             { k: 'Income gap percentage', v: '40.1%' },
             { k: 'Monthly support (40.1% × $4,150)', v: '$1,663', tot: false },

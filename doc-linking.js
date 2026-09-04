@@ -240,7 +240,7 @@ function getDocumentLinkManager() {
 
 /**
  * Make a number clickable and link it to documents
- * Usage: <span class="doc-link" data-calc-id="income_w2_2025">$236,819</span>
+ * Usage: <span class="doc-link" data-calc-id="income_w2_2025">[amount]</span>
  */
 function makeNumberClickable(element, calcId) {
   if (!element) return;

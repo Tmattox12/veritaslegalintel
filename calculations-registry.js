@@ -111,7 +111,7 @@ const CalculationsRegistry = {
       notes: [
         "All income documented via paystubs or statements",
         "Bonus is recurring annual (confirmed by HR)",
-        "Investment income is passive; portfolio value ~$250k"
+        "Investment income is passive; portfolio value ~[amount]"
       ]
     }
   },

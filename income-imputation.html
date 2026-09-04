@@ -245,7 +245,7 @@
         <!-- Bonus issue -->
         <div class="flag-box">
           <div class="flag-title">⚖ ISSUE: Is the bonus counted?</div>
-          <div class="flag-detail">Whether the bonus counts as income for support turns on its <strong>character</strong>. Pick the character below for a recommendation. Base only = $236,819 W-2; all-in = $336,819 (W-2 + $100,000 bonus). The support calculators use whichever paying-spouse card you select above.</div>
+          <div class="flag-detail">Whether the bonus counts as income for support turns on its <strong>character</strong>. Pick the character below for a recommendation. Base only = [amount] W-2; all-in = [amount] (W-2 + [amount] bonus). The support calculators use whichever paying-spouse card you select above.</div>
         </div>
 
         <div class="note" id="bonusCharPanel">
@@ -321,9 +321,9 @@
               </div>
               <span class="income-card-badge">AFI</span>
             </div>
-            <div class="income-card-value">$236,819 / $78,169</div>
+            <div class="income-card-value">[amount] / $78,169</div>
             <div class="income-card-meta">
-              <div class="income-card-row"><span>Paying spouse</span><strong>$236,819</strong></div>
+              <div class="income-card-row"><span>Paying spouse</span><strong>[amount]</strong></div>
               <div class="income-card-row"><span>Supported spouse</span><strong>$78,169</strong></div>
             </div>
             <a class="income-card-foot" href="afi.html" target="_blank" rel="noopener">Open AFI module ↗</a>          </div>
@@ -335,9 +335,9 @@
               </div>
               <span class="income-card-badge">Spousal</span>
             </div>
-            <div class="income-card-value">$236,819 / $66,086</div>
+            <div class="income-card-value">[amount] / $66,086</div>
             <div class="income-card-meta">
-              <div class="income-card-row"><span>Payor</span><strong>$236,819</strong></div>
+              <div class="income-card-row"><span>Payor</span><strong>[amount]</strong></div>
               <div class="income-card-row"><span>Recipient</span><strong>$66,086</strong></div>
             </div>
             <a class="income-card-foot" href="spousal.html" target="_blank" rel="noopener">Open spousal module ↗</a>          </div>
@@ -349,9 +349,9 @@
               </div>
               <span class="income-card-badge">Child support</span>
             </div>
-            <div class="income-card-value">$236,819 / $59,820</div>
+            <div class="income-card-value">[amount] / $59,820</div>
             <div class="income-card-meta">
-              <div class="income-card-row"><span>Payor</span><strong>$236,819</strong></div>
+              <div class="income-card-row"><span>Payor</span><strong>[amount]</strong></div>
               <div class="income-card-row"><span>Recipient (Miessner HH + FF)</span><strong>$59,820</strong></div>
             </div>
             <a class="income-card-foot" href="child-support.html" target="_blank" rel="noopener">Open child-support module ↗</a>          </div>
@@ -404,9 +404,9 @@
           </tr>
           <tr>
             <td><strong>[Party A]</strong></td>
-            <td class="amount">$236,819<br>(W-2 base)</td>
-            <td class="amount">$236,819<br>(bonus separate)</td>
-            <td class="amount">$336,819<br>(+$100k bonus)</td>
+            <td class="amount">[amount]<br>(W-2 base)</td>
+            <td class="amount">[amount]<br>(bonus separate)</td>
+            <td class="amount">[amount]<br>(+$100k bonus)</td>
           </tr>
           <tr>
             <td><strong>[Party B]</strong></td>
@@ -418,7 +418,7 @@
 
         <div class="note" style="margin-top: 16px;">
           <strong>Rationale:</strong><br>
-          • <strong>[Party A]:</strong> Use the $236,819 W-2 base; the $100,000 bonus is contested (separate property, Memo 17) and layered in only for the aggressive case.<br>
+          • <strong>[Party A]:</strong> Use the [amount] W-2 base; the [amount] bonus is contested (separate property, Memo 17) and layered in only for the aggressive case.<br>
           • <strong>[Party B]:</strong> Impute at least her documented $66,086 (2026 paystubs) — opposing counsel's $0 is untenable against the pay records. The $45,480 vocational floor is the conservative minimum.        </div>
       </div>
 
@@ -516,11 +516,11 @@
   <script>
     (function () {
       var RECO = {
-        routine:       { verdict: 'INCLUDE', tone: '#2f7d5b', bg: '#e5f3ec', bd: '#bfe3d0', text: 'Bonuses paid routinely every year are generally treated as income for support. Lean toward the all-in $336,819 basis.' },
+        routine:       { verdict: 'INCLUDE', tone: '#2f7d5b', bg: '#e5f3ec', bd: '#bfe3d0', text: 'Bonuses paid routinely every year are generally treated as income for support. Lean toward the all-in [amount] basis.' },
         performance:   { verdict: 'INCLUDE', tone: '#2f7d5b', bg: '#e5f3ec', bd: '#bfe3d0', text: 'Regularly paid performance bonuses are typically counted, often averaged over 2–3 years. Lean toward all-in / a multi-year average.' },
-        discretionary: { verdict: 'LEAN EXCLUDE', tone: '#9a6b1e', bg: '#fbf1df', bd: '#f0dcb4', text: "Employer-discretionary bonuses are often excluded or averaged. Argue base-only $236,819; average only if there is a consistent history." },
-        onetime:       { verdict: 'EXCLUDE', tone: '#b3402f', bg: '#fbe9e6', bd: '#f0c9c2', text: 'Non-recurring, one-time bonuses are typically excluded from ongoing support. Use base-only $236,819.' },
-        speculative:   { verdict: 'EXCLUDE', tone: '#b3402f', bg: '#fbe9e6', bd: '#f0c9c2', text: 'Speculative or uncertain bonuses should not be imputed as ongoing income. Use base-only $236,819.' }      };
+        discretionary: { verdict: 'LEAN EXCLUDE', tone: '#9a6b1e', bg: '#fbf1df', bd: '#f0dcb4', text: "Employer-discretionary bonuses are often excluded or averaged. Argue base-only [amount]; average only if there is a consistent history." },
+        onetime:       { verdict: 'EXCLUDE', tone: '#b3402f', bg: '#fbe9e6', bd: '#f0c9c2', text: 'Non-recurring, one-time bonuses are typically excluded from ongoing support. Use base-only [amount].' },
+        speculative:   { verdict: 'EXCLUDE', tone: '#b3402f', bg: '#fbe9e6', bd: '#f0c9c2', text: 'Speculative or uncertain bonuses should not be imputed as ongoing income. Use base-only [amount].' }      };
       var box = document.getElementById('bonusCharReco');
       var checks = Array.prototype.slice.call(document.querySelectorAll('#bonusCharChecks input[type=checkbox]'));
       var LABELS = { routine: 'Routine', performance: 'Performance-based', discretionary: 'Discretionary', onetime: 'One-time', speculative: 'Speculative' };
@@ -540,14 +540,14 @@
         var combined, tone, bg, bd, note;
         if (hasInclude && hasExclude) {
           combined = 'MIXED — FACT-DEPENDENT'; tone = '#9a6b1e'; bg = '#fbf1df'; bd = '#f0dcb4';
-          note = 'The bonus shows both recurring and non-recurring traits. Courts commonly average the bonus over 2–3 years or count only the consistently recurring portion. Argue base-only $236,819 for the non-recurring part and an averaged add-back for the recurring part.';
+          note = 'The bonus shows both recurring and non-recurring traits. Courts commonly average the bonus over 2–3 years or count only the consistently recurring portion. Argue base-only [amount] for the non-recurring part and an averaged add-back for the recurring part.';
         } else if (hasInclude) {
           combined = 'INCLUDE'; tone = '#2f7d5b'; bg = '#e5f3ec'; bd = '#bfe3d0';
-          note = 'Every selected trait supports counting the bonus. Lean toward the all-in $336,819 basis (or a 2–3 year average where a history exists).';        } else {
+          note = 'Every selected trait supports counting the bonus. Lean toward the all-in [amount] basis (or a 2–3 year average where a history exists).';        } else {
           var anyHard = selected.some(function (k) { return RECO[k].verdict === 'EXCLUDE'; });
           combined = anyHard ? 'EXCLUDE' : 'LEAN EXCLUDE'; tone = anyHard ? '#b3402f' : '#9a6b1e';
           bg = anyHard ? '#fbe9e6' : '#fbf1df'; bd = anyHard ? '#f0c9c2' : '#f0dcb4';
-          note = 'The selected traits weigh against counting the bonus as ongoing income. Use the base-only $236,819 basis' + (anyHard ? '.' : '; average only if a consistent history exists.');
+          note = 'The selected traits weigh against counting the bonus as ongoing income. Use the base-only [amount] basis' + (anyHard ? '.' : '; average only if a consistent history exists.');
         }
         box.style.background = bg; box.style.borderColor = bd; box.style.color = '#2b3a4c';
         box.innerHTML = '<strong style="color:' + tone + '">Combined recommendation: ' + combined + ' the bonus.</strong>' +
