@@ -296,98 +296,118 @@
           <div class="stat-value" id="avgMapping">0%</div>        </div>
       </div>
 
-      <!-- Category Cards -->
+      <!-- Document Type Cards -->
       <div style="margin-bottom: 40px;">
-        <div class="section-title">📊 Document Categories</div>
+        <div class="section-title">📄 Document Types</div>
         <div class="hub-grid">
-          <!-- Expenses -->
-          <a href="document-hub-expenses.html" class="hub-card">
-            <div class="hub-card-icon">💰</div>            <div class="hub-card-title">Expenses</div>
-            <div class="hub-card-desc">Monthly living expenses, bills, utilities, childcare, medical, education, and discretionary spending.</div>
+          <!-- Bank Statements -->
+          <a href="discovery-intake.html" class="hub-card">
+            <div class="hub-card-icon">🏦</div>
+            <div class="hub-card-title">Bank Statements</div>
+            <div class="hub-card-desc">Personal & business bank statements, checking, savings, and transaction records for income and expense analysis.</div>
             <div class="hub-card-meta">
-              <span>8 subcategories</span>
-              <span class="hub-card-count" id="count-expenses">0 docs</span>            </div>
+              <span>Financial Records</span>
+              <span class="hub-card-count" id="count-bank-statements">0 docs</span>
+            </div>
           </a>
 
-          <!-- Income -->
+          <!-- Tax Returns -->
+          <a href="document-hub-tax.html" class="hub-card">
+            <div class="hub-card-icon">📋</div>
+            <div class="hub-card-title">Tax Returns</div>
+            <div class="hub-card-desc">1040, 1065, corporate returns, K-1s, schedules, amended returns, and IRS documentation.</div>
+            <div class="hub-card-meta">
+              <span>IRS & Filing</span>
+              <span class="hub-card-count" id="count-tax">0 docs</span>
+            </div>
+          </a>
+
+          <!-- Income Documents -->
           <a href="document-hub-income.html" class="hub-card">
-            <div class="hub-card-icon">💵</div>            <div class="hub-card-title">Income</div>
-            <div class="hub-card-desc">W2s, 1099s, pay stubs, business income statements, bonuses, and other income sources.</div>
+            <div class="hub-card-icon">💼</div>
+            <div class="hub-card-title">Income Documents</div>
+            <div class="hub-card-desc">W-2s, 1099s, pay stubs, employment letters, bonus statements, and other income verification.</div>
             <div class="hub-card-meta">
-              <span>Employment & Business</span>
-              <span class="hub-card-count" id="count-income">0 docs</span>            </div>
+              <span>Employment & Compensation</span>
+              <span class="hub-card-count" id="count-income">0 docs</span>
+            </div>
           </a>
 
-          <!-- Assets -->
-          <a href="document-hub-assets.html" class="hub-card">
-            <div class="hub-card-icon">💎</div>            <div class="hub-card-title">Assets</div>
-            <div class="hub-card-desc">Bank accounts, investment portfolios, real estate, vehicles, jewelry, and other valuable assets.</div>
-            <div class="hub-card-meta">
-              <span>Personal & Business</span>
-              <span class="hub-card-count" id="count-assets">0 docs</span>            </div>
-          </a>
-
-          <!-- Liabilities -->
-          <a href="document-hub-liabilities.html" class="hub-card">
-            <div class="hub-card-icon">💳</div>            <div class="hub-card-title">Liabilities</div>
-            <div class="hub-card-desc">Credit card debt, loans, mortgages, lines of credit, and other financial obligations.</div>
-            <div class="hub-card-meta">
-              <span>Debts & Obligations</span>
-              <span class="hub-card-count" id="count-liabilities">0 docs</span>            </div>
-          </a>
-
-          <!-- Investments -->
-          <a href="document-hub-investments.html" class="hub-card">
-            <div class="hub-card-icon">📈</div>            <div class="hub-card-title">Investments</div>
-            <div class="hub-card-desc">Stocks, bonds, mutual funds, ETFs, brokerage statements, and investment account documentation.</div>
-            <div class="hub-card-meta">
-              <span>Portfolio & Trading</span>
-              <span class="hub-card-count" id="count-investments">0 docs</span>            </div>
-          </a>
-
-          <!-- Retirement -->
-          <a href="document-hub-retirement.html" class="hub-card">
-            <div class="hub-card-icon">🎯</div>            <div class="hub-card-title">Retirement</div>
-            <div class="hub-card-desc">401(k), IRA, Roth IRA, pensions, Social Security statements, and retirement account statements.</div>
-            <div class="hub-card-meta">
-              <span>Retirement Plans</span>
-              <span class="hub-card-count" id="count-retirement">0 docs</span>            </div>
-          </a>
-
-          <!-- Real Estate -->
-          <a href="document-hub-realestate.html" class="hub-card">
-            <div class="hub-card-icon">🏠</div>            <div class="hub-card-title">Real Estate</div>
-            <div class="hub-card-desc">Property deeds, mortgages, appraisals, property tax statements, title documents, and deed of trust.</div>
-            <div class="hub-card-meta">
-              <span>Properties & Mortgages</span>
-              <span class="hub-card-count" id="count-real-estate">0 docs</span>            </div>
-          </a>
-
-          <!-- Business -->
+          <!-- Business Documents -->
           <a href="document-hub-business.html" class="hub-card">
-            <div class="hub-card-icon">🏢</div>            <div class="hub-card-title">Business</div>
-            <div class="hub-card-desc">Business tax returns, P&L statements, balance sheets, ownership agreements, and business documentation.</div>
+            <div class="hub-card-icon">🏢</div>
+            <div class="hub-card-title">Business Documents</div>
+            <div class="hub-card-desc">Business licenses, partnership agreements, corporate minutes, P&L statements, balance sheets, and ownership documentation.</div>
             <div class="hub-card-meta">
               <span>Business Operations</span>
-              <span class="hub-card-count" id="count-business">0 docs</span>            </div>
+              <span class="hub-card-count" id="count-business">0 docs</span>
+            </div>
           </a>
 
-          <!-- Tax Documents -->
-          <a href="document-hub-tax.html" class="hub-card">
-            <div class="hub-card-icon">📋</div>            <div class="hub-card-title">Tax Documents</div>
-            <div class="hub-card-desc">Personal and business tax returns, K-1s, schedules, amended returns, and tax filing documentation.</div>
+          <!-- Real Estate & Property -->
+          <a href="document-hub-realestate.html" class="hub-card">
+            <div class="hub-card-icon">🏠</div>
+            <div class="hub-card-title">Real Estate & Property</div>
+            <div class="hub-card-desc">Property deeds, mortgages, appraisals, tax assessments, title documents, and property-related correspondence.</div>
             <div class="hub-card-meta">
-              <span>IRS & Tax Filing</span>
-              <span class="hub-card-count" id="count-tax">0 docs</span>            </div>
+              <span>Property Documents</span>
+              <span class="hub-card-count" id="count-real-estate">0 docs</span>
+            </div>
           </a>
 
-          <!-- Legal & Other -->
+          <!-- Liabilities & Debts -->
+          <a href="document-hub-liabilities.html" class="hub-card">
+            <div class="hub-card-icon">💳</div>
+            <div class="hub-card-title">Liabilities & Debts</div>
+            <div class="hub-card-desc">Credit card statements, loan agreements, mortgage documents, lines of credit, and other financial obligations.</div>
+            <div class="hub-card-meta">
+              <span>Obligations</span>
+              <span class="hub-card-count" id="count-liabilities">0 docs</span>
+            </div>
+          </a>
+
+          <!-- Assets & Investments -->
+          <a href="document-hub-investments.html" class="hub-card">
+            <div class="hub-card-icon">💎</div>
+            <div class="hub-card-title">Assets & Investments</div>
+            <div class="hub-card-desc">Brokerage statements, investment accounts, retirement accounts, cryptocurrency, and other asset documentation.</div>
+            <div class="hub-card-meta">
+              <span>Investment Accounts</span>
+              <span class="hub-card-count" id="count-investments">0 docs</span>
+            </div>
+          </a>
+
+          <!-- Insurance & Legal -->
           <a href="document-hub-legal.html" class="hub-card">
-            <div class="hub-card-icon">📄</div>            <div class="hub-card-title">Legal & Other</div>
-            <div class="hub-card-desc">Prenuptial agreements, trusts, wills, power of attorney, insurance policies, and miscellaneous documents.</div>
+            <div class="hub-card-icon">📄</div>
+            <div class="hub-card-title">Insurance & Legal</div>
+            <div class="hub-card-desc">Insurance policies, prenuptial agreements, trusts, wills, power of attorney, and legal documentation.</div>
             <div class="hub-card-meta">
               <span>Legal Documents</span>
-              <span class="hub-card-count" id="count-legal">0 docs</span>            </div>
+              <span class="hub-card-count" id="count-legal">0 docs</span>
+            </div>
+          </a>
+
+          <!-- Retirement Plans -->
+          <a href="document-hub-retirement.html" class="hub-card">
+            <div class="hub-card-icon">🎯</div>
+            <div class="hub-card-title">Retirement Plans</div>
+            <div class="hub-card-desc">401(k), IRA, Roth IRA, pensions, Social Security statements, and retirement account documentation.</div>
+            <div class="hub-card-meta">
+              <span>Retirement Accounts</span>
+              <span class="hub-card-count" id="count-retirement">0 docs</span>
+            </div>
+          </a>
+
+          <!-- Other Documents -->
+          <a href="#" class="hub-card">
+            <div class="hub-card-icon">📁</div>
+            <div class="hub-card-title">Other Documents</div>
+            <div class="hub-card-desc">Miscellaneous financial records, correspondence, and documents not covered by the above categories.</div>
+            <div class="hub-card-meta">
+              <span>General Storage</span>
+              <span class="hub-card-count" id="count-other">0 docs</span>
+            </div>
           </a>
         </div>
       </div>
