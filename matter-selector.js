@@ -11,6 +11,19 @@ document.addEventListener('DOMContentLoaded', async () => {
     matterBtn.addEventListener('click', showMatterDropdown);
   }
 
+  // Also make sidebar "Matters" link open the dropdown
+  const mattersNavLink = Array.from(document.querySelectorAll('.nav-item'))
+    .find(a => a.textContent.includes('Matters') && !a.textContent.includes('Matter'));
+  if (mattersNavLink) {
+    mattersNavLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      const matterBtn = document.querySelector('.matter-btn');
+      if (matterBtn) {
+        matterBtn.click();
+      }
+    });
+  }
+
   // Load previously selected matter from localStorage
   const savedMatterId = localStorage.getItem('currentMatterId');
   if (savedMatterId) {
