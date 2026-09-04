@@ -58,11 +58,87 @@ function initializeDatabase() {
             s3_key TEXT,
             filename TEXT NOT NULL,
             content_type TEXT,
+            category TEXT,
             uploaded_by TEXT NOT NULL,
             uploaded_at TEXT DEFAULT CURRENT_TIMESTAMP,
             deleted_at TEXT,
             FOREIGN KEY (matter_id) REFERENCES matters(id),
             FOREIGN KEY (uploaded_by) REFERENCES users(id)
+          )
+        `);
+
+        // Bank statements table
+        db.run(`
+          CREATE TABLE IF NOT EXISTS bank_statements (
+            id TEXT PRIMARY KEY,
+            document_id TEXT NOT NULL,
+            matter_id TEXT NOT NULL,
+            bank_name TEXT,
+            account_type TEXT,
+            account_number_masked TEXT,
+            statement_start TEXT,
+            statement_end TEXT,
+            beginning_balance REAL,
+            ending_balance REAL,
+            processing_status TEXT DEFAULT 'pending' CHECK(processing_status IN ('pending', 'processing', 'completed', 'error')),
+            error_message TEXT,
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (document_id) REFERENCES documents(id),
+            FOREIGN KEY (matter_id) REFERENCES matters(id)
+          )
+        `);
+
+        // Bank transactions table
+        db.run(`
+          CREATE TABLE IF NOT EXISTS bank_transactions (
+            id TEXT PRIMARY KEY,
+            bank_statement_id TEXT NOT NULL,
+            transaction_date TEXT,
+            description TEXT,
+            amount REAL,
+            transaction_type TEXT,
+            running_balance REAL,
+            flow_type TEXT CHECK(flow_type IN ('income', 'expense', 'transfer', 'unknown')),
+            suggested_category TEXT,
+            mapped_category TEXT,
+            mapping_status TEXT DEFAULT 'unmapped' CHECK(mapping_status IN ('auto_mapped', 'unmapped', 'confirmed')),
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (bank_statement_id) REFERENCES bank_statements(id)
+          )
+        `);
+
+        // Income items table
+        db.run(`
+          CREATE TABLE IF NOT EXISTS income_items (
+            id TEXT PRIMARY KEY,
+            matter_id TEXT NOT NULL,
+            bank_transaction_id TEXT,
+            party TEXT,
+            source_description TEXT,
+            amount REAL,
+            frequency TEXT,
+            transaction_date TEXT,
+            status TEXT DEFAULT 'pending' CHECK(status IN ('pending', 'accepted', 'rejected')),
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (matter_id) REFERENCES matters(id),
+            FOREIGN KEY (bank_transaction_id) REFERENCES bank_transactions(id)
+          )
+        `);
+
+        // Flags table
+        db.run(`
+          CREATE TABLE IF NOT EXISTS flags (
+            id TEXT PRIMARY KEY,
+            matter_id TEXT NOT NULL,
+            bank_transaction_id TEXT,
+            rule_type TEXT CHECK(rule_type IN ('large_transfer', 'undisclosed_account', 'round_trip', 'claude_qualitative')),
+            severity TEXT CHECK(severity IN ('critical', 'high', 'medium', 'low')),
+            title TEXT,
+            description TEXT,
+            status TEXT DEFAULT 'open' CHECK(status IN ('open', 'reviewed', 'dismissed')),
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (matter_id) REFERENCES matters(id),
+            FOREIGN KEY (bank_transaction_id) REFERENCES bank_transactions(id)
           )
         `, (err) => {
           if (err) {

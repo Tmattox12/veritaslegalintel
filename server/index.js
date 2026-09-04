@@ -5,6 +5,7 @@ const { v4: uuidv4 } = require('uuid');
 require('dotenv').config();
 
 const { initializeDatabase, getDatabase } = require('./db/schema');
+const bankStatementsRouter = require('./routes/bank-statements');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -22,6 +23,9 @@ app.use(async (req, res, next) => {
     res.status(500).json({ error: 'Database connection failed' });
   }
 });
+
+// Mount routes
+app.use('/api/matters/:matterId/bank-statements', bankStatementsRouter);
 
 // Health check
 app.get('/api/health', (req, res) => {
