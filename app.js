@@ -1,122 +1,122 @@
-/* Veritas Template — home screen with sample case data */
+/* Veritas Template — home screen (no hardcoded client data) */
 
 const MODULES = [
   {
     key: 'discovery', icon: '⤓', tint: '#274566', soft: '#e7edf5',
     title: 'Discovery Intake', badge: 'Live', badgeCls: 'live',
     desc: 'Auto-ingest, OCR & classify statements, pay stubs, tax records and disclosures.',
-    statNum: '42', statLbl: 'docs indexed'
+    statNum: '—', statLbl: 'documents'
   },
   {
     key: 'spousal', icon: '⚖', tint: '#8a6528', soft: '#f4ead6',
-    title: 'Spousal Maintenance', badge: 'AZ §25-319', badgeCls: 'law',
-    desc: 'Guideline calculator with BLS expenditure bands, duration & scenario modeling.',
-    statNum: '$2,850', statLbl: '/mo · 11 yr'
+    title: 'Spousal Maintenance', badge: 'Guideline', badgeCls: 'law',
+    desc: 'Guideline calculator with expenditure bands, duration & scenario modeling.',
+    statNum: '—', statLbl: 'monthly support'
   },
   {
     key: 'childsupport', icon: '◈', tint: '#2f7d5b', soft: '#e3f2ea',
-    title: 'Child Support', badge: 'AZ Worksheet', badgeCls: 'law',
-    desc: 'Income Shares worksheet, childcare add-ons and 70/30 reimbursement tracing.',
-    statNum: '$1,620', statLbl: '/mo · 2 kids'
+    title: 'Child Support', badge: 'Worksheet', badgeCls: 'law',
+    desc: 'Income Shares worksheet, childcare add-ons and reimbursement tracing.',
+    statNum: '—', statLbl: 'monthly support'
   },
   {
     key: 'custody', icon: '⌘', tint: '#5b4b8a', soft: '#efeafd',
     title: 'Child Custody', badge: 'Parenting Plan', badgeCls: 'law',
     desc: 'Legal decision-making, best-interest factors, communication protocols and order drafting.',
-    statNum: '6', statLbl: 'core custody sections'
+    statNum: '—', statLbl: 'custody sections'
   },
   {
     key: 'schedules', icon: '◷', tint: '#1d6f7a', soft: '#e3f4f6',
     title: 'Schedules & Calendar', badge: 'Template', badgeCls: 'live',
     desc: 'Weekly parenting schedule, holidays, summer rotations, exchanges and deadline tracking.',
-    statNum: '4', statLbl: 'schedule tracks'
+    statNum: '—', statLbl: 'schedule tracks'
   },
   {
     key: 'afi', icon: '≠', tint: '#b3402f', soft: '#fbe7e2',
-    title: 'AFI Discrepancy', badge: '3 flags', badgeCls: 'warn',
-    desc: 'Line-by-line AFI comparison vs. bank reality with headcount allocation.',
-    statNum: '$1,200', statLbl: '/mo variance'
+    title: 'AFI Discrepancy', badge: 'Analysis', badgeCls: 'warn',
+    desc: 'Line-by-line expense comparison vs. bank reality with allocation analysis.',
+    statNum: '—', statLbl: 'variances'
   },
   {
     key: 'forensic', icon: '⌕', tint: '#274566', soft: '#e7edf5',
-    title: 'Forensic Tracing', badge: '2 accts', badgeCls: 'live',
-    desc: 'Source-and-application tracing of separate property through the residence chain.',
-    statNum: '2', statLbl: 'accounts traced'
+    title: 'Forensic Tracing', badge: 'Tracing', badgeCls: 'live',
+    desc: 'Source-and-application tracing of separate property through transaction history.',
+    statNum: '—', statLbl: 'accounts traced'
   },
   {
     key: 'estate', icon: '⊟', tint: '#8a6528', soft: '#f4ead6',
-    title: 'Estate & Worksheets', badge: 'Date of service', badgeCls: 'law',
-    desc: 'Date-of-service asset/liability inventory, AZ guideline worksheets & document comparison.',
-    statNum: '$1.35M', statLbl: 'estate @ service'
+    title: 'Estate & Worksheets', badge: 'Valuation', badgeCls: 'law',
+    desc: 'Asset/liability inventory, guideline worksheets & document comparison.',
+    statNum: '—', statLbl: 'estate value'
   },
   {
     key: 'settlement', icon: '⇄', tint: '#8a6528', soft: '#f4ead6',
-    title: 'Settlement Modeling', badge: 'Draft', badgeCls: 'live',
-    desc: 'Blend spousal, support, property splits & credits into ranked offer scenarios.',
-    statNum: '$280K', statLbl: 'current gap'
+    title: 'Settlement Modeling', badge: 'Scenario', badgeCls: 'live',
+    desc: 'Blend support, property splits & credits into ranked settlement scenarios.',
+    statNum: '—', statLbl: 'settlement gap'
   },
   {
     key: 'argument', icon: '§', tint: '#274566', soft: '#e7edf5',
     title: 'Argument Builder', badge: 'AI-assist', badgeCls: 'ai',
     desc: 'Draft fact-anchored position memos with statute & exhibit citations.',
-    statNum: '5', statLbl: 'issue memos'
+    statNum: '—', statLbl: 'position memos'
   },
   {
     key: 'redflag', icon: '⚑', tint: '#b3402f', soft: '#fbe7e2',
-    title: 'Red-Flag Detection', badge: '2 med', badgeCls: 'warn',
+    title: 'Red-Flag Detection', badge: 'Alerts', badgeCls: 'warn',
     desc: 'Surface undisclosed accounts, inflated claims & inconsistent sworn statements.',
-    statNum: '3', statLbl: 'open flags'
+    statNum: '—', statLbl: 'flags'
   }
 ];
 
 const ACTIVITY = [
-  { who: 'You', txt: 'uploaded <b>Checking ••4521</b> — transactions imported', time: '18m ago' },
-  { who: 'Veritas', txt: 'flagged <b>Investment acct ••7834</b> as not on inventory', time: '1h ago' },
-  { who: 'Veritas', txt: 'surfaced income discrepancy in <b>Paystub summary</b>', time: '2h ago' },
-  { who: 'You', txt: 'completed <b>Spousal Support calculation</b>', time: '4h ago' },
-  { who: 'Veritas', txt: 'traced property through <b>residence purchase</b>', time: 'Yesterday' },
-  { who: 'You', txt: 'generated <b>Child Support Worksheet</b>', time: '2 days ago' }
+  { who: 'You', txt: 'uploaded <b>Financial document</b> — transactions imported', time: '18m ago' },
+  { who: 'Veritas', txt: 'flagged <b>Account</b> as not on inventory', time: '1h ago' },
+  { who: 'Veritas', txt: 'surfaced discrepancy in <b>Income documentation</b>', time: '2h ago' },
+  { who: 'You', txt: 'completed <b>Support calculation</b>', time: '4h ago' },
+  { who: 'Veritas', txt: 'traced property through <b>transaction history</b>', time: 'Yesterday' },
+  { who: 'You', txt: 'generated <b>Worksheet</b>', time: '2 days ago' }
 ];
 
 const FLAGS = [
   {
     sev: 'med',
-    title: 'Investment income omitted from disclosure',
-    body: 'Investment account ••7834 shows $18,200 annual income but is not listed on the financial inventory.',
-    ref: 'Sample Case · Memo 01'
+    title: 'Account omitted from disclosure',
+    body: 'Account shows annual income but is not listed on the financial inventory.',
+    ref: 'Matter · Document'
   },
   {
     sev: 'med',
-    title: 'Income variance in paystub series',
-    body: 'Petitioner\'s bonus ($32K) varies year-to-year; no documentation of recurring nature.',
-    ref: 'Discovery Intake · Paystubs'
+    title: 'Income variance in documentation',
+    body: 'Income varies year-to-year; no documentation of recurring nature.',
+    ref: 'Discovery Intake · Income'
   },
   {
     sev: 'low',
-    title: 'Childcare expense line-item mismatch',
-    body: 'Claimed childcare of $1,200/mo but receipts show average of $950/mo over same period.',
-    ref: 'AFI Discrepancy · Worksheet'
+    title: 'Expense line-item mismatch',
+    body: 'Claimed expense shows different amounts across documents.',
+    ref: 'AFI Analysis · Expenses'
   }
 ];
 
 const MISSING = [
   {
-    id: 'recent-stubs', priority: 'high', module: 'discovery', area: 'Discovery Intake',
-    doc: 'Recent paystubs (2026 YTD)',
-    why: 'Needed to establish current income run-rate. Last provided stub is May 2026.',
-    ask: 'Request current paystubs through month-end'
+    id: 'income-docs', priority: 'high', module: 'discovery', area: 'Discovery Intake',
+    doc: 'Current income documentation',
+    why: 'Needed to establish current income. Previous documentation is outdated.',
+    ask: 'Request recent income statements'
   },
   {
-    id: 'tax-return', priority: 'high', module: 'estate', area: 'Estate & Worksheets',
-    doc: '2025 Tax return',
-    why: 'Cross-check reported income and verify investment income claims.',
-    ask: 'RFP — 2025 personal tax return'
+    id: 'tax-docs', priority: 'high', module: 'estate', area: 'Estate & Worksheets',
+    doc: 'Tax return documentation',
+    why: 'Cross-check reported income and verify all income sources.',
+    ask: 'Request personal tax return'
   },
   {
-    id: 'investment-stmt', priority: 'med', module: 'forensic', area: 'Forensic Tracing',
-    doc: 'Investment account ••7834 — 2024 statements',
-    why: 'Establish pre-service date balances for date-of-service calculation.',
-    ask: 'Request 12-month historical statements'
+    id: 'account-stmts', priority: 'med', module: 'forensic', area: 'Forensic Tracing',
+    doc: 'Account statements',
+    why: 'Establish account balances for valuation calculation.',
+    ask: 'Request historical account statements'
   }
 ];
 
