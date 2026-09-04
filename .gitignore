@@ -7,3 +7,4 @@ uploads/
 *.sqlite
 *.db
 seed-data/*.local.json
+.claude/settings.json
