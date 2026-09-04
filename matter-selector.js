@@ -114,7 +114,7 @@ function showMatterDropdownFromSidebar() {
 
 async function loadMatters() {
   try {
-    const response = await fetch('/api/matters');
+    const response = await fetch('http://localhost:3000/api/matters');
     allMatters = await response.json();
 
     // Set first matter as default if none selected
