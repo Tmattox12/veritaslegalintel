@@ -201,7 +201,7 @@ async function handleSubmit(event) {
 
   // Build case data
   const caseData = {
-    name: caseName,
+    name: formData.get('caseName') || 'Untitled Case',
     caseNumber: formData.get('caseNumber') || null,
     state: formData.get('state'),
     county: formData.get('county'),
