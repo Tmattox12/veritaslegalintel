@@ -136,6 +136,18 @@ async function uploadFile(file, uploadId) {
     item.classList.remove('processing');
     item.classList.add('complete');
 
+    // Store extracted data for case intake form
+    if (result.extracted) {
+      const bankStatementsData = {
+        incomeItems: result.extracted.incomeItems || [],
+        flags: result.extracted.flags || [],
+        transactions: result.extracted.transactions || [],
+        timestamp: new Date().toISOString(),
+      };
+      localStorage.setItem('bankStatementsData', JSON.stringify(bankStatementsData));
+      console.log('✓ Bank statement data saved for case intake');
+    }
+
     // Reload document list
     loadUploadedDocuments();
   } catch (error) {

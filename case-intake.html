@@ -530,6 +530,41 @@
           </div>
         </div>
 
+        <!-- Discovery Summary -->
+        <div class="form-section">
+          <div class="section-header">
+            <span>📊</span>
+            <h2>Summary from Discovery Documents</h2>
+          </div>
+          <div>
+            <div class="form-grid">
+              <div class="form-group">
+                <label>Petitioner Annual Income (from documents)</label>
+                <input type="text" id="summaryPetitionerIncome" placeholder="$0" readonly style="background: var(--bg);" />
+                <div class="form-help">Extracted from bank statements</div>
+              </div>
+              <div class="form-group">
+                <label>Respondent Annual Income (from documents)</label>
+                <input type="text" id="summaryRespondentIncome" placeholder="$0" readonly style="background: var(--bg);" />
+                <div class="form-help">Extracted from bank statements</div>
+              </div>
+              <div class="form-group">
+                <label>Identified Assets</label>
+                <input type="text" id="summaryAssets" placeholder="None identified yet" readonly style="background: var(--bg);" />
+                <div class="form-help">From uploaded documents</div>
+              </div>
+              <div class="form-group">
+                <label>Identified Liabilities</label>
+                <input type="text" id="summaryLiabilities" placeholder="None identified yet" readonly style="background: var(--bg);" />
+                <div class="form-help">From uploaded documents</div>
+              </div>
+            </div>
+            <div style="margin-top: 20px; padding: 16px; background: #e8f3ff; border-left: 3px solid var(--navy-600); border-radius: 4px; font-size: 12px; color: var(--navy-700);">
+              💡 <strong>Tip:</strong> Upload bank statements and financial documents to <a href="discovery-intake.html" style="color: var(--navy-700); font-weight: 600; text-decoration: underline;">Document Intake</a> to auto-populate income and asset information here.
+            </div>
+          </div>
+        </div>
+
         <!-- Notes -->
         <div class="form-section">
           <div class="section-title"><span>📝</span> Additional Information</div>

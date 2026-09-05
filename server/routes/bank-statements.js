@@ -174,7 +174,7 @@ router.post('/:matterId/upload', upload.single('file'), async (req, res) => {
     // Insert all flags
     await insertFlags(req.db, flagList);
 
-    // Return summary
+    // Return summary with extracted data
     res.json({
       success: true,
       statementId,
@@ -187,6 +187,11 @@ router.post('/:matterId/upload', upload.single('file'), async (req, res) => {
         transactionCount: parsed.transactions.length,
         incomeItemsCreated: incomeItemIds.length,
         flagsRaised: flagList.length,
+      },
+      extracted: {
+        incomeItems: incomeList,
+        flags: flagList,
+        transactions: parsed.transactions,
       },
     });
   } catch (error) {

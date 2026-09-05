@@ -228,5 +228,57 @@ function handleSubmit(event) {
   }, 1500);
 }
 
+function loadDiscoverySummary() {
+  // Check if there's extracted data from discovery documents
+  const bankStatements = localStorage.getItem('bankStatementsData');
+
+  if (bankStatements) {
+    try {
+      const data = JSON.parse(bankStatements);
+
+      // Extract income info
+      if (data.incomeItems) {
+        const petitionerIncome = data.incomeItems
+          .filter(item => item.party === 'paying_spouse')
+          .reduce((sum, item) => sum + (parseFloat(item.amount) || 0), 0);
+
+        const respondentIncome = data.incomeItems
+          .filter(item => item.party === 'supported_spouse')
+          .reduce((sum, item) => sum + (parseFloat(item.amount) || 0), 0);
+
+        if (petitionerIncome > 0) {
+          document.getElementById('summaryPetitionerIncome').value = '$' + petitionerIncome.toLocaleString('en-US', {maximumFractionDigits: 0});
+          // Also populate the main income field if empty
+          if (!document.getElementById('petitionerIncome').value) {
+            document.getElementById('petitionerIncome').value = petitionerIncome;
+          }
+        }
+
+        if (respondentIncome > 0) {
+          document.getElementById('summaryRespondentIncome').value = '$' + respondentIncome.toLocaleString('en-US', {maximumFractionDigits: 0});
+          if (!document.getElementById('respondentIncome').value) {
+            document.getElementById('respondentIncome').value = respondentIncome;
+          }
+        }
+      }
+
+      // Extract flags info (assets, suspicious activity, etc.)
+      if (data.flags && data.flags.length > 0) {
+        const assetFlags = data.flags.filter(f => f.rule_type === 'undisclosed_account' || f.rule_type === 'large_transfer');
+        if (assetFlags.length > 0) {
+          document.getElementById('summaryAssets').value = assetFlags.length + ' account(s) identified';
+        }
+      }
+
+      console.log('✓ Discovery summary loaded');
+    } catch (e) {
+      console.error('Error loading discovery summary:', e);
+    }
+  }
+}
+
 // Load draft on page load
-window.addEventListener('DOMContentLoaded', loadDraft);
+window.addEventListener('DOMContentLoaded', function() {
+  loadDraft();
+  loadDiscoverySummary();
+});
