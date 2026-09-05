@@ -181,6 +181,30 @@ app.delete('/api/documents/:id', (req, res) => {
   );
 });
 
+// Admin reset endpoint (development only)
+app.post('/api/admin/reset', (req, res) => {
+  const fs = require('fs');
+
+  try {
+    // Delete all database records
+    req.db.run('DELETE FROM users');
+    req.db.run('DELETE FROM matters');
+    req.db.run('DELETE FROM documents');
+
+    // Delete uploads directory
+    const uploadsDir = path.join(__dirname, '../uploads');
+    if (fs.existsSync(uploadsDir)) {
+      fs.rmSync(uploadsDir, { recursive: true, force: true });
+    }
+
+    console.log('✓ Backend reset complete');
+    res.json({ success: true, message: 'Template reset successfully' });
+  } catch (error) {
+    console.error('Reset error:', error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
 // Initialize database and start server
 initializeDatabase()
   .then(() => {

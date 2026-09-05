@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Reset — Veritas</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      background: #f5f7fa;
+      color: #1a1a1a;
+      padding: 40px 20px;
+    }
+
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .card {
+      background: white;
+      border-radius: 12px;
+      padding: 40px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+    h1 {
+      font-size: 28px;
+      margin-bottom: 8px;
+      color: #1c3f66;
+    }
+
+    .subtitle {
+      color: #666;
+      margin-bottom: 32px;
+      font-size: 14px;
+    }
+
+    .warning-box {
+      background: #fff3cd;
+      border-left: 4px solid #ff9800;
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 24px;
+      font-size: 14px;
+      line-height: 1.6;
+    }
+
+    .warning-box strong {
+      display: block;
+      margin-bottom: 8px;
+      color: #cc7a00;
+    }
+
+    .details {
+      background: #f9f9f9;
+      padding: 16px;
+      border-radius: 8px;
+      margin-bottom: 24px;
+      font-size: 13px;
+      color: #666;
+      line-height: 1.8;
+    }
+
+    .details strong {
+      display: block;
+      margin-top: 12px;
+      margin-bottom: 4px;
+      color: #333;
+    }
+
+    .details strong:first-child {
+      margin-top: 0;
+    }
+
+    button {
+      background: #d32f2f;
+      color: white;
+      border: none;
+      padding: 12px 32px;
+      border-radius: 8px;
+      font-size: 16px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+      width: 100%;
+    }
+
+    button:hover {
+      background: #b71c1c;
+    }
+
+    button:active {
+      transform: scale(0.98);
+    }
+
+    .back-link {
+      display: inline-block;
+      margin-top: 24px;
+      color: #1c3f66;
+      text-decoration: none;
+      font-size: 14px;
+    }
+
+    .back-link:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="card">
+      <h1>🗑️ Reset Template</h1>
+      <p class="subtitle">Clean slate for a new client</p>
+
+      <div class="warning-box">
+        <strong>⚠️ WARNING: This action cannot be undone</strong>
+        This will permanently delete all case data, documents, uploads, and database records.
+      </div>
+
+      <div class="details">
+        <strong>This will remove:</strong>
+        ✗ All case intake data and drafts<br>
+        ✗ All uploaded documents and PDFs<br>
+        ✗ All bank statement extractions<br>
+        ✗ All matters and client information<br>
+        ✗ All processing and analysis data<br>
+        <br>
+        The template will be ready for the next client.
+      </div>
+
+      <button onclick="resetTemplate()">
+        Reset Template & Start Over
+      </button>
+
+      <a href="/" class="back-link">← Back to Dashboard</a>
+    </div>
+  </div>
+
+  <script src="reset-template.js"></script>
+</body>
+</html>
