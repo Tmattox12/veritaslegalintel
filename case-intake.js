@@ -64,17 +64,17 @@ function resetForm() {
 function saveDraft() {
   const formData = {
     caseNumber: document.getElementById('caseNumber').value,
+    county: document.getElementById('county').value,
+    state: document.getElementById('state').value,
     petitioner: {
       name: document.getElementById('petitioner').value,
+      dob: document.getElementById('petitionerDOB').value,
       age: document.getElementById('petitionerAge').value,
-      income: document.getElementById('petitionerIncome').value,
-      employment: document.getElementById('petitionerEmployment').value,
     },
     respondent: {
       name: document.getElementById('respondent').value,
+      dob: document.getElementById('respondentDOB').value,
       age: document.getElementById('respondentAge').value,
-      income: document.getElementById('respondentIncome').value,
-      employment: document.getElementById('respondentEmployment').value,
     },
     marriage: {
       date: document.getElementById('marriageDate').value,
@@ -88,12 +88,6 @@ function saveDraft() {
     custody: Array.from(document.querySelectorAll('input[name="custody"]:checked')).map(x => x.value),
     childSupport: document.getElementById('childSupport').value,
     alimony: document.getElementById('alimony').value,
-    assets: {
-      estimated: document.getElementById('estimatedEstate').value,
-    },
-    liabilities: {
-      estimated: document.getElementById('estimatedDebt').value,
-    },
     notes: document.getElementById('notes').value,
     timestamp: new Date().toISOString(),
   };
@@ -129,17 +123,16 @@ function loadDraft() {
 
       // Fill in basic fields
       if (data.caseNumber) document.getElementById('caseNumber').value = data.caseNumber;
+      if (data.county) document.getElementById('county').value = data.county;
+      if (data.state) document.getElementById('state').value = data.state;
+
       if (data.petitioner) {
         if (data.petitioner.name) document.getElementById('petitioner').value = data.petitioner.name;
-        if (data.petitioner.age) document.getElementById('petitionerAge').value = data.petitioner.age;
-        if (data.petitioner.income) document.getElementById('petitionerIncome').value = data.petitioner.income;
-        if (data.petitioner.employment) document.getElementById('petitionerEmployment').value = data.petitioner.employment;
+        if (data.petitioner.dob) document.getElementById('petitionerDOB').value = data.petitioner.dob;
       }
       if (data.respondent) {
         if (data.respondent.name) document.getElementById('respondent').value = data.respondent.name;
-        if (data.respondent.age) document.getElementById('respondentAge').value = data.respondent.age;
-        if (data.respondent.income) document.getElementById('respondentIncome').value = data.respondent.income;
-        if (data.respondent.employment) document.getElementById('respondentEmployment').value = data.respondent.employment;
+        if (data.respondent.dob) document.getElementById('respondentDOB').value = data.respondent.dob;
       }
       if (data.marriage) {
         if (data.marriage.date) document.getElementById('marriageDate').value = data.marriage.date;
@@ -157,8 +150,6 @@ function loadDraft() {
 
       if (data.childSupport) document.getElementById('childSupport').value = data.childSupport;
       if (data.alimony) document.getElementById('alimony').value = data.alimony;
-      if (data.assets && data.assets.estimated) document.getElementById('estimatedEstate').value = data.assets.estimated;
-      if (data.liabilities && data.liabilities.estimated) document.getElementById('estimatedDebt').value = data.liabilities.estimated;
       if (data.notes) document.getElementById('notes').value = data.notes;
 
       // Restore children
@@ -184,17 +175,17 @@ function handleSubmit(event) {
 
   const formData = {
     caseNumber: document.getElementById('caseNumber').value,
+    county: document.getElementById('county').value,
+    state: document.getElementById('state').value,
     petitioner: {
       name: document.getElementById('petitioner').value,
+      dob: document.getElementById('petitionerDOB').value,
       age: document.getElementById('petitionerAge').value,
-      income: document.getElementById('petitionerIncome').value,
-      employment: document.getElementById('petitionerEmployment').value,
     },
     respondent: {
       name: document.getElementById('respondent').value,
+      dob: document.getElementById('respondentDOB').value,
       age: document.getElementById('respondentAge').value,
-      income: document.getElementById('respondentIncome').value,
-      employment: document.getElementById('respondentEmployment').value,
     },
     marriage: {
       date: document.getElementById('marriageDate').value,
@@ -208,12 +199,6 @@ function handleSubmit(event) {
     custody: Array.from(document.querySelectorAll('input[name="custody"]:checked')).map(x => x.value),
     childSupport: document.getElementById('childSupport').value,
     alimony: document.getElementById('alimony').value,
-    assets: {
-      estimated: document.getElementById('estimatedEstate').value,
-    },
-    liabilities: {
-      estimated: document.getElementById('estimatedDebt').value,
-    },
     notes: document.getElementById('notes').value,
   };
 
@@ -236,7 +221,7 @@ function loadDiscoverySummary() {
     try {
       const data = JSON.parse(bankStatements);
 
-      // Extract income info
+      // Extract income info and populate summary
       if (data.incomeItems) {
         const petitionerIncome = data.incomeItems
           .filter(item => item.party === 'paying_spouse')
@@ -248,17 +233,10 @@ function loadDiscoverySummary() {
 
         if (petitionerIncome > 0) {
           document.getElementById('summaryPetitionerIncome').value = '$' + petitionerIncome.toLocaleString('en-US', {maximumFractionDigits: 0});
-          // Also populate the main income field if empty
-          if (!document.getElementById('petitionerIncome').value) {
-            document.getElementById('petitionerIncome').value = petitionerIncome;
-          }
         }
 
         if (respondentIncome > 0) {
           document.getElementById('summaryRespondentIncome').value = '$' + respondentIncome.toLocaleString('en-US', {maximumFractionDigits: 0});
-          if (!document.getElementById('respondentIncome').value) {
-            document.getElementById('respondentIncome').value = respondentIncome;
-          }
         }
       }
 
@@ -277,8 +255,69 @@ function loadDiscoverySummary() {
   }
 }
 
-// Load draft on page load
-window.addEventListener('DOMContentLoaded', function() {
+function setupCalculations() {
+  // Marriage length calculation
+  document.getElementById('marriageDate')?.addEventListener('change', calculateMarriageLength);
+  document.getElementById('separationDate')?.addEventListener('change', calculateMarriageLength);
+
+  // Age calculations
+  document.getElementById('petitionerDOB')?.addEventListener('change', () => calculateAge('petitioner'));
+  document.getElementById('respondentDOB')?.addEventListener('change', () => calculateAge('respondent'));
+}
+
+function calculateMarriageLength() {
+  const marriageDate = document.getElementById('marriageDate')?.value;
+  const separationDate = document.getElementById('separationDate')?.value;
+  const marriageLengthField = document.getElementById('marriageLength');
+
+  if (!marriageDate) return;
+
+  const marriage = new Date(marriageDate);
+  const separation = separationDate ? new Date(separationDate) : new Date();
+
+  if (marriage > separation) {
+    marriageLengthField.value = '';
+    return;
+  }
+
+  const years = (separation - marriage) / (1000 * 60 * 60 * 24 * 365.25);
+  marriageLengthField.value = years.toFixed(1);
+}
+
+function calculateAge(party) {
+  const dobFieldId = party === 'petitioner' ? 'petitionerDOB' : 'respondentDOB';
+  const ageFieldId = party === 'petitioner' ? 'petitionerAge' : 'respondentAge';
+
+  const dobField = document.getElementById(dobFieldId);
+  const ageField = document.getElementById(ageFieldId);
+
+  if (!dobField?.value) {
+    ageField.value = '';
+    return;
+  }
+
+  const dob = new Date(dobField.value);
+  const today = new Date();
+  let age = today.getFullYear() - dob.getFullYear();
+  const monthDiff = today.getMonth() - dob.getMonth();
+
+  if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < dob.getDate())) {
+    age--;
+  }
+
+  ageField.value = age;
+}
+
+// Listen for calculation updates on page load
+document.addEventListener('DOMContentLoaded', function() {
+  setupCalculations();
   loadDraft();
   loadDiscoverySummary();
+
+  // Trigger calculations after everything loads
+  setTimeout(() => {
+    calculateMarriageLength();
+    calculateAge('petitioner');
+    calculateAge('respondent');
+  }, 100);
 });

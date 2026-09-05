@@ -327,8 +327,14 @@
               <input type="text" id="petitioner" name="petitioner" placeholder="Full name" required />
             </div>
             <div class="form-group">
-              <label for="petitionerAge">Petitioner Age *</label>
-              <input type="number" id="petitionerAge" name="petitionerAge" min="18" max="120" placeholder="Age" required />            </div>
+              <label for="petitionerDOB">Date of Birth</label>
+              <input type="date" id="petitionerDOB" name="petitionerDOB" />
+              <div class="form-help">Age calculated automatically</div>
+            </div>
+            <div class="form-group">
+              <label for="petitionerAge">Age</label>
+              <input type="number" id="petitionerAge" name="petitionerAge" min="18" max="120" placeholder="Auto-calculated" readonly style="background: var(--bg);" />
+            </div>
           </div>
 
           <div class="form-row">
@@ -337,8 +343,14 @@
               <input type="text" id="respondent" name="respondent" placeholder="Full name" required />
             </div>
             <div class="form-group">
-              <label for="respondentAge">Respondent Age *</label>
-              <input type="number" id="respondentAge" name="respondentAge" min="18" max="120" placeholder="Age" required />            </div>
+              <label for="respondentDOB">Date of Birth</label>
+              <input type="date" id="respondentDOB" name="respondentDOB" />
+              <div class="form-help">Age calculated automatically</div>
+            </div>
+            <div class="form-group">
+              <label for="respondentAge">Age</label>
+              <input type="number" id="respondentAge" name="respondentAge" min="18" max="120" placeholder="Auto-calculated" readonly style="background: var(--bg);" />
+            </div>
           </div>
         </div>
         </div>
@@ -469,64 +481,6 @@
             <div class="form-group">
               <label for="separateProperty">Separate Property Claims</label>
               <textarea id="separateProperty" name="separateProperty" placeholder="e.g., Inheritance, gifts, property brought into marriage..."></textarea>            </div>
-          </div>
-        </div>
-
-        <!-- Income Information -->
-        <div class="form-section">
-          <div class="section-title"><span>💰</span> Income (Summary)</div>
-          <div>
-          <div class="form-help" style="margin-bottom: 16px;">Details will be entered in the modules. This is for quick reference.</div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label for="petitionerIncome">Petitioner Annual Income (Estimated) *</label>
-              <input type="number" id="petitionerIncome" name="petitionerIncome" min="0" step="1" placeholder="$0" required />
-            </div>
-            <div class="form-group">
-              <label for="respondentIncome">Respondent Annual Income (Estimated) *</label>
-              <input type="number" id="respondentIncome" name="respondentIncome" min="0" step="1" placeholder="$0" required />            </div>
-          </div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label for="petitionerEmployment">Petitioner Employment Status</label>
-              <select id="petitionerEmployment" name="petitionerEmployment">
-                <option value="">Select...</option>
-                <option value="w2-employed">W-2 Employed</option>
-                <option value="self-employed">Self-Employed</option>
-                <option value="business-owner">Business Owner</option>
-                <option value="unemployed">Unemployed</option>
-                <option value="retired">Retired</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label for="respondentEmployment">Respondent Employment Status</label>
-              <select id="respondentEmployment" name="respondentEmployment">
-                <option value="">Select...</option>
-                <option value="w2-employed">W-2 Employed</option>
-                <option value="self-employed">Self-Employed</option>
-                <option value="business-owner">Business Owner</option>
-                <option value="unemployed">Unemployed</option>
-                <option value="retired">Retired</option>              </select>
-            </div>
-          </div>
-        </div>
-
-        <!-- Assets (Summary) -->
-        <div class="form-section">
-          <div class="section-title"><span>💎</span> Assets (Summary)</div>
-          <div>
-          <div class="form-help" style="margin-bottom: 16px;">Detailed asset valuation happens in Equitable Distribution module.</div>
-
-          <div class="form-row">
-            <div class="form-group">
-              <label for="estimatedEstate">Estimated Total Estate Value</label>
-              <input type="number" id="estimatedEstate" name="estimatedEstate" min="0" step="1" placeholder="$0" />
-            </div>
-            <div class="form-group">
-              <label for="estimatedDebt">Estimated Total Liabilities</label>
-              <input type="number" id="estimatedDebt" name="estimatedDebt" min="0" step="1" placeholder="$0" />            </div>
           </div>
         </div>
 
