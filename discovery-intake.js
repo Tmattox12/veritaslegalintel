@@ -64,10 +64,106 @@ async function handleFileSelection(files) {
     }
 
     const uploadId = 'upload-' + Date.now() + '-' + Math.random();
+
+    // Check for duplicates before creating upload item
+    const isDuplicate = await checkForDuplicate(file);
+    if (isDuplicate) {
+      window.pendingFile = file;
+      window.pendingUploadId = uploadId;
+      showDuplicateWarning(file, uploadId, queue);
+      return; // Stop and wait for user decision
+    }
+
     const uploadItem = createUploadItem(uploadId, file.name);
     queue.appendChild(uploadItem);
-
     uploadFile(file, uploadId);
+  }
+}
+
+async function checkForDuplicate(file) {
+  if (!currentMatterId) return false;
+
+  try {
+    // Calculate file hash
+    const hash = await calculateFileHash(file);
+
+    // Get existing documents
+    const response = await fetch(`/api/matters/${currentMatterId}/documents`);
+    const documents = await response.json();
+
+    // Check for matching filename or hash
+    const duplicate = documents.find(doc =>
+      doc.filename === file.name || doc.file_hash === hash
+    );
+
+    return duplicate ? { ...duplicate, hash } : null;
+  } catch (error) {
+    console.error('Error checking duplicates:', error);
+    return false;
+  }
+}
+
+async function calculateFileHash(file) {
+  const buffer = await file.arrayBuffer();
+  const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+function showDuplicateWarning(file, uploadId, queue) {
+  // Create modal for duplicate warning
+  const modal = document.createElement('div');
+  modal.className = 'duplicate-modal';
+  modal.style.cssText = `
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0,0,0,0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+  `;
+
+  modal.innerHTML = `
+    <div style="background: white; border-radius: 12px; padding: 32px; max-width: 500px; box-shadow: 0 20px 60px rgba(0,0,0,0.3);">
+      <h2 style="margin: 0 0 12px 0; color: #1a1a1a;">📄 Duplicate Document</h2>
+      <p style="color: #666; margin: 0 0 20px 0;">
+        <strong>${file.name}</strong> appears to already be in this case.
+      </p>
+      <p style="color: #999; font-size: 13px; margin: 0 0 24px 0;">
+        What would you like to do?
+      </p>
+      <div style="display: flex; gap: 12px;">
+        <button onclick="this.closest('.duplicate-modal').remove()" style="flex: 1; padding: 10px; border: 1px solid #ddd; border-radius: 8px; background: white; color: #666; cursor: pointer; font-weight: 600;">
+          Ignore
+        </button>
+        <button onclick="window.uploadDuplicate('${uploadId}', false); this.closest('.duplicate-modal').remove()" style="flex: 1; padding: 10px; border: 1px solid #1c3f66; border-radius: 8px; background: white; color: #1c3f66; cursor: pointer; font-weight: 600;">
+          Upload Anyway
+        </button>
+        <button onclick="window.uploadDuplicate('${uploadId}', true); this.closest('.duplicate-modal').remove()" style="flex: 1; padding: 10px; border: none; border-radius: 8px; background: #ff9800; color: white; cursor: pointer; font-weight: 600;">
+          Replace
+        </button>
+      </div>
+    </div>
+  `;
+
+  document.body.appendChild(modal);
+}
+
+// Store file for deferred upload
+window.pendingFile = null;
+window.pendingUploadId = null;
+
+window.uploadDuplicate = function(uploadId, replace) {
+  if (window.pendingFile) {
+    const uploadItem = createUploadItem(uploadId, window.pendingFile.name);
+    const queue = document.querySelector('.upload-queue') || createUploadQueue();
+    queue.appendChild(uploadItem);
+    uploadFile(window.pendingFile, uploadId, replace);
+    window.pendingFile = null;
   }
 }
 
@@ -93,7 +189,7 @@ function createUploadItem(id, filename) {
   return item;
 }
 
-async function uploadFile(file, uploadId) {
+async function uploadFile(file, uploadId, replace = false) {
   const item = document.getElementById(uploadId);
   const statusEl = item.querySelector('.upload-status');
   const barEl = item.querySelector('.upload-bar-fill');
@@ -102,6 +198,7 @@ async function uploadFile(file, uploadId) {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('userId', getCurrentUserId());
+    if (replace) formData.append('replace', 'true');
 
     // Simulate progress updates
     let progress = 10;
@@ -129,8 +226,9 @@ async function uploadFile(file, uploadId) {
 
     // Show success details
     const summary = result.summary;
+    const action = replace ? '🔄 Replaced' : '✅ Processed';
     statusEl.innerHTML = `
-      ✅ Processed: ${summary.transactionCount} transactions, ${summary.incomeItemsCreated} income items, ${summary.flagsRaised} flags detected
+      ${action}: ${summary.transactionCount} transactions, ${summary.incomeItemsCreated} income items, ${summary.flagsRaised} flags detected
     `;
 
     item.classList.remove('processing');
