@@ -245,7 +245,7 @@
           <div class="form-row full">
             <div class="form-group">
               <label for="caseName">Case Name *</label>
-              <input type="text" id="caseName" name="caseName" placeholder="e.g., Smith v. Smith" required />
+              <input type="text" id="caseName" name="caseName" placeholder="e.g., Smith v. Smith" />
               <div class="form-help">Usually Petitioner v. Respondent</div>
             </div>
           </div>
@@ -257,14 +257,14 @@
             </div>
             <div class="form-group">
               <label for="county">County *</label>
-              <input type="text" id="county" name="county" placeholder="e.g., Maricopa" required />
+              <input type="text" id="county" name="county" placeholder="e.g., Maricopa" />
             </div>
           </div>
 
           <div class="form-row">
             <div class="form-group">
               <label for="state">State *</label>
-              <select id="state" name="state" required onchange="updateStateInfo()">
+              <select id="state" name="state" onchange="updateStateInfo()">
                 <option value="">Select State...</option>
                 <option value="AZ">Arizona</option>
                 <option value="CA">California</option>
@@ -281,7 +281,7 @@
             </div>
             <div class="form-group">
               <label for="court">Court *</label>
-              <input type="text" id="court" name="court" placeholder="e.g., Superior Court" required />
+              <input type="text" id="court" name="court" placeholder="e.g., Superior Court" />
             </div>
           </div>
 
@@ -304,22 +304,22 @@
           <div class="form-row">
             <div class="form-group">
               <label for="petitioner">Petitioner Name *</label>
-              <input type="text" id="petitioner" name="petitioner" placeholder="Full name" required />
+              <input type="text" id="petitioner" name="petitioner" placeholder="Full name" />
             </div>
             <div class="form-group">
               <label for="petitionerAge">Petitioner Age *</label>
-              <input type="number" id="petitionerAge" name="petitionerAge" min="18" max="120" placeholder="Age" required />
+              <input type="number" id="petitionerAge" name="petitionerAge" min="18" max="120" placeholder="Age" />
             </div>
           </div>
 
           <div class="form-row">
             <div class="form-group">
               <label for="respondent">Respondent Name *</label>
-              <input type="text" id="respondent" name="respondent" placeholder="Full name" required />
+              <input type="text" id="respondent" name="respondent" placeholder="Full name" />
             </div>
             <div class="form-group">
               <label for="respondentAge">Respondent Age *</label>
-              <input type="number" id="respondentAge" name="respondentAge" min="18" max="120" placeholder="Age" required />
+              <input type="number" id="respondentAge" name="respondentAge" min="18" max="120" placeholder="Age" />
             </div>
           </div>
         </div>
@@ -331,7 +331,7 @@
           <div class="form-row">
             <div class="form-group">
               <label for="marriageLength">Marriage Length (Years) *</label>
-              <input type="number" id="marriageLength" name="marriageLength" min="0" step="0.1" placeholder="e.g., 21" required />
+              <input type="number" id="marriageLength" name="marriageLength" min="0" step="0.1" placeholder="e.g., 21" />
               <div class="form-help">Used for spousal maintenance duration/amount calculations</div>
             </div>
             <div class="form-group">
@@ -347,7 +347,7 @@
             </div>
             <div class="form-group">
               <label for="yearsInState">Years Lived in Current State *</label>
-              <input type="number" id="yearsInState" name="yearsInState" min="0" step="0.1" placeholder="e.g., 15" required />
+              <input type="number" id="yearsInState" name="yearsInState" min="0" step="0.1" placeholder="e.g., 15" />
               <div class="form-help">Determines jurisdiction and community property rules</div>
             </div>
           </div>
@@ -375,7 +375,7 @@
 
           <div class="form-group">
             <label for="childrenCount">Number of Children *</label>
-            <input type="number" id="childrenCount" name="childrenCount" min="0" max="10" placeholder="0" required onchange="updateChildrenFields()" />
+            <input type="number" id="childrenCount" name="childrenCount" min="0" max="10" placeholder="0" onchange="updateChildrenFields()" />
             <div class="form-help">Used for child support calculations</div>
           </div>
 
@@ -487,11 +487,11 @@
           <div class="form-row">
             <div class="form-group">
               <label for="petitionerIncome">Petitioner Annual Income (Estimated) *</label>
-              <input type="number" id="petitionerIncome" name="petitionerIncome" min="0" step="1" placeholder="$0" required />
+              <input type="number" id="petitionerIncome" name="petitionerIncome" min="0" step="1" placeholder="$0" />
             </div>
             <div class="form-group">
               <label for="respondentIncome">Respondent Annual Income (Estimated) *</label>
-              <input type="number" id="respondentIncome" name="respondentIncome" min="0" step="1" placeholder="$0" required />
+              <input type="number" id="respondentIncome" name="respondentIncome" min="0" step="1" placeholder="$0" />
             </div>
           </div>
 
@@ -553,7 +553,8 @@
         <!-- Buttons -->
         <div class="button-group">
           <button type="button" class="btn btn-secondary" onclick="resetForm()">Clear</button>
-          <button type="submit" class="btn btn-primary">Create Case</button>
+          <button type="button" class="btn btn-secondary" onclick="saveDraft()" style="background: #e8f4ff; border: 1px solid #2e5b8a; color: #2e5b8a;">💾 Save Draft</button>
+          <button type="submit" class="btn btn-primary">✓ Create Case</button>
         </div>
 
       </form>

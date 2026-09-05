@@ -87,15 +87,102 @@ function resetForm() {
   document.getElementById('prenupDetails').style.display = 'none';
 }
 
+function saveDraft() {
+  // Collect form data without validation
+  const formData = new FormData(document.getElementById('intakeForm'));
+
+  // Collect children data
+  const children = [];
+  const childEntries = document.querySelectorAll('.child-entry');
+  childEntries.forEach((entry, index) => {
+    const name = document.getElementById(`childName${index}`)?.value;
+    const age = document.getElementById(`childAge${index}`)?.value;
+    const gender = document.getElementById(`childGender${index}`)?.value;
+    const birthDate = document.getElementById(`childBirthDate${index}`)?.value;
+
+    if (age) {
+      children.push({
+        name: name || `Child ${index + 1}`,
+        age: parseInt(age),
+        gender: gender || null,
+        birthDate: birthDate || null,
+      });
+    }
+  });
+
+  // Build case data from whatever is filled in
+  const caseName = formData.get('caseName') || 'Untitled Case';
+
+  const caseData = {
+    name: caseName,
+    caseNumber: formData.get('caseNumber') || null,
+    state: formData.get('state') || null,
+    county: formData.get('county') || null,
+    court: formData.get('court') || null,
+    judgeAssigned: formData.get('judgeAssigned') || null,
+    trialDate: formData.get('trialDate') || null,
+
+    petitioner: formData.get('petitioner') || null,
+    petitionerAge: parseInt(formData.get('petitionerAge')) || null,
+    respondent: formData.get('respondent') || null,
+    respondentAge: parseInt(formData.get('respondentAge')) || null,
+
+    marriageLength: parseFloat(formData.get('marriageLength')) || null,
+    marriageDate: formData.get('marriageDate') || null,
+    separationDate: formData.get('separationDate') || null,
+    yearsInState: parseFloat(formData.get('yearsInState')) || null,
+    petitionerPriorMarriage: formData.get('petitionerPrior') ? true : false,
+    respondentPriorMarriage: formData.get('respondentPrior') ? true : false,
+
+    children: children,
+    childrenCount: children.length,
+    custodyArrangement: Array.from(document.querySelectorAll('input[name="custody"]:checked')).map(x => x.value),
+    childSupportStatus: formData.get('childSupport') || null,
+    spousalMaintenanceStatus: formData.get('alimony') || null,
+
+    hasPrenup: formData.get('prenupExists') ? true : false,
+    prenupDetails: formData.get('prenupDetailsText') || null,
+    separatePropertyClaims: formData.get('separateProperty') || null,
+
+    petitionerAnnualIncome: parseFloat(formData.get('petitionerIncome')) || null,
+    respondentAnnualIncome: parseFloat(formData.get('respondentIncome')) || null,
+    petitionerEmploymentStatus: formData.get('petitionerEmployment') || null,
+    respondentEmploymentStatus: formData.get('respondentEmployment') || null,
+
+    estimatedEstateValue: parseFloat(formData.get('estimatedEstate')) || null,
+    estimatedLiabilities: parseFloat(formData.get('estimatedDebt')) || null,
+
+    notes: formData.get('notes') || null,
+    status: 'draft',
+    createdAt: new Date().toISOString(),
+  };
+
+  // Save to localStorage as draft
+  localStorage.setItem('currentCaseDraft', JSON.stringify(caseData));
+
+  // Show success message
+  const msg = document.createElement('div');
+  msg.style.cssText = `
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background: #e3f2ea;
+    border: 1px solid #2e7d32;
+    color: #2e7d32;
+    padding: 16px 24px;
+    border-radius: 8px;
+    z-index: 9999;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  `;
+  msg.textContent = '✓ Draft saved successfully!';
+  document.body.appendChild(msg);
+
+  setTimeout(() => msg.remove(), 3000);
+}
+
 async function handleSubmit(event) {
   event.preventDefault();
-
-  // Validate required fields
-  const caseName = document.getElementById('caseName')?.value;
-  if (!caseName) {
-    alert('Please enter a case name');
-    return;
-  }
 
   // Collect form data
   const formData = new FormData(document.getElementById('intakeForm'));
@@ -160,12 +247,13 @@ async function handleSubmit(event) {
     estimatedLiabilities: parseFloat(formData.get('estimatedDebt')) || 0,
 
     notes: formData.get('notes') || null,
-    status: 'intake-complete',
+    status: 'active',
     createdAt: new Date().toISOString(),
   };
 
   // Save to localStorage
   localStorage.setItem('currentCase', JSON.stringify(caseData));
+  localStorage.removeItem('currentCaseDraft'); // Clear draft when case is created
 
   // Show success message
   const successMsg = document.getElementById('successMessage');
