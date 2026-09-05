@@ -2,71 +2,62 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />  <title>Case Intake Form — Veritas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Case Intake Form — Veritas</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
-  <link rel="stylesheet" href="styles.css" />
   <style>
-    .main {
-      display: flex;
-      flex-direction: column;
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #f5f7fa;
+      color: #1c3f66;
+      line-height: 1.6;
+      padding: 20px;
     }
-
-    .topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 16px 24px;
-      background: white;
-      border-bottom: 1px solid var(--line);
-      position: sticky;
-      top: 0;
-      z-index: 50;
-    }
-
-    .topbar h1 {
-      font-size: 18px;
-      font-weight: 600;
-      color: var(--navy-900);
-    }
-
-    .content {
-      flex: 1;
-      padding: 24px;
-      overflow-y: auto;
-    }
-
     .intake-container {
-      max-width: 800px;
+      max-width: 900px;
       margin: 0 auto;
-    }
-    .intake-form {
-      padding: 0;
-    }
-    .form-section {
       background: white;
-      border: 1px solid var(--line);
-      border-radius: var(--radius);
-      margin-bottom: 20px;
+      border-radius: 12px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.08);
       overflow: hidden;
     }
-
-    .section-title {
-      background: var(--bg);
-      padding: 16px 20px;
-      border-bottom: 2px solid var(--navy-600);
-      font-size: 14px;
-      font-weight: 600;
-      color: var(--navy-900);
-      margin: 0;
-      display: flex;
-      align-items: center;
-      gap: 10px;
+    .intake-header {
+      background: linear-gradient(135deg, #1c3f66 0%, #2e5b8a 100%);
+      color: white;
+      padding: 40px;
+      text-align: center;
     }
-
-    .form-section > div:not(.section-title) {
-      padding: 20px;
+    .intake-header h1 {
+      font-family: 'Fraunces', serif;
+      font-size: 28px;
+      margin-bottom: 8px;
+    }
+    .intake-header p {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+    .intake-form {
+      padding: 40px;
+    }
+    .form-section {
+      margin-bottom: 40px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    .form-section:last-of-type {
+      border-bottom: none;
+    }
+    .section-title {
+      font-family: 'Fraunces', serif;
+      font-size: 18px;
+      font-weight: 600;
+      color: #2e5b8a;
+      margin-bottom: 20px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #b8893b;
     }
     .form-row {
       display: grid;
@@ -138,24 +129,9 @@
     }
     .checkbox-group {
       display: flex;
-      flex-direction: column;
-      gap: 10px;
-      margin-top: 12px;
-    }
-    .checkbox-group label {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      font-weight: 400;
-      color: var(--ink);
-      cursor: pointer;
-      margin: 0;
-    }
-    .checkbox-group input[type="checkbox"] {
-      width: 16px;
-      height: 16px;
-      cursor: pointer;
-      accent-color: var(--navy-600);
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-top: 8px;
     }
     .checkbox-item {
       display: flex;
@@ -245,31 +221,29 @@
   </style>
 </head>
 <body>
-  <script src="sidebar-loader.js"></script>
-
-  <main class="main">
-    <div class="topbar">
-      <h1>📋 Case Intake — New Matter</h1>
+  <div class="intake-container">
+    <div class="intake-header">
+      <h1>New Case Intake</h1>
+      <p>Comprehensive case information for family law financial analysis</p>
     </div>
 
-    <div class="content">
-      <div class="intake-container">
-        <div class="intake-form">
+    <div class="intake-form">
       <div class="success-message" id="successMessage">
         ✓ Case created successfully! Redirecting...
       </div>
 
       <form id="intakeForm" onsubmit="handleSubmit(event)">
+
         <!-- Case Information -->
         <div class="form-section">
-          <div class="section-title"><span>📑</span> Case Information</div>
-          <div>
+          <div class="section-title">Case Information</div>
 
           <div class="form-row full">
             <div class="form-group">
               <label for="caseName">Case Name *</label>
-              <input type="text" id="caseName" name="caseName" placeholder="e.g., [Party A] v. [Party B]" required />
-              <div class="form-help">Usually Petitioner v. Respondent</div>            </div>
+              <input type="text" id="caseName" name="caseName" placeholder="e.g., Smith v. Smith" required />
+              <div class="form-help">Usually Petitioner v. Respondent</div>
+            </div>
           </div>
 
           <div class="form-row">
@@ -279,7 +253,8 @@
             </div>
             <div class="form-group">
               <label for="county">County *</label>
-              <input type="text" id="county" name="county" placeholder="e.g., Maricopa" required />            </div>
+              <input type="text" id="county" name="county" placeholder="e.g., Maricopa" required />
+            </div>
           </div>
 
           <div class="form-row">
@@ -287,7 +262,7 @@
               <label for="state">State *</label>
               <select id="state" name="state" required onchange="updateStateInfo()">
                 <option value="">Select State...</option>
-                <option value="[State]">Arizona</option>
+                <option value="AZ">Arizona</option>
                 <option value="CA">California</option>
                 <option value="TX">Texas</option>
                 <option value="NY">New York</option>
@@ -296,12 +271,14 @@
                 <option value="CO">Colorado</option>
                 <option value="WA">Washington</option>
                 <option value="OR">Oregon</option>
-                <option value="NV">Nevada</option>              </select>
+                <option value="NV">Nevada</option>
+              </select>
               <div class="form-help">Determines applicable family law statutes</div>
             </div>
             <div class="form-group">
               <label for="court">Court *</label>
-              <input type="text" id="court" name="court" placeholder="e.g., Superior Court" required />            </div>
+              <input type="text" id="court" name="court" placeholder="e.g., Superior Court" required />
+            </div>
           </div>
 
           <div class="form-row">
@@ -311,15 +288,14 @@
             </div>
             <div class="form-group">
               <label for="trialDate">Trial Date (if scheduled)</label>
-              <input type="date" id="trialDate" name="trialDate" />            </div>
+              <input type="date" id="trialDate" name="trialDate" />
+            </div>
           </div>
-        </div>
         </div>
 
         <!-- Parties Information -->
         <div class="form-section">
-          <div class="section-title"><span>👥</span> Parties</div>
-          <div>
+          <div class="section-title">Parties</div>
 
           <div class="form-row">
             <div class="form-group">
@@ -327,13 +303,8 @@
               <input type="text" id="petitioner" name="petitioner" placeholder="Full name" required />
             </div>
             <div class="form-group">
-              <label for="petitionerDOB">Date of Birth</label>
-              <input type="date" id="petitionerDOB" name="petitionerDOB" />
-              <div class="form-help">Age calculated automatically</div>
-            </div>
-            <div class="form-group">
-              <label for="petitionerAge">Age</label>
-              <input type="number" id="petitionerAge" name="petitionerAge" min="18" max="120" placeholder="Auto-calculated" readonly style="background: var(--bg);" />
+              <label for="petitionerAge">Petitioner Age *</label>
+              <input type="number" id="petitionerAge" name="petitionerAge" min="18" max="120" placeholder="Age" required />
             </div>
           </div>
 
@@ -343,22 +314,15 @@
               <input type="text" id="respondent" name="respondent" placeholder="Full name" required />
             </div>
             <div class="form-group">
-              <label for="respondentDOB">Date of Birth</label>
-              <input type="date" id="respondentDOB" name="respondentDOB" />
-              <div class="form-help">Age calculated automatically</div>
-            </div>
-            <div class="form-group">
-              <label for="respondentAge">Age</label>
-              <input type="number" id="respondentAge" name="respondentAge" min="18" max="120" placeholder="Auto-calculated" readonly style="background: var(--bg);" />
+              <label for="respondentAge">Respondent Age *</label>
+              <input type="number" id="respondentAge" name="respondentAge" min="18" max="120" placeholder="Age" required />
             </div>
           </div>
-        </div>
         </div>
 
         <!-- Marriage Information -->
         <div class="form-section">
-          <div class="section-title"><span>💍</span> Marriage Information</div>
-          <div>
+          <div class="section-title">Marriage Information</div>
 
           <div class="form-row">
             <div class="form-group">
@@ -368,7 +332,8 @@
             </div>
             <div class="form-group">
               <label for="marriageDate">Marriage Date</label>
-              <input type="date" id="marriageDate" name="marriageDate" />            </div>
+              <input type="date" id="marriageDate" name="marriageDate" />
+            </div>
           </div>
 
           <div class="form-row">
@@ -378,7 +343,8 @@
             </div>
             <div class="form-group">
               <label for="yearsInState">Years Lived in Current State *</label>
-              <input type="number" id="yearsInState" name="yearsInState" min="0" step="0.1" placeholder="e.g., 15" required />              <div class="form-help">Determines jurisdiction and community property rules</div>
+              <input type="number" id="yearsInState" name="yearsInState" min="0" step="0.1" placeholder="e.g., 15" required />
+              <div class="form-help">Determines jurisdiction and community property rules</div>
             </div>
           </div>
 
@@ -392,7 +358,8 @@
                 </div>
                 <div class="checkbox-item">
                   <input type="checkbox" id="respondentPrior" name="respondentPrior" />
-                  <label for="respondentPrior">Respondent</label>                </div>
+                  <label for="respondentPrior">Respondent</label>
+                </div>
               </div>
             </div>
           </div>
@@ -400,8 +367,7 @@
 
         <!-- Children Information -->
         <div class="form-section">
-          <div class="section-title"><span>👶</span> Children</div>
-          <div>
+          <div class="section-title">Children</div>
 
           <div class="form-group">
             <label for="childrenCount">Number of Children *</label>
@@ -411,25 +377,26 @@
 
           <div id="childrenContainer"></div>
 
-          <button type="button" class="add-child-btn" onclick="addChildEntry()">+ Add Child</button>        </div>
+          <button type="button" class="add-child-btn" onclick="addChildEntry()">+ Add Child</button>
+        </div>
 
         <!-- Custody & Support -->
         <div class="form-section">
-          <div class="section-title"><span>⚖️</span> Custody & Support</div>
-          <div>
+          <div class="section-title">Custody & Support</div>
 
-          <div class="form-row full">
+          <div class="form-row">
             <div class="form-group">
-              <label>Custody Arrangement</label>
-              <div class="checkbox-group">
-                <label><input type="checkbox" name="custody" value="joint-legal" /> Joint Legal Custody</label>
-                <label><input type="checkbox" name="custody" value="joint-physical" /> Joint Physical Custody</label>
-                <label><input type="checkbox" name="custody" value="petitioner-legal" /> Petitioner Legal Custody</label>
-                <label><input type="checkbox" name="custody" value="respondent-legal" /> Respondent Legal Custody</label>
-                <label><input type="checkbox" name="custody" value="petitioner-physical" /> Petitioner Physical Custody</label>
-                <label><input type="checkbox" name="custody" value="respondent-physical" /> Respondent Physical Custody</label>
-                <label><input type="checkbox" name="custody" value="pending" /> Pending Decision</label>
-              </div>
+              <label for="custody">Custody Arrangement *</label>
+              <select id="custody" name="custody" required>
+                <option value="">Select...</option>
+                <option value="joint-legal">Joint Legal Custody</option>
+                <option value="joint-physical">Joint Physical Custody</option>
+                <option value="petitioner-legal">Petitioner Legal Custody</option>
+                <option value="respondent-legal">Respondent Legal Custody</option>
+                <option value="petitioner-physical">Petitioner Physical Custody</option>
+                <option value="respondent-physical">Respondent Physical Custody</option>
+                <option value="pending">Pending Decision</option>
+              </select>
             </div>
             <div class="form-group">
               <label for="childSupport">Child Support Status</label>
@@ -437,7 +404,8 @@
                 <option value="">Not Yet Determined</option>
                 <option value="agreed">Agreed (Consent Order)</option>
                 <option value="court-ordered">Court Ordered</option>
-                <option value="pending">Pending</option>              </select>
+                <option value="pending">Pending</option>
+              </select>
             </div>
           </div>
 
@@ -448,15 +416,15 @@
                 <option value="">Not Yet Determined</option>
                 <option value="agreed">Agreed (Consent Order)</option>
                 <option value="court-ordered">Court Ordered</option>
-                <option value="pending">Pending</option>              </select>
+                <option value="pending">Pending</option>
+              </select>
             </div>
           </div>
         </div>
 
         <!-- Pre-nup & Separate Property -->
         <div class="form-section">
-          <div class="section-title"><span>📜</span> Pre-nup & Separate Property</div>
-          <div>
+          <div class="section-title">Pre-nup & Separate Property</div>
 
           <div class="form-row">
             <div class="form-group">
@@ -464,7 +432,8 @@
               <div class="checkbox-group">
                 <div class="checkbox-item">
                   <input type="checkbox" id="prenupExists" name="prenupExists" onchange="updatePrenupFields()" />
-                  <label for="prenupExists">Yes, pre-nup exists</label>                </div>
+                  <label for="prenupExists">Yes, pre-nup exists</label>
+                </div>
               </div>
             </div>
           </div>
@@ -473,77 +442,99 @@
             <div class="form-row full">
               <div class="form-group">
                 <label for="prenupDetails">Pre-nup Details</label>
-                <textarea id="prenupDetailsText" name="prenupDetailsText" placeholder="Summary of key provisions..."></textarea>              </div>
+                <textarea id="prenupDetailsText" name="prenupDetailsText" placeholder="Summary of key provisions..."></textarea>
+              </div>
             </div>
           </div>
 
           <div class="form-row full">
             <div class="form-group">
               <label for="separateProperty">Separate Property Claims</label>
-              <textarea id="separateProperty" name="separateProperty" placeholder="e.g., Inheritance, gifts, property brought into marriage..."></textarea>            </div>
+              <textarea id="separateProperty" name="separateProperty" placeholder="e.g., Inheritance, gifts, property brought into marriage..."></textarea>
+            </div>
           </div>
         </div>
 
-        <!-- Discovery Summary -->
+        <!-- Income Information -->
         <div class="form-section">
-          <div class="section-header">
-            <span>📊</span>
-            <h2>Summary from Discovery Documents</h2>
-          </div>
-          <div>
-            <div class="form-grid">
-              <div class="form-group">
-                <label>Petitioner Annual Income (from documents)</label>
-                <input type="text" id="summaryPetitionerIncome" placeholder="$0" readonly style="background: var(--bg);" />
-                <div class="form-help">Extracted from bank statements</div>
-              </div>
-              <div class="form-group">
-                <label>Respondent Annual Income (from documents)</label>
-                <input type="text" id="summaryRespondentIncome" placeholder="$0" readonly style="background: var(--bg);" />
-                <div class="form-help">Extracted from bank statements</div>
-              </div>
-              <div class="form-group">
-                <label>Identified Assets</label>
-                <input type="text" id="summaryAssets" placeholder="None identified yet" readonly style="background: var(--bg);" />
-                <div class="form-help">From uploaded documents</div>
-              </div>
-              <div class="form-group">
-                <label>Identified Liabilities</label>
-                <input type="text" id="summaryLiabilities" placeholder="None identified yet" readonly style="background: var(--bg);" />
-                <div class="form-help">From uploaded documents</div>
-              </div>
+          <div class="section-title">Income (Summary)</div>
+          <div class="form-help" style="margin-bottom: 16px;">Details will be entered in the modules. This is for quick reference.</div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="petitionerIncome">Petitioner Annual Income (Estimated) *</label>
+              <input type="number" id="petitionerIncome" name="petitionerIncome" min="0" step="1" placeholder="$0" required />
             </div>
-            <div style="margin-top: 20px; padding: 16px; background: #e8f3ff; border-left: 3px solid var(--navy-600); border-radius: 4px; font-size: 12px; color: var(--navy-700);">
-              💡 <strong>Tip:</strong> Upload bank statements and financial documents to <a href="discovery-intake.html" style="color: var(--navy-700); font-weight: 600; text-decoration: underline;">Document Intake</a> to auto-populate income and asset information here.
+            <div class="form-group">
+              <label for="respondentIncome">Respondent Annual Income (Estimated) *</label>
+              <input type="number" id="respondentIncome" name="respondentIncome" min="0" step="1" placeholder="$0" required />
+            </div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="petitionerEmployment">Petitioner Employment Status</label>
+              <select id="petitionerEmployment" name="petitionerEmployment">
+                <option value="">Select...</option>
+                <option value="w2-employed">W-2 Employed</option>
+                <option value="self-employed">Self-Employed</option>
+                <option value="business-owner">Business Owner</option>
+                <option value="unemployed">Unemployed</option>
+                <option value="retired">Retired</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="respondentEmployment">Respondent Employment Status</label>
+              <select id="respondentEmployment" name="respondentEmployment">
+                <option value="">Select...</option>
+                <option value="w2-employed">W-2 Employed</option>
+                <option value="self-employed">Self-Employed</option>
+                <option value="business-owner">Business Owner</option>
+                <option value="unemployed">Unemployed</option>
+                <option value="retired">Retired</option>
+              </select>
+            </div>
+          </div>
+        </div>
+
+        <!-- Assets (Summary) -->
+        <div class="form-section">
+          <div class="section-title">Assets (Summary)</div>
+          <div class="form-help" style="margin-bottom: 16px;">Detailed asset valuation happens in Equitable Distribution module.</div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="estimatedEstate">Estimated Total Estate Value</label>
+              <input type="number" id="estimatedEstate" name="estimatedEstate" min="0" step="1" placeholder="$0" />
+            </div>
+            <div class="form-group">
+              <label for="estimatedDebt">Estimated Total Liabilities</label>
+              <input type="number" id="estimatedDebt" name="estimatedDebt" min="0" step="1" placeholder="$0" />
             </div>
           </div>
         </div>
 
         <!-- Notes -->
         <div class="form-section">
-          <div class="section-title"><span>📝</span> Additional Information</div>
-          <div>
+          <div class="section-title">Additional Information</div>
 
           <div class="form-row full">
             <div class="form-group">
               <label for="notes">Case Notes</label>
-              <textarea id="notes" name="notes" placeholder="Any relevant facts, disputes, or special circumstances..."></textarea>            </div>
+              <textarea id="notes" name="notes" placeholder="Any relevant facts, disputes, or special circumstances..."></textarea>
+            </div>
           </div>
-        </div>
         </div>
 
         <!-- Buttons -->
         <div class="button-group">
           <button type="button" class="btn btn-secondary" onclick="resetForm()">Clear</button>
-          <button type="button" class="btn btn-secondary" onclick="saveDraft()" style="background: #e8f3ff; color: var(--navy-700); border: 1px solid var(--navy-600);">💾 Save as Draft</button>
-          <button type="submit" class="btn btn-primary">✓ Create Case</button>
+          <button type="submit" class="btn btn-primary">Create Case</button>
         </div>
 
       </form>
-        </div>
-      </div>
     </div>
-  </main>
+  </div>
 
   <script src="api-client.js"></script>
   <script src="safe-text.js"></script>
