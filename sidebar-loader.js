@@ -20,10 +20,48 @@ document.addEventListener('DOMContentLoaded', async () => {
 
     // Setup Matters link to open dropdown
     setupSidebarMattersLink();
+
+    // Load case header (updates topbar with case name, county, state)
+    loadCaseHeader();
   } catch (error) {
     console.error('Error loading sidebar:', error);
   }
 });
+
+// Load and display current case on all pages
+function loadCaseHeader() {
+  const caseData = localStorage.getItem('currentCase');
+  if (!caseData) return;
+
+  try {
+    const currentCase = JSON.parse(caseData);
+    updateCaseHeader(currentCase);
+  } catch (e) {
+    console.error('Error loading case header:', e);
+  }
+}
+
+function updateCaseHeader(caseData) {
+  // Build case title
+  const petitioner = caseData.petitioner || '[Petitioner]';
+  const respondent = caseData.respondent || '[Respondent]';
+  const caseTitle = `${petitioner} v. ${respondent}`;
+
+  // Update page title
+  document.title = `${caseTitle} — Veritas`;
+
+  // Update topbar matter button
+  const matterBtn = document.querySelector('.matter-btn strong');
+  if (matterBtn) {
+    matterBtn.textContent = caseTitle;
+  }
+
+  // Update case number and county/state in topbar
+  const caseNo = document.querySelector('.matter-btn .case-no');
+  if (caseNo && caseData.caseNumber && caseData.county && caseData.state) {
+    caseNo.textContent = `No. ${caseData.caseNumber} · ${caseData.county}, ${caseData.state}`;
+  }
+}
 
 function setActiveNavItem() {
   // Get current page filename

@@ -25,16 +25,22 @@ function loadCurrentCase() {
 
 function updateCaseHeader(caseData) {
   // Update page title
-  const petitioner = caseData.petitioner.name || '[Petitioner]';
-  const respondent = caseData.respondent.name || '[Respondent]';
+  const petitioner = caseData.petitioner || '[Petitioner]';
+  const respondent = caseData.respondent || '[Respondent]';
   const caseTitle = `${petitioner} v. ${respondent}`;
 
   document.title = `${caseTitle} — Veritas`;
 
-  // Update topbar if it exists
-  const topbar = document.querySelector('.topbar h1');
-  if (topbar) {
-    topbar.textContent = caseTitle;
+  // Update topbar matter button
+  const matterBtn = document.querySelector('.matter-btn strong');
+  if (matterBtn) {
+    matterBtn.textContent = caseTitle;
+  }
+
+  // Update case number and county/state in topbar
+  const caseNo = document.querySelector('.matter-btn .case-no');
+  if (caseNo && caseData.caseNumber && caseData.county && caseData.state) {
+    caseNo.textContent = `No. ${caseData.caseNumber} · ${caseData.county}, ${caseData.state}`;
   }
 
   // Update any element with id="caseName"
