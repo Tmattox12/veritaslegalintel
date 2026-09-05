@@ -173,17 +173,25 @@ function loadDraft() {
 function handleSubmit(event) {
   event.preventDefault();
 
+  const petitionerName = document.getElementById('petitioner').value;
+  const respondentName = document.getElementById('respondent').value;
+
+  if (!petitionerName || !respondentName) {
+    alert('Please enter names for both petitioner and respondent');
+    return;
+  }
+
   const formData = {
     caseNumber: document.getElementById('caseNumber').value,
     county: document.getElementById('county').value,
     state: document.getElementById('state').value,
     petitioner: {
-      name: document.getElementById('petitioner').value,
+      name: petitionerName,
       dob: document.getElementById('petitionerDOB').value,
       age: document.getElementById('petitionerAge').value,
     },
     respondent: {
-      name: document.getElementById('respondent').value,
+      name: respondentName,
       dob: document.getElementById('respondentDOB').value,
       age: document.getElementById('respondentAge').value,
     },
@@ -200,9 +208,10 @@ function handleSubmit(event) {
     childSupport: document.getElementById('childSupport').value,
     alimony: document.getElementById('alimony').value,
     notes: document.getElementById('notes').value,
+    createdAt: new Date().toISOString(),
   };
 
-  localStorage.setItem('caseIntake', JSON.stringify(formData));
+  localStorage.setItem('currentCase', JSON.stringify(formData));
   localStorage.removeItem('caseIntakeDraft'); // Clear draft after creating case
 
   const successMsg = document.getElementById('successMessage');
