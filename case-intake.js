@@ -258,9 +258,13 @@ async function handleSubmit(event) {
   }, 2000);
 }
 
-// Load saved draft on page load
+// Load saved draft or case on page load
 function loadDraft() {
-  const draft = localStorage.getItem('currentCaseDraft');
+  // Try to load draft first, fall back to current case
+  let draft = localStorage.getItem('currentCaseDraft');
+  if (!draft) {
+    draft = localStorage.getItem('currentCase');
+  }
   if (!draft) return;
 
   try {
