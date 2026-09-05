@@ -177,11 +177,51 @@ async function handleSubmit(event) {
   }, 2000);
 }
 
+// Setup auto-calculations for dates
+function setupCalculations() {
+  // Marriage length calculation
+  const marriageDate = document.getElementById('marriageDate');
+  const separationDate = document.getElementById('separationDate');
+  const marriageLength = document.getElementById('marriageLength');
+
+  if (marriageDate && separationDate && marriageLength) {
+    marriageDate.addEventListener('change', calculateMarriageLength);
+    separationDate.addEventListener('change', calculateMarriageLength);
+  }
+}
+
+function calculateMarriageLength() {
+  const marriageDateEl = document.getElementById('marriageDate');
+  const separationDateEl = document.getElementById('separationDate');
+  const marriageLengthEl = document.getElementById('marriageLength');
+
+  if (!marriageDateEl?.value) return;
+
+  const marriage = new Date(marriageDateEl.value);
+  const separation = separationDateEl?.value ? new Date(separationDateEl.value) : new Date();
+
+  if (marriage > separation) {
+    marriageLengthEl.value = '';
+    return;
+  }
+
+  const years = (separation - marriage) / (1000 * 60 * 60 * 24 * 365.25);
+  marriageLengthEl.value = years.toFixed(1);
+}
+
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
+  // Setup calculations
+  setupCalculations();
+
+  // Trigger marriage length calculation if dates are already filled
+  setTimeout(() => {
+    calculateMarriageLength();
+  }, 100);
+
   // Skip auth redirect in local dev; only enforce when actually behind the API
   const isDev = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
-  if (!isDev && !api.isAuthenticated()) {
+  if (!isDev && typeof api !== 'undefined' && !api.isAuthenticated()) {
     window.location.href = 'auth.html';
     return;
   }
