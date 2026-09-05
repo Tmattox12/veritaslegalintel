@@ -144,13 +144,6 @@ function saveDraft() {
     prenupDetails: formData.get('prenupDetailsText') || null,
     separatePropertyClaims: formData.get('separateProperty') || null,
 
-    petitionerAnnualIncome: parseFloat(formData.get('petitionerIncome')) || null,
-    respondentAnnualIncome: parseFloat(formData.get('respondentIncome')) || null,
-    petitionerEmploymentStatus: formData.get('petitionerEmployment') || null,
-    respondentEmploymentStatus: formData.get('respondentEmployment') || null,
-
-    estimatedEstateValue: parseFloat(formData.get('estimatedEstate')) || null,
-    estimatedLiabilities: parseFloat(formData.get('estimatedDebt')) || null,
 
     notes: formData.get('notes') || null,
     status: 'draft',
@@ -331,13 +324,6 @@ function loadDraft() {
     }
     document.getElementById('separateProperty').value = data.separatePropertyClaims || '';
 
-    document.getElementById('petitionerIncome').value = data.petitionerAnnualIncome || '';
-    document.getElementById('respondentIncome').value = data.respondentAnnualIncome || '';
-    document.getElementById('petitionerEmployment').value = data.petitionerEmploymentStatus || '';
-    document.getElementById('respondentEmployment').value = data.respondentEmploymentStatus || '';
-
-    document.getElementById('estimatedEstate').value = data.estimatedEstateValue || '';
-    document.getElementById('estimatedDebt').value = data.estimatedLiabilities || '';
 
     document.getElementById('notes').value = data.notes || '';
 
@@ -402,5 +388,12 @@ document.addEventListener('DOMContentLoaded', () => {
   // Load logo
   if (typeof setupLogo === 'function') {
     setupLogo();
+  }
+
+  // Check if updating existing case
+  const existingCase = localStorage.getItem('currentCase');
+  const submitBtn = document.querySelector('button[type="submit"]');
+  if (existingCase && submitBtn) {
+    submitBtn.innerHTML = '✎ Update Case';
   }
 });
