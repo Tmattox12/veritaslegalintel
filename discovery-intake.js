@@ -260,34 +260,148 @@ async function loadUploadedDocuments() {
   if (!currentMatterId) return;
 
   try {
-    const response = await fetch(`/api/matters/${currentMatterId}/documents`);
-    const documents = await response.json();
+    // Load bank statements
+    const response = await fetch(`/api/matters/${currentMatterId}/bank-statements`);
+    const statements = await response.json();
 
-    // Filter for financial statements (bank statements, credit card statements, etc.)
-    const bankStatements = documents.filter(d => d.category === 'financial_statement');
-
-    // Group by document for display
     const container = document.querySelector('.category-section') || createCategorySection();
 
-    if (bankStatements.length === 0) {
+    if (statements.length === 0) {
       container.innerHTML = '<div style="color: #999; text-align: center; padding: 20px;">No bank statements uploaded yet.</div>';
       return;
     }
 
-    let html = '<div class="category-title">📊 Bank Statements</div><div class="doc-list">';
-    bankStatements.forEach(doc => {
+    // Build statements list
+    let html = `
+      <div class="category-title">📊 Uploaded Bank Statements</div>
+      <div class="doc-list">
+    `;
+
+    statements.forEach(stmt => {
+      const txCount = stmt.transaction_count || 0;
       html += `
-        <div class="doc-item">
-          <span class="doc-name">${doc.filename}</span>
-          <span class="doc-badge received">Processed</span>
+        <div class="doc-item" style="display: flex; justify-content: space-between; align-items: center; padding: 12px; border: 1px solid #e0e0e0; border-radius: 8px; margin-bottom: 8px;">
+          <div>
+            <span class="doc-name">${stmt.filename || 'Unknown'}</span>
+            <div style="font-size: 12px; color: #999; margin-top: 4px;">
+              ${stmt.statement_start} to ${stmt.statement_end} · ${txCount} transactions
+            </div>
+          </div>
+          <span class="doc-badge received">${stmt.processing_status === 'completed' ? '✓ Done' : '⚠ Error'}</span>
         </div>
       `;
     });
-    html += '</div>';
+
+    html += `
+      </div>
+      <button onclick="loadTransactionTable()" style="margin-top: 16px; padding: 10px 16px; background: #1c3f66; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
+        📋 View All Transactions
+      </button>
+      <button onclick="downloadTransactionsCSV()" style="margin-top: 8px; margin-left: 8px; padding: 10px 16px; background: #4caf50; color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: 600;">
+        📥 Export to CSV
+      </button>
+    `;
 
     container.innerHTML = html;
   } catch (error) {
     console.error('Error loading documents:', error);
+  }
+}
+
+async function loadTransactionTable() {
+  if (!currentMatterId) return;
+
+  try {
+    const response = await fetch(`/api/matters/${currentMatterId}/bank-statements/transactions?limit=500`);
+    const transactions = await response.json();
+
+    const container = document.querySelector('.category-section');
+    if (!container) return;
+
+    if (transactions.length === 0) {
+      alert('No transactions found.');
+      return;
+    }
+
+    // Build transactions table
+    let html = `
+      <div style="margin-top: 24px; overflow-x: auto;">
+        <h3 style="margin-bottom: 12px; color: #1c3f66;">💳 Extracted Transactions (${transactions.length})</h3>
+        <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+          <thead>
+            <tr style="background: #f5f5f5; border-bottom: 2px solid #ddd;">
+              <th style="text-align: left; padding: 10px; border-right: 1px solid #ddd;">Date</th>
+              <th style="text-align: left; padding: 10px; border-right: 1px solid #ddd;">Description</th>
+              <th style="text-align: right; padding: 10px; border-right: 1px solid #ddd;">Amount</th>
+              <th style="text-align: center; padding: 10px; border-right: 1px solid #ddd;">Type</th>
+              <th style="text-align: center; padding: 10px; border-right: 1px solid #ddd;">Flow</th>
+              <th style="text-align: left; padding: 10px;">Category</th>
+            </tr>
+          </thead>
+          <tbody>
+    `;
+
+    transactions.slice(0, 100).forEach(txn => {
+      const amount = parseFloat(txn.amount || 0).toFixed(2);
+      const flow = txn.flow_type || 'unknown';
+      const category = txn.mapped_category || txn.suggested_category || '—';
+      const flowColor = flow === 'income' ? '#4caf50' : flow === 'expense' ? '#ff6b6b' : '#999';
+
+      html += `
+        <tr style="border-bottom: 1px solid #eee;">
+          <td style="padding: 10px; border-right: 1px solid #eee;">${txn.transaction_date || '—'}</td>
+          <td style="padding: 10px; border-right: 1px solid #eee; max-width: 300px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${txn.description || '—'}</td>
+          <td style="padding: 10px; border-right: 1px solid #eee; text-align: right; font-weight: 600;">$${amount}</td>
+          <td style="padding: 10px; border-right: 1px solid #eee; text-align: center;">${txn.transaction_type || '—'}</td>
+          <td style="padding: 10px; border-right: 1px solid #eee; text-align: center; color: ${flowColor}; font-weight: 600;">${flow}</td>
+          <td style="padding: 10px;">${category}</td>
+        </tr>
+      `;
+    });
+
+    if (transactions.length > 100) {
+      html += `
+        <tr style="border-bottom: 1px solid #eee;">
+          <td colspan="6" style="padding: 10px; text-align: center; color: #999;">
+            Showing 100 of ${transactions.length} transactions (download CSV to see all)
+          </td>
+        </tr>
+      `;
+    }
+
+    html += `
+        </tbody>
+        </table>
+      </div>
+    `;
+
+    container.innerHTML += html;
+  } catch (error) {
+    console.error('Error loading transactions:', error);
+    alert('Error loading transactions: ' + error.message);
+  }
+}
+
+async function downloadTransactionsCSV() {
+  if (!currentMatterId) return;
+
+  try {
+    const response = await fetch(`/api/matters/${currentMatterId}/bank-statements/export.csv`);
+    const csv = await response.text();
+
+    // Create download link
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `transactions-${new Date().toISOString().split('T')[0]}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    window.URL.revokeObjectURL(url);
+    document.body.removeChild(a);
+  } catch (error) {
+    console.error('Error downloading CSV:', error);
+    alert('Error downloading CSV: ' + error.message);
   }
 }
 

@@ -210,27 +210,8 @@ router.post('/:matterId/upload', upload.single('file'), async (req, res) => {
   }
 });
 
-// GET /api/matters/:matterId/bank-statements
-router.get('/:matterId', (req, res) => {
-  const { matterId } = req.params;
-
-  req.db.all(
-    `SELECT bs.*, d.filename FROM bank_statements bs
-     LEFT JOIN documents d ON bs.document_id = d.id
-     WHERE bs.matter_id = ? AND bs.processing_status IN ('completed', 'error')
-     ORDER BY bs.created_at DESC`,
-    [matterId],
-    (err, rows) => {
-      if (err) {
-        return res.status(500).json({ error: err.message });
-      }
-      res.json(rows || []);
-    }
-  );
-});
-
-// GET /api/matters/:matterId/bank-statements/export.csv
-router.get('/:matterId/export.csv', (req, res) => {
+// GET /api/matters/:matterId/bank-statements/export.csv (must come before generic GET)
+router.get('/export.csv', (req, res) => {
   const { matterId } = req.params;
 
   req.db.all(
@@ -276,5 +257,49 @@ router.get('/:matterId/export.csv', (req, res) => {
     }
   );
 });
+
+// GET /api/matters/:matterId/bank-statements/transactions - all transactions for matter (must come before generic GET)
+router.get('/transactions', (req, res) => {
+  const { matterId } = req.params;
+  const { limit = 500, offset = 0 } = req.query;
+
+  req.db.all(
+    `SELECT bt.*, bs.bank_name, bs.statement_start, bs.statement_end, bs.account_number_masked
+     FROM bank_transactions bt
+     JOIN bank_statements bs ON bt.bank_statement_id = bs.id
+     WHERE bs.matter_id = ?
+     ORDER BY bt.transaction_date DESC
+     LIMIT ? OFFSET ?`,
+    [matterId, parseInt(limit), parseInt(offset)],
+    (err, rows) => {
+      if (err) {
+        return res.status(500).json({ error: err.message });
+      }
+      res.json(rows || []);
+    }
+  );
+});
+
+// GET /api/matters/:matterId/bank-statements - list all statements
+router.get('/', (req, res) => {
+  const { matterId } = req.params;
+
+  req.db.all(
+    `SELECT bs.*, d.filename,
+            (SELECT COUNT(*) FROM bank_transactions WHERE bank_statement_id = bs.id) as transaction_count
+     FROM bank_statements bs
+     LEFT JOIN documents d ON bs.document_id = d.id
+     WHERE bs.matter_id = ? AND bs.processing_status IN ('completed', 'error')
+     ORDER BY bs.created_at DESC`,
+    [matterId],
+    (err, rows) => {
+      if (err) {
+        return res.status(500).json({ error: err.message });
+      }
+      res.json(rows || []);
+    }
+  );
+});
+
 
 module.exports = router;
