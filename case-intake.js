@@ -143,7 +143,7 @@ async function handleSubmit(event) {
 
     children: children,
     childrenCount: children.length,
-    custodyArrangement: formData.get('custody') || null,
+    custodyArrangement: Array.from(document.querySelectorAll('input[name="custody"]:checked')).map(x => x.value),
     childSupportStatus: formData.get('childSupport') || null,
     spousalMaintenanceStatus: formData.get('alimony') || null,
 
