@@ -265,6 +265,88 @@ async function handleSubmit(event) {
   }, 2000);
 }
 
+// Load saved draft on page load
+function loadDraft() {
+  const draft = localStorage.getItem('currentCaseDraft');
+  if (!draft) return;
+
+  try {
+    const data = JSON.parse(draft);
+
+    // Fill in form fields from draft
+    document.getElementById('caseName').value = data.name || '';
+    document.getElementById('caseNumber').value = data.caseNumber || '';
+    document.getElementById('county').value = data.county || '';
+    document.getElementById('state').value = data.state || '';
+    document.getElementById('court').value = data.court || '';
+    document.getElementById('judgeAssigned').value = data.judgeAssigned || '';
+    document.getElementById('trialDate').value = data.trialDate || '';
+
+    document.getElementById('petitioner').value = data.petitioner || '';
+    document.getElementById('petitionerAge').value = data.petitionerAge || '';
+    document.getElementById('respondent').value = data.respondent || '';
+    document.getElementById('respondentAge').value = data.respondentAge || '';
+
+    document.getElementById('marriageLength').value = data.marriageLength || '';
+    document.getElementById('marriageDate').value = data.marriageDate || '';
+    document.getElementById('separationDate').value = data.separationDate || '';
+    document.getElementById('yearsInState').value = data.yearsInState || '';
+
+    if (data.petitionerPriorMarriage) document.getElementById('petitionerPrior').checked = true;
+    if (data.respondentPriorMarriage) document.getElementById('respondentPrior').checked = true;
+
+    // Restore children
+    if (data.children && data.children.length > 0) {
+      data.children.forEach(() => {
+        addChildEntry();
+      });
+
+      document.querySelectorAll('.child-entry').forEach((entry, index) => {
+        if (data.children[index]) {
+          document.getElementById(`childName${index}`).value = data.children[index].name || '';
+          document.getElementById(`childAge${index}`).value = data.children[index].age || '';
+          document.getElementById(`childGender${index}`).value = data.children[index].gender || '';
+          document.getElementById(`childBirthDate${index}`).value = data.children[index].birthDate || '';
+        }
+      });
+
+      document.getElementById('childrenCount').value = data.children.length;
+    }
+
+    // Restore custody checkboxes
+    if (data.custodyArrangement && Array.isArray(data.custodyArrangement)) {
+      data.custodyArrangement.forEach(val => {
+        const checkbox = document.getElementById(`custody-${val}`);
+        if (checkbox) checkbox.checked = true;
+      });
+    }
+
+    document.getElementById('childSupport').value = data.childSupportStatus || '';
+    document.getElementById('alimony').value = data.spousalMaintenanceStatus || '';
+
+    if (data.hasPrenup) {
+      document.getElementById('prenupExists').checked = true;
+      document.getElementById('prenupDetails').style.display = 'block';
+      document.getElementById('prenupDetailsText').value = data.prenupDetails || '';
+    }
+    document.getElementById('separateProperty').value = data.separatePropertyClaims || '';
+
+    document.getElementById('petitionerIncome').value = data.petitionerAnnualIncome || '';
+    document.getElementById('respondentIncome').value = data.respondentAnnualIncome || '';
+    document.getElementById('petitionerEmployment').value = data.petitionerEmploymentStatus || '';
+    document.getElementById('respondentEmployment').value = data.respondentEmploymentStatus || '';
+
+    document.getElementById('estimatedEstate').value = data.estimatedEstateValue || '';
+    document.getElementById('estimatedDebt').value = data.estimatedLiabilities || '';
+
+    document.getElementById('notes').value = data.notes || '';
+
+    console.log('✓ Draft loaded successfully');
+  } catch (e) {
+    console.error('Error loading draft:', e);
+  }
+}
+
 // Setup auto-calculations for dates
 function setupCalculations() {
   // Marriage length calculation
@@ -299,6 +381,9 @@ function calculateMarriageLength() {
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
+  // Load any saved draft
+  loadDraft();
+
   // Setup calculations
   setupCalculations();
 
