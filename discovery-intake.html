@@ -93,7 +93,7 @@
       <div class="nav-group-label">Workspace</div>
       <a class="nav-item" href="index.html"><span class="nav-ico">◆</span> Dashboard</a>
       <a class="nav-item" href="index.html"><span class="nav-ico">▤</span> Matters</a>
-      <a class="nav-item active" href="discovery-intake.html"><span class="nav-ico">⤓</span> Document Intake</a>
+      <a class="nav-item active" href="#" onclick="navigateToDiscoveryIntake(); return false;"><span class="nav-ico">⤓</span> Document Intake</a>
       <a class="nav-item" href="schedules.html"><span class="nav-ico">◷</span> Calendar</a>
       <a class="nav-item" href="#"><span class="nav-ico">☑</span> Tasks</a>
       <a class="nav-item" href="discovery-intake.html"><span class="nav-ico">▦</span> Documents</a>
@@ -151,6 +151,21 @@
           <p class="sub">Upload, organize, and track all discovery documents · automatic OCR and classification</p>        </div>
       </section>
 
+      <!-- New-client process guide -->
+      <div class="panel" id="processGuide" style="border-left:4px solid #2e5b8a;background:#f5f9ff;">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
+          <div style="font-weight:700;color:#1c3f66;">How a new matter flows</div>
+          <button type="button" class="btn ghost" style="padding:2px 8px;font-size:11px;" onclick="document.getElementById('processSteps').style.display = document.getElementById('processSteps').style.display==='none'?'':'none';this.textContent=this.textContent==='Hide'?'Show':'Hide';">Hide</button>
+        </div>
+        <ol id="processSteps" style="margin:10px 0 0;padding-left:20px;font-size:13px;color:#42526e;line-height:1.9;">
+          <li><strong>1 · Case Intake</strong> — create the matter (<a href="case-intake.html">case-intake.html</a>). This makes it the <em>active matter</em>.</li>
+          <li><strong>2 · Import Documents</strong> — drag &amp; drop below. Files auto-categorize into the buckets on this page.</li>
+          <li><strong>3 · Auto-parse</strong> — bank / card statements become transaction lists (see <em>View Parsed Transactions</em> / CSV export).</li>
+          <li><strong>4 · Map &amp; push</strong> — the AFI panel below turns transactions into AFI lines; the Income Engine imports detected income.</li>
+          <li><strong>5 · Track completeness</strong> — the <em>Document Checklist</em> (bottom) shows what Rule&nbsp;49 items are still missing.</li>
+        </ol>
+      </div>
+
       <!-- Upload Area + Stats -->
       <div class="intake-grid">
         <div>
@@ -160,12 +175,12 @@
               <h3>📁 Upload Documents</h3>
               <span class="tag">Drag & drop or select files</span>
             </div>
-            <div class="dropzone" id="dropzone" ondrop="handleDrop(event)" ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)">
+            <div class="dropzone" id="dropzone">
               <div class="dz-icon">⇪</div>
-              <p class="dz-title">Drag files here or <button class="dz-browse" onclick="document.getElementById('fileInput').click()">browse</button></p>
+              <p class="dz-title">Drag files here or <button class="dz-browse">browse</button></p>
               <p class="dz-sub">PDF, Excel, CSV, Word, Images — up to 50 MB per file</p>
             </div>
-            <input type="file" id="fileInput" hidden multiple accept=".pdf,.xlsx,.xls,.csv,.docx,.doc,.jpg,.png,.gif" onchange="handleFileSelect(event)">
+            <input type="file" id="fileInput" hidden multiple accept=".pdf,.xlsx,.xls,.csv,.docx,.doc,.jpg,.png,.gif">
 
             <!-- Upload Queue -->
             <div class="upload-queue" id="uploadQueue"></div>
@@ -224,9 +239,18 @@
 
           <!-- Processed Documents by Category -->
           <div style="margin-top: 20px;">
+            <div style="display:flex;justify-content:flex-end;gap:8px;margin-bottom:8px;">
+              <button type="button" class="btn ghost" id="coverageBtn" style="padding:8px 14px;">🗓 Statement Coverage</button>
+              <button type="button" class="btn ghost" id="exportAllCsvBtn" style="padding:8px 14px;">⬇ Export All Transactions CSV</button>
+              <button type="button" class="btn" data-view-transactions style="padding:8px 14px;">💳 View Parsed Transactions</button>
+            </div>
             <div class="category-section">
               <div class="category-title">💰 Financial Statements</div>
               <div class="doc-list" id="financialDocs"></div>
+              <div style="margin-top:10px;border-top:1px solid #eee;padding-top:10px;">
+                <div style="font-size:11px;font-weight:700;color:#1c3f66;margin-bottom:6px;">Parsed statements</div>
+                <div id="statementsList"></div>
+              </div>
             </div>
 
             <div class="category-section">
@@ -260,29 +284,29 @@
           <div class="stats-box">
             <div class="stat-row">
               <div class="stat-label">Documents Processed</div>
-              <div class="stat-value" id="totalDocs">1,284</div>
-              <div class="stat-bar"><div class="stat-bar-fill" style="width: 98%"></div></div>
-              <div class="stat-label" style="font-size: 10px; margin-top: 4px; color: #999;">of 1,310 expected</div>            </div>
+              <div class="stat-value" id="totalDocs">0</div>
+              <div class="stat-bar"><div class="stat-bar-fill" style="width: 0%"></div></div>
+              <div class="stat-label" style="font-size: 10px; margin-top: 4px; color: #999;">uploaded & categorized</div>            </div>
 
             <div class="stat-row">
               <div class="stat-label">Bank Statements</div>
-              <div class="stat-value" id="bankCount">312</div>
-              <div style="font-size: 10px; color: #666; margin-top: 4px;">36 months of history</div>            </div>
+              <div class="stat-value" id="bankCount">0</div>
+              <div style="font-size: 10px; color: #666; margin-top: 4px;">financial statements uploaded</div>            </div>
 
             <div class="stat-row">
-              <div class="stat-label">Pay Stubs</div>
-              <div class="stat-value" id="paystubCount">48</div>
-              <div style="font-size: 10px; color: #666; margin-top: 4px;">Both parties, 24 months</div>            </div>
+              <div class="stat-label">Parsed Transactions</div>
+              <div class="stat-value" id="paystubCount">0</div>
+              <div style="font-size: 10px; color: #666; margin-top: 4px;">from bank & card statements</div>            </div>
 
             <div class="stat-row">
-              <div class="stat-label">Tax Documents</div>
-              <div class="stat-value" id="taxCount">27</div>
-              <div style="font-size: 10px; color: #666; margin-top: 4px;">1040s, K-1s, business returns</div>            </div>
+              <div class="stat-label">Tax & Income Documents</div>
+              <div class="stat-value" id="taxCount">0</div>
+              <div style="font-size: 10px; color: #666; margin-top: 4px;">1040s, W-2s, K-1s</div>            </div>
 
             <div class="stat-row">
               <div class="stat-label">Documents Needing OCR Review</div>
-              <div class="stat-value" id="ocrCount" style="color: #f39c12;">26</div>
-              <div style="font-size: 10px; color: #666; margin-top: 4px;">Poor image quality</div>
+              <div class="stat-value" id="ocrCount" style="color: #f39c12;">0</div>
+              <div style="font-size: 10px; color: #666; margin-top: 4px;">poor image quality</div>
             </div>
           </div>
 
@@ -333,11 +357,14 @@
     </div>
   </main>
 
+  <script src="veritas-auth.js"></script>
   <script src="sidebar-loader.js"></script>
   <script src="api-client.js"></script>
   <script src="case-manager.js"></script>
   <script src="safe-text.js"></script>
-  <script src="discovery-intake.js"></script>
+  <script src="discovery-intake-uploads.js?v=6"></script>
+  <script src="discovery-intake-afi.js?v=3"></script>
+  <script src="discovery-checklist.js?v=3"></script>
   <script src="logo-handler.js"></script>
 </body>
 </html>

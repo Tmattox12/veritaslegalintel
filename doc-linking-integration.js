@@ -395,11 +395,7 @@ function integrateAFIModule() {
         rows: [
           { k: 'Property', v: '123 Main St, Tucson, [State]' },
           { k: 'Monthly rent', v: '$1,850', hi: true },
-<<<<<<< HEAD
-          { k: 'Tenant', v: 'Sarah Anderson' }
-=======
-          { k: 'Tenant', v: 'Sarah Template Matter' }
->>>>>>> cbd6749 (Clean stale case data and neutralize templates)
+          { k: 'Tenant', v: '[Tenant Name]' }
         ]
       },
       {
@@ -454,34 +450,20 @@ function exampleHTMLStructure() {
 
       <div class="income-section">
         <h3>Petitioner Income</h3>
-<<<<<<< HEAD
-        <div id="luisW2Base" class="income-cell" data-calc-id="[Party A]:w2">
-          [amount]
-        </div>
-        <div id="luisWithBonus" class="income-cell" data-calc-id="[Party A]:bonus">
-=======
         <div id="partyAW2Base" class="income-cell" data-calc-id="Parent A:w2">
           [amount]
         </div>
         <div id="partyAWithBonus" class="income-cell" data-calc-id="Parent A:bonus">
->>>>>>> cbd6749 (Clean stale case data and neutralize templates)
           [amount]
         </div>
       </div>
 
       <div class="income-section">
         <h3>Respondent Income</h3>
-<<<<<<< HEAD
-        <div id="coniRunrate" class="income-cell" data-calc-id="[Party B]:runrate">
-          [amount]
-        </div>
-        <div id="coniCapacity" class="income-cell" data-calc-id="[Party B]:capacity">
-=======
         <div id="partyBRunrate" class="income-cell" data-calc-id="Parent B:runrate">
           [amount]
         </div>
         <div id="partyBCapacity" class="income-cell" data-calc-id="Parent B:capacity">
->>>>>>> cbd6749 (Clean stale case data and neutralize templates)
           [amount]
         </div>
       </div>

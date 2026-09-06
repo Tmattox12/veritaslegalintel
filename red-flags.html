@@ -56,101 +56,147 @@
     <div class="header">
       <h1>🚩 Red-Flag Detection</h1>
       <p>Identify undisclosed accounts, income discrepancies, and inconsistent sworn statements</p>
+      <p id="rfMatter" style="font-size:12px;opacity:0.85;margin-top:6px;"></p>
     </div>
 
-    <div class="flag-grid">
-      <div class="flag-card">
-        <div class="flag-title">Account Not Disclosed</div>
-        <div class="flag-desc">Account shows activity but was omitted from financial disclosure</div>
-        <div class="flag-items">
-          <div class="flag-item">
-            <span class="flag-label">Account Type:</span><span class="flag-value"> Checking/Savings</span>
-          </div>
-          <div class="flag-item">
-            <span class="flag-label">Status:</span><span class="flag-value"> Never disclosed</span>
-          </div>
-          <div class="flag-item">
-            <span class="flag-label">Evidence:</span><span class="flag-value"> Transaction history</span>
-          </div>
-        </div>
-        <div class="action">Request production of account statements and account opening documentation</div>
-      </div>
-
-      <div class="flag-card high">
-        <div class="flag-title">Income Discrepancy</div>
-        <div class="flag-desc">Reported income does not match documentation or employment records</div>
-        <div class="flag-items">
-          <div class="flag-item">
-            <span class="flag-label">Sworn Claim:</span><span class="flag-value"> [Amount/Status]</span>
-          </div>
-          <div class="flag-item">
-            <span class="flag-label">Documented Amount:</span><span class="flag-value"> [Amount]</span>
-          </div>
-          <div class="flag-item">
-            <span class="flag-label">Variance:</span><span class="flag-value"> [Dollar amount]</span>
-          </div>
-        </div>
-        <div class="action">Obtain complete recent employment and income documentation for reconciliation</div>
-      </div>
-
-      <div class="flag-card high">
-        <div class="flag-title">Missing Documentation</div>
-        <div class="flag-desc">Critical documents referenced but not produced</div>
-        <div class="flag-items">
-          <div class="flag-item">
-            <span class="flag-label">Document Type:</span><span class="flag-value"> Tax returns, W-2s, etc.</span>
-          </div>
-          <div class="flag-item">
-            <span class="flag-label">Date Period:</span><span class="flag-value"> [Time range]</span>
-          </div>
-          <div class="flag-item">
-            <span class="flag-label">Materiality:</span><span class="flag-value"> Significant</span>
-          </div>
-        </div>
-        <div class="action">Issue RFP for complete and continuous documentation of stated period</div>
-      </div>
-
-      <div class="flag-card medium">
-        <div class="flag-title">Expense/Spending Pattern</div>
-        <div class="flag-desc">Spending pattern conflicts with stated financial circumstances</div>
-        <div class="flag-items">
-          <div class="flag-item">
-            <span class="flag-label">Claimed Status:</span><span class="flag-value"> [Financial condition]</span>
-          </div>
-          <div class="flag-item">
-            <span class="flag-label">Spending Pattern:</span><span class="flag-value"> [Type/Amount]</span>
-          </div>
-          <div class="flag-item">
-            <span class="flag-label">Frequency:</span><span class="flag-value"> Regular/Ongoing</span>
-          </div>
-        </div>
-        <div class="action">Obtain complete credit card and bank statements for pattern analysis</div>
-      </div>
-
-      <div class="flag-card low">
-        <div class="flag-title">Documentary Inconsistency</div>
-        <div class="flag-desc">Different documents show conflicting information for same item</div>
-        <div class="flag-items">
-          <div class="flag-item">
-            <span class="flag-label">Item:</span><span class="flag-value"> [Account/Asset/Amount]</span>
-          </div>
-          <div class="flag-item">
-            <span class="flag-label">Source 1:</span><span class="flag-value"> [Amount/Date]</span>
-          </div>
-          <div class="flag-item">
-            <span class="flag-label">Source 2:</span><span class="flag-value"> [Amount/Date]</span>
-          </div>
-        </div>
-        <div class="action">Request clarification and obtain original documents from financial institution</div>
-      </div>
+    <div id="rfSummary" style="margin-bottom:20px;"></div>
+    <div class="flag-grid" id="flagGrid">
+      <div style="padding:40px;text-align:center;color:#999;grid-column:1/-1;">Analyzing discovery documents…</div>
     </div>
+
+    <div id="rfActions" style="display:none;margin-top:20px;text-align:center;">
+      <button id="genRfpBtn" style="padding:12px 20px;background:#b3402f;color:#fff;border:none;border-radius:8px;font-weight:600;cursor:pointer;font-size:14px;">📄 Generate Request for Production (RFP) draft</button>
+    </div>
+    <div id="rfpOutput" style="margin-top:16px;"></div>
 
     <div style="margin-top: 40px; padding: 20px; background: #f0fdf4; border-radius: 8px; border-left: 4px solid #10b981;">
       <h3 style="color: #065f46; margin-bottom: 10px;">💡 Using Red-Flag Detection</h3>
       <p style="color: #047857; font-size: 14px;">
-        This module helps surface potential disclosure issues, income discrepancies, and inconsistent sworn statements. Red flags don't prove misconduct but identify areas requiring further investigation through document production and deposition questioning.
+        This module surfaces potential disclosure issues, missing documentation, and gaps in the discovery record. Red flags don't prove misconduct but identify areas requiring further investigation through document production and deposition questioning.
       </p>
     </div>
   </div>
+
+  <script>
+    const API_BASE = window.API_BASE || 'http://localhost:3000/api';
+    function matterId() {
+      return (window.Veritas && window.Veritas.currentMatterId) ||
+        new URLSearchParams(location.search).get('matter') ||
+        localStorage.getItem('currentMatterId') || null;
+    }
+    const esc = (s) => String(s ?? '').replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+
+    function card(sev, title, desc, items, action) {
+      return `<div class="flag-card ${sev}">
+        <div class="flag-title">${esc(title)}</div>
+        <div class="flag-desc">${esc(desc)}</div>
+        <div class="flag-items">${items.map(([k, v]) => `<div class="flag-item"><span class="flag-label">${esc(k)}:</span> <span class="flag-value">${esc(v)}</span></div>`).join('')}</div>
+        <div class="action">${esc(action)}</div>
+      </div>`;
+    }
+
+    async function loadFlags() {
+      const mid = matterId();
+      const grid = document.getElementById('flagGrid');
+      const sumEl = document.getElementById('rfSummary');
+      if (!mid) {
+        grid.innerHTML = '<div style="padding:40px;text-align:center;color:#999;grid-column:1/-1;">No matter selected. Select a case first (Case Intake).</div>';
+        return;
+      }
+      document.getElementById('rfMatter').textContent = 'Matter ID: ' + mid;
+      try {
+        const r = await fetch(`${API_BASE}/matters/${mid}/documents/gap-analysis`);
+        const g = await r.json();
+
+        const cards = [];
+
+        // Missing required documents -> high-severity flags
+        (g.missingRequiredDocs || []).forEach((d) => {
+          cards.push(card('high', 'Missing Documentation', 'Required under Rule 49 but not found in discovery', [
+            ['Document Type', d.label],
+            ['Status', 'Not produced'],
+            ['Materiality', 'Significant'],
+          ], 'Issue RFP for this document or confirm it does not exist.'));
+        });
+
+        // Statement coverage gaps -> medium flags
+        (g.statementGaps || []).forEach((gp) => {
+          cards.push(card('medium', 'Statement Coverage Gap', 'Account is missing statements for part of the period', [
+            ['Account', gp.account],
+            ['Gap', `${gp.after} → ${gp.before}`],
+            ['Missing', gp.missingMonths.join(', ')],
+          ], 'Obtain the missing monthly statements for a continuous record.'));
+        });
+
+        // Thin coverage (single-statement accounts) -> low flags
+        (g.thinCoverage || []).forEach((t) => {
+          cards.push(card('low', 'Limited Statement History', 'Only one statement on file for this account — earlier history may be missing', [
+            ['Account', t.account],
+            ['Only month on file', t.onlyMonth],
+            ['Concern', 'Income/spending history incomplete'],
+          ], 'Request additional monthly statements to establish the account\'s history.'));
+        });
+
+        // Summary banner
+        const issues = (g.missingRequiredDocs || []).length + (g.statementGaps || []).length + (g.thinCoverage || []).length;
+        sumEl.innerHTML = `<div style="background:#fff;border:1px solid #e6ecf3;border-left:4px solid ${issues ? '#d64040' : '#10b981'};border-radius:8px;padding:14px;font-size:13px;color:#42526e;">
+          <strong style="color:#1c3f66;">${issues}</strong> issue(s) found ·
+          <strong>${g.requiredDocsPresent}/${g.requiredDocsTotal}</strong> required doc types present ·
+          <strong>${g.totalStatements}</strong> statements across <strong>${g.accounts}</strong> account(s).
+        </div>`;
+
+        grid.innerHTML = cards.length
+          ? cards.join('')
+          : '<div style="padding:40px;text-align:center;color:#2e7d32;grid-column:1/-1;background:#f0fdf4;border-radius:8px;">✓ No disclosure gaps detected. All required document types are present and statement coverage is continuous.</div>';
+
+        // Show the RFP generator only when there are issues to request.
+        document.getElementById('rfActions').style.display = issues > 0 ? '' : 'none';
+      } catch (e) {
+        grid.innerHTML = '<div style="padding:40px;text-align:center;color:#c62828;grid-column:1/-1;">Could not analyze — is the backend running on :3000?</div>';
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', loadFlags);
+    window.addEventListener('matterSelected', loadFlags);
+
+    // RFP generation
+    document.getElementById('genRfpBtn').addEventListener('click', async () => {
+      const mid = matterId();
+      if (!mid) return;
+      const out = document.getElementById('rfpOutput');
+      out.innerHTML = '<div style="padding:20px;text-align:center;color:#999;">Drafting RFP…</div>';
+      try {
+        const r = await fetch(`${API_BASE}/matters/${mid}/documents/rfp`);
+        const d = await r.json();
+        if (!d.success) throw new Error(d.error || 'failed');
+        out.innerHTML = `
+          <div style="background:#fff;border:1px solid #e6ecf3;border-radius:8px;padding:20px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;">
+              <strong style="color:#1c3f66;">Request for Production — ${esc(d.caseName)} (${d.itemCount} item${d.itemCount===1?'':'s'})</strong>
+              <div>
+                <button id="rfpCopy" style="padding:8px 12px;background:#2e5b8a;color:#fff;border:none;border-radius:6px;cursor:pointer;margin-right:6px;">Copy</button>
+                <button id="rfpTxt" style="padding:8px 12px;background:#6b7280;color:#fff;border:none;border-radius:6px;cursor:pointer;margin-right:6px;">.txt</button>
+                <button id="rfpDocx" style="padding:8px 12px;background:#1c6b52;color:#fff;border:none;border-radius:6px;cursor:pointer;">Download Word (.docx)</button>
+              </div>
+            </div>
+            <pre style="white-space:pre-wrap;font-family:Georgia,serif;font-size:13px;color:#222;line-height:1.6;background:#fafaf7;padding:16px;border-radius:6px;border:1px solid #eee;">${esc(d.rfp)}</pre>
+          </div>`;
+        document.getElementById('rfpCopy').addEventListener('click', () => { navigator.clipboard.writeText(d.rfp); });
+        document.getElementById('rfpTxt').addEventListener('click', () => {
+          const blob = new Blob([d.rfp], { type: 'text/plain' });
+          const a = document.createElement('a');
+          a.href = URL.createObjectURL(blob);
+          a.download = `RFP-${d.caseName.replace(/\s+/g, '-')}.txt`;
+          a.click();
+          URL.revokeObjectURL(a.href);
+        });
+        document.getElementById('rfpDocx').addEventListener('click', () => {
+          window.location.href = `${API_BASE}/matters/${matterId()}/documents/rfp.docx`;
+        });
+      } catch (e) {
+        out.innerHTML = '<div style="padding:20px;text-align:center;color:#c62828;">Could not generate RFP — is the backend running?</div>';
+      }
+    });
+  </script>
 </body>
 </html>

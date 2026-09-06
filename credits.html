@@ -183,7 +183,7 @@
           <div class="cr-val">$2,365</div><div class="cr-view">View reconciliation →</div>
         </div>
         <div class="cr-row" data-credit-recon="child-phones-reimb">
-          <div class="cr-row-main"><div class="cr-lbl">Children's phone-share reimbursement<span class="cr-badge doc">documented</span></div><div class="cr-basis">$208/mo (Joaquin $132 + Martin $76) × 30% × 17 mo</div></div>
+          <div class="cr-row-main"><div class="cr-lbl">Children's phone-share reimbursement<span class="cr-badge doc">documented</span></div><div class="cr-basis">$208/mo ([Child] $132 + [Child] $76) × 30% × 17 mo</div></div>
           <div class="cr-val">$1,061</div><div class="cr-view">View reconciliation →</div>
         </div>
         <div class="cr-row" data-credit-recon="child-uber-reimb">
@@ -372,15 +372,15 @@
         },
         'child-phones-reimb': {
           title: "Children's Phone-Share Reimbursement",
-          intro: 'Joaquin $132 + Martin $76 = $208/mo base for the two younger boys. Temp-orders 30% share over 17 months (Nov 2024 – Mar 2026).',
+          intro: '[Child] $132 + [Child] $76 = $208/mo base for the two younger boys. Temp-orders 30% share over 17 months (Nov 2024 – Mar 2026).',
           columns: [
             { key: 'desc', label: 'Item', align: 'left' },
             { key: 'amount', label: 'Amount', align: 'right', money: true },
             { key: 'status', label: 'Status', align: 'center', badge: true }
           ],
           rows: [
-            { desc: 'Joaquin (monthly)', amount: 132.00, status: 'doc' },
-            { desc: 'Martin (monthly)', amount: 76.00, status: 'doc' },
+            { desc: '[Child] (monthly)', amount: 132.00, status: 'doc' },
+            { desc: '[Child] (monthly)', amount: 76.00, status: 'doc' },
             { desc: 'Monthly base', amount: 208.00, status: 'doc' },
             { desc: '30% share / month', amount: 62.40, status: 'doc' },
             { desc: '× 17 months', amount: 1060.80, status: 'doc' }
@@ -388,7 +388,7 @@
           total: { label: 'Phone-share reimbursement', value: 1060.80 },
           summary: { 'Monthly base': 208.00, "[Party B]'s share": '30%', 'Months': 17, 'Reimbursement due': 1060.80, 'Basis': 'Temp-orders 30% share' },
           calc: [
-            'Two younger boys\' phones: Joaquin $132 + Martin $76 = $208/mo.',
+            'Two younger boys\' phones: [Child] $132 + [Child] $76 = $208/mo.',
             '$208 × 30% = $62.40/mo [Party B] share.',
             '$62.40 × 17 months (Nov 2024 – Mar 2026) = [amount].',
             'Confirm month count and any offsets before final filing (defer to Holly).'

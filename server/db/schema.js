@@ -67,6 +67,20 @@ function initializeDatabase() {
           )
         `);
 
+        // Extraction metadata columns (added for discovery intake pipeline)
+        db.run(`ALTER TABLE documents ADD COLUMN category TEXT`, () => {});
+        db.run(`ALTER TABLE documents ADD COLUMN extraction_status TEXT`, () => {});
+        db.run(`ALTER TABLE documents ADD COLUMN ocr_needed INTEGER DEFAULT 0`, () => {});
+
+        // Matter case-detail columns (added for case intake)
+        db.run(`ALTER TABLE matters ADD COLUMN case_no TEXT`, () => {});
+        db.run(`ALTER TABLE matters ADD COLUMN county TEXT`, () => {});
+        db.run(`ALTER TABLE matters ADD COLUMN state TEXT`, () => {});
+        db.run(`ALTER TABLE matters ADD COLUMN court TEXT`, () => {});
+        db.run(`ALTER TABLE matters ADD COLUMN petitioner TEXT`, () => {});
+        db.run(`ALTER TABLE matters ADD COLUMN respondent TEXT`, () => {});
+        db.run(`ALTER TABLE matters ADD COLUMN details TEXT`, () => {});
+
         // Bank statements table
         db.run(`
           CREATE TABLE IF NOT EXISTS bank_statements (

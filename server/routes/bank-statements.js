@@ -8,7 +8,7 @@ const { extractTextFromPDF } = require('../services/pdf-extractor');
 const { parseBankStatement } = require('../services/claude-bank-parser');
 const { detectFlags, insertFlags } = require('../services/flag-detector');
 
-const router = express.Router();
+const router = express.Router({ mergeParams: true });
 
 // Configure multer for PDF uploads
 const storage = multer.memoryStorage();
@@ -25,7 +25,7 @@ const upload = multer({
 });
 
 // POST /api/matters/:matterId/bank-statements/upload
-router.post('/:matterId/upload', upload.single('file'), async (req, res) => {
+router.post('/upload', upload.single('file'), async (req, res) => {
   const { matterId } = req.params;
   const { userId } = req.body;
 
@@ -189,7 +189,7 @@ router.post('/:matterId/upload', upload.single('file'), async (req, res) => {
         flagsRaised: flagList.length,
       },
       extracted: {
-        incomeItems: incomeList,
+        incomeItems: incomeItemIds,
         flags: flagList,
         transactions: parsed.transactions,
       },
@@ -208,6 +208,35 @@ router.post('/:matterId/upload', upload.single('file'), async (req, res) => {
 
     res.status(500).json({ error: error.message });
   }
+});
+
+// GET /api/matters/:matterId/bank-statements/coverage - per-account/month reconciliation
+router.get('/coverage', (req, res) => {
+  const { matterId } = req.params;
+  req.db.all(
+    `SELECT bs.id, bs.bank_name, bs.account_number_masked, bs.account_type, bs.statement_start, bs.statement_end, d.filename,
+            (SELECT COUNT(*) FROM bank_transactions WHERE bank_statement_id = bs.id) as transaction_count
+     FROM bank_statements bs
+     LEFT JOIN documents d ON bs.document_id = d.id
+     WHERE bs.matter_id = ? AND bs.processing_status = 'completed'
+     ORDER BY bs.statement_start ASC`,
+    [matterId],
+    (err, rows) => {
+      if (err) return res.status(500).json({ error: err.message });
+      const byAccount = {};
+      (rows || []).forEach((r) => {
+        const key = r.account_number_masked || r.bank_name || 'unknown';
+        if (!byAccount[key]) byAccount[key] = { account: key, type: r.account_type, months: [], totalTx: 0 };
+        byAccount[key].months.push({ start: r.statement_start, end: r.statement_end, tx: r.transaction_count, file: r.filename });
+        byAccount[key].totalTx += r.transaction_count || 0;
+      });
+      res.json({
+        totalStatements: (rows || []).length,
+        totalTransactions: (rows || []).reduce((s, r) => s + (r.transaction_count || 0), 0),
+        accounts: Object.values(byAccount),
+      });
+    }
+  );
 });
 
 // GET /api/matters/:matterId/bank-statements/export.csv (must come before generic GET)
@@ -242,7 +271,7 @@ router.get('/export.csv', (req, res) => {
         row.statement_start,
         row.statement_end,
         row.transaction_date,
-        `"${row.description.replace(/"/g, '""')}"`, // Escape quotes
+        `"${(row.description || '').replace(/"/g, '""')}"`, // Escape quotes, handle null
         row.amount,
         row.transaction_type,
         row.flow_type,
@@ -276,6 +305,36 @@ router.get('/transactions', (req, res) => {
         return res.status(500).json({ error: err.message });
       }
       res.json(rows || []);
+    }
+  );
+});
+
+// GET /api/matters/:matterId/bank-statements/:statementId/export.csv - one statement's transactions
+router.get('/:statementId/export.csv', (req, res) => {
+  const { matterId, statementId } = req.params;
+
+  req.db.all(
+    `SELECT bt.transaction_date, bt.description, bt.amount, bt.transaction_type, bt.flow_type, bt.mapped_category, bs.bank_name, bs.statement_start, bs.statement_end
+     FROM bank_transactions bt
+     JOIN bank_statements bs ON bt.bank_statement_id = bs.id
+     WHERE bs.matter_id = ? AND bs.id = ?
+     ORDER BY bt.transaction_date ASC`,
+    [matterId, statementId],
+    (err, rows) => {
+      if (err) return res.status(500).json({ error: err.message });
+      if (!rows || rows.length === 0) return res.status(404).json({ error: 'No transactions for this statement' });
+
+      const headers = ['Bank', 'Statement Start', 'Statement End', 'Date', 'Description', 'Amount', 'Type', 'Flow', 'Category'];
+      const csvRows = rows.map((r) => [
+        r.bank_name || '', r.statement_start || '', r.statement_end || '',
+        r.transaction_date || '', `"${(r.description || '').replace(/"/g, '""')}"`,
+        r.amount, r.transaction_type || '', r.flow_type || '', r.mapped_category || '',
+      ]);
+      const csv = [headers, ...csvRows].map((r) => r.join(',')).join('\n');
+
+      res.header('Content-Type', 'text/csv');
+      res.header('Content-Disposition', `attachment; filename="statement-${statementId}.csv"`);
+      res.send(csv);
     }
   );
 });

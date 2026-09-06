@@ -85,6 +85,9 @@ function resetForm() {
   document.getElementById('childrenContainer').innerHTML = '';
   childCount = 0;
   document.getElementById('prenupDetails').style.display = 'none';
+  // Also clear any saved draft/case so old data doesn't re-populate on reload.
+  localStorage.removeItem('currentCaseDraft');
+  localStorage.removeItem('currentCase');
 }
 
 function saveDraft() {
@@ -148,6 +151,7 @@ function saveDraft() {
     notes: formData.get('notes') || null,
     status: 'draft',
     createdAt: new Date().toISOString(),
+    _savedAt: new Date().toISOString(),
   };
 
   // Save to localStorage as draft
@@ -248,28 +252,70 @@ async function handleSubmit(event) {
   localStorage.setItem('currentCase', JSON.stringify(caseData));
   localStorage.removeItem('currentCaseDraft'); // Clear draft when case is created
 
-  // Show success message
+  // Create the matter in the backend so Discovery Intake can attach documents to it.
   const successMsg = document.getElementById('successMessage');
-  successMsg.classList.add('show');
+  try {
+    const resp = await fetch('http://localhost:3000/api/matters', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        name: caseData.name,
+        clientName: caseData.petitioner || caseData.name,
+        caseNo: caseData.caseNumber,
+        county: caseData.county,
+        state: caseData.state,
+        court: caseData.court,
+        petitioner: caseData.petitioner,
+        respondent: caseData.respondent,
+        details: caseData,
+      }),
+    });
 
-  // Redirect to dashboard after 2 seconds
-  setTimeout(() => {
-    window.location.href = 'index.html';
-  }, 2000);
+    if (!resp.ok) throw new Error('Matter creation failed');
+    const matter = await resp.json();
+
+    // Make this the active matter everywhere (matter-selector + discovery pages listen for this).
+    localStorage.setItem('currentMatterId', matter.id);
+    window.dispatchEvent(new CustomEvent('matterSelected', { detail: matter }));
+
+    successMsg.innerHTML = `
+      ✓ Case "${caseData.name}" created. <strong>Next step: import discovery documents.</strong><br>
+      <a href="/discovery-intake.html?matter=${matter.id}" style="display:inline-block;margin-top:10px;padding:10px 16px;background:#1c6b52;color:#fff;border-radius:6px;text-decoration:none;font-weight:600;">Import Documents →</a>
+      <a href="index.html" style="display:inline-block;margin-top:10px;margin-left:8px;padding:10px 16px;background:#eef2f7;color:#1c3f66;border-radius:6px;text-decoration:none;font-weight:600;">Go to Dashboard</a>
+    `;
+    successMsg.classList.add('show');
+    // No auto-redirect: let the user choose the next step.
+  } catch (e) {
+    console.error('Matter creation error:', e);
+    successMsg.innerHTML = `
+      ✓ Case saved locally. <strong>Could not reach the backend</strong> (is the Node server running on :3000?),<br>
+      so documents can't be attached yet. <a href="index.html" style="color:#1c3f66;">Continue to dashboard</a>
+    `;
+    successMsg.classList.add('show');
+  }
 }
 
-// Load saved draft or case on page load
+// Start with a BLANK form. Do not auto-fill from stale localStorage drafts/cases —
+// this is a clean template. Users can still use the explicit "Save draft" feature.
 function loadDraft() {
-  // Try to load draft first, fall back to current case
-  let draft = localStorage.getItem('currentCaseDraft');
-  if (!draft) {
-    draft = localStorage.getItem('currentCase');
-  }
-  if (!draft) return;
-
+  // If a draft was saved in THIS session via the Save Draft button, restore it.
+  // Only restore drafts that are clearly fresh (have a _savedAt timestamp within 24h).
+  const raw = localStorage.getItem('currentCaseDraft');
+  if (!raw) return;
   try {
-    const data = JSON.parse(draft);
+    const data = JSON.parse(raw);
+    const savedAt = data._savedAt ? new Date(data._savedAt).getTime() : 0;
+    const fresh = savedAt && (Date.now() - savedAt) < 24 * 60 * 60 * 1000;
+    if (!fresh) {
+      localStorage.removeItem('currentCaseDraft');
+      return;
+    }
+    fillForm(data);
+  } catch (e) { /* ignore corrupt draft */ }
+}
 
+function fillForm(data) {
+  try {
     // Fill in form fields from draft
     document.getElementById('caseName').value = data.name || '';
     document.getElementById('caseNumber').value = data.caseNumber || '';

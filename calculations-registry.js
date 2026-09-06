@@ -1,10 +1,6 @@
 /**
  * Calculations Registry for Veritas Template
-<<<<<<< HEAD
- * Sample Anderson v. Anderson case data
-=======
  * Sample [Case Name] case data
->>>>>>> cbd6749 (Clean stale case data and neutralize templates)
  */
 
 const CalculationsRegistry = {
@@ -135,11 +131,8 @@ const CalculationsRegistry = {
   },
 
   // Household composition
-  children: [
-    { name: "Emma", age: 8, dob: "2016-03-20" },
-    { name: "Liam", age: 6, dob: "2018-07-10" }
-  ],
-  childrenCount: 2,
+  children: [],
+  childrenCount: 0,
 
   // Support calculations (simple guidelines)
   spousalMaintenanceSample: {
@@ -168,8 +161,4 @@ const RESPONDENT_NAME = "Sarah";
 const PETITIONER_NAME = "Michael";
 const RESPONDENT_INCOME = 72400;
 const PETITIONER_INCOME = 185400;
-<<<<<<< HEAD
-const CASE_TITLE = "Anderson v. Anderson";
-=======
 const CASE_TITLE = "[Case Name]";
->>>>>>> cbd6749 (Clean stale case data and neutralize templates)

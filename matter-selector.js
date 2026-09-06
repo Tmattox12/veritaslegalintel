@@ -21,7 +21,13 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (saved) {
       currentMatter = saved;
       updateMatterDisplay();
+    } else {
+      // Saved matter no longer exists (e.g., data was reset) -> clear it
+      localStorage.removeItem('currentMatterId');
+      updateMatterDisplay();
     }
+  } else {
+    updateMatterDisplay();
   }
 });
 
@@ -30,10 +36,11 @@ function setupSidebarMattersLink() {
   const navItems = document.querySelectorAll('.nav-item');
 
   navItems.forEach(item => {
-    const text = item.textContent.trim();
-    // Look for the Matters link (should contain "Matters" but not "Matter" alone if checking other keywords)
-    if (text === 'Matters' || text.includes('▤') && text.includes('Matters')) {
+    const text = item.textContent;
+    // Look for the Matters link - check if text contains "Matters"
+    if (text.includes('Matters')) {
       item.style.cursor = 'pointer';
+      item.href = '#'; // Make sure href is set to prevent navigation
       item.addEventListener('click', (e) => {
         e.preventDefault();
         e.stopPropagation();
@@ -130,7 +137,16 @@ async function loadMatters() {
 
 function updateMatterDisplay() {
   const matterBtn = document.querySelector('.matter-btn');
-  if (!matterBtn || !currentMatter) return;
+  if (!matterBtn) return;
+
+  if (!currentMatter) {
+    matterBtn.innerHTML = `
+      <strong>[No matter selected]</strong>
+      <span class="case-no">Create or select a matter</span>
+      <span class="chev">▾</span>
+    `;
+    return;
+  }
 
   const name = currentMatter.name || currentMatter.client_name || 'Unknown Matter';
   const caseNo = currentMatter.case_no || '[Case No.]';
@@ -170,6 +186,25 @@ function showMatterDropdown(e) {
     max-height: 400px;
     overflow-y: auto;
   `;
+
+  // Empty state: no matters yet -> guide to create one
+  if (allMatters.length === 0) {
+    const empty = document.createElement('div');
+    empty.style.cssText = 'padding:16px;font-size:13px;color:#666;';
+    empty.innerHTML = `
+      <div style="font-weight:600;color:#1c3f66;margin-bottom:6px;">No matters yet</div>
+      <div style="margin-bottom:12px;">Start by completing a case intake to create your first matter.</div>
+      <button id="goToIntake" style="width:100%;padding:10px;background:#1c3f66;color:#fff;border:none;border-radius:6px;cursor:pointer;font-weight:600;">+ New Case Intake</button>
+    `;
+    dropdown.appendChild(empty);
+    matterBtn.parentElement.style.position = 'relative';
+    matterBtn.parentElement.appendChild(dropdown);
+    empty.querySelector('#goToIntake').addEventListener('click', () => {
+      window.location.href = '/case-intake.html';
+    });
+    document.addEventListener('click', () => { dropdown.remove(); }, { once: true });
+    return;
+  }
 
   allMatters.forEach(matter => {
     const item = document.createElement('button');
@@ -216,4 +251,12 @@ function selectMatter(matter) {
 
   // Update discovery-intake.js with the selected matter
   window.dispatchEvent(new CustomEvent('matterSelected', { detail: matter }));
+}
+
+function navigateToDiscoveryIntake() {
+  if (!currentMatter) {
+    alert('Please select a matter first.');
+    return;
+  }
+  window.location.href = `/discovery-intake.html?matter=${currentMatter.id}`;
 }

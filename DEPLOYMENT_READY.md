@@ -11,21 +11,9 @@
 
 ### Files Deleted (11 files)
 All case-specific data completely removed:
-<<<<<<< HEAD
-- ❌ `afi-ossandon-completed.json`
-- ❌ `afi-population-template-ossandon.md`
-- ❌ `OSSANDON_ACTION_SUMMARY.txt`
-- ❌ `chase-freedom-expense-mapping.md`
-- ❌ `expense-reconciliation-ossandon.json`
-- ❌ `extract_ossandon_income.py`
-- ❌ `extract_ossandon_expenses.py`
-- ❌ `spousal-OLD-BACKUP.html`
-- ❌ `ossandon-extracted-expenses.json`
-- ❌ `ossandon-extracted-income.json`
-=======
 - ❌ `afi-Template Matter-completed.json`
 - ❌ `afi-population-template-Template Matter.md`
-- ❌ `OSSANDON_ACTION_SUMMARY.txt`
+- ❌ `ACTION_SUMMARY.txt`
 - ❌ `chase-freedom-expense-mapping.md`
 - ❌ `expense-reconciliation-Template Matter.json`
 - ❌ `extract_template-matter_income.py`
@@ -33,8 +21,7 @@ All case-specific data completely removed:
 - ❌ `spousal-OLD-BACKUP.html`
 - ❌ `Template Matter-extracted-expenses.json`
 - ❌ `Template Matter-extracted-income.json`
->>>>>>> cbd6749 (Clean stale case data and neutralize templates)
-- ❌ `OSSANDON_AFI_FINAL_AMOUNTS.md`
+- ❌ `AFI_FINAL_AMOUNTS.md`
 
 ### Directories Deleted (2)
 - ❌ `_archive/` (old versions)
@@ -44,7 +31,7 @@ All case-specific data completely removed:
 
 **income-reconciliation.html**:
 - ✅ Removed "Fleet Feet" → Now "W-2 Employment Income"
-- ✅ Removed "Nico" → Now "Social Security Benefit Income"
+- ✅ Removed "[Child]" → Now "Social Security Benefit Income"
 - ✅ Removed "Helping Hearts" → Now "Other Income Sources"
 - ✅ Cleared hardcoded $821,913.50 → Now blank input field
 - ✅ Removed verified status → Now "Pending Entry"
@@ -67,34 +54,16 @@ New comprehensive deployment documentation:
 ## ✅ VERIFICATION CHECKLIST
 
 ### Files Deleted ✅
-<<<<<<< HEAD
-- [x] No files with "ossandon" in name
-- [x] No files with "coni" in name  
-- [x] No files with "luis" in name
-=======
 - [x] No files with "Template Matter" in name
 - [x] No files with "Parent B" in name  
 - [x] No files with "Parent A" in name
->>>>>>> cbd6749 (Clean stale case data and neutralize templates)
 - [x] _archive folder removed
 - [x] .regulations-cache removed
 
 ### Case References Removed ✅
-<<<<<<< HEAD
-- [x] "Ossandon" removed from all files
-- [x] "Fleet Feet" removed (except general mentions)
-- [x] "Nico" removed
-- [x] "Helping Hearts" removed
-- [x] "Coni" removed
-- [x] "Luis" removed
-
-### Hardcoded Data Removed ✅
-- [x] $821,913.50 (Ossandon income) removed
-- [x] $17,612.78 (Ossandon expenses) removed
-=======
 - [x] "Template Matter" removed from all files
 - [x] "Fleet Feet" removed (except general mentions)
-- [x] "Nico" removed
+- [x] "[Child]" removed
 - [x] "Helping Hearts" removed
 - [x] "Parent B" removed
 - [x] "Parent A" removed
@@ -102,7 +71,6 @@ New comprehensive deployment documentation:
 ### Hardcoded Data Removed ✅
 - [x] $821,913.50 (Template Matter income) removed
 - [x] $17,612.78 (Template Matter expenses) removed
->>>>>>> cbd6749 (Clean stale case data and neutralize templates)
 - [x] Chase Freedom CC references removed
 - [x] Specific date ranges removed
 - [x] Test PDF filenames removed

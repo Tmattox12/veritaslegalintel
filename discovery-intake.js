@@ -5,13 +5,23 @@ document.addEventListener('DOMContentLoaded', () => {
   const urlParams = new URLSearchParams(window.location.search);
   currentMatterId = urlParams.get('matter') || localStorage.getItem('currentMatterId');
 
+  console.log('Current Matter ID:', currentMatterId);
+
   if (!currentMatterId) {
     showError('No matter selected. Please go back and select a matter first.');
-    return;
+  } else {
+    // Dropzone is handled by discovery-intake-uploads.js (avoid double uploads).
+    loadUploadedDocuments();
   }
 
-  initializeDropzone();
-  loadUploadedDocuments();
+  // Listen for matter selection from matter-selector.js
+  window.addEventListener('matterSelected', (e) => {
+    currentMatterId = e.detail.id;
+    const errorDiv = document.querySelector('[style*="ffebee"]');
+    if (errorDiv) errorDiv.remove();
+    // Dropzone is handled by discovery-intake-uploads.js.
+    loadUploadedDocuments();
+  });
 });
 
 function initializeDropzone() {
@@ -64,19 +74,11 @@ async function handleFileSelection(files) {
     }
 
     const uploadId = 'upload-' + Date.now() + '-' + Math.random();
-
-    // Check for duplicates before creating upload item
-    const isDuplicate = await checkForDuplicate(file);
-    if (isDuplicate) {
-      window.pendingFile = file;
-      window.pendingUploadId = uploadId;
-      showDuplicateWarning(file, uploadId, queue);
-      return; // Stop and wait for user decision
-    }
-
     const uploadItem = createUploadItem(uploadId, file.name);
     queue.appendChild(uploadItem);
-    uploadFile(file, uploadId);
+
+    // Upload sequentially for now
+    await uploadFile(file, uploadId);
   }
 }
 
@@ -209,7 +211,10 @@ async function uploadFile(file, uploadId, replace = false) {
       }
     }, 100);
 
-    const response = await fetch(`/api/matters/${currentMatterId}/bank-statements/upload`, {
+    const uploadUrl = `/api/matters/${currentMatterId}/bank-statements/upload`;
+    console.log('Uploading to:', uploadUrl);
+
+    const response = await fetch(uploadUrl, {
       method: 'POST',
       body: formData,
     });
@@ -387,6 +392,12 @@ async function downloadTransactionsCSV() {
 
   try {
     const response = await fetch(`/api/matters/${currentMatterId}/bank-statements/export.csv`);
+
+    if (!response.ok) {
+      const error = await response.json().catch(() => ({ error: response.statusText }));
+      throw new Error(error.error || `Server error: ${response.status}`);
+    }
+
     const csv = await response.text();
 
     // Create download link

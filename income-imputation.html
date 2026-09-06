@@ -165,6 +165,17 @@
           <p class="sub">Evaluate claimed vs. actual vs. imputable income · identify discrepancies · build defense</p>        </div>
       </section>
 
+      <!-- Import income detected from parsed discovery bank/card statements -->
+      <div id="ieDiscoveryImport" class="panel" style="border-left:4px solid #2e7d32;background:#f4fbf7;display:none;">
+        <div style="display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;">
+          <div>
+            <strong style="color:#1c3f66;">📥 Income detected in Discovery documents</strong>
+            <div style="font-size:12px;color:#51617a;margin-top:3px;" id="ieDiscoveryImportSummary">Loading…</div>
+          </div>
+          <button type="button" class="btn" id="ieDiscoveryImportBtn">Review &amp; Import</button>
+        </div>
+      </div>
+
       <!-- Selected-income summary header (single source of truth for downstream calcs) -->
       <div id="incomeEngineSummary" class="ie-summary">
         <div class="ie-sum-col ie-sum-paying">
@@ -512,6 +523,7 @@
   <script src="document-support-registry.js"></script>
   <script src="document-support-integration.js"></script>
   <script src="income-imputation.js"></script>
+  <script src="income-discovery.js"></script>
   <script src="logo-handler.js"></script>
   <script>
     (function () {
