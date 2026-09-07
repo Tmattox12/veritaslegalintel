@@ -148,22 +148,59 @@ async function uploadToServer(file) {
 }
 
 // Run async tasks with limited concurrency so a big batch doesn't stall on one slow file.
-async function runBatched(items, worker, concurrency = 3) {
+async function runBatched(items, worker, onResult, concurrency = 3) {
   const results = new Array(items.length);
   let idx = 0;
   async function next() {
     while (idx < items.length) {
       const i = idx++;
-      results[i] = await worker(items[i], i);
+      try {
+        results[i] = await worker(items[i], i);
+      } catch (error) {
+        results[i] = { file: items[i].name, outcome: 'failed', error: error.message || 'Unexpected upload error' };
+      }
+      // A rendering error must not stop the remaining files in the queue.
+      try { onResult(results[i], i + 1, items.length); } catch (error) { console.error('Batch progress update failed', error); }
     }
   }
   await Promise.all(Array.from({ length: Math.min(concurrency, items.length) }, next));
   return results;
 }
 
+let uploadBatchActive = false;
+
+async function uploadWithRetry(file, attempts = 2) {
+  let result = null;
+  for (let attempt = 1; attempt <= attempts; attempt++) {
+    result = await uploadToServer(file);
+    if (result.outcome !== 'failed') return result;
+    if (attempt < attempts) {
+      const item = document.querySelector(`#uploadQueue .upload-item:last-child .upload-status`);
+      if (item) item.textContent = `Retrying (${attempt + 1}/${attempts})…`;
+    }
+  }
+  return result;
+}
+
 async function handleFiles(fileList) {
-  const files = Array.from(fileList || []);
+  const selectedFiles = Array.from(fileList || []);
+  const seenNames = new Set();
+  const selectionDuplicates = [];
+  const files = selectedFiles.filter((file) => {
+    const key = file.name.toLowerCase();
+    if (seenNames.has(key)) {
+      selectionDuplicates.push(file.name);
+      return false;
+    }
+    seenNames.add(key);
+    return true;
+  });
   if (!files.length) return;
+
+  if (uploadBatchActive) {
+    alert('A document batch is already processing. Wait for its reconciliation to finish before selecting another batch.');
+    return;
+  }
 
   // Block early with a clear banner if there's no valid matter.
   const mid = await validMatterId();
@@ -172,8 +209,33 @@ async function handleFiles(fileList) {
     return;
   }
 
+  uploadBatchActive = true;
   const startTime = Date.now();
-  const results = await runBatched(files, (f) => uploadToServer(f), 3);
+  const running = { uploaded: 0, duplicates: 0, failed: 0 };
+  // Large PDF/OCR batches are intentionally serial: one slow PDF cannot make
+  // the browser abandon siblings, and every file receives a retry.
+  const concurrency = files.length > 20 ? 1 : 3;
+  showBatchProgress({ selected: selectedFiles.length, queued: files.length, selectionDuplicates: selectionDuplicates.length, complete: 0, uploaded: 0, duplicates: 0, failed: 0, concurrency });
+  let results = [];
+  try {
+    results = await runBatched(files, (f) => uploadWithRetry(f), (result, complete, total) => {
+    if (result?.outcome === 'uploaded') running.uploaded++;
+    if (result?.outcome === 'duplicate') running.duplicates++;
+    if (result?.outcome === 'failed') running.failed++;
+    showBatchProgress({
+      selected: selectedFiles.length,
+      queued: total,
+      selectionDuplicates: selectionDuplicates.length,
+      complete,
+      uploaded: running.uploaded,
+      duplicates: running.duplicates,
+      failed: running.failed,
+      concurrency,
+    });
+    }, concurrency);
+  } finally {
+    uploadBatchActive = false;
+  }
 
   // Reconciliation summary
   const uploaded = results.filter((r) => r && r.outcome === 'uploaded');
@@ -181,16 +243,54 @@ async function handleFiles(fileList) {
   const failed = results.filter((r) => r && r.outcome === 'failed');
   const txTotal = uploaded.reduce((s, r) => s + (r.transactions || 0), 0);
   showRecon({
-    selected: files.length,
+    selected: selectedFiles.length,
     uploaded: uploaded.length,
-    duplicates: dups.length,
+    duplicates: dups.length + selectionDuplicates.length,
     failed: failed.length,
     transactions: txTotal,
     failedFiles: failed,
     seconds: ((Date.now() - startTime) / 1000).toFixed(1),
   });
 
+  finishBatchProgress({
+    selected: selectedFiles.length,
+    uploaded: uploaded.length,
+    duplicates: dups.length + selectionDuplicates.length,
+    failed: failed.length,
+  });
+
   refreshBuckets();
+}
+
+function showBatchProgress(progress) {
+  let el = document.getElementById('uploadBatchProgress');
+  if (!el) {
+    el = document.createElement('div');
+    el.id = 'uploadBatchProgress';
+    el.style.cssText = 'margin-top:12px;border:1px solid #cdddea;border-left:4px solid #2e5b8a;border-radius:8px;background:#f7fafd;padding:12px;';
+    const queue = document.getElementById('uploadQueue');
+    queue.parentElement.insertBefore(el, queue);
+  }
+  const pct = progress.queued ? Math.round((progress.complete / progress.queued) * 100) : 0;
+  el.innerHTML = `
+    <div style="font-weight:700;color:#1c3f66;">📤 Batch upload in progress</div>
+    <div style="font-size:12px;color:#42526e;margin-top:4px;">Selected: <strong>${progress.selected}</strong> · Queue: <strong>${progress.queued}</strong> · Completed: <strong>${progress.complete}/${progress.queued}</strong> · Uploaded: <strong>${progress.uploaded}</strong> · Already present: <strong>${progress.duplicates + progress.selectionDuplicates}</strong> · Failed: <strong>${progress.failed}</strong></div>
+    <div style="height:6px;background:#e2e8f0;border-radius:4px;overflow:hidden;margin-top:8px;"><div style="width:${pct}%;height:100%;background:#2e5b8a;"></div></div>
+    <div style="font-size:11px;color:#6b7280;margin-top:5px;">${progress.concurrency === 1 ? 'Large batch safety mode: one file at a time, with one automatic retry.' : 'Three files process at a time.'} The remaining selected files are safely queued, not skipped.</div>`;
+}
+
+function finishBatchProgress(result) {
+  const queue = document.getElementById('uploadQueue');
+  if (queue) queue.replaceChildren();
+
+  const progress = document.getElementById('uploadBatchProgress');
+  if (!progress) return;
+  const allAccounted = result.failed === 0;
+  progress.style.borderLeftColor = allAccounted ? '#2e7d32' : '#c62828';
+  progress.innerHTML = `
+    <div style="font-weight:700;color:#1c3f66;">${allAccounted ? '✓ Batch upload complete' : '⚠ Batch completed with failures'}</div>
+    <div style="font-size:12px;color:#42526e;margin-top:4px;">Selected: <strong>${result.selected}</strong> · Uploaded: <strong>${result.uploaded}</strong> · Already present: <strong>${result.duplicates}</strong> · Failed: <strong>${result.failed}</strong></div>
+    <div style="font-size:11px;color:#6b7280;margin-top:5px;">Per-file rows cleared. The reconciliation summary below is the retained audit record.</div>`;
 }
 
 /* ---------- Upload reconciliation summary ---------- */
@@ -236,6 +336,9 @@ async function showStoredRecon() {
     ]);
     const docs = await docsR.json();
     const cov = await covR.json();
+    const parsedCount = (docs || []).filter((doc) => doc.extraction_status === 'parsed').length;
+    const reviewCount = (docs || []).filter((doc) => doc.extraction_status === 'needs_review' || doc.ocr_needed).length;
+    const unclassifiedCount = (docs || []).filter((doc) => doc.category === 'Other').length;
 
     let el = document.getElementById('storedRecon');
     if (!el) {
@@ -255,6 +358,9 @@ async function showStoredRecon() {
         <strong>${cov.totalStatements || 0}</strong> statements ·
         <strong>${cov.totalTransactions || 0}</strong> transactions
       </div>
+      <div style="font-size:11px;margin-top:4px;color:${reviewCount || unclassifiedCount ? '#8a6a1f' : '#2e7d32'};">
+        ${parsedCount} parsed · ${reviewCount} need OCR/parsing review · ${unclassifiedCount} need category review
+      </div>
       ${acctLine ? `<div style="font-size:11px;color:#6b7280;margin-top:4px;">${acctLine}</div>` : ''}
       <div style="margin-top:10px;">
         <button type="button" id="reconFolderBtn" class="btn ghost" style="padding:8px 12px;font-size:12px;">🗂 Reconcile against a folder…</button>
@@ -266,6 +372,7 @@ async function showStoredRecon() {
       btn.__wired = true;
       btn.addEventListener('click', pickFolderAndReconcile);
     }
+    showSavedFolderRecon();
   } catch (e) { /* backend down */ }
 }
 
@@ -280,12 +387,12 @@ function pickFolderAndReconcile() {
   input.addEventListener('change', async (e) => {
     const files = Array.from(e.target.files || []);
     const filenames = files.map((f) => f.name);
-    await reconcileFilenames(filenames);
+    await reconcileFilenames(filenames, files);
   });
   input.click();
 }
 
-async function reconcileFilenames(filenames) {
+async function reconcileFilenames(filenames, sourceFiles = []) {
   const mid = await validMatterId();
   if (!mid) { showNoMatterBanner(true); return; }
   const out = document.getElementById('reconFolderSummary');
@@ -296,19 +403,50 @@ async function reconcileFilenames(filenames) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ filenames }),
     });
-    const d = await r.json();
+    let d = await r.json();
+    // A filename mismatch can still be the same document. Hash only the
+    // apparent misses (rather than all source PDFs) and ask the server again.
+    if (d.missingCount && sourceFiles.length && window.crypto?.subtle) {
+      if (out) out.textContent = `Checking ${d.missingCount} apparent missing file(s) for identical contents…`;
+      const missingKeys = new Set(d.missing.map((name) => name.toLowerCase()));
+      const candidates = sourceFiles.filter((file) => missingKeys.has(file.name.toLowerCase()));
+      const manifest = [];
+      for (const file of candidates) {
+        const buffer = await file.arrayBuffer();
+        const hashBuffer = await crypto.subtle.digest('SHA-256', buffer);
+        const hash = Array.from(new Uint8Array(hashBuffer)).map((byte) => byte.toString(16).padStart(2, '0')).join('');
+        manifest.push({ name: file.name, hash });
+      }
+      const retry = await fetch(`${API_BASE}/matters/${mid}/documents/reconcile`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ filenames, files: manifest }),
+      });
+      d = await retry.json();
+    }
+    // Keep the manifest (names only) so the current reconciliation remains
+    // visible after refresh. Browser security prevents persisting file handles;
+    // the user selects the folder again only when ready to upload missing files.
+    localStorage.setItem(`veritas_folder_recon_${mid}`, JSON.stringify({
+      sourceCount: d.sourceCount,
+      presentCount: d.presentCount,
+      missingCount: d.missingCount,
+      extraCount: d.extraCount,
+      missing: d.missing,
+      checkedAt: new Date().toISOString(),
+    }));
     if (out) {
       const ok = d.missingCount === 0;
       out.textContent = `${d.presentCount}/${d.sourceCount} stored · ${d.missingCount} missing · ${d.extraCount} extra`;
       out.style.color = ok ? '#2e7d32' : '#c62828';
     }
-    showFolderRecon(d);
+    showFolderRecon(d, sourceFiles);
   } catch (e) {
     if (out) { out.textContent = 'Could not reconcile — is the backend running?'; out.style.color = '#c62828'; }
   }
 }
 
-function showFolderRecon(d) {
+function showFolderRecon(d, sourceFiles = []) {
   const overlay = document.createElement('div');
   overlay.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:9999;display:flex;align-items:center;justify-content:center;padding:24px;';
   overlay.addEventListener('click', (e) => { if (e.target === overlay) overlay.remove(); });
@@ -328,17 +466,47 @@ function showFolderRecon(d) {
       <div style="display:flex;gap:14px;flex-wrap:wrap;font-size:12px;margin-bottom:8px;">
         <div><span style="color:#666;">Source files:</span> <strong>${d.sourceCount}</strong></div>
         <div><span style="color:#2e7d32;">Stored:</span> <strong>${d.presentCount}</strong></div>
+        <div><span style="color:#856404;">Same-content copies:</span> <strong>${d.contentDuplicateCount || 0}</strong></div>
         <div><span style="color:#c62828;">Missing:</span> <strong>${d.missingCount}</strong></div>
         <div><span style="color:#856404;">Extra in system:</span> <strong>${d.extraCount}</strong></div>
       </div>
       <div style="font-size:12px;color:${ok ? '#2e7d32' : '#c62828'};font-weight:600;margin-bottom:6px;">
-        ${ok ? '✓ System matches the source folder.' : `⚠ ${d.missingCount} source file(s) are not yet in the system.`}
+        ${ok ? `✓ Every source file is accounted for (${d.contentDuplicateCount || 0} byte-identical renamed copy/copies).` : `⚠ ${d.missingCount} source file(s) are not yet in the system.`}
       </div>
       ${missHtml}
       ${extraHtml}
+      ${d.missingCount && sourceFiles.length ? `<div style="margin-top:14px;display:flex;justify-content:flex-end;gap:8px;"><button class="btn" id="frUploadMissing">Upload ${d.missingCount} missing file(s)</button></div>` : ''}
+      ${d.missingCount && !sourceFiles.length ? `<div style="margin-top:14px;font-size:12px;color:#42526e;">Select the same folder again with <strong>Reconcile against a folder…</strong> to enable uploading these ${d.missingCount} missing files.</div>` : ''}
     </div>`;
   document.body.appendChild(overlay);
   overlay.querySelector('#frClose').addEventListener('click', () => overlay.remove());
+  const uploadMissing = overlay.querySelector('#frUploadMissing');
+  if (uploadMissing) {
+    uploadMissing.addEventListener('click', async () => {
+      const missingNames = new Set(d.missing.map((name) => name.toLowerCase()));
+      const missingFiles = sourceFiles.filter((file) => missingNames.has(file.name.toLowerCase()));
+      if (!missingFiles.length) return;
+      overlay.remove();
+      await handleFiles(missingFiles);
+      await showStoredRecon();
+      // Re-run against the full original folder manifest so the result proves
+      // whether every source file is now stored, not merely that the batch ended.
+      await reconcileFilenames(sourceFiles.map((file) => file.name), sourceFiles);
+    });
+  }
+}
+
+function showSavedFolderRecon() {
+  const mid = matterId();
+  if (!mid) return;
+  try {
+    const saved = JSON.parse(localStorage.getItem(`veritas_folder_recon_${mid}`) || 'null');
+    if (!saved) return;
+    const out = document.getElementById('reconFolderSummary');
+    if (!out) return;
+    out.textContent = `${saved.presentCount}/${saved.sourceCount} stored · ${saved.missingCount} missing · ${saved.extraCount} extra`;
+    out.style.color = saved.missingCount ? '#c62828' : '#2e7d32';
+  } catch (error) { /* ignore stale manifest */ }
 }
 
 /* ---------- Category buckets & stats ---------- */
@@ -369,12 +537,25 @@ function docBucket(d) {
 function docItem(d) {
   const div = document.createElement('div');
   div.className = 'doc-item';
+  const categories = ['Financial Statements', 'Tax Returns & Income', 'Property & Assets', 'Court & Legal Documents', 'AFI & Disclosures', 'Other'];
+  const type = d.document_type;
+  const isPayStub = type === 'Pay Stub / Earnings Statement';
+  const isBank = type === 'Bank Account Statement';
+  const isCard = type === 'Credit Card Statement';
+  const isTyped = isPayStub || isBank || isCard;
+  const options = categories.map((category) =>
+    `<option value="${category}" ${d.category === category && !isTyped ? 'selected' : ''}>${category}</option>`
+  ).join('')
+    + `<option value="__bank__" ${isBank ? 'selected' : ''}>Bank Account Statement (feeds AFI expenses)</option>`
+    + `<option value="__credit_card__" ${isCard ? 'selected' : ''}>Credit Card Statement (feeds AFI expenses)</option>`
+    + `<option value="__pay_stub__" ${isPayStub ? 'selected' : ''}>Pay Stub (links to Income)</option>`;
   const badge = d.ocr_needed ? '<span class="doc-badge pending">OCR review</span>'
     : '<span class="doc-badge received">Received</span>';
   div.innerHTML = `
     <div>
       <span class="doc-name">${d.filename}</span>
-      <div style="font-size:11px;color:#999;margin-top:2px;">${d.category || 'Uncategorized'}</div>
+      <select class="map-select" data-category style="margin-top:4px;max-width:220px;">${options}</select>
+      <div style="font-size:11px;color:${d.classification_confidence === 'needs_review' ? '#b45309' : '#6b7280'};margin-top:3px;">${d.document_type || 'Document type pending'}${d.classification_confidence === 'needs_review' ? ' · review needed' : ''}</div>
     </div>
     <div style="display:flex;gap:6px;align-items:center;">
       ${badge}
@@ -385,7 +566,64 @@ function docItem(d) {
   if (btn) btn.addEventListener('click', () => markReviewed(d.id));
   const dl = div.querySelector('[data-dl]');
   if (dl) dl.addEventListener('click', () => downloadOriginal(d.id, d.filename));
+  const categorySelect = div.querySelector('[data-category]');
+  if (categorySelect) categorySelect.addEventListener('change', () => {
+    const v = categorySelect.value;
+    if (v === '__pay_stub__') {
+      updateDocumentCategory(d.id, 'Tax Returns & Income', 'Pay Stub / Earnings Statement');
+    } else if (v === '__bank__') {
+      classifyAccount(d, 'Bank Account Statement');
+    } else if (v === '__credit_card__') {
+      classifyAccount(d, 'Credit Card Statement');
+    } else {
+      updateDocumentCategory(d.id, v);
+    }
+  });
   return div;
+}
+
+// Classify every statement that shares this document's account number at once.
+async function classifyAccount(doc, documentType) {
+  const m = (doc.filename || '').match(/(?:acct|account|cc|card)\s*(\d{3,})/i);
+  if (!m) {
+    updateDocumentCategory(doc.id, 'Financial Statements', documentType);
+    return;
+  }
+  const account = m[1];
+  if (!confirm(`Apply "${documentType}" to all statements for account ${account}?`)) {
+    refreshBuckets();
+    return;
+  }
+  const mid = matterId();
+  try {
+    const response = await fetch(`${API_BASE}/matters/${mid}/documents/classify-account`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ documentId: doc.id, category: 'Financial Statements', documentType }),
+    });
+    const result = await response.json();
+    if (!response.ok) throw new Error(result.error || 'Update failed');
+    refreshBuckets();
+  } catch (error) {
+    alert('Could not update the account statements.');
+    refreshBuckets();
+  }
+}
+
+async function updateDocumentCategory(docId, category, documentType) {
+  try {
+    const body = { category };
+    if (documentType) body.documentType = documentType;
+    const response = await fetch(`${API_BASE}/documents/${docId}/category`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    if (!response.ok) throw new Error('Category update failed');
+    refreshBuckets();
+  } catch (error) {
+    alert('Could not update the document category.');
+  }
 }
 
 async function downloadOriginal(docId, filename) {

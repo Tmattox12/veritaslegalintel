@@ -1,14 +1,18 @@
 const express = require('express');
 const multer = require('multer');
+const crypto = require('crypto');
 const { v4: uuidv4 } = require('uuid');
 
 const { extractText } = require('../services/file-extractor');
 const { visionExtractText } = require('../services/claude-vision-ocr');
 const { categorizeDocument, CATEGORIES } = require('../services/document-categorizer');
+const { classifyDocument } = require('../services/document-classifier');
+const { extractIncomeEvidence } = require('../services/income-evidence-extractor');
 const { parseStatementText } = require('../services/statement-parser');
 const { storeOriginal, MODE: STORAGE_MODE } = require('../services/storage');
 
 const router = express.Router({ mergeParams: true });
+const activeUploads = new Set();
 
 // Map UI category labels -> the DOM ids used on discovery-intake.html
 const CATEGORY_TO_BUCKET = {
@@ -26,7 +30,7 @@ function keywordClassify(filename, text) {
   const t = (text || '').toLowerCase().slice(0, 4000);
   const has = (re) => re.test(f) || re.test(t);
 
-  if (has(/bank statement|statement period|account summary|checking account|savings account|credit card statement/)) return CATEGORIES.FINANCIAL_STATEMENTS;
+  if (has(/bank statement|statement period|account summary|checking account|savings account|credit card statement|\bacct\.?\s*\d{3,}|chase freedom|chase savings|chase card/)) return CATEGORIES.FINANCIAL_STATEMENTS;
   if (has(/\b1040\b|\bw-?2\b|\bk-?1\b|tax return|schedule c|1099/)) return CATEGORIES.TAX_RETURNS;
   if (has(/\bdeed\b|\btitle\b|appraisal|property tax|closing statement|hud-1|mortgage statement/)) return CATEGORIES.PROPERTY_ASSETS;
   if (has(/affidavit of financial information|\bafi\b|financial disclosure|sworn statement|rule 49/)) return CATEGORIES.AFI_DISCLOSURES;
@@ -62,11 +66,20 @@ router.post('/upload', upload.single('file'), async (req, res) => {
     return res.status(404).json({ error: 'Matter not found. Create/select a matter first (Case Intake).' });
   }
 
-  // Server-side dedup: same filename already uploaded to this matter -> skip.
+  const fileHash = crypto.createHash('sha256').update(req.file.buffer).digest('hex');
+  const uploadKey = `${matterId}:${fileHash}`;
+
+  // Protect against duplicate browser events while a large file is still parsing.
+  if (activeUploads.has(uploadKey)) {
+    return res.json({ success: true, duplicate: true, message: 'This file is already processing' });
+  }
+
+  // Server-side dedup: same filename OR the same file contents -> skip.
   const dup = await new Promise((resolve) => {
     req.db.get(
-      'SELECT id FROM documents WHERE matter_id = ? AND filename = ? AND deleted_at IS NULL',
-      [matterId, req.file.originalname],
+      `SELECT id FROM documents
+       WHERE matter_id = ? AND deleted_at IS NULL AND (filename = ? OR file_hash = ?)`,
+      [matterId, req.file.originalname, fileHash],
       (e, r) => resolve(r)
     );
   });
@@ -74,14 +87,16 @@ router.post('/upload', upload.single('file'), async (req, res) => {
     return res.json({ success: true, duplicate: true, documentId: dup.id, message: 'Already uploaded' });
   }
 
+  activeUploads.add(uploadKey);
   const docId = uuidv4();
 
   try {
-    // Extract text (pdf text layer / csv / xlsx / docx). If no text layer,
-    // fall back to vision OCR for scanned PDFs and images.
+    // Extract text (pdf text layer / csv / xlsx / docx). Bulk intake must not
+    // stop on a slow vision-OCR request: store no-text documents immediately
+    // and flag them for explicit OCR/parsing review instead.
     let { text, ocrNeeded, ext } = await extractText(req.file);
     let ocrUsed = false;
-    if (ocrNeeded && process.env.ANTHROPIC_API_KEY && (ext === 'pdf' || ['jpg', 'jpeg', 'png', 'gif'].includes(ext))) {
+    if (req.body.processOcr === 'true' && ocrNeeded && process.env.ANTHROPIC_API_KEY && (ext === 'pdf' || ['jpg', 'jpeg', 'png', 'gif'].includes(ext))) {
       try {
         text = await visionExtractText(req.file.buffer, ext);
         ocrUsed = !!text;
@@ -91,13 +106,16 @@ router.post('/upload', upload.single('file'), async (req, res) => {
       }
     }
 
-    // Classify: keyword first (free), Claude as fallback.
-    let category = keywordClassify(req.file.originalname, text);
-    let classificationSource = category ? 'keyword' : null;
-    if (!category && text && process.env.ANTHROPIC_API_KEY) {
+    // Classify from evidence in the filename/header first, then use Claude only
+    // for genuinely ambiguous documents.
+    let classification = classifyDocument(req.file.originalname, text);
+    let category = classification.category;
+    let classificationSource = classification.confidence === 'high' ? 'evidence' : null;
+    if (classification.confidence === 'needs_review' && text && process.env.ANTHROPIC_API_KEY) {
       try {
         category = await categorizeDocument(req.file.originalname, text);
         classificationSource = 'claude';
+        classification = { ...classification, category, type: 'AI-classified document', confidence: 'review_ai' };
       } catch (e) {
         category = CATEGORIES.OTHER;
       }
@@ -134,9 +152,9 @@ router.post('/upload', upload.single('file'), async (req, res) => {
       }
     }
 
-    await run(req, `INSERT INTO documents (id, matter_id, filename, content_type, category, uploaded_by, uploaded_at)
-      VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)`,
-      [docId, matterId, req.file.originalname, req.file.mimetype, category, userId]);
+    await run(req, `INSERT INTO documents (id, matter_id, filename, content_type, category, uploaded_by, uploaded_at, file_hash, document_type, classification_confidence)
+      VALUES (?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP, ?, ?, ?)`,
+      [docId, matterId, req.file.originalname, req.file.mimetype, category, userId, fileHash, classification.type, classification.confidence]);
 
     // Persist the original file (local disk or Azure Blob depending on STORAGE_MODE)
     let storageKey = null;
@@ -148,9 +166,14 @@ router.post('/upload', upload.single('file'), async (req, res) => {
       console.error('Storage save failed:', e.message);
     }
 
+    const extractionStatus = looksFinancial
+      ? (transactionCount > 0 ? 'parsed' : 'needs_review')
+      : (ocrUsed ? 'ocr' : 'uploaded');
+    const needsReview = ocrNeeded || extractionStatus === 'needs_review';
+
     // Best-effort: store extraction metadata columns if they exist.
     await run(req, `UPDATE documents SET extraction_status = ?, ocr_needed = ? WHERE id = ?`,
-      [looksFinancial && transactionCount > 0 ? 'parsed' : (ocrUsed ? 'ocr' : 'uploaded'), ocrNeeded ? 1 : 0, docId]).catch(() => {});
+      [extractionStatus, needsReview ? 1 : 0, docId]).catch(() => {});
 
     res.json({
       success: true,
@@ -158,7 +181,7 @@ router.post('/upload', upload.single('file'), async (req, res) => {
       category,
       categoryBucket: CATEGORY_TO_BUCKET[category] || 'other',
       classificationSource: classificationSource || 'keyword-default',
-      ocrNeeded,
+      ocrNeeded: needsReview,
       ocrUsed,
       statementId,
       transactionCount,
@@ -169,8 +192,95 @@ router.post('/upload', upload.single('file'), async (req, res) => {
     });
   } catch (error) {
     console.error('Document upload error:', error);
+    if (error.code === 'SQLITE_CONSTRAINT') {
+      return res.json({ success: true, duplicate: true, message: 'Already uploaded' });
+    }
+    res.status(500).json({ error: error.message });
+  } finally {
+    activeUploads.delete(uploadKey);
+  }
+});
+
+// GET /api/matters/:matterId/documents/income-evidence
+// Reads specifically classified income documents and returns reviewable evidence.
+router.get('/income-evidence', async (req, res) => {
+  const { matterId } = req.params;
+  try {
+    const { getOriginal } = require('../services/storage');
+    const docs = await new Promise((resolve, reject) => {
+      req.db.all(
+        `SELECT d.id, d.filename, d.s3_key, d.document_type, d.extraction_status,
+          r.party, r.annual_amount, r.status AS review_status
+         FROM documents d
+         LEFT JOIN income_evidence_reviews r ON r.document_id = d.id
+         WHERE d.matter_id = ? AND d.deleted_at IS NULL
+           AND d.category = 'Tax Returns & Income'`,
+        [matterId],
+        (error, rows) => error ? reject(error) : resolve(rows || [])
+      );
+    });
+
+    const evidence = [];
+    for (const doc of docs) {
+      let text = '';
+      if (doc.s3_key) {
+        try {
+          const buffer = await getOriginal(doc.s3_key);
+          text = (await extractText({ originalname: doc.filename, buffer })).text || '';
+        } catch (error) {
+          // Keep the document visible even when it needs OCR/manual review.
+        }
+      }
+      evidence.push({
+        documentId: doc.id,
+        ...extractIncomeEvidence(doc.filename, text, doc.document_type),
+        extractionStatus: doc.extraction_status,
+        party: doc.party || null,
+        annualAmount: doc.annual_amount || null,
+        reviewStatus: doc.review_status || 'pending',
+      });
+    }
+
+    const payStubs = evidence.filter((item) => item.kind === 'pay_stub');
+    const grossTotal = payStubs.reduce((total, item) => total + (item.grossPay || 0), 0);
+    const netTotal = payStubs.reduce((total, item) => total + (item.netPay || item.paymentAmount || 0), 0);
+    res.json({
+      matterId,
+      evidence,
+      summary: {
+        documentCount: evidence.length,
+        payStubCount: payStubs.length,
+        documentedGrossTotal: +grossTotal.toFixed(2),
+        documentedNetTotal: +netTotal.toFixed(2),
+        reviewRequired: evidence.filter((item) => item.requiresReview).length,
+      },
+    });
+  } catch (error) {
     res.status(500).json({ error: error.message });
   }
+});
+
+// POST /api/matters/:matterId/documents/income-evidence/:documentId/review
+// An approved annual amount is the only document-derived income that downstream
+// calculation pages may treat as accepted.
+router.post('/income-evidence/:documentId/review', (req, res) => {
+  const { matterId, documentId } = req.params;
+  const { party, annualAmount, status } = req.body || {};
+  if (!['party_a', 'party_b'].includes(party) || !['accepted', 'rejected', 'pending'].includes(status)) {
+    return res.status(400).json({ error: 'Valid party and review status are required' });
+  }
+  const amount = annualAmount === '' || annualAmount == null ? null : Number(annualAmount);
+  if (amount != null && (!Number.isFinite(amount) || amount < 0)) {
+    return res.status(400).json({ error: 'Annual amount must be a non-negative number' });
+  }
+  req.db.run(
+    `INSERT INTO income_evidence_reviews (document_id, matter_id, party, annual_amount, status, reviewed_at)
+     VALUES (?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+     ON CONFLICT(document_id) DO UPDATE SET party=excluded.party, annual_amount=excluded.annual_amount,
+       status=excluded.status, reviewed_at=CURRENT_TIMESTAMP`,
+    [documentId, matterId, party, amount, status],
+    (error) => error ? res.status(500).json({ error: error.message }) : res.json({ success: true })
+  );
 });
 
 // POST /api/matters/:matterId/documents/reprocess - re-extract + re-parse all stored originals
@@ -186,18 +296,35 @@ router.post('/reprocess', async (req, res) => {
     for (const doc of docs) {
       try {
         const buf = await getOriginal(doc.s3_key);
+        const fileHash = crypto.createHash('sha256').update(buf).digest('hex');
+        await run(req, 'UPDATE documents SET file_hash = ? WHERE id = ?', [fileHash, doc.id]);
         const fakeFile = { originalname: doc.filename, buffer: buf };
         let { text, ocrNeeded, ext } = await extractText(fakeFile);
         if (ocrNeeded && process.env.ANTHROPIC_API_KEY && (ext === 'pdf' || ['jpg','jpeg','png','gif'].includes(ext))) {
           try { text = await visionExtractText(buf, ext); } catch (e) { /* keep going */ }
         }
-        if (!text) continue;
+        const classification = classifyDocument(doc.filename, text);
+        await run(req, 'UPDATE documents SET category = ?, document_type = ?, classification_confidence = ? WHERE id = ?',
+          [classification.category, classification.type, classification.confidence, doc.id]);
+
+        if (!text) {
+          await run(req, `UPDATE documents SET extraction_status = 'needs_review', ocr_needed = 1 WHERE id = ?`, [doc.id]);
+          continue;
+        }
 
         const looksFinancial = /\d{1,2}\/\d{1,2}/.test(text) && /\d+\.\d{2}/.test(text);
-        if (!looksFinancial) continue;
+        if (!looksFinancial) {
+          if (classification.category === CATEGORIES.FINANCIAL_STATEMENTS) {
+            await run(req, `UPDATE documents SET extraction_status = 'needs_review', ocr_needed = 1 WHERE id = ?`, [doc.id]);
+          }
+          continue;
+        }
 
         const parsed = parseStatementText(text, doc.filename);
-        if (!parsed.transactions.length) continue;
+        if (!parsed.transactions.length) {
+          await run(req, `UPDATE documents SET extraction_status = 'needs_review', ocr_needed = 1 WHERE id = ?`, [doc.id]);
+          continue;
+        }
 
         // Replace existing statement + transactions for this document
         const existing = await new Promise((resolve) => {
@@ -218,6 +345,7 @@ router.post('/reprocess', async (req, res) => {
             [uuidv4(), statementId, txn.date, txn.description, txn.amount, txn.type, txn.runningBalance, txn.flowType, txn.suggestedCategory, txn.suggestedCategory || null, txn.suggestedCategory ? 'auto_mapped' : 'unmapped']);
           totalTx++;
         }
+        await run(req, `UPDATE documents SET extraction_status = 'parsed', ocr_needed = 0 WHERE id = ?`, [doc.id]);
         reprocessed++;
       } catch (e) {
         console.error('reprocess failed for', doc.filename, e.message);
@@ -430,27 +558,52 @@ router.get('/rfp.docx', async (req, res) => {
 });
 
 // POST /api/matters/:matterId/documents/reconcile
-// Body: { filenames: string[] } — the source folder's file list.
-// Returns which source files are stored, which are missing, and any stored extras.
+// Body: { filenames: string[], files?: [{ name, hash }] } — a source folder manifest.
+// A file with the same SHA-256 content is accounted for even if it has a renamed copy.
 router.post('/reconcile', async (req, res) => {
   const { matterId } = req.params;
-  const sourceFiles = Array.isArray(req.body.filenames) ? req.body.filenames : [];
+  const suppliedFiles = Array.isArray(req.body.files) ? req.body.files : [];
+  const sourceFiles = Array.isArray(req.body.filenames) && req.body.filenames.length
+    ? req.body.filenames
+    : suppliedFiles.map((file) => file?.name);
+  const normalizeFilename = (value) => String(value || '')
+    .normalize('NFKD')
+    .replace(/[’'`]/g, '')
+    .replace(/[^a-z0-9.]+/gi, '')
+    .toLowerCase();
   try {
     const docs = await new Promise((resolve) => {
-      req.db.all('SELECT filename, category, extraction_status FROM documents WHERE matter_id = ? AND deleted_at IS NULL', [matterId], (e, r) => resolve(r || []));
+      req.db.all('SELECT filename, file_hash, category, extraction_status FROM documents WHERE matter_id = ? AND deleted_at IS NULL', [matterId], (e, r) => resolve(r || []));
     });
-    const stored = new Set(docs.map((d) => (d.filename || '').toLowerCase()));
+    const storedNames = new Set(docs.map((d) => normalizeFilename(d.filename)));
+    const storedHashes = new Set(docs.map((d) => d.file_hash).filter(Boolean));
     const srcNorm = sourceFiles.map((f) => (f || '').trim()).filter(Boolean);
-    const srcSet = new Set(srcNorm.map((f) => f.toLowerCase()));
+    const sourceByName = new Map(suppliedFiles.map((file) => [normalizeFilename(file?.name), file?.hash]));
+    const srcSet = new Set(srcNorm.map(normalizeFilename));
+    const sourceHashes = new Set(suppliedFiles.map((file) => file?.hash).filter(Boolean));
 
-    const missing = srcNorm.filter((f) => !stored.has(f.toLowerCase()));
-    const present = srcNorm.filter((f) => stored.has(f.toLowerCase()));
-    const extra = docs.filter((d) => !srcSet.has((d.filename || '').toLowerCase())).map((d) => d.filename);
+    const contentDuplicates = [];
+    const missing = srcNorm.filter((name) => {
+      const normalized = normalizeFilename(name);
+      if (storedNames.has(normalized)) return false;
+      const hash = sourceByName.get(normalized);
+      if (hash && storedHashes.has(hash)) {
+        contentDuplicates.push(name);
+        return false;
+      }
+      return true;
+    });
+    const presentCount = srcNorm.length - missing.length - contentDuplicates.length;
+    const extra = docs
+      .filter((d) => !srcSet.has(normalizeFilename(d.filename)) && !sourceHashes.has(d.file_hash))
+      .map((d) => d.filename);
 
     res.json({
       sourceCount: srcNorm.length,
       storedCount: docs.length,
-      presentCount: present.length,
+      presentCount,
+      contentDuplicateCount: contentDuplicates.length,
+      contentDuplicates,
       missingCount: missing.length,
       extraCount: extra.length,
       missing,

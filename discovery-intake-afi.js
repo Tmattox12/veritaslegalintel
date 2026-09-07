@@ -26,7 +26,7 @@
     fuel: 7,
     groceries: 8,
     dining: 8,
-    shopping: null, // discretionary, no AFI line
+    shopping: 8, // household/grocery purchases (Amazon, Walmart, Target) -> Food/Groceries
     transfer: null,
     tax: null,
     employment_income: null, // income, not expense
@@ -35,6 +35,51 @@
   let allTransactions = [];
   // merchantKey -> afiLine (number|null) for user overrides
   const userMappings = {};
+
+  // Auto-detect common merchants -> AFI line. Checked against the uppercased
+  // merchant key. User overrides always win; these are just a first-pass guess.
+  const MERCHANT_PATTERNS = [
+    // Line 8 — Food / Groceries / household shopping
+    [/\bamazon\b|\bamzn\b|\bamzn\s*mktp\b|\bwalmart\b|\bwal-?mart\b|\bwalmartcom\b|\bsafeway\b|\bsams ?club\b|\bsamsclubcom\b|\bcostco\b|\bkroger\b|\bfry'?s\b|\balbertsons?\b|\btrader\s*joe'?s?\b|\bwhole\s*foods?\b|\bsprouts?\b|\btarget\b|\bdollar\s*(?:tree|general)\b|\baldi\b|\bfood\s*city\b|\bel\s*super\b|\bbashas\b|\bwin-?co\b/i, 8],
+    // Line 3 — Medical / Dental (out-of-pocket)
+    [/\bcvs\b|\bwalgreens?\b|\brite\s*aid\b|\bpharmacy\b|\b(derm|dent|ortho|vision|optom|clinic|medical|urgent\s*care|lab|quest|labcorp|hospital|physician|pediatric)\b/i, 3],
+    // Line 7 — Transportation (car / gas / insurance)
+    [/\bchevron\b|\bshell\b|\bcircle\s*k\b|\barco\b|\bexxon\b|\bmobil\b|\bspeedway\b|\bquiktrip\b|\bqt\b|\bgas\b|\bfuel\b|\bvalero\b|\bcostco\s*gas\b|\bhonda\b|\btoyota\b|\bford\b|\bjiffy\s*lube\b|\bmidas\b|\btire\b|\bauto\s*zone\b|\bo'?reilly\b|\bnapa\s*auto\b|\bpep\s*boys\b|\bdmv\b|\bgeico\b|\bstate\s*farm\b|\bprogressive\b|\ballstate\b|\busaa\b|\bAAA\b/i, 7],
+    // Line 5 — Housing (mortgage / rent)
+    [/\bmortgage\b|\brent\b|\bhoa\b|\bhome\s*owners\b|\bproperty\s*management\b|\bhud\b|\bzillow\b|\bapartment/i, 5],
+    // Line 6 — Utilities (phone / internet / cable / electric)
+    [/\bverizon\b|\bat&?t\b|\bt-?mobile\b|\bsprint\b|\bcomcast\b|\bxfinity\b|\bcox\b|\bcenturylink\b|\bspectrum\b|\btep\b|\btucson\s*electric\b|\bsouthwest\s*gas\b|\bwater\b|\btrash\b|\bwm\s*waste\b|\bcity\s*of\b|\butility\b|\binternet\b|\bcable\b/i, 6],
+    // Line 1 — Health insurance premium
+    [/\bblue\s*cross\b|\bbcbcs?\b|\bunited\s*health|\baetna\b|\bcigna\b|\bhumana\b|\bkaiser\b|\bhealth\s*insur|\bambetter\b|\boscar\s*health/i, 1],
+    // Line 2 — Childcare / dependent care
+    [/\bday\s*care\b|\bdaycare\b|\bchild\s*care\b|\bchildcare\b|\bpreschool\b|\bmontessori\b|\bafter\s*school\b|\bbabysit|\bnanny\b|\byouth\s*(?:program|camp)\b|\bboys\s*&?\s*girls\s*club/i, 2],
+    // Line 4 — Education / books / supplies
+    [/\bschool\b|\btuition\b|\buniversity\b|\bcollege\b|\bbookstore\b|\bamzn\s*mktp.*book|\bscholastic\b|\bpearson\b|\btusd\b|\bclassroom\b|\bstaples\b|\boffice\s*(?:depot|max)\b/i, 4],
+  ];
+
+  // Returns { line, auto } for a merchant description, or null when unknown.
+  function detectMerchantLine(description) {
+    const key = (description || '').toUpperCase();
+    for (const [re, line] of MERCHANT_PATTERNS) {
+      if (re.test(key)) return line;
+    }
+    return null;
+  }
+
+  function isMappableExpense(transaction) {
+    const description = (transaction.description || '').toLowerCase();
+    const category = transaction.mapped_category || transaction.suggested_category || '';
+    const amount = Math.abs(parseFloat(transaction.amount) || 0);
+
+    // Transfers and credit-card payments move money between accounts; they are
+    // not household spending and must never inflate an AFI expense total.
+    if (category === 'transfer' || /\bpayment\s+to\s+(?:chase|credit|card)|\bpayment thank you|\btransfer\b|\bzelle\b|\bvenmo\b|\bpaypal\b|\bdeposit\b/.test(description)) {
+      return false;
+    }
+    // A parsed amount over $100k is almost certainly an OCR/reference-ID error
+    // and requires review before it can participate in a financial calculation.
+    return amount > 0 && amount <= 100000;
+  }
 
   function matterId() {
     return (
@@ -72,11 +117,11 @@
       ]);
       const rows = await txRes.json();
       const stmts = await stRes.json();
-      allTransactions = (rows || []).filter((t) => t.flow_type === 'expense');
+      allTransactions = (rows || []).filter((t) => t.flow_type === 'expense' && isMappableExpense(t));
       statementSpans = (stmts || []).filter((s) => s.statement_start && s.statement_end);
       render();
       setNote(allTransactions.length
-        ? `Loaded ${allTransactions.length} expense transactions from parsed statements.`
+        ? `Loaded ${allTransactions.length} mappable expense transactions from parsed statements (payments and transfers excluded).`
         : 'No expense transactions found. Upload bank/card statements first.');
     } catch (e) {
       setNote('Could not load transactions — is the Node backend running on :3000?');
@@ -95,7 +140,12 @@
       const cat = t.mapped_category || t.suggested_category;
       let line = cat != null ? CATEGORY_TO_LINE[cat] : undefined;
 
-      // user override by merchant
+      // auto-detect obvious merchants when the parser left it unmapped
+      if (line == null || line === undefined) {
+        line = detectMerchantLine(t.description);
+      }
+
+      // user override by merchant always wins
       const mk = merchantKey(t.description);
       if (userMappings[mk] !== undefined) line = userMappings[mk];
 

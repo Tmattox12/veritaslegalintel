@@ -109,6 +109,84 @@ app.get('/api/matters/:id', (req, res) => {
   );
 });
 
+  // Source-backed totals for AFI, spousal maintenance, and child support pages.
+  app.get('/api/matters/:id/analysis-summary', (req, res) => {
+    const { id } = req.params;
+    const all = (sql, params) => new Promise((resolve, reject) => {
+      req.db.all(sql, params, (err, rows) => err ? reject(err) : resolve(rows || []));
+    });
+
+    Promise.all([
+      all('SELECT COUNT(*) AS count FROM documents WHERE matter_id = ? AND deleted_at IS NULL', [id]),
+      all(`SELECT id, account_type, statement_start, statement_end
+           FROM bank_statements WHERE matter_id = ? AND processing_status = 'completed'`, [id]),
+      all(`SELECT bt.amount, bt.description, bt.suggested_category, bt.mapped_category, bt.flow_type, bs.account_type
+           FROM bank_transactions bt
+           JOIN bank_statements bs ON bs.id = bt.bank_statement_id
+           WHERE bs.matter_id = ?`, [id]),
+      all(`SELECT ier.document_id AS documentId, ier.party, ier.annual_amount AS annualAmount,
+                  d.filename AS filename, d.document_type AS documentType
+           FROM income_evidence_reviews ier
+           JOIN documents d ON d.id = ier.document_id
+           WHERE ier.matter_id = ?
+             AND ier.status = 'accepted'
+             AND ier.annual_amount > 0
+             AND d.deleted_at IS NULL`, [id]),
+    ]).then(([docRows, statements, transactions, acceptedIncomeEvidence]) => {
+      const coverage = new Set(statements.map((s) => (s.statement_start || '').slice(0, 7)).filter(Boolean));
+      const monthCount = Math.max(1, coverage.size);
+      const monthlyExpenses = {};
+      let incomeCandidateTotal = 0;
+
+      transactions.forEach((txn) => {
+        const amount = Math.abs(Number(txn.amount) || 0);
+        const category = txn.mapped_category || txn.suggested_category;
+        const description = (txn.description || '').toLowerCase();
+        const isAccountMovement =
+          category === 'transfer' || category === 'employment_income' || category === 'tax' ||
+          /\bpayment\s+to\s+(?:chase|credit|card)|\bpayment thank you|\btransfer\b|\bzelle\b|\bvenmo\b|\bpaypal\b|\bdeposit\b/.test(description);
+
+        if (txn.flow_type === 'expense' && category && !isAccountMovement && amount <= 100000) {
+          monthlyExpenses[category] = (monthlyExpenses[category] || 0) + amount;
+        }
+        // Only non-credit-card deposits are income candidates. Card payments/refunds
+        // are deliberately excluded; a lawyer must review/confirm candidate income.
+        if (txn.flow_type === 'income' && txn.account_type !== 'credit_card') {
+          incomeCandidateTotal += amount;
+        }
+      });
+
+      Object.keys(monthlyExpenses).forEach((key) => {
+        monthlyExpenses[key] = +(monthlyExpenses[key] / monthCount).toFixed(2);
+      });
+
+      const acceptedIncomeByParty = { party_a: 0, party_b: 0 };
+      acceptedIncomeEvidence.forEach((item) => {
+        if (Object.hasOwn(acceptedIncomeByParty, item.party)) {
+          acceptedIncomeByParty[item.party] += Number(item.annualAmount) || 0;
+        }
+      });
+      Object.keys(acceptedIncomeByParty).forEach((party) => {
+        acceptedIncomeByParty[party] = +acceptedIncomeByParty[party].toFixed(2);
+      });
+
+      res.json({
+        matterId: id,
+        documentCount: docRows[0]?.count || 0,
+        statementCount: statements.length,
+        transactionCount: transactions.length,
+        coverageMonths: coverage.size,
+        monthlyIncomeCandidate: +(incomeCandidateTotal / monthCount).toFixed(2),
+        annualIncomeCandidate: +(incomeCandidateTotal / monthCount * 12).toFixed(2),
+        acceptedIncomeAnnual: +(acceptedIncomeByParty.party_a + acceptedIncomeByParty.party_b).toFixed(2),
+        acceptedIncomeByParty,
+        acceptedIncomeEvidence,
+        monthlyExpenses,
+        generatedAt: new Date().toISOString(),
+      });
+    }).catch((err) => res.status(500).json({ error: err.message }));
+  });
+
 // Get documents for a matter
 app.get('/api/matters/:id/documents', (req, res) => {
   const { id } = req.params;
@@ -205,6 +283,86 @@ app.post('/api/documents/:id/review', (req, res) => {
         return res.status(500).json({ error: err.message });
       }
       res.json({ success: true });
+    }
+  );
+});
+
+// Allow an attorney/paralegal to correct an automatic document classification.
+app.patch('/api/documents/:id/category', (req, res) => {
+  const { id } = req.params;
+  const allowed = [
+    'Financial Statements',
+    'Tax Returns & Income',
+    'Property & Assets',
+    'Court & Legal Documents',
+    'AFI & Disclosures',
+    'Other',
+  ];
+  const allowedTypes = [
+    'Pay Stub / Earnings Statement',
+    'Social Security Income / Benefits Statement',
+    'Tax Return / Tax Income Record',
+    'Brokerage / Investment Statement',
+    'Credit Card Statement',
+    'Savings Account Statement',
+    'Bank Account Statement',
+    'Expert Report / Expert Disclosure',
+    'Court / Legal Disclosure',
+    'Child / Education Record',
+    'Unclassified Document',
+  ];
+  const category = req.body?.category;
+  const documentType = req.body?.documentType;
+  if (!allowed.includes(category)) {
+    return res.status(400).json({ error: 'Invalid document category' });
+  }
+  if (documentType != null && !allowedTypes.includes(documentType)) {
+    return res.status(400).json({ error: 'Invalid document type' });
+  }
+  const sql = documentType != null
+    ? 'UPDATE documents SET category = ?, document_type = ? WHERE id = ? AND deleted_at IS NULL'
+    : 'UPDATE documents SET category = ? WHERE id = ? AND deleted_at IS NULL';
+  const params = documentType != null ? [category, documentType, id] : [category, id];
+  req.db.run(sql, params, function(err) {
+      if (err) return res.status(500).json({ error: err.message });
+      if (!this.changes) return res.status(404).json({ error: 'Document not found' });
+      res.json({ success: true, id, category, documentType: documentType || undefined });
+    }
+  );
+});
+
+// Apply a classification to every statement for the same account.
+// The account is inferred from the account/card token in the filename
+// (e.g. "3063", "5013", "8531"), so monthly statements for one account update together.
+app.post('/api/matters/:matterId/documents/classify-account', (req, res) => {
+  const { matterId } = req.params;
+  const { documentId, category, documentType } = req.body || {};
+  if (!documentId || !category) {
+    return res.status(400).json({ error: 'documentId and category are required' });
+  }
+
+  req.db.get(
+    'SELECT filename FROM documents WHERE id = ? AND matter_id = ? AND deleted_at IS NULL',
+    [documentId, matterId],
+    (err, doc) => {
+      if (err) return res.status(500).json({ error: err.message });
+      if (!doc) return res.status(404).json({ error: 'Document not found' });
+
+      const m = (doc.filename || '').match(/(?:acct|account|cc|card)\s*(\d{3,})/i);
+      if (!m) {
+        return res.status(422).json({ error: 'No account number could be detected in the filename' });
+      }
+      const account = m[1];
+      const sql = documentType != null
+        ? 'UPDATE documents SET category = ?, document_type = ? WHERE matter_id = ? AND deleted_at IS NULL AND filename LIKE ?'
+        : 'UPDATE documents SET category = ? WHERE matter_id = ? AND deleted_at IS NULL AND filename LIKE ?';
+      const params = documentType != null
+        ? [category, documentType, matterId, `%${account}%`]
+        : [category, matterId, `%${account}%`];
+      req.db.run(sql, params, function(updateErr) {
+        if (updateErr) return res.status(500).json({ error: updateErr.message });
+        res.json({ success: true, account, updated: this.changes, category, documentType: documentType || undefined });
+      });
     }
   );
 });

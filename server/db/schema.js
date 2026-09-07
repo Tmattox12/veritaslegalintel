@@ -71,6 +71,12 @@ function initializeDatabase() {
         db.run(`ALTER TABLE documents ADD COLUMN category TEXT`, () => {});
         db.run(`ALTER TABLE documents ADD COLUMN extraction_status TEXT`, () => {});
         db.run(`ALTER TABLE documents ADD COLUMN ocr_needed INTEGER DEFAULT 0`, () => {});
+        db.run(`ALTER TABLE documents ADD COLUMN file_hash TEXT`, () => {});
+        db.run(`ALTER TABLE documents ADD COLUMN document_type TEXT`, () => {});
+        db.run(`ALTER TABLE documents ADD COLUMN classification_confidence TEXT`, () => {});
+        // NULL hashes on legacy rows are allowed; new uploads get a SHA-256 hash.
+        db.run(`CREATE UNIQUE INDEX IF NOT EXISTS ux_documents_matter_hash
+          ON documents(matter_id, file_hash) WHERE file_hash IS NOT NULL`, () => {});
 
         // Matter case-detail columns (added for case intake)
         db.run(`ALTER TABLE matters ADD COLUMN case_no TEXT`, () => {});
@@ -136,6 +142,20 @@ function initializeDatabase() {
             created_at TEXT DEFAULT CURRENT_TIMESTAMP,
             FOREIGN KEY (matter_id) REFERENCES matters(id),
             FOREIGN KEY (bank_transaction_id) REFERENCES bank_transactions(id)
+          )
+        `);
+
+        // Attorney-reviewed income evidence from pay stubs, benefits, and tax records.
+        db.run(`
+          CREATE TABLE IF NOT EXISTS income_evidence_reviews (
+            document_id TEXT PRIMARY KEY,
+            matter_id TEXT NOT NULL,
+            party TEXT CHECK(party IN ('party_a', 'party_b')),
+            annual_amount REAL,
+            status TEXT NOT NULL DEFAULT 'pending' CHECK(status IN ('pending', 'accepted', 'rejected')),
+            reviewed_at TEXT,
+            FOREIGN KEY (document_id) REFERENCES documents(id),
+            FOREIGN KEY (matter_id) REFERENCES matters(id)
           )
         `);
 

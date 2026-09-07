@@ -31,16 +31,25 @@ function detectBankName(text) {
   return null;
 }
 
-function detectAccountType(text) {
-  // Credit-card markers: explicit words, card networks, common card product names, and card-statement phrases.
-  if (/credit\s*card|card\s*ending|\bvisa\b|\bmastercard\b|\bamex\b|american\s+express|\bdiscover\b/i.test(text)) return 'credit_card';
-  if (/freedom|sapphire|preferred|unlimited|slate|cash\s+back|rewards\s+card|\bcard\b/i.test(text)) return 'credit_card';
-  // "Payments and Credits" / "Purchases" sections are characteristic of card statements
-  if (/payments\s+and\s+credits|\bpurchases\b|minimum\s+payment\s+due|new\s+balance/i.test(text)) return 'credit_card';
-  if (/savings\s+account|savings\b/i.test(text)) return 'savings';
-  if (/money\s+market/i.test(text)) return 'money_market';
-  if (/checking|debit|checking\s+account/i.test(text)) return 'checking';
-  return 'bank_statement';
+function detectAccountType(text, filename = '') {
+  const filenameText = filename.toLowerCase();
+  const header = text.slice(0, 2500);
+
+  // Filename/product names are the strongest evidence. Do not treat a bank
+  // transaction description such as "payment to credit card" as account type.
+  if (/\b(?:cc|credit[ _-]?card)\b|freedom|sapphire|slate|unlimited/i.test(filenameText)) return 'credit_card';
+  // Deposit account headings on the statement itself are explicit evidence and
+  // take precedence over a generic filename such as "Acct 3063.pdf".
+  if (/chase\s+(?:premier\s+)?savings|\bsavings\s+(?:summary|account)\b/i.test(header)) return 'savings';
+  if (/chase\s+(?:sapphire\s+)?checking|\bchecking\s+(?:summary|account)\b/i.test(header)) return 'checking';
+  // A generic account filename is deliberately not guessed from transaction
+  // wording; it remains review-required unless the header identifies it.
+  if (/\bacct\.?\s*\d{3,}\b/i.test(filenameText)) return 'unknown';
+  if (/credit\s*card|card\s*ending|\bvisa\b|\bmastercard\b|\bamex\b|american\s+express|\bdiscover\b/i.test(header)) return 'credit_card';
+  // These are statement-section headings, not ordinary transaction wording.
+  if (/payments\s+and\s+credits|minimum\s+payment\s+due|new\s+balance/i.test(header)) return 'credit_card';
+  if (/money\s+market/i.test(header)) return 'money_market';
+  return 'unknown';
 }
 
 function maskAccountNumber(text) {
@@ -80,6 +89,11 @@ function parseAmount(s) {
   return neg ? -Math.abs(n) : n;
 }
 
+// Statement transaction amounts nearly always include cents. Require a decimal
+// amount, unless a whole-dollar value has an explicit $ marker, so OCR'd ACH,
+// Zelle, and Web IDs cannot be mistaken for dollar amounts.
+const CURRENCY_AMOUNT = '-?\\$?\\(?[\\d,]+\\.\\d{2}\\)?|-?\\$\\(?[\\d,]+\\)?';
+
 function suggestCategory(description) {
   const d = (description || '').toLowerCase();
   const map = [
@@ -102,14 +116,15 @@ function suggestCategory(description) {
   return null;
 }
 
-function determineFlow(amount, isCredit, description) {
+function determineFlow(amount, accountType, description) {
   const d = (description || '').toLowerCase();
-  if (isCredit) {
+  if (accountType === 'credit_card') {
     // On a credit card: negative amounts / "payment thank you" / credits reduce the balance (payments IN).
     // Positive amounts are purchases = expenses.
     if (/payment|thank you|credit|refund|adjustment/.test(d) || amount < 0) return 'income';
     return 'expense';
   }
+  if (accountType === 'unknown') return 'unknown';
   // Bank account: positive = deposit (income), negative = withdrawal (expense).
   return amount >= 0 ? 'income' : 'expense';
 }
@@ -183,7 +198,7 @@ function accountLabelFromFilename(filename) {
  */
 function parseStatementText(text, filename) {
   const lines = text.split(/\r?\n/).map(l => l.trim()).filter(Boolean);
-  const isCredit = detectAccountType(text) === 'credit_card';
+  const accountType = detectAccountType(text, filename);
   const period = detectStatementPeriod(text);
   const fallbackYear = yearFromFilename(filename);
   const fnPeriod = periodFromFilename(filename);
@@ -191,8 +206,8 @@ function parseStatementText(text, filename) {
 
   const transactions = [];
   // Date patterns: 01/15, 01/15/2024, Jan 15 2024
-  const reMDY = /^(\d{1,2}\/\d{1,2}(?:\/\d{2,4})?)[,\s]+(.+?)[,\s]+(-?\$?\(?[\d,]+\.?\d*\)?)(?:[,\s]+(-?\$?\(?[\d,]+\.?\d*\)?))?$/;
-  const reText = /^([A-Za-z]{3,9})\s+(\d{1,2})(?:,?\s+(\d{4}))?[,\s]+(.+?)[,\s]+(-?\$?\(?[\d,]+\.?\d*\)?)(?:[,\s]+(-?\$?\(?[\d,]+\.?\d*\)?))?$/;
+  const reMDY = new RegExp(`^(\\d{1,2}\\/\\d{1,2}(?:\\/\\d{2,4})?)[,\\s]+(.+?)[,\\s]+(${CURRENCY_AMOUNT})(?:[,\\s]+(${CURRENCY_AMOUNT}))?$`);
+  const reText = new RegExp(`^([A-Za-z]{3,9})\\s+(\\d{1,2})(?:,?\\s+(\\d{4}))?[,\\s]+(.+?)[,\\s]+(${CURRENCY_AMOUNT})(?:[,\\s]+(${CURRENCY_AMOUNT}))?$`);
 
   for (const line of lines) {
     let m = line.match(reMDY);
@@ -224,7 +239,7 @@ function parseStatementText(text, filename) {
     if (/^(description|details|memo|total|subtotal|balance|ending|beginning|payments?\s+and\s+credits)/i.test(desc.trim())) continue;
 
     const date = normDate(withInferredYear(dateStr, period, fallbackYear));
-    const flowType = determineFlow(amount, isCredit, desc);
+    const flowType = determineFlow(amount, accountType, desc);
     const suggestedCategory = suggestCategory(desc);
 
     transactions.push({
@@ -251,7 +266,7 @@ function parseStatementText(text, filename) {
 
   return {
     bankName: detectBankName(text),
-    accountType: detectAccountType(text),
+    accountType,
     accountNumberMasked,
     statementStart,
     statementEnd,
