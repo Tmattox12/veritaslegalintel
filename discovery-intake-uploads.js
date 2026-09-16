@@ -99,7 +99,7 @@ async function uploadToServer(file) {
   if (!mid) {
     item.classList.replace('processing', 'error');
     status.textContent = '❌ No matter selected. Select a case first.';
-    return;
+    return { file: file.name, outcome: 'failed', error: 'No matter selected' };
   }
 
   try {
@@ -169,6 +169,18 @@ async function runBatched(items, worker, onResult, concurrency = 3) {
 
 let uploadBatchActive = false;
 
+// Reloading or navigating mid-batch abandons every file still queued, which
+// reads as "the upload did nothing". Make the browser ask first.
+function warnIfLeavingMidBatch(event) {
+  event.preventDefault();
+  event.returnValue = '';
+}
+function setBatchActive(active) {
+  uploadBatchActive = active;
+  if (active) window.addEventListener('beforeunload', warnIfLeavingMidBatch);
+  else window.removeEventListener('beforeunload', warnIfLeavingMidBatch);
+}
+
 async function uploadWithRetry(file, attempts = 2) {
   let result = null;
   for (let attempt = 1; attempt <= attempts; attempt++) {
@@ -209,12 +221,13 @@ async function handleFiles(fileList) {
     return;
   }
 
-  uploadBatchActive = true;
+  setBatchActive(true);
   const startTime = Date.now();
   const running = { uploaded: 0, duplicates: 0, failed: 0 };
-  // Large PDF/OCR batches are intentionally serial: one slow PDF cannot make
-  // the browser abandon siblings, and every file receives a retry.
-  const concurrency = files.length > 20 ? 1 : 3;
+  // runBatched isolates each file in its own try/catch and uploadWithRetry gives
+  // each one a retry, so a slow or failing PDF cannot affect its siblings at any
+  // concurrency. Four workers keeps a 129-file intake under a minute.
+  const concurrency = 4;
   showBatchProgress({ selected: selectedFiles.length, queued: files.length, selectionDuplicates: selectionDuplicates.length, complete: 0, uploaded: 0, duplicates: 0, failed: 0, concurrency });
   let results = [];
   try {
@@ -234,7 +247,7 @@ async function handleFiles(fileList) {
     });
     }, concurrency);
   } finally {
-    uploadBatchActive = false;
+    setBatchActive(false);
   }
 
   // Reconciliation summary
