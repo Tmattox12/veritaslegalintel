@@ -350,7 +350,7 @@ function integrateIncomeImputationModule() {
         period: '03/13/2026',
         flag: 'Sample data - in production this would reference the actual vocational expert report.',
         rows: [
-          { k: 'Vocational expert', v: 'Brad H. Taft' },
+          { k: 'Vocational expert', v: '[Vocational Expert]' },
           { k: 'Open-market earning capacity', v: '[amount]', hi: true },
           { k: 'Monthly equivalent', v: '$3,750' }
         ]

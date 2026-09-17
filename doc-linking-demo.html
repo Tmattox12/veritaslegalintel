@@ -426,7 +426,7 @@
 
         <div class="calculation-card">
           <div class="card-label">Expert Report</div>
-          <div class="card-value" data-calc-id="[Party B]:expert">$59,820</div>          <div class="card-note">Click to view comparative expert report</div>
+          <div class="card-value" data-calc-id="[Party B]:expert">[amount]</div>          <div class="card-note">Click to view comparative expert report</div>
         </div>
 
         <div class="calculation-card">
@@ -1263,18 +1263,18 @@ DocumentLinking.makeNumberClickable(el, '[Party A]:w2');</pre>
         },
         {
           id: '[Party B]:expert',
-          displayValue: '$59,820',          description: 'Expert Report Income Estimate (Miessner)',
+          displayValue: '[amount]',          description: 'Expert Report Income Estimate ([Expert])',
           category: 'income',
           method: 'From [Expert] expert report Schedule 2',
           breakdown: [
             { k: '[Employer A] Caregivers', v: '$3,976 /mo' },
             { k: '[Employer B]', v: '$1,009 /mo' },
             { k: 'Total gross monthly', v: '$4,985 /mo' },
-            { k: 'Annualized (×12)', v: '$59,820', tot: true }
+            { k: 'Annualized (×12)', v: '[amount]', tot: true }
           ],
           exhibits: [
             {
-              name: 'Miessner Preliminary Report',
+              name: '[Expert] Preliminary Report',
               kind: 'report',
               page: 'Schedule 2',
               payer: '[Expert] PLLC',
@@ -1301,10 +1301,10 @@ DocumentLinking.makeNumberClickable(el, '[Party A]:w2');</pre>
           ],
           exhibits: [
             {
-              name: 'Taft Vocational Expert Report (Exhibit E)',
+              name: '[Vocational Expert] Report (Exhibit E)',
               kind: 'report',
               page: 'Summary',
-              payer: 'Brad H. Taft',
+              payer: '[Vocational Expert]',
               docTitle: 'Vocational Expert Report',
               period: '03/13/2026',
               flag: 'Report not yet in workspace - figure from [Party A] memos',
@@ -1333,7 +1333,7 @@ DocumentLinking.makeNumberClickable(el, '[Party A]:w2');</pre>
               kind: 'report',
               page: 'pp.6-7',
               payer: '[Expert] PLLC',
-              docTitle: 'Findings Letter (Yeanoplos)',
+              docTitle: 'Findings Letter ([Expert])',
               period: '06/29/2026',
               highlights: [
                 { label: 'CD principal', value: '$268,400', ref: 'Home proceeds asset', pg: 6 },
@@ -1348,7 +1348,7 @@ DocumentLinking.makeNumberClickable(el, '[Party A]:w2');</pre>
           displayValue: '$2,771.58/mo',
           description: 'Liquid Pool Return (10% midpoint)',
           category: 'income',
-          method: 'Kevin\'s liquid estate estimate (10% return, midpoint from Findings Letter)',
+          method: '[Expert]\'s liquid estate estimate (10% return, midpoint from Findings Letter)',
           breakdown: [
             { k: 'Liquid estate (50% share)', v: '$440,397.37' },
             { k: 'Return rate (10% midpoint)', v: '$44,040 /yr' },
@@ -1361,7 +1361,7 @@ DocumentLinking.makeNumberClickable(el, '[Party A]:w2');</pre>
               kind: 'report',
               page: 'p.7',
               payer: '[Expert] PLLC',
-              docTitle: 'Findings Letter (Yeanoplos)',
+              docTitle: 'Findings Letter ([Expert])',
               period: '06/29/2026',
               highlights: [
                 { label: 'Liquid principal', value: '$440,397', ref: 'Excludes 401k, RSU, pension', pg: 7 },

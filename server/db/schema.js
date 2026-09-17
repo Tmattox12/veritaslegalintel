@@ -74,6 +74,7 @@ function initializeDatabase() {
         db.run(`ALTER TABLE documents ADD COLUMN file_hash TEXT`, () => {});
         db.run(`ALTER TABLE documents ADD COLUMN document_type TEXT`, () => {});
         db.run(`ALTER TABLE documents ADD COLUMN classification_confidence TEXT`, () => {});
+        db.run(`ALTER TABLE documents ADD COLUMN manual_notes TEXT`, () => {});
         // NULL hashes on legacy rows are allowed; new uploads get a SHA-256 hash.
         db.run(`CREATE UNIQUE INDEX IF NOT EXISTS ux_documents_matter_hash
           ON documents(matter_id, file_hash) WHERE file_hash IS NOT NULL`, () => {});

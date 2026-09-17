@@ -201,6 +201,37 @@ router.post('/upload', upload.single('file'), async (req, res) => {
   }
 });
 
+// POST /api/matters/:matterId/documents/expense-workbook
+// Builds a multi-tab .xlsx: lead sheet of AFI-line totals, one tab per vendor
+// with every transaction, and an Unmatched tab. Accepts the same merchant
+// overrides the AFI mapper UI holds, so the export matches the on-screen state.
+router.post('/expense-workbook', async (req, res) => {
+  const { matterId } = req.params;
+  const overrides = (req.body && req.body.overrides) || {};
+  try {
+    const { buildExpenseWorkbook } = require('../services/expense-workbook');
+    const transactions = await new Promise((resolve, reject) => {
+      req.db.all(
+        `SELECT bt.amount, bt.description, bt.transaction_date, bt.flow_type, bt.suggested_category, bt.mapped_category
+         FROM bank_transactions bt
+         JOIN bank_statements bs ON bs.id = bt.bank_statement_id
+         WHERE bs.matter_id = ?`,
+        [matterId],
+        (error, rows) => error ? reject(error) : resolve(rows || [])
+      );
+    });
+    const buffer = buildExpenseWorkbook(transactions, overrides);
+    res.setHeader('Content-Type', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    res.setHeader('Content-Disposition', `attachment; filename="expense-workbook-${new Date().toISOString().slice(0, 10)}.xlsx"`);
+    res.send(buffer);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// POST /api/documents/:id/manual-entry and single-doc retry live in server/index.js
+// alongside the other /api/documents/:id/* routes.
+
 // GET /api/matters/:matterId/documents/income-evidence
 // Reads specifically classified income documents and returns reviewable evidence.
 router.get('/income-evidence', async (req, res) => {

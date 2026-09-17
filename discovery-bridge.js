@@ -13,6 +13,26 @@
     return '$' + (Number(value) || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
 
+  function selectedIncome() {
+    const mid = matterId();
+    if (!mid) return null;
+    try {
+      return JSON.parse(localStorage.getItem(`veritas_income_selection_${mid}`) || 'null');
+    } catch (error) {
+      return null;
+    }
+  }
+
+  function basisLabel(basis) {
+    return {
+      accepted: 'Accepted document evidence',
+      avg12: '12-month bank-deposit average',
+      avg6: '6-month bank-deposit average',
+      avg3: '3-month bank-deposit average',
+      runrate: 'Last-month bank-deposit run-rate',
+    }[basis] || 'Not selected';
+  }
+
   function addPanel(summary, incomeEvidence) {
     let host = document.getElementById('discoveryAnalysisBridge');
     if (!host) {
@@ -31,6 +51,7 @@
       .join('');
     const evidenceSummary = incomeEvidence?.summary || {};
     const acceptedByParty = summary.acceptedIncomeByParty || {};
+    const selected = selectedIncome();
     const incomeRows = (incomeEvidence?.evidence || []).map((item) => {
       const amounts = [
         item.grossPay != null ? `Gross ${money(item.grossPay)}` : null,
@@ -55,6 +76,10 @@
       <div style="font-size:12px;color:#42526e;margin-top:5px;">
         Accepted document income: <strong>${money(summary.acceptedIncomeAnnual)}/yr</strong>
         <span style="color:#51617a;">Party A ${money(acceptedByParty.party_a)} · Party B ${money(acceptedByParty.party_b)} · ${summary.acceptedIncomeEvidence?.length || 0} approved source(s)</span>
+      </div>
+      <div style="font-size:12px;color:#42526e;margin-top:5px;padding:7px 9px;background:#fff;border:1px solid #dbe5f0;border-radius:5px;">
+        Selected income basis: <strong>${selected ? basisLabel(selected.party_a?.basis) : 'Not selected'}</strong> Party A ${money(selected?.party_a?.amount)} · <strong>${selected ? basisLabel(selected.party_b?.basis) : 'Not selected'}</strong> Party B ${money(selected?.party_b?.amount)}
+        <span style="color:#8a6a1f;">Review before using in a support calculation.</span>
       </div>
       <div style="margin-top:8px;padding-top:8px;border-top:1px solid #dbe5f0;">
         <div style="font-size:12px;font-weight:700;color:#1c3f66;">Income documents on file: ${evidenceSummary.documentCount || 0}</div>
@@ -92,4 +117,5 @@
 
   document.addEventListener('DOMContentLoaded', load);
   window.addEventListener('matterSelected', load);
+  window.addEventListener('incomeSelectionReady', load);
 })();

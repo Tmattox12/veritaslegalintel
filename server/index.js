@@ -187,6 +187,105 @@ app.get('/api/matters/:id', (req, res) => {
     }).catch((err) => res.status(500).json({ error: err.message }));
   });
 
+  // Income analysis across multiple bases for the Income Engine cards.
+  // Computes 12-month average, 6-month average, last-month run-rate, and
+  // trailing-3-month average from non-card deposits, plus accepted document
+  // evidence. Deposit-derived bases are review-only and stay separate from
+  // attorney-accepted figures.
+  app.get('/api/matters/:id/income-analysis', (req, res) => {
+    const { id } = req.params;
+    const all = (sql, params) => new Promise((resolve, reject) => {
+      req.db.all(sql, params, (err, rows) => err ? reject(err) : resolve(rows || []));
+    });
+
+    Promise.all([
+      all(`SELECT bt.amount, bt.description, bt.transaction_date, bt.flow_type,
+                  bt.suggested_category, bt.mapped_category, bs.account_type
+           FROM bank_transactions bt
+           JOIN bank_statements bs ON bs.id = bt.bank_statement_id
+           WHERE bs.matter_id = ?`, [id]),
+      all(`SELECT ier.party, ier.annual_amount AS annualAmount, d.document_type AS documentType, d.filename
+           FROM income_evidence_reviews ier
+           JOIN documents d ON d.id = ier.document_id
+           WHERE ier.matter_id = ? AND ier.status = 'accepted' AND ier.annual_amount > 0 AND d.deleted_at IS NULL`, [id]),
+    ]).then(([transactions, acceptedEvidence]) => {
+      const movement = /\bpayment\s+to\s+(?:chase|credit|card)|\bpayment thank you|\btransfer\b|\bzelle\b|\bvenmo\b|\bpaypal\b|\brefund\b|\bcredit\b/i;
+
+      // Employment income deposits only (non-card, categorized as income, not a transfer).
+      const incomeDeposits = transactions.filter((t) => {
+        const cat = t.mapped_category || t.suggested_category;
+        const desc = (t.description || '').toLowerCase();
+        return t.flow_type === 'income'
+          && t.account_type !== 'credit_card'
+          && cat !== 'transfer'
+          && !movement.test(desc);
+      });
+
+      // Group deposits by YYYY-MM month. Fill calendar gaps with zero so a
+      // trailing-period average cannot overstate income by skipping months.
+      const byMonth = {};
+      incomeDeposits.forEach((t) => {
+        const m = (t.transaction_date || '').slice(0, 7);
+        if (!m) return;
+        byMonth[m] = (byMonth[m] || 0) + Math.abs(Number(t.amount) || 0);
+      });
+      const observedMonths = Object.keys(byMonth).sort();
+      const monthSequence = [];
+      if (observedMonths.length) {
+        const cursor = new Date(`${observedMonths[0]}-01T00:00:00Z`);
+        const end = new Date(`${observedMonths[observedMonths.length - 1]}-01T00:00:00Z`);
+        while (cursor <= end) {
+          const month = cursor.toISOString().slice(0, 7);
+          monthSequence.push(month);
+          cursor.setUTCMonth(cursor.getUTCMonth() + 1);
+        }
+      }
+      const months = monthSequence;
+      const monthValues = months.map((m) => byMonth[m] || 0);
+
+      const sum = (arr) => arr.reduce((a, b) => a + b, 0);
+      const avg = (arr) => (arr.length ? sum(arr) / arr.length : 0);
+      const annualize = (monthly) => +(monthly * 12).toFixed(2);
+
+      const last12 = monthValues.slice(-12);
+      const last6 = monthValues.slice(-6);
+      const last3 = monthValues.slice(-3);
+      const last1 = monthValues.slice(-1);
+
+      const depositBases = {
+        avg12Month: annualize(avg(last12)),
+        avg6Month: annualize(avg(last6)),
+        avg3Month: annualize(avg(last3)),
+        lastMonthRunRate: annualize(avg(last1)),
+        monthsCovered: months.length,
+        firstMonth: months[0] || null,
+        lastMonth: months[months.length - 1] || null,
+      };
+
+      // Accepted document evidence by party
+      const acceptedByParty = { party_a: 0, party_b: 0 };
+      acceptedEvidence.forEach((item) => {
+        if (Object.hasOwn(acceptedByParty, item.party)) {
+          acceptedByParty[item.party] += Number(item.annualAmount) || 0;
+        }
+      });
+
+      res.json({
+        matterId: id,
+        // Deposit-derived candidates (review only — NOT calculation-ready)
+        depositCandidates: depositBases,
+        // Attorney-accepted document income (calculation-ready)
+        accepted: {
+          party_a: +acceptedByParty.party_a.toFixed(2),
+          party_b: +acceptedByParty.party_b.toFixed(2),
+          combined: +(acceptedByParty.party_a + acceptedByParty.party_b).toFixed(2),
+          sources: acceptedEvidence.map((e) => ({ filename: e.filename, type: e.documentType, party: e.party, annualAmount: e.annualAmount })),
+        },
+        generatedAt: new Date().toISOString(),
+      });
+    }).catch((err) => res.status(500).json({ error: err.message }));
+  });
+
 // Get documents for a matter
 app.get('/api/matters/:id/documents', (req, res) => {
   const { id } = req.params;
@@ -219,6 +318,24 @@ app.post('/api/matters', (req, res) => {
         return res.status(500).json({ error: err.message });
       }
       res.json({ id: matterId, firmId, name, clientName, status, caseNo, county, state, court, petitioner, respondent });
+    }
+  );
+});
+
+// Update an existing matter (re-submitting the intake form for an active case).
+app.put('/api/matters/:id', (req, res) => {
+  const { id } = req.params;
+  const { name, clientName, status, caseNo, county, state, court, petitioner, respondent, details } = req.body;
+  req.db.run(
+    `UPDATE matters SET name = ?, client_name = ?, status = ?, case_no = ?, county = ?, state = ?,
+       court = ?, petitioner = ?, respondent = ?, details = ?
+     WHERE id = ? AND deleted_at IS NULL`,
+    [name, clientName, status || 'active', caseNo || null, county || null, state || null,
+     court || null, petitioner || null, respondent || null, details ? JSON.stringify(details) : null, id],
+    function(err) {
+      if (err) return res.status(500).json({ error: err.message });
+      if (!this.changes) return res.status(404).json({ error: 'Matter not found' });
+      res.json({ id, name, clientName, status, caseNo, county, state, court, petitioner, respondent });
     }
   );
 });
@@ -365,6 +482,119 @@ app.post('/api/matters/:matterId/documents/classify-account', (req, res) => {
       });
     }
   );
+});
+
+// POST /api/documents/:id/manual-entry
+// For files that could not be parsed or OCR'd: an attorney/paralegal records
+// what the document is and its key detail as plain text. Marks the document
+// reviewed so it drops out of the needs-review queue.
+app.post('/api/documents/:id/manual-entry', (req, res) => {
+  const { id } = req.params;
+  const notes = (req.body?.notes || '').toString().trim();
+  const documentType = req.body?.documentType || null;
+  const category = req.body?.category || null;
+  if (!notes) {
+    return res.status(400).json({ error: 'notes is required' });
+  }
+  req.db.run(
+    `UPDATE documents SET manual_notes = ?, extraction_status = 'manual', ocr_needed = 0,
+       classification_confidence = 'manual'
+       ${documentType ? ', document_type = ?' : ''}
+       ${category ? ', category = ?' : ''}
+     WHERE id = ? AND deleted_at IS NULL`,
+    [notes, ...(documentType ? [documentType] : []), ...(category ? [category] : []), id],
+    function(err) {
+      if (err) return res.status(500).json({ error: err.message });
+      if (!this.changes) return res.status(404).json({ error: 'Document not found' });
+      res.json({ success: true, id, notes, documentType, category });
+    }
+  );
+});
+
+// POST /api/documents/:id/retry-extraction
+// Re-runs text extraction (and optionally vision OCR) for a single document,
+// without touching every other document in the matter.
+app.post('/api/documents/:id/retry-extraction', async (req, res) => {
+  const { id } = req.params;
+  const useOcr = req.body?.useOcr === true;
+  try {
+    const { getOriginal } = require('./services/storage');
+    const { extractText } = require('./services/file-extractor');
+    const { visionExtractText } = require('./services/claude-vision-ocr');
+    const { classifyDocument } = require('./services/document-classifier');
+    const { parseStatementText } = require('./services/statement-parser');
+    const crypto = require('crypto');
+
+    const doc = await new Promise((resolve, reject) => {
+      req.db.get('SELECT * FROM documents WHERE id = ? AND deleted_at IS NULL', [id], (e, r) => e ? reject(e) : resolve(r));
+    });
+    if (!doc) return res.status(404).json({ error: 'Document not found' });
+    if (!doc.s3_key) return res.status(404).json({ error: 'No stored original file for this document' });
+
+    const buffer = await getOriginal(doc.s3_key);
+    const fileHash = crypto.createHash('sha256').update(buffer).digest('hex');
+    await new Promise((resolve, reject) => req.db.run('UPDATE documents SET file_hash = ? WHERE id = ?', [fileHash, id], (e) => e ? reject(e) : resolve()));
+
+    let { text, ocrNeeded, ext } = await extractText({ originalname: doc.filename, buffer });
+    let usedOcr = false;
+    if (useOcr && ocrNeeded && process.env.ANTHROPIC_API_KEY && (ext === 'pdf' || ['jpg', 'jpeg', 'png', 'gif'].includes(ext))) {
+      try { text = await visionExtractText(buffer, ext); usedOcr = true; } catch (e) { /* fall through, still report failure below */ }
+    }
+
+    if (!text) {
+      await new Promise((resolve, reject) => req.db.run(
+        `UPDATE documents SET extraction_status = 'needs_review', ocr_needed = 1 WHERE id = ?`, [id], (e) => e ? reject(e) : resolve()
+      ));
+      return res.json({ success: true, extracted: false, usedOcr, message: 'Still unreadable. Try OCR or enter details manually.' });
+    }
+
+    const classification = classifyDocument(doc.filename, text);
+    await new Promise((resolve, reject) => req.db.run(
+      'UPDATE documents SET category = ?, document_type = ?, classification_confidence = ? WHERE id = ?',
+      [classification.category, classification.type, classification.confidence, id], (e) => e ? reject(e) : resolve()
+    ));
+
+    const looksFinancial = /\d{1,2}\/\d{1,2}/.test(text) && /\d+\.\d{2}/.test(text);
+    let transactionCount = 0;
+    if (looksFinancial) {
+      const parsed = parseStatementText(text, doc.filename);
+      transactionCount = parsed.transactions.length;
+      if (transactionCount) {
+        const existing = await new Promise((resolve) => req.db.get('SELECT id FROM bank_statements WHERE document_id = ?', [id], (e, r) => resolve(r)));
+        let statementId = existing?.id;
+        if (existing) {
+          await new Promise((resolve, reject) => req.db.run('DELETE FROM bank_transactions WHERE bank_statement_id = ?', [existing.id], (e) => e ? reject(e) : resolve()));
+          await new Promise((resolve, reject) => req.db.run(
+            'UPDATE bank_statements SET bank_name=?, account_type=?, account_number_masked=?, statement_start=?, statement_end=? WHERE id=?',
+            [parsed.bankName, parsed.accountType, parsed.accountNumberMasked, parsed.statementStart, parsed.statementEnd, existing.id], (e) => e ? reject(e) : resolve()
+          ));
+        } else {
+          statementId = uuidv4();
+          await new Promise((resolve, reject) => req.db.run(
+            `INSERT INTO bank_statements (id, document_id, matter_id, bank_name, account_type, account_number_masked, statement_start, statement_end, processing_status) VALUES (?,?,?,?,?,?,?,?,?)`,
+            [statementId, id, doc.matter_id, parsed.bankName, parsed.accountType, parsed.accountNumberMasked, parsed.statementStart, parsed.statementEnd, 'completed'], (e) => e ? reject(e) : resolve()
+          ));
+        }
+        for (const txn of parsed.transactions) {
+          await new Promise((resolve, reject) => req.db.run(
+            `INSERT INTO bank_transactions (id, bank_statement_id, transaction_date, description, amount, transaction_type, running_balance, flow_type, suggested_category, mapped_category, mapping_status) VALUES (?,?,?,?,?,?,?,?,?,?,?)`,
+            [uuidv4(), statementId, txn.date, txn.description, txn.amount, txn.type, txn.runningBalance, txn.flowType, txn.suggestedCategory, txn.suggestedCategory || null, txn.suggestedCategory ? 'auto_mapped' : 'unmapped'],
+            (e) => e ? reject(e) : resolve()
+          ));
+        }
+      }
+    }
+
+    const stillNeedsReview = !looksFinancial && classification.category === 'Financial Statements';
+    await new Promise((resolve, reject) => req.db.run(
+      `UPDATE documents SET extraction_status = ?, ocr_needed = ? WHERE id = ?`,
+      [stillNeedsReview ? 'needs_review' : 'parsed', stillNeedsReview ? 1 : 0, id], (e) => e ? reject(e) : resolve()
+    ));
+
+    res.json({ success: true, extracted: true, usedOcr, transactionCount, category: classification.category, documentType: classification.type });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
 });
 
 // Download the original uploaded file for a document

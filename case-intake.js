@@ -178,6 +178,8 @@ function saveDraft() {
   setTimeout(() => msg.remove(), 3000);
 }
 
+let boundMatterId = null;
+
 async function handleSubmit(event) {
   event.preventDefault();
 
@@ -248,15 +250,16 @@ async function handleSubmit(event) {
     createdAt: new Date().toISOString(),
   };
 
-  // Save to localStorage
-  localStorage.setItem('currentCase', JSON.stringify(caseData));
-  localStorage.removeItem('currentCaseDraft'); // Clear draft when case is created
+  // The backend matter (fetched fresh each load) is the source of truth.
+  // localStorage.currentCase is no longer used to repopulate the form.
+  localStorage.removeItem('currentCaseDraft'); // Clear draft when case is submitted
 
-  // Create the matter in the backend so Discovery Intake can attach documents to it.
   const successMsg = document.getElementById('successMessage');
+  const isUpdate = !!boundMatterId;
   try {
-    const resp = await fetch('http://localhost:3000/api/matters', {
-      method: 'POST',
+    const url = isUpdate ? `http://localhost:3000/api/matters/${boundMatterId}` : 'http://localhost:3000/api/matters';
+    const resp = await fetch(url, {
+      method: isUpdate ? 'PUT' : 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         name: caseData.name,
@@ -271,14 +274,18 @@ async function handleSubmit(event) {
       }),
     });
 
-    if (!resp.ok) throw new Error('Matter creation failed');
+    if (!resp.ok) throw new Error(isUpdate ? 'Matter update failed' : 'Matter creation failed');
     const matter = await resp.json();
+    boundMatterId = matter.id;
 
     // Make this the active matter everywhere (matter-selector + discovery pages listen for this).
     localStorage.setItem('currentMatterId', matter.id);
     window.dispatchEvent(new CustomEvent('matterSelected', { detail: matter }));
 
-    successMsg.innerHTML = `
+    successMsg.innerHTML = isUpdate
+      ? `✓ Case "${caseData.name}" updated. Case-specific details across the app stay driven by this intake plus your uploaded documents — nothing else to do here.<br>
+         <a href="/discovery-intake.html?matter=${matter.id}" style="display:inline-block;margin-top:10px;padding:10px 16px;background:#1c6b52;color:#fff;border-radius:6px;text-decoration:none;font-weight:600;">Go to Document Intake →</a>`
+      : `
       ✓ Case "${caseData.name}" created. <strong>Next step: import discovery documents.</strong><br>
       <a href="/discovery-intake.html?matter=${matter.id}" style="display:inline-block;margin-top:10px;padding:10px 16px;background:#1c6b52;color:#fff;border-radius:6px;text-decoration:none;font-weight:600;">Import Documents →</a>
       <a href="index.html" style="display:inline-block;margin-top:10px;margin-left:8px;padding:10px 16px;background:#eef2f7;color:#1c3f66;border-radius:6px;text-decoration:none;font-weight:600;">Go to Dashboard</a>
@@ -286,12 +293,54 @@ async function handleSubmit(event) {
     successMsg.classList.add('show');
     // No auto-redirect: let the user choose the next step.
   } catch (e) {
-    console.error('Matter creation error:', e);
+    console.error('Matter save error:', e);
     successMsg.innerHTML = `
-      ✓ Case saved locally. <strong>Could not reach the backend</strong> (is the Node server running on :3000?),<br>
-      so documents can't be attached yet. <a href="index.html" style="color:#1c3f66;">Continue to dashboard</a>
+      Could not reach the backend</strong> (is the Node server running on :3000?),<br>
+      so this case could not be ${isUpdate ? 'updated' : 'created'}. <a href="index.html" style="color:#1c3f66;">Continue to dashboard</a>
     `;
     successMsg.classList.add('show');
+  }
+}
+
+// This page is a blank template by default. When a real matter is already
+// active (backend-confirmed, not just stale localStorage), it loads that
+// matter's saved intake details so editing updates the same case instead of
+// creating a duplicate. Case-specific values always come from the backend
+// matter + uploaded documents — never hardcoded into the template.
+async function loadActiveMatter() {
+  const mid = localStorage.getItem('currentMatterId');
+  if (!mid) return false;
+  try {
+    const resp = await fetch(`http://localhost:3000/api/matters/${mid}`);
+    if (!resp.ok) {
+      // Stale id (matter deleted or backend reset) — stay on a blank template.
+      localStorage.removeItem('currentMatterId');
+      return false;
+    }
+    const matter = await resp.json();
+    let details = {};
+    try { details = matter.details ? JSON.parse(matter.details) : {}; } catch (e) { details = {}; }
+    // Fall back to top-level matter columns if details JSON is missing a field.
+    details.name = details.name || matter.name;
+    details.caseNumber = details.caseNumber || matter.case_no;
+    details.county = details.county || matter.county;
+    details.state = details.state || matter.state;
+    details.court = details.court || matter.court;
+    details.petitioner = details.petitioner || matter.petitioner;
+    details.respondent = details.respondent || matter.respondent;
+
+    fillForm(details);
+    boundMatterId = matter.id;
+
+    const banner = document.getElementById('successMessage');
+    if (banner) {
+      banner.innerHTML = `Editing active case: <strong>${matter.name || 'Untitled Case'}</strong>. Saving below updates this case — it does not create a new one.`;
+      banner.classList.add('show');
+    }
+    return true;
+  } catch (e) {
+    // Backend offline — leave the template blank rather than guessing from stale local data.
+    return false;
   }
 }
 
@@ -416,9 +465,11 @@ function calculateMarriageLength() {
 }
 
 // Initialize on page load
-document.addEventListener('DOMContentLoaded', () => {
-  // Load any saved draft
-  loadDraft();
+document.addEventListener('DOMContentLoaded', async () => {
+  // If a real matter is already active, load its saved details from the
+  // backend. Only fall back to a local draft when there's no active matter.
+  const loadedMatter = await loadActiveMatter();
+  if (!loadedMatter) loadDraft();
 
   // Setup calculations
   setupCalculations();
@@ -440,10 +491,9 @@ document.addEventListener('DOMContentLoaded', () => {
     setupLogo();
   }
 
-  // Check if updating existing case
-  const existingCase = localStorage.getItem('currentCase');
+  // Reflect edit-vs-create state on the submit button.
   const submitBtn = document.querySelector('button[type="submit"]');
-  if (existingCase && submitBtn) {
+  if (boundMatterId && submitBtn) {
     submitBtn.innerHTML = '✎ Update Case';
   }
 });

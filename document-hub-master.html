@@ -271,6 +271,7 @@
     <div class="hub-header">
       <div class="hub-container">
         <div class="hub-title">📁 Master Document Hub</div>        <div class="hub-subtitle">Centralized document management for all financial records, assets, liabilities, and reconciliations</div>
+        <div style="margin-top:10px;font-size:13px;" id="activeMatterBanner"></div>
       </div>
     </div>
 
@@ -283,7 +284,7 @@
           <div class="stat-value" id="totalDocs">0</div>
         </div>
         <div class="stat-card">
-          <div class="stat-label">Total Items Extracted</div>
+          <div class="stat-label">Processed</div>
           <div class="stat-value" id="totalItems">0</div>
         </div>
         <div class="stat-card">
@@ -291,8 +292,8 @@
           <div class="stat-value" id="totalCategories">0</div>
         </div>
         <div class="stat-card">
-          <div class="stat-label">Avg Mapping Rate</div>
-          <div class="stat-value" id="avgMapping">0%</div>        </div>
+          <div class="stat-label">Needs Review</div>
+          <div class="stat-value" id="avgMapping">0</div>        </div>
       </div>
 
       <!-- Document Type Cards -->
@@ -436,78 +437,111 @@
   <script src="logo-handler.js"></script>
 
   <script>
-    // Load statistics from localStorage
-    function loadStats() {
-      const allData = {
-        expenses: JSON.parse(localStorage.getItem('hub_expenses') || '[]'),
-        income: JSON.parse(localStorage.getItem('hub_income') || '[]'),
-        assets: JSON.parse(localStorage.getItem('hub_assets') || '[]'),
-        liabilities: JSON.parse(localStorage.getItem('hub_liabilities') || '[]'),
-        investments: JSON.parse(localStorage.getItem('hub_investments') || '[]'),
-        retirement: JSON.parse(localStorage.getItem('hub_retirement') || '[]'),
-        realEstate: JSON.parse(localStorage.getItem('hub_real_estate') || '[]'),
-        business: JSON.parse(localStorage.getItem('hub_business') || '[]'),
-        tax: JSON.parse(localStorage.getItem('hub_tax') || '[]'),
-        legal: JSON.parse(localStorage.getItem('hub_legal') || '[]')
-      };
+    const API_BASE = window.API_BASE || 'http://localhost:3000/api';
 
-      // Calculate totals
-      const totalDocs = Object.values(allData).reduce((sum, arr) => sum + arr.length, 0);
-      const totalItems = Object.values(allData).reduce((sum, arr) => {
-        return sum + arr.reduce((s, doc) => s + (doc.items ? doc.items.length : 0), 0);
-      }, 0);
-      const populatedCategories = Object.values(allData).filter(arr => arr.length > 0).length;
-      const avgMapping = populatedCategories > 0 ? Math.round(
-        Object.values(allData).reduce((sum, arr) => {
-          return sum + arr.reduce((s, doc) => s + (doc.mappingRate || 0), 0);
-        }, 0) / totalDocs
-      ) : 0;
+    function matterId() {
+      return (
+        (window.Veritas && window.Veritas.currentMatterId) ||
+        new URLSearchParams(location.search).get('matter') ||
+        localStorage.getItem('currentMatterId') ||
+        null
+      );
+    }
 
-      // Update stats
-      document.getElementById('totalDocs').textContent = totalDocs;
-      document.getElementById('totalItems').textContent = totalItems.toLocaleString();
-      document.getElementById('totalCategories').textContent = populatedCategories;
-      document.getElementById('avgMapping').textContent = (totalDocs > 0 ? avgMapping : 0) + '%';
+    // Same category/type rules used on each individual hub page, so counts
+    // here always match what you'll see after clicking through.
+    const CARD_RULES = {
+      'bank-statements': (d) => d.category === 'Financial Statements' && d.document_type !== 'Brokerage / Investment Statement',
+      'tax': (d) => d.category === 'Tax Returns & Income',
+      'income': (d) => d.category === 'Tax Returns & Income',
+      'business': (d) => d.category === 'Property & Assets',
+      'real-estate': (d) => d.category === 'Property & Assets',
+      'liabilities': (d) => d.category === 'Property & Assets',
+      'investments': (d) => d.category === 'Financial Statements' && d.document_type === 'Brokerage / Investment Statement',
+      'legal': (d) => d.category === 'Court & Legal Documents',
+      'retirement': (d) => d.category === 'Property & Assets',
+      'other': (d) => !d.category || d.category === 'Other' || d.category === 'AFI & Disclosures',
+    };
 
-      // Update category counts
-      Object.entries(allData).forEach(([key, data]) => {
-        const elem = document.getElementById(`count-${key.replace(/([A-Z])/g, '-$1').toLowerCase()}`);
-        if (elem) {
-          const count = data.length;
-          elem.textContent = count + (count === 1 ? ' doc' : ' docs');
-        }
-      });
+    function renderBanner(matter) {
+      const el = document.getElementById('activeMatterBanner');
+      if (!el) return;
+      if (!matter) {
+        el.innerHTML = '<a href="case-intake.html">No active case — start Case Intake →</a>';
+        return;
+      }
+      el.innerHTML = `Active case: <strong>${matter.name || 'Untitled Case'}</strong>`;
+    }
 
-      // Show recent uploads
-      const allUploads = [];
-      Object.entries(allData).forEach(([category, docs]) => {
-        docs.forEach(doc => {
-          allUploads.push({
-            ...doc,
-            category: category.replace(/([A-Z])/g, ' $1').trim()
-          });
-        });
-      });
-
-      const recent = allUploads.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).slice(0, 10);
-
+    // Loads real documents for the active matter — no localStorage, no fake data.
+    async function loadStats() {
+      const mid = matterId();
       const recentList = document.getElementById('recentList');
-      if (recent.length === 0) {
+      if (!mid) {
+        renderBanner(null);
         recentList.innerHTML = `
           <div class="empty-state">
             <div class="empty-icon">📭</div>
-            <div class="empty-title">No uploads yet</div>
-            <p style="font-size: 12px; margin-top: 6px;">Click on a category card above to start uploading documents</p>          </div>
-        `;
-      } else {
-        recentList.innerHTML = recent.map(doc => `
-          <div class="upload-item">
-            <div class="upload-info">
-              <div class="upload-name">${doc.fileName}</div>
-              <div class="upload-meta">${new Date(doc.timestamp).toLocaleDateString()} · ${doc.category}</div>            </div>
-            <div class="upload-stat">${doc.items ? doc.items.length : 0} items</div>
+            <div class="empty-title">No active case selected</div>
+            <p style="font-size: 12px; margin-top: 6px;">Select or create a case, then upload documents in Document Intake.</p>
           </div>
-        `).join('');
+        `;
+        return;
+      }
+
+      try {
+        const [matterRes, docsRes] = await Promise.all([
+          fetch(`${API_BASE}/matters/${mid}`),
+          fetch(`${API_BASE}/matters/${mid}/documents`),
+        ]);
+        renderBanner(matterRes.ok ? await matterRes.json() : null);
+        const docs = (docsRes.ok ? await docsRes.json() : []).filter((d) => !d.deleted_at);
+
+        document.getElementById('totalDocs').textContent = docs.length;
+        document.getElementById('totalItems').textContent = docs.filter((d) => d.extraction_status === 'parsed' || d.extraction_status === 'manual').length;
+        document.getElementById('avgMapping').textContent = docs.filter((d) => d.ocr_needed).length;
+
+        let populatedCategories = 0;
+        Object.entries(CARD_RULES).forEach(([key, rule]) => {
+          const count = docs.filter(rule).length;
+          if (count > 0) populatedCategories++;
+          const elem = document.getElementById(`count-${key}`);
+          if (elem) elem.textContent = count + (count === 1 ? ' doc' : ' docs');
+        });
+        document.getElementById('totalCategories').textContent = populatedCategories;
+
+        const recent = docs
+          .filter((d) => d.uploaded_at)
+          .sort((a, b) => new Date(b.uploaded_at) - new Date(a.uploaded_at))
+          .slice(0, 10);
+
+        if (!recent.length) {
+          recentList.innerHTML = `
+            <div class="empty-state">
+              <div class="empty-icon">📭</div>
+              <div class="empty-title">No uploads yet</div>
+              <p style="font-size: 12px; margin-top: 6px;">Upload documents in Document Intake to get started.</p>
+            </div>
+          `;
+        } else {
+          recentList.innerHTML = recent.map((d) => `
+            <div class="upload-item">
+              <div class="upload-info">
+                <div class="upload-name">${d.filename}</div>
+                <div class="upload-meta">${new Date(d.uploaded_at).toLocaleDateString()} · ${d.document_type || d.category || 'Document type pending'}</div>
+              </div>
+              <div class="upload-stat">${d.ocr_needed ? 'Review' : (d.extraction_status || 'Uploaded')}</div>
+            </div>
+          `).join('');
+        }
+      } catch (error) {
+        recentList.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-icon">⚠️</div>
+            <div class="empty-title">Could not reach the backend</div>
+            <p style="font-size: 12px; margin-top: 6px;">Start the Node server on :3000, then reload this page.</p>
+          </div>
+        `;
       }
     }
 
@@ -518,8 +552,7 @@
       loadStats();
     }
 
-    // Listen for updates
-    window.addEventListener('hubDataUpdated', loadStats);
+    window.addEventListener('matterSelected', loadStats);
   </script>
 </body>
 </html>

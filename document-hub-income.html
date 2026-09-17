@@ -278,6 +278,7 @@
         <div class="area-subtitle">W2s, 1099s, pay stubs, business income, and other income sources</div>
         <div class="breadcrumb">
           <a href="document-hub-master.html">← Back to Document Hub</a>        </div>
+        <div class="breadcrumb" id="activeMatterBanner" style="margin-top:6px;"></div>
       </div>
     </div>
 
@@ -294,23 +295,21 @@
           <div class="stat-value" id="totalItems">0</div>
         </div>
         <div class="stat-box">
-          <div class="stat-label">Total Income</div>
-          <div class="stat-value" id="totalIncome">$0</div>        </div>
+          <div class="stat-label">Needs Review</div>
+          <div class="stat-value" id="totalValue">0</div>
+        </div>
       </div>
 
       <!-- Upload Section -->
       <div class="upload-section">
-        <div class="section-title">📤 Upload Income Documents</div>
-
-        <div class="upload-area" onclick="document.getElementById('incomeFileInput').click()">
-          <div class="upload-text">📁 Click to upload or drag & drop</div>
-          <div class="upload-sub">CSV, JSON, or PDF files up to 10MB</div>
-          <input type="file" id="incomeFileInput" class="file-input" accept=".csv,.json,.pdf,.txt" />
-        </div>
-
-        <button class="btn-upload" onclick="document.getElementById('incomeFileInput').click()">
-          Choose File
-        </button>
+        <div class="section-title">📤 Upload Documents</div>
+        <p style="font-size:12px;color:#666;margin-bottom:14px;">
+          Income documents are uploaded once, in Document Intake, and classified automatically.
+          This page only displays what has already been uploaded and classified for the active case —
+          it does not store files itself.
+        </p>
+        <a id="goToIntakeBtn" class="btn-upload" style="display:inline-block;text-decoration:none;text-align:center;" href="discovery-intake.html">Go to Document Intake →</a>
+      </div>
 
         <div style="background: #f0f4f8; border-left: 3px solid #2e5b8a; padding: 12px 15px; border-radius: 4px; margin-top: 20px; font-size: 12px; color: #333;">
           <strong>Income Sources:</strong>
@@ -385,89 +384,12 @@
   <script src="logo-handler.js"></script>
 
   <script>
-    let selectedCategory = 'w2';
-
-    function selectCategory(category) {
-      selectedCategory = category;
-      alert(`Selected: ${category.toUpperCase()} - Upload to categorize as ${category}`);
-    }
-
-    document.getElementById('incomeFileInput').addEventListener('change', function(e) {
-      if (e.target.files.length > 0) {
-        const file = e.target.files[0];
-
-        // Store upload data
-        const uploadData = {
-          fileName: file.name,
-          category: selectedCategory,
-          timestamp: new Date().toISOString(),
-          fileSize: file.size,
-          items: Math.floor(Math.random() * 15) + 5 // Mock items count
-        };
-
-        let uploads = JSON.parse(localStorage.getItem('hub_income') || '[]');
-        uploads.push(uploadData);
-        localStorage.setItem('hub_income', JSON.stringify(uploads));
-
-        alert(`✅ Uploaded: ${file.name}\n\nCategory: ${selectedCategory}\nItems extracted: ${uploadData.items}`);
-
-        // Trigger hub update
-        window.dispatchEvent(new Event('hubDataUpdated'));
-
-        // Reload this page
-        location.reload();
-      }
-    });
-
-    // Load documents
-    function loadDocuments() {
-      const uploads = JSON.parse(localStorage.getItem('hub_income') || '[]');
-      const list = document.getElementById('documentsList');
-
-      if (uploads.length === 0) {
-        list.innerHTML = `
-          <div class="empty-state">
-            <div class="empty-icon">📭</div>
-            <div class="empty-title">No documents uploaded yet</div>
-            <p style="font-size: 12px; margin-top: 6px;">Upload income documents above to get started</p>          </div>
-        `;
-        return;
-      }
-
-      // Update stats
-      let totalItems = 0;
-      let totalIncome = 0;
-
-      uploads.forEach(doc => {
-        totalItems += doc.items || 0;
-        // Mock income calculation
-        totalIncome += (Math.random() * 150000) + 30000;
-      });
-
-      document.getElementById('totalDocs').textContent = uploads.length;
-      document.getElementById('totalItems').textContent = totalItems;
-      document.getElementById('totalIncome').textContent = '$' + Math.round(totalIncome).toLocaleString();
-
-      // Display documents
-      list.innerHTML = uploads.map((doc, idx) => `
-        <div class="doc-item">
-          <div class="doc-info">
-            <div class="doc-name">${doc.fileName}</div>
-            <div class="doc-meta">
-              ${new Date(doc.timestamp).toLocaleDateString()} ·
-              ${doc.category.toUpperCase()} ·              ${(doc.fileSize / 1024 / 1024).toFixed(2)} MB
-            </div>
-          </div>
-          <div class="doc-stat">${doc.items || 0} items</div>
-        </div>
-      `).join('');
-    }
-
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', loadDocuments);
-    } else {
-      loadDocuments();
-    }
+    window.HUB_CONFIG = {
+      category: 'Tax Returns & Income',
+      emptyTitle: 'No income documents on file yet',
+      emptyHint: "Upload pay stubs, W-2s, 1099s, or benefit statements in Document Intake — they'll appear here automatically once classified.",
+    };
   </script>
+  <script src="document-hub-category.js"></script>
 </body>
 </html>
