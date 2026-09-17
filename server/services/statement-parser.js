@@ -125,6 +125,12 @@ function determineFlow(amount, accountType, description) {
     return 'expense';
   }
   if (accountType === 'unknown') return 'unknown';
+  // A withdrawal is money leaving the account whatever sign the statement
+  // column carried, and counting one as a deposit inflates imputed income.
+  // "ATM cash deposit" and surcharge refunds are inflows despite the wording.
+  if (/\bwithdraw(?:al|n|s)?\b|\bcash advance\b/.test(d) && !/\bdeposit\b|\brefund\b|\breversal\b/.test(d)) {
+    return 'expense';
+  }
   // Bank account: positive = deposit (income), negative = withdrawal (expense).
   return amount >= 0 ? 'income' : 'expense';
 }

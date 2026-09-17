@@ -10,6 +10,28 @@ const { detectFlags, insertFlags } = require('../services/flag-detector');
 
 const router = express.Router({ mergeParams: true });
 
+// Quote every field: descriptions, filenames and bank names all contain commas.
+function csvCell(value) {
+  return `"${String(value == null ? '' : value).replace(/"/g, '""')}"`;
+}
+
+// One column set for both transaction exports. Account and source file are what
+// let a figure on a schedule be traced back to the statement it came from.
+const TRANSACTION_CSV_COLUMNS = [
+  { header: 'Account', value: (r) => r.account_number_masked },
+  { header: 'Account Type', value: (r) => (r.account_type || '').replace(/_/g, ' ') },
+  { header: 'Bank', value: (r) => r.bank_name },
+  { header: 'Statement Start', value: (r) => r.statement_start },
+  { header: 'Statement End', value: (r) => r.statement_end },
+  { header: 'Date', value: (r) => r.transaction_date },
+  { header: 'Description', value: (r) => r.description },
+  { header: 'Amount', value: (r) => r.amount },
+  { header: 'Type', value: (r) => r.transaction_type },
+  { header: 'Flow', value: (r) => r.flow_type },
+  { header: 'Category', value: (r) => r.mapped_category || r.suggested_category },
+  { header: 'Source File', value: (r) => r.source_file },
+];
+
 // Configure multer for PDF uploads
 const storage = multer.memoryStorage();
 const upload = multer({
@@ -246,39 +268,32 @@ router.get('/export.csv', (req, res) => {
   req.db.all(
     `SELECT
        bs.bank_name,
+       bs.account_number_masked,
+       bs.account_type,
        bs.statement_start,
        bs.statement_end,
+       d.filename AS source_file,
        bt.transaction_date,
        bt.description,
        bt.amount,
        bt.transaction_type,
        bt.flow_type,
+       bt.suggested_category,
        bt.mapped_category
      FROM bank_transactions bt
      JOIN bank_statements bs ON bt.bank_statement_id = bs.id
+     LEFT JOIN documents d ON d.id = bs.document_id
      WHERE bs.matter_id = ?
-     ORDER BY bt.transaction_date DESC`,
+     ORDER BY bs.account_number_masked, bt.transaction_date DESC`,
     [matterId],
     (err, rows) => {
       if (err) {
         return res.status(500).json({ error: err.message });
       }
 
-      // Generate CSV
-      const headers = ['Bank', 'Statement Start', 'Statement End', 'Date', 'Description', 'Amount', 'Type', 'Flow', 'Category'];
-      const csvRows = rows.map(row => [
-        row.bank_name,
-        row.statement_start,
-        row.statement_end,
-        row.transaction_date,
-        `"${(row.description || '').replace(/"/g, '""')}"`, // Escape quotes, handle null
-        row.amount,
-        row.transaction_type,
-        row.flow_type,
-        row.mapped_category || '',
-      ]);
-
-      const csv = [headers, ...csvRows].map(row => row.join(',')).join('\n');
+      const csvRows = rows.map(row => TRANSACTION_CSV_COLUMNS.map((col) => csvCell(col.value(row))));
+      const csv = [TRANSACTION_CSV_COLUMNS.map((c) => csvCell(c.header)), ...csvRows]
+        .map(row => row.join(',')).join('\n');
 
       res.header('Content-Type', 'text/csv');
       res.header('Content-Disposition', 'attachment; filename="bank-statements-export.csv"');
@@ -314,9 +329,13 @@ router.get('/:statementId/export.csv', (req, res) => {
   const { matterId, statementId } = req.params;
 
   req.db.all(
-    `SELECT bt.transaction_date, bt.description, bt.amount, bt.transaction_type, bt.flow_type, bt.mapped_category, bs.bank_name, bs.statement_start, bs.statement_end
+    `SELECT bt.transaction_date, bt.description, bt.amount, bt.transaction_type, bt.flow_type,
+            bt.suggested_category, bt.mapped_category,
+            bs.bank_name, bs.account_number_masked, bs.account_type, bs.statement_start, bs.statement_end,
+            d.filename AS source_file
      FROM bank_transactions bt
      JOIN bank_statements bs ON bt.bank_statement_id = bs.id
+     LEFT JOIN documents d ON d.id = bs.document_id
      WHERE bs.matter_id = ? AND bs.id = ?
      ORDER BY bt.transaction_date ASC`,
     [matterId, statementId],
@@ -324,13 +343,9 @@ router.get('/:statementId/export.csv', (req, res) => {
       if (err) return res.status(500).json({ error: err.message });
       if (!rows || rows.length === 0) return res.status(404).json({ error: 'No transactions for this statement' });
 
-      const headers = ['Bank', 'Statement Start', 'Statement End', 'Date', 'Description', 'Amount', 'Type', 'Flow', 'Category'];
-      const csvRows = rows.map((r) => [
-        r.bank_name || '', r.statement_start || '', r.statement_end || '',
-        r.transaction_date || '', `"${(r.description || '').replace(/"/g, '""')}"`,
-        r.amount, r.transaction_type || '', r.flow_type || '', r.mapped_category || '',
-      ]);
-      const csv = [headers, ...csvRows].map((r) => r.join(',')).join('\n');
+      const csvRows = rows.map((r) => TRANSACTION_CSV_COLUMNS.map((col) => csvCell(col.value(r))));
+      const csv = [TRANSACTION_CSV_COLUMNS.map((c) => csvCell(c.header)), ...csvRows]
+        .map((r) => r.join(',')).join('\n');
 
       res.header('Content-Type', 'text/csv');
       res.header('Content-Disposition', `attachment; filename="statement-${statementId}.csv"`);

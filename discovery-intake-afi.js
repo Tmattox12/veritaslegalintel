@@ -26,7 +26,7 @@
     fuel: 7,
     groceries: 8,
     dining: 8,
-    shopping: 8, // household/grocery purchases (Amazon, Walmart, Target) -> Food/Groceries
+    shopping: null, // discretionary shopping is reported separately, not forced into AFI
     transfer: null,
     tax: null,
     employment_income: null, // income, not expense
@@ -36,11 +36,37 @@
   // merchantKey -> afiLine (number|null) for user overrides
   const userMappings = {};
 
+  function mappingStorageKey() {
+    const mid = matterId();
+    return mid ? `veritas_afi_mappings_${mid}` : null;
+  }
+
+  function loadUserMappings() {
+    const key = mappingStorageKey();
+    if (!key) return;
+    try {
+      const saved = JSON.parse(localStorage.getItem(key) || '{}');
+      Object.assign(userMappings, saved);
+    } catch (error) { /* ignore malformed local mapping state */ }
+  }
+
+  function saveUserMappings() {
+    const key = mappingStorageKey();
+    if (key) localStorage.setItem(key, JSON.stringify(userMappings));
+  }
+
   // Auto-detect common merchants -> AFI line. Checked against the uppercased
   // merchant key. User overrides always win; these are just a first-pass guess.
   const MERCHANT_PATTERNS = [
-    // Line 8 — Food / Groceries / household shopping
-    [/\bamazon\b|\bamzn\b|\bamzn\s*mktp\b|\bwalmart\b|\bwal-?mart\b|\bwalmartcom\b|\bsafeway\b|\bsams ?club\b|\bsamsclubcom\b|\bcostco\b|\bkroger\b|\bfry'?s\b|\balbertsons?\b|\btrader\s*joe'?s?\b|\bwhole\s*foods?\b|\bsprouts?\b|\btarget\b|\bdollar\s*(?:tree|general)\b|\baldi\b|\bfood\s*city\b|\bel\s*super\b|\bbashas\b|\bwin-?co\b/i, 8],
+    // Order matters: the first match wins, so the rules that disambiguate a
+    // brand from what was actually bought have to come before the brand rules.
+    // Line 6 — piped gas is a household utility, not vehicle fuel.
+    [/\bsouthwest\s*gas\b|\bnatural\s*gas\b|\bgas\s*(?:company|co\b|utility)/i, 6],
+    // Line 7 — fuel bought at a grocery brand's pump is transportation, not food.
+    // "FUEL1521" has no trailing word boundary, so do not anchor the end.
+    [/\bfuel|\bgasoline\b/i, 7],
+    // Line 8 — Food / Groceries
+    [/\bwalmart\b|\bwal-?mart\b|\bwalmartcom\b|\bsafeway\b|\bsams ?club\b|\bsamsclubcom\b|\bcostco\b|\bkroger\b|\bfry'?s\b|\balbertsons?\b|\btrader\s*joe'?s?\b|\bwhole\s*foods?\b|\bsprouts?\b|\btarget\b|\bdollar\s*(?:tree|general)\b|\baldi\b|\bfood\s*city\b|\bel\s*super\b|\bbashas\b|\bwin-?co\b/i, 8],
     // Line 3 — Medical / Dental (out-of-pocket)
     [/\bcvs\b|\bwalgreens?\b|\brite\s*aid\b|\bpharmacy\b|\b(derm|dent|ortho|vision|optom|clinic|medical|urgent\s*care|lab|quest|labcorp|hospital|physician|pediatric)\b/i, 3],
     // Line 7 — Transportation (car / gas / insurance)
@@ -49,6 +75,10 @@
     [/\bmortgage\b|\brent\b|\bhoa\b|\bhome\s*owners\b|\bproperty\s*management\b|\bhud\b|\bzillow\b|\bapartment/i, 5],
     // Line 6 — Utilities (phone / internet / cable / electric)
     [/\bverizon\b|\bat&?t\b|\bt-?mobile\b|\bsprint\b|\bcomcast\b|\bxfinity\b|\bcox\b|\bcenturylink\b|\bspectrum\b|\btep\b|\btucson\s*electric\b|\bsouthwest\s*gas\b|\bwater\b|\btrash\b|\bwm\s*waste\b|\bcity\s*of\b|\butility\b|\binternet\b|\bcable\b/i, 6],
+    // Line 6 — recurring streaming / device subscriptions, billed alongside cable.
+    // Deliberately narrow: Amazon marketplace orders and Apple hardware are
+    // ordinary discretionary shopping and must not be swept into a utility line.
+    [/\bamazon\s*prime\b|\bamzn\s*prime\b|\bprime\s*video\b|apple\.?com\/?bill|\bapplecombill\b|\bitunes\b|\bnetflix\b|\bhulu\b|\bspotify\b|\bhbo\s*max\b|\bpeacock\b|\byoutube\s*(?:tv|premium)\b|\bsling\s*tv\b/i, 6],
     // Line 1 — Health insurance premium
     [/\bblue\s*cross\b|\bbcbcs?\b|\bunited\s*health|\baetna\b|\bcigna\b|\bhumana\b|\bkaiser\b|\bhealth\s*insur|\bambetter\b|\boscar\s*health/i, 1],
     // Line 2 — Childcare / dependent care
@@ -109,6 +139,7 @@
   async function loadTransactions() {
     const mid = matterId();
     if (!mid) { setNote('No matter selected. Select a case first.'); return; }
+    loadUserMappings();
     setNote('Loading parsed transactions from discovery…');
     try {
       const [txRes, stRes] = await Promise.all([
@@ -131,6 +162,7 @@
   /* ---------- Derive mapping ---------- */
   function computeMapping() {
     const lineTotals = {}; // line -> { total, rows }
+    const shoppingTotal = { total: 0, rows: 0 };
     const unmapped = {};   // merchantKey -> { rows, amount, desc }
     let mapped = 0, total = 0;
 
@@ -139,6 +171,11 @@
       total += amt;
       const cat = t.mapped_category || t.suggested_category;
       let line = cat != null ? CATEGORY_TO_LINE[cat] : undefined;
+
+      if (cat === 'shopping' || /\bamazon\b|\bamzn\b/i.test(t.description || '')) {
+        shoppingTotal.total += amt;
+        shoppingTotal.rows++;
+      }
 
       // auto-detect obvious merchants when the parser left it unmapped
       if (line == null || line === undefined) {
@@ -154,6 +191,8 @@
         if (!lineTotals[line]) lineTotals[line] = { total: 0, rows: 0 };
         lineTotals[line].total += amt;
         lineTotals[line].rows++;
+      } else if (cat === 'shopping' || /\bamazon\b|\bamzn\b/i.test(t.description || '')) {
+        mapped++;
       } else {
         if (!unmapped[mk]) unmapped[mk] = { rows: 0, amount: 0, desc: t.description };
         unmapped[mk].rows++;
@@ -161,12 +200,12 @@
       }
     });
 
-    return { lineTotals, unmapped, mapped, total };
+    return { lineTotals, shoppingTotal, unmapped, mapped, total };
   }
 
   /* ---------- Render ---------- */
   function render() {
-    const { lineTotals, unmapped, mapped, total } = computeMapping();
+    const { lineTotals, shoppingTotal, unmapped, mapped, total } = computeMapping();
 
     const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
     set('afiMapRows', allTransactions.length);
@@ -191,6 +230,17 @@
           <td>${agg.rows}</td>`;
         catBody.appendChild(tr);
       });
+      if (shoppingTotal.rows) {
+        const months = statementMonths();
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>Review</td>
+          <td>Shopping / Discretionary (Amazon and similar)</td>
+          <td>${money(shoppingTotal.total)}</td>
+          <td>${money(shoppingTotal.total / months)}</td>
+          <td>${shoppingTotal.rows}</td>`;
+        catBody.appendChild(tr);
+      }
       if (!catBody.children.length) {
         catBody.innerHTML = '<tr><td colspan="5" style="color:#999;padding:12px;">No mapped transactions yet.</td></tr>';
       }
@@ -227,6 +277,7 @@
           if (v === '') delete userMappings[sel.dataset.mk];
           else if (v === 'none') userMappings[sel.dataset.mk] = null;
           else userMappings[sel.dataset.mk] = parseInt(v, 10);
+          saveUserMappings();
           render();
         });
       });
@@ -287,6 +338,34 @@
     setNote(`✓ Pushed monthly totals to AFI draft. Open afi-form-populator.html and it will load automatically.`);
   }
 
+  // Lead sheet + one tab per vendor + Unmatched tab, using the same overrides
+  // currently applied in this mapper (a real Excel workbook — plain CSV has no tabs).
+  async function exportVendorWorkbook(btn) {
+    const mid = matterId();
+    if (!mid) { setNote('No matter selected.'); return; }
+    const originalLabel = btn ? btn.textContent : null;
+    if (btn) { btn.disabled = true; btn.textContent = 'Building workbook…'; }
+    try {
+      const response = await fetch(`${API_BASE}/matters/${mid}/documents/expense-workbook`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ overrides: userMappings }),
+      });
+      if (!response.ok) throw new Error('Workbook export failed');
+      const blob = await response.blob();
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `expense-workbook-${new Date().toISOString().slice(0, 10)}.xlsx`;
+      document.body.appendChild(a); a.click(); a.remove();
+      URL.revokeObjectURL(a.href);
+      setNote('✓ Exported vendor workbook: lead sheet totals, one tab per vendor, and an Unmatched tab.');
+    } catch (error) {
+      setNote('Could not export the vendor workbook. Is the backend running on :3000?');
+    } finally {
+      if (btn) { btn.disabled = false; btn.textContent = originalLabel; }
+    }
+  }
+
   function exportReconCSV() {
     const { lineTotals, unmapped } = computeMapping();
     const rows = [['AFI Line', 'Category', 'Total', 'Monthly', 'Rows']];
@@ -320,6 +399,8 @@
     if (pushBtn) pushBtn.addEventListener('click', pushToAFI);
     const exportBtn = document.getElementById('afiExportReconBtn');
     if (exportBtn) exportBtn.addEventListener('click', exportReconCSV);
+    const workbookBtn = document.getElementById('afiExportWorkbookBtn');
+    if (workbookBtn) workbookBtn.addEventListener('click', () => exportVendorWorkbook(workbookBtn));
 
     // hide the now-unused CSV file input
     const fi = document.getElementById('afiMapCsvInput');
