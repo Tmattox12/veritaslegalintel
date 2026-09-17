@@ -27,8 +27,11 @@ async function validMatterId() {
   try {
     const r = await fetch(`${API_BASE}/matters/${mid}`);
     if (r.ok) return mid;
-  } catch (e) { /* backend down */ }
-  // Stale or invalid -> clear so we stop pointing at a phantom matter.
+  } catch (e) {
+    // Backend unreachable says nothing about the matter; keep the selection.
+    return null;
+  }
+  // Backend answered and the matter is gone -> clear the stale pointer.
   localStorage.removeItem('currentMatterId');
   if (window.Veritas) window.Veritas.currentMatterId = null;
   return null;

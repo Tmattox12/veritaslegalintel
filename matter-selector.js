@@ -3,7 +3,7 @@ let allMatters = [];
 
 document.addEventListener('DOMContentLoaded', async () => {
   // Load matters from API
-  await loadMatters();
+  const mattersLoaded = await loadMatters();
 
   // Setup matter button click handler
   const matterBtn = document.querySelector('.matter-btn');
@@ -20,15 +20,16 @@ document.addEventListener('DOMContentLoaded', async () => {
     const saved = allMatters.find(m => m.id === savedMatterId);
     if (saved) {
       currentMatter = saved;
-      updateMatterDisplay();
-    } else {
-      // Saved matter no longer exists (e.g., data was reset) -> clear it
+    } else if (mattersLoaded) {
+      // Only a successful list proves the matter is gone; an offline backend does not.
       localStorage.removeItem('currentMatterId');
-      updateMatterDisplay();
     }
-  } else {
-    updateMatterDisplay();
   }
+  if (!currentMatter && mattersLoaded && !localStorage.getItem('currentMatterId') && allMatters.length > 0) {
+    currentMatter = allMatters[0];
+    localStorage.setItem('currentMatterId', currentMatter.id);
+  }
+  updateMatterDisplay();
 });
 
 function setupSidebarMattersLink() {
@@ -122,16 +123,12 @@ function showMatterDropdownFromSidebar() {
 async function loadMatters() {
   try {
     const response = await fetch('http://localhost:3000/api/matters');
+    if (!response.ok) return false;
     allMatters = await response.json();
-
-    // Set first matter as default if none selected
-    if (allMatters.length > 0 && !currentMatter) {
-      currentMatter = allMatters[0];
-      localStorage.setItem('currentMatterId', currentMatter.id);
-      updateMatterDisplay();
-    }
+    return true;
   } catch (error) {
     console.error('Error loading matters:', error);
+    return false;
   }
 }
 
