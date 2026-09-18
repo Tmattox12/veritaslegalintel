@@ -1,97 +1,107 @@
 # Veritas Morning Handoff
 
-Date: 2026-09-06
+Date: 2026-09-17
 
 ## Current State
 
-- Local backend: `node server/index.js` on `http://localhost:3000`.
+- Local backend: run `start-veritas.bat` (double-click) and leave the window open.
+  Starting it inside a terminal that later closes is what made the app look empty
+  twice this week — a stopped backend renders every page as zeros.
 - Frontend: Live Server on `http://127.0.0.1:5502`.
-- Active real matter id: `6cdff522-2dac-4731-926e-f159da6e29e9`.
-- Real documents/database remain local and gitignored. Do not purge `.data/` or `server/uploads/`.
-- Current uncommitted product files:
-  - `server/index.js`
-  - `income-imputation.js`
-  - `income-imputation.html`
-  - `discovery-intake-afi.js`
-  - `discovery-intake.html`
-  - `discovery-bridge.js`
+- Everything is committed and pushed. `origin/main` is at `f804ad2`.
+- Real documents and the database stay local and gitignored. Do not purge
+  `.data/` or `server/uploads/`.
 
-## Completed Tonight
+### Matters — unresolved duplicate
 
-- Added account-wide statement classification. Changing one account statement can update every matching filename/account token together.
-- Added explicit statement options:
-  - Bank Account Statement (feeds AFI expenses)
-  - Credit Card Statement (feeds AFI expenses)
-  - Pay Stub (links to Income)
-- Added merchant auto-mapping for common merchants.
-  - Walmart, Safeway, Sam's Club, Costco, Target -> groceries / AFI Line 8.
-  - Medical, gas/auto, utilities, insurance, childcare, education, housing patterns are covered.
-  - Ambiguous merchants remain for review.
-- Amazon/AMZN is classified as `shopping` and now appears in a visible `Shopping / Discretionary` review row instead of disappearing into groceries or the unresolved list.
-- AFI manual merchant overrides now persist by matter in localStorage.
-- Income review workflow exists:
-  - pay stubs and benefits are reviewed by party;
-  - annual amount must be entered before acceptance;
-  - accepted-only evidence feeds calculation-ready income;
-  - bank deposit candidates remain review-only.
-- Income Engine cards exist for:
-  - 12-month average
-  - 6-month average
-  - 3-month average
-  - last-month run-rate
-  - accepted document income
-- Income basis selection now requires confirmation for review-only bank candidates and persists by matter.
-- Shared AFI/spousal/child-support discovery bridge now displays the selected basis and amount for each party, with a review warning and no automatic legal-calculation write.
-- Income averages now include calendar gaps as zero months to avoid overstating trailing averages.
-- Cache versions updated:
-  - `discovery-intake-uploads.js?v=21`
-  - `discovery-intake-afi.js?v=6`
-  - `income-imputation.js?v=2`
+| Matter id | Docs | Transactions |
+|---|---|---|
+| `04042bf8-c744-46ee-a2af-583825acee06` | 127 | 3,430 |
+| `6cdff522-2dac-4731-926e-f159da6e29e9` | 127 | 3,485 |
 
-## Live Validation
+Both are fully populated. Work has been split across them because the matter
+selector used to adopt the first matter on every page load (fixed). Decide which
+is authoritative before either is deleted.
 
-- `node --check server/index.js` passed.
-- `node --check income-imputation.js` passed.
-- `node --check discovery-intake-afi.js` passed.
-- Editor diagnostics are clear for all five touched files.
-- Live `/api/matters/:id/income-analysis` responds successfully.
-- Current analysis reported 36 calendar months of coverage, 12-month and 6-month candidate values, and `$0` accepted income because no evidence has been explicitly accepted yet.
+Database backups taken today, before each data change:
+`.data/veritas.sqlite.bak-20260917-165728` and `.bak-reclass-*`.
+
+## Completed Today
+
+- **Bulk intake no longer stalls.** Batches over 20 files ran one at a time and
+  looked frozen; reloading to retry abandoned the queue, which is why repeated
+  attempts landed only 2–4 files. Concurrency is 4, and the browser now warns
+  before you navigate away mid-batch.
+- **The active matter survives a backend outage.** An unreachable backend was
+  treated as proof the matter no longer existed and its id was deleted from
+  browser storage.
+- **Withdrawals are no longer counted as income.** Direction was decided from the
+  sign of the amount alone. 14 stored rows corrected; none remain.
+- **Fuel and gas precedence fixed.** $1,718 of fuel bought at Fry's and Safeway
+  pumps was filed as groceries; Southwest Gas would have been transportation.
+- **AFI-aligned taxonomy.** `afi-taxonomy.js` is now the single definition of
+  expense categories, mirroring AFI sections 6–10 plus discretionary and
+  excluded. It had been defined three times over (mapper, workbook, parser).
+  5,539 stored rows re-classified. 81.5% coverage on real data.
+- **CSV exports carry the account.** Account, Account Type and Source File, so a
+  figure can be traced back to the statement it came from.
+- Cache versions: `discovery-intake-uploads.js?v=23`, `afi-taxonomy.js?v=1`,
+  `discovery-intake-afi.js?v=9`.
+
+## Open Defects — imputed income is overstated
+
+These are known and unfixed. They matter because they feed support calculations.
+
+1. **"Interest Payment" — $110,805 across 49 rows.** Not interest. One savings
+   statement shows $25,186; account 1874 shows ~$13,170/month climbing by a near
+   constant ~$967. That is a balance column being read as the transaction
+   amount. This is roughly a third of the deposit-derived income figure and is
+   the single biggest thing to fix.
+2. `Manual CR-Bkrg` ($29,475) and `JPMorgan Chase Chase ACH` ($17,342) look like
+   transfers being counted as income.
+3. `Tucson Crossroad Web Pmts` — 14 payments of exactly $1,967.50 ($27,545,
+   2024-01 to 2026-06). An unidentified fixed obligation, probably rent,
+   mortgage or tuition. Left unclassified rather than guessed.
 
 ## First Tasks Tomorrow
 
-1. Hard-refresh `discovery-intake.html` and verify:
-   - Amazon appears under `Shopping / Discretionary`.
-   - Walmart/Safeway appear in AFI Line 8.
-   - manual merchant mappings survive refresh.
-2. Hard-refresh `income-imputation.html` and verify the income card grid renders.
-3. Open the review modal and review the three current income evidence records:
-   - `2024.08 Ws SS Stmt.pdf`
-   - `2024.11.06 Nico SS Income.pdf`
-   - `2025.05.15 Helping Hearts.pdf`
-   Assign the correct party and enter attorney-confirmed annual amounts before accepting. Do not annualize a single pay stub automatically.
-4. Decide whether Amazon should remain entirely discretionary or whether selected Amazon merchants should be manually moved to groceries/education/other. The persisted merchant override supports this.
-5. Test `Push to AFI` and confirm `afi_form_draft` contains monthly lines 1-8 without transfers, card payments, Zelle, Venmo, PayPal, or OCR outliers.
-6. Wire the selected basis into each page's actual calculation contract only after confirming the field mapping; the shared bridge display is complete but deliberately read-only.
-7. Add a visible selected-basis/source summary to any remaining calculation panels before allowing calculation use.
-8. Review the two remaining unclassified documents manually:
-   - `2024.04.05 Fleet Feet.pdf`
-   - `Screenshot.pdf`
+1. Start the backend with `start-veritas.bat`, then hard-refresh
+   `discovery-intake.html` (Ctrl+Shift+R) so the new taxonomy loads.
+2. Confirm the AFI mapper renders and that Apple/Prime now appear as
+   **discretionary**, not Utilities — your spec reversed an earlier call, so only
+   basic cable kept for news or communication is a utility.
+3. Decide what `Tucson Crossroad Web Pmts` is and map it. At $27,545 it is the
+   largest single unclassified obligation.
+4. Fix the "Interest Payment" balance-column misread in the statement parser,
+   then re-run classification.
+5. Decide which of the two Ossandon matters is authoritative.
+6. Review the 489 still-unclassified expense rows ($38,125) in the mapper.
+7. Three documents remain unverified — `2025.12`, `2026.01`, `2026.02 Acct
+   3063.pdf`. Their Chase text layer is boilerplate only; even the balance
+   summary is empty, so zero activity cannot be confirmed from text.
+   `ANTHROPIC_API_KEY` is configured, so
+   `POST /api/documents/:id/retry-extraction` with `{useOcr: true}` can settle
+   it. It bills and sends financial documents to an external API.
 
 ## Technical Follow-Up
 
-- `income-imputation.js` currently shows the same unassigned bank candidate bases for both parties. Keep them visibly labeled as shared/unassigned unless account-to-party assignment is added.
-- Consider adding a server-side persistence table for AFI merchant mappings if mappings must follow the matter across browsers/devices; localStorage is currently browser-local.
-- Verify the income-analysis average definition with counsel: current trailing averages use calendar months between first and last observed deposit, with missing months as zero.
-- Do not enable Entra/Azure tunnel or imply production confidentiality until deployment is explicitly configured. Local mode remains `AUTH_MODE=none` and `TUNNEL_MODE=none`.
-- Before committing, inspect `git diff` carefully. Never commit `.data/`, SQLite files, uploads, or real client documents.
+- Clothing and personal necessities are Section 7 needs with no box on the
+  eight-line `afi-form-populator.html`. They report in their own section but
+  cannot be pushed to the form without rebuilding it.
+- AFI merchant overrides are still browser-local `localStorage`. A server-side
+  table is needed if mappings must follow the matter across devices.
+- The parser fix only affects newly parsed statements. Stored rows were
+  corrected by targeted update, not by reprocessing.
+- Verify the trailing-average definition with counsel: it uses calendar months
+  between the first and last observed deposit, with missing months as zero.
+- Local mode stays `AUTH_MODE=none` and `TUNNEL_MODE=none`. Do not imply
+  production confidentiality until deployment is configured.
+- Before committing, inspect `git diff`. Never commit `.data/`, SQLite files,
+  uploads, or real client documents. `.gitignore` covers these today and the
+  pushed history has been checked for client names and credentials.
 
 ## Safe Shutdown
 
-The work is saved in the repository and this handoff file. It is safe to stop the local Node server and Live Server tonight. Restart tomorrow with:
-
-```powershell
-cd C:\dev\Veritas_CLEAN
-node server\index.js
-```
-
-Then start Live Server for the workspace and hard-refresh the two pages.
+Everything is committed and pushed; nothing is held only in a running process.
+Close the backend window and Live Server. Tomorrow, double-click
+`start-veritas.bat`, start Live Server, and hard-refresh.
