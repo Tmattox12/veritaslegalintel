@@ -121,7 +121,7 @@ app.get('/api/matters/:id', (req, res) => {
       all('SELECT COUNT(*) AS count FROM documents WHERE matter_id = ? AND deleted_at IS NULL', [id]),
       all(`SELECT id, account_type, statement_start, statement_end
            FROM bank_statements WHERE matter_id = ? AND processing_status = 'completed'`, [id]),
-      all(`SELECT bt.amount, bt.description, bt.suggested_category, bt.mapped_category, bt.flow_type, bs.account_type
+      all(`SELECT bt.amount, bt.description, bt.suggested_category, bt.mapped_category, bt.mapping_status, bt.flow_type, bs.account_type
            FROM bank_transactions bt
            JOIN bank_statements bs ON bs.id = bt.bank_statement_id
            WHERE bs.matter_id = ?`, [id]),
@@ -153,7 +153,7 @@ app.get('/api/matters/:id', (req, res) => {
         // Only non-credit-card deposits are income candidates. Card payments/refunds
         // are deliberately excluded; a lawyer must review/confirm candidate income.
         if (txn.flow_type === 'income' && txn.account_type !== 'credit_card' &&
-            !AFITaxonomy.isAccountMovement(category)) {
+            !AFITaxonomy.excludedFromIncome(category, txn.description, txn.mapping_status)) {
           incomeCandidateTotal += amount;
         }
       });
@@ -202,7 +202,7 @@ app.get('/api/matters/:id', (req, res) => {
 
     Promise.all([
       all(`SELECT bt.amount, bt.description, bt.transaction_date, bt.flow_type,
-                  bt.suggested_category, bt.mapped_category, bs.account_type
+                  bt.suggested_category, bt.mapped_category, bt.mapping_status, bs.account_type
            FROM bank_transactions bt
            JOIN bank_statements bs ON bs.id = bt.bank_statement_id
            WHERE bs.matter_id = ?`, [id]),
@@ -219,7 +219,7 @@ app.get('/api/matters/:id', (req, res) => {
         const desc = (t.description || '').toLowerCase();
         return t.flow_type === 'income'
           && t.account_type !== 'credit_card'
-          && !AFITaxonomy.isAccountMovement(cat)
+          && !AFITaxonomy.excludedFromIncome(cat, t.description, t.mapping_status)
           && !movement.test(desc);
       });
 

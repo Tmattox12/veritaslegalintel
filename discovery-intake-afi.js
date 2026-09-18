@@ -12,30 +12,30 @@
   let allTransactions = [];
   // merchantKey -> afiLine (number|null) for user overrides
   const userMappings = {};
+  // merchantKey -> true once a person has accepted a flagged suggestion as-is
+  const confirmedGuesses = {};
 
-  function mappingStorageKey() {
+  function mappingStorageKey(kind = 'mappings') {
     const mid = matterId();
-    return mid ? `veritas_afi_mappings_${mid}` : null;
+    return mid ? `veritas_afi_${kind}_${mid}` : null;
   }
 
   function loadUserMappings() {
-    const key = mappingStorageKey();
-    if (!key) return;
-    try {
-      const saved = JSON.parse(localStorage.getItem(key) || '{}');
-      Object.assign(userMappings, saved);
-    } catch (error) { /* ignore malformed local mapping state */ }
+    [[mappingStorageKey(), userMappings], [mappingStorageKey('confirmed'), confirmedGuesses]].forEach(([key, target]) => {
+      if (!key) return;
+      try {
+        Object.assign(target, JSON.parse(localStorage.getItem(key) || '{}'));
+      } catch (error) { /* ignore malformed local mapping state */ }
+    });
   }
 
   function saveUserMappings() {
     const key = mappingStorageKey();
     if (key) localStorage.setItem(key, JSON.stringify(userMappings));
+    const ck = mappingStorageKey('confirmed');
+    if (ck) localStorage.setItem(ck, JSON.stringify(confirmedGuesses));
   }
 
-  // Returns the AFI line for a description, or null when unknown.
-  function detectMerchantLine(description) {
-    return T.afiLineFor(T.classify(description));
-  }
 
   function isMappableExpense(transaction) {
     const description = (transaction.description || '').toLowerCase();
@@ -45,7 +45,11 @@
 
     // Transfers, cash and credit-card payments move money between accounts;
     // they are not household spending and must never inflate an AFI total.
-    if (T.treatmentFor(code) === 'none' || /\bpayment\s+to\s+(?:chase|credit|card)|\bpayment thank you|\btransfer\b|\bzelle\b|\bvenmo\b|\bpaypal\b|\bdeposit\b/.test(description)) {
+    // A merely-guessed "not spending" category stays in the list, flagged, so
+    // a person sees it instead of it silently disappearing.
+    const detail = T.classifyDetailed(transaction.description);
+    const guessed = detail && detail.confidence === 'review' && detail.code === code;
+    if ((T.treatmentFor(code) === 'none' && !guessed) || /\bpayment\s+to\s+(?:chase|credit|card)|\bpayment thank you|\btransfer\b|\bzelle\b|\bvenmo\b|\bpaypal\b|\bdeposit\b/.test(description)) {
       return false;
     }
     // A parsed amount over $100k is almost certainly an OCR/reference-ID error
@@ -105,37 +109,51 @@
   function computeMapping() {
     const lineTotals = {}; // line -> { total, rows }
     const shoppingTotal = { total: 0, rows: 0 };
+    const offForm = {};    // category code -> { total, rows } for needs with no AFI box
     const unmapped = {};   // merchantKey -> { rows, amount, desc }
-    let mapped = 0, total = 0;
+    const flagged = {};    // merchantKey -> { rows, amount, desc, code } best-guess categories
+    let mapped = 0, flaggedRows = 0, total = 0;
 
     allTransactions.forEach((t) => {
       const amt = Math.abs(parseFloat(t.amount) || 0);
       total += amt;
-      const cat = T.normalize(t.mapped_category || t.suggested_category) || T.classify(t.description);
-      let line = cat != null ? T.afiLineFor(cat) : undefined;
-      const isDiscretionary = T.treatmentFor(cat) === 'discretionary';
-
-      if (isDiscretionary) {
-        shoppingTotal.total += amt;
-        shoppingTotal.rows++;
-      }
-
-      // auto-detect obvious merchants when the parser left it unmapped
-      if (line == null || line === undefined) {
-        line = detectMerchantLine(t.description);
-      }
-
-      // user override by merchant always wins
       const mk = merchantKey(t.description);
-      if (userMappings[mk] !== undefined) line = userMappings[mk];
+      const detail = T.classifyDetailed(t.description);
+      const cat = T.normalize(t.mapped_category || t.suggested_category) || (detail && detail.code);
+      const userSet = userMappings[mk] !== undefined;
 
-      if (line != null && line !== undefined) {
+      // A best-guess category counts toward the totals but stays visible until
+      // a person confirms it or picks something else. Whether it is a guess is
+      // a property of the taxonomy rule that matched, so it is derived here.
+      const isGuess = !!(detail && detail.confidence === 'review');
+      if (cat && isGuess && !userSet && !confirmedGuesses[mk] && t.mapping_status !== 'confirmed') {
+        if (!flagged[mk]) flagged[mk] = { rows: 0, amount: 0, desc: t.description, code: cat };
+        flagged[mk].rows++;
+        flagged[mk].amount += amt;
+        flaggedRows++;
+      }
+
+      const line = userSet ? userMappings[mk] : (cat != null ? T.afiLineFor(cat) : null);
+
+      if (line != null) {
         mapped++;
         if (!lineTotals[line]) lineTotals[line] = { total: 0, rows: 0 };
         lineTotals[line].total += amt;
         lineTotals[line].rows++;
-      } else if (isDiscretionary) {
+      } else if (userSet) {
+        // The person chose "Other / Skip": handled, deliberately outside the form.
         mapped++;
+      } else if (cat && T.treatmentFor(cat) === 'discretionary') {
+        mapped++;
+        shoppingTotal.total += amt;
+        shoppingTotal.rows++;
+      } else if (cat) {
+        // Categorised, but a need (or legal/debt/excluded item) with no box on
+        // the eight-line form: reported on its own line, not left "unmapped".
+        mapped++;
+        if (!offForm[cat]) offForm[cat] = { total: 0, rows: 0 };
+        offForm[cat].total += amt;
+        offForm[cat].rows++;
       } else {
         if (!unmapped[mk]) unmapped[mk] = { rows: 0, amount: 0, desc: t.description };
         unmapped[mk].rows++;
@@ -143,17 +161,23 @@
       }
     });
 
-    return { lineTotals, shoppingTotal, unmapped, mapped, total };
+    return { lineTotals, shoppingTotal, offForm, unmapped, flagged, mapped, flaggedRows, total };
   }
 
   /* ---------- Render ---------- */
+  function esc(s) {
+    return String(s == null ? '' : s).replace(/[&<>"']/g, (c) =>
+      ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+  }
+
   function render() {
-    const { lineTotals, shoppingTotal, unmapped, mapped, total } = computeMapping();
+    const { lineTotals, shoppingTotal, offForm, unmapped, flagged, mapped, flaggedRows, total } = computeMapping();
 
     const set = (id, v) => { const el = document.getElementById(id); if (el) el.textContent = v; };
     set('afiMapRows', allTransactions.length);
-    set('afiMapMapped', mapped);
-    set('afiMapUnmapped', allTransactions.length - mapped);
+    set('afiMapMapped', mapped - flaggedRows);
+    // Needs review = nothing matched, plus best guesses nobody has confirmed yet.
+    set('afiMapUnmapped', allTransactions.length - mapped + flaggedRows);
     set('afiMapTotal', money(total));
 
     // Category table
@@ -184,6 +208,19 @@
           <td>${shoppingTotal.rows}</td>`;
         catBody.appendChild(tr);
       }
+      Object.keys(offForm).sort((a, b) => offForm[b].total - offForm[a].total).forEach((code) => {
+        const agg = offForm[code];
+        const sec = T.sectionFor(code);
+        const months = statementMonths();
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${esc(sec && sec.afiSection ? '§' + sec.afiSection : sec ? sec.label : '')}</td>
+          <td>${esc(T.labelFor(code))} <span style="color:#8a94a6;">(no box on the 8-line form)</span></td>
+          <td>${money(agg.total)}</td>
+          <td>${money(agg.total / months)}</td>
+          <td>${agg.rows}</td>`;
+        catBody.appendChild(tr);
+      });
       if (!catBody.children.length) {
         catBody.innerHTML = '<tr><td colspan="5" style="color:#999;padding:12px;">No mapped transactions yet.</td></tr>';
       }
@@ -193,25 +230,53 @@
     const unBody = document.getElementById('afiUnmappedBody');
     if (unBody) {
       unBody.innerHTML = '';
-      const keys = Object.keys(unmapped).sort((a, b) => unmapped[b].amount - unmapped[a].amount);
-      keys.forEach((mk) => {
+      const options = (selected) => [`<option value="">— Select AFI line —</option>`]
+        .concat(AFI_LINES.map(({ line, label }) =>
+          `<option value="${line}" ${selected === line ? 'selected' : ''}>${line}. ${esc(label)}</option>`))
+        .concat([`<option value="none" ${selected === null ? 'selected' : ''}>Other / Skip</option>`])
+        .join('');
+
+      // Best guesses first: recognisable merchants whose category a person
+      // should confirm. They already count toward the totals above.
+      Object.keys(flagged).sort((a, b) => flagged[b].amount - flagged[a].amount).forEach((mk) => {
+        const f = flagged[mk];
+        const line = T.afiLineFor(f.code);
+        const tr = document.createElement('tr');
+        tr.style.background = '#fffbeb';
+        tr.innerHTML = `
+          <td title="${esc(f.desc)}">${esc(mk || '(blank)')}
+            <div style="margin-top:3px;"><span class="map-badge" style="background:#fef3c7;color:#92400e;">Suggested — review</span>
+            <span style="font-size:10px;color:#6b7280;">${esc(T.labelFor(f.code))}</span></div></td>
+          <td>${f.rows}</td>
+          <td>${money(f.amount)}</td>
+          <td><div style="display:flex;gap:6px;align-items:center;">
+            <select class="map-select" data-mk="${esc(mk)}">${options(line == null ? null : line)}</select>
+            <button type="button" class="btn ghost" style="padding:3px 8px;font-size:11px;white-space:nowrap;" data-confirm="${esc(mk)}">✓ Confirm</button>
+          </div></td>`;
+        unBody.appendChild(tr);
+      });
+
+      Object.keys(unmapped).sort((a, b) => unmapped[b].amount - unmapped[a].amount).forEach((mk) => {
         const u = unmapped[mk];
         const tr = document.createElement('tr');
-        const opts = [`<option value="">— Select AFI line —</option>`]
-          .concat(AFI_LINES.map(({ line, label }) =>
-            `<option value="${line}" ${userMappings[mk] === line ? 'selected' : ''}>${line}. ${label}</option>`))
-          .concat([`<option value="none" ${userMappings[mk] === null ? 'selected' : ''}>Other / Skip</option>`])
-          .join('');
         tr.innerHTML = `
-          <td title="${(u.desc || '').replace(/"/g, '&quot;')}">${mk || '(blank)'}</td>
+          <td title="${esc(u.desc)}">${esc(mk || '(blank)')}</td>
           <td>${u.rows}</td>
           <td>${money(u.amount)}</td>
-          <td><select class="map-select" data-mk="${mk}">${opts}</select></td>`;
+          <td><select class="map-select" data-mk="${esc(mk)}">${options(userMappings[mk])}</select></td>`;
         unBody.appendChild(tr);
       });
       if (!unBody.children.length) {
-        unBody.innerHTML = '<tr><td colspan="4" style="color:#999;padding:12px;">No unmapped merchants. 🎉</td></tr>';
+        unBody.innerHTML = '<tr><td colspan="4" style="color:#999;padding:12px;">No unmapped or flagged merchants. 🎉</td></tr>';
       }
+
+      unBody.querySelectorAll('button[data-confirm]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          confirmedGuesses[btn.dataset.confirm] = true;
+          saveUserMappings();
+          render();
+        });
+      });
 
       // wire selects
       unBody.querySelectorAll('select[data-mk]').forEach((sel) => {
@@ -310,15 +375,25 @@
   }
 
   function exportReconCSV() {
-    const { lineTotals, unmapped } = computeMapping();
+    const { lineTotals, offForm, unmapped, flagged } = computeMapping();
+    const q = (v) => `"${String(v == null ? '' : v).replace(/"/g, '""')}"`;
     const rows = [['AFI Line', 'Category', 'Total', 'Monthly', 'Rows']];
     AFI_LINES.forEach(({ line, label }) => {
       const agg = lineTotals[line];
-      if (agg) rows.push([line, `"${label}"`, agg.total.toFixed(2), (agg.total / statementMonths()).toFixed(2), agg.rows]);
+      if (agg) rows.push([line, q(label), agg.total.toFixed(2), (agg.total / statementMonths()).toFixed(2), agg.rows]);
+    });
+    Object.keys(offForm).forEach((code) => {
+      const agg = offForm[code];
+      const sec = T.sectionFor(code);
+      rows.push([q(sec ? 'Section ' + (sec.afiSection || sec.label) : ''), q(T.labelFor(code) + ' (no box on 8-line form)'),
+        agg.total.toFixed(2), (agg.total / statementMonths()).toFixed(2), agg.rows]);
     });
     rows.push([]);
+    rows.push(['Flagged Merchant (suggested - needs review)', 'Suggested Category', 'Rows', 'Amount']);
+    Object.keys(flagged).forEach((mk) => rows.push([q(mk), q(T.labelFor(flagged[mk].code)), flagged[mk].rows, flagged[mk].amount.toFixed(2)]));
+    rows.push([]);
     rows.push(['Unmapped Merchant', 'Rows', 'Amount']);
-    Object.keys(unmapped).forEach((mk) => rows.push([`"${mk}"`, unmapped[mk].rows, unmapped[mk].amount.toFixed(2)]));
+    Object.keys(unmapped).forEach((mk) => rows.push([q(mk), unmapped[mk].rows, unmapped[mk].amount.toFixed(2)]));
 
     const csv = rows.map((r) => r.join(',')).join('\n');
     const blob = new Blob([csv], { type: 'text/csv' });

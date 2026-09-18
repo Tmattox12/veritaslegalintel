@@ -177,6 +177,8 @@
     tax: 'tax',
   };
 
+  const REVIEW = 'review';
+
   // Order matters: the first match wins, so rules that disambiguate a brand
   // from what was actually bought must come before the brand rules.
   const RULES = [
@@ -186,7 +188,9 @@
     [/\bgarnish|\brestitution\b|\bjudgment\s*(?:payment|lien)\b|\blevy\b/i, 'debt_garnishment'],
 
     // --- legal / case costs --------------------------------------------------
-    [/\battorney\b|\blaw\s*(?:office|firm|group|gro)\b|\blegal\s*fees?\b|\bretainer\b|\bpllc\b|\bllp\b|\bfamily\s*law\b|\bkarp\s*weiss\b|\bbelleau\b/i, 'legal_attorney_fees'],
+    [/\battorney\b|\blaw\s*(?:office|firm|group|gro)\b|\blegal\s*fees?\b|\bretainer\b|\bpllc\b|\bllp\b|\bfamily\s*law\b|\bkarp\s*&?\s*weiss\b|\bbelleau\b/i, 'legal_attorney_fees'],
+    // A CPA may be forensic accounting for the case or ordinary tax prep.
+    [/\bcpa\b/i, 'legal_professional', REVIEW],
     [/\bmediation\b|\bfiling\s*fee\b|\bclerk\s*of\s*(?:the\s*)?court\b|\bparenting\s*coordinator\b|\bsuperior\s*court\b/i, 'legal_court_costs'],
     [/\bforensic\s*account|\bcustody\s*evaluat|\bbusiness\s*valuation\b|\bexpert\s*witness\b/i, 'legal_professional'],
 
@@ -198,6 +202,66 @@
     // Streaming is a discretionary subscription, never a utility.
     [/\bnetflix\b|\bhulu\b|\bdisney\s*\+|\bhbo\s*max\b|\bparamount\s*\+|\bpeacock\b|\bspotify\b|\bpandora\b|\bprime\s*video\b|\bamazon\s*prime\b|\bamzn\s*prime\b|\byoutube\s*(?:tv|premium)\b|\bsling\s*tv\b|apple\.?com\/?bill|\bapplecombill\b|\bitunes\b/i, 'disc_streaming'],
     [/\bplanet\s*fitness\b|\bla\s*fitness\b|\bgold'?s\s*gym\b|\banytime\s*fitness\b|\borange\s*theory\b|\bpeloton\b|\bgym\b|\bcrossfit\b/i, 'disc_gym'],
+    [/\bdisney\s*plus\b/i, 'disc_streaming'],
+
+    // --- specific merchants seen in discovery, high confidence ---------------
+    // QuikTrip prints as "QT 1234"; order ids like "*QT8SZ" must not match.
+    [/(?:^|\s)qt\s+#?\s*\d|(?:^|\s)qt\s+outside\b/i, 'transport_fuel'],
+    [/\bmister\s*car\s*wash\b|\bcar\s*wash\b/i, 'transport_maintenance'],
+    [/\buber\s*\*?\s*trip\b|\blyft\b/i, 'transport_parking_transit'],
+    [/\bwaste\s*mgmt\b/i, 'utilities_water'],
+    [/\bswpestsolutions\b|\bpest\s*solutions\b/i, 'housing_maintenance'],
+    [/\bsams\s*scan|\bwholefds\b|\bwm\s*supercenter\b/i, 'food_groceries'],
+    [/\bbanner\s*(?:health|univ)|\brincon\s*asc\b|\bpathology\s*specialists\b|\bliver\s*health\b|\bkidney\s*institut|\blaboratory\s*corporation\b|\bchiropractic\b|\bphysical\s*medicin|\bm\.?d\.?,?\s*p\b|\bmychart\b/i, 'medical_unreimbursed'],
+    [/\bbarber|\bgreat\s*clips\b|\bsupercuts\b|\bsport\s*clips\b/i, 'personal_grooming'],
+    [/\bulta\b|\bsephora\b|\bthrivecausemetics\b/i, 'disc_beauty'],
+    [/\btaekwondo\b|\bmartial\s*arts\b/i, 'child_activities'],
+    [/\bamphitheater\s*public\s*scho|\bpima\s*county\s*amphithea|\bpublic\s*schools?\b/i, 'education_fees'],
+    [/\bhtl\s*\*|\bhampton\s*inn|\bhamptoninn|\bsonesta\b|\bclarion\s*hotels?\b|\bcourtyard\b|\bdays\s*inns?\b|\bdaysinn|\bhotels\.?com\b|\bhotelcom\b|\bvrbo\b/i, 'disc_travel'],
+    [/\btopgolf\b|\bcinemas?\b|\bultrasignup\b|\braceroster\b|\bmarathon\b(?!\s*(?:petro|gas))|\bstate\s*park\b|\bfarm\s*festival|\bpumpkin\s*pa/i, 'disc_entertainment'],
+    // TST* is the Toast point-of-sale, used almost exclusively by restaurants.
+    [/\btst\s*\*|\bristorante\b|\bin-n-out\b|\bchick-fil-a\b|\bjimmy\s*johns\b|\bdairy\s*queen\b|\bburger\s*king\b|\barbys\b|\bwingstop\b|\bdunkin\b|\bcrumbl\b|\btrue\s*food\s*kitchen\b|\bhandels\s*homemade\b|\bchoice\s*greens\b|\bpitalian\b/i, 'disc_dining'],
+    [/\blululemon|\bpatagonia\b|\bathleta\b|\bnew\s*balance\b|\bnewbalance\b|\bvans\.com\b|\bzara\b|\bann\s*taylor|\banntaylor\b|\bloft\.com\b|\banthropologie\b|\bjcpenney\b|\bspanx\b|\bkipling\b|\bpatriot\s*jean|\blifeisgood\b|\bold\s*navy\b|\bgap\b/i, 'clothing'],
+    [/\blulu\s*and\s*georgia\b|\bpotterybarn\b|\bpottery\s*barn\b|\bashley\s*furniture|\bashleyfurniture|\bmagnolia\s*market\b|\bcrate\s*and\s*barrel\b|\ble\s*creuset\b|\bdecor\s*steals\b|\bhobby-?\s*lobby\b|\bthule\b|\bultimate\s*sack\b/i, 'disc_shopping'],
+    [/\bpet\s*supplies\s*plus\b/i, 'disc_pets'],
+    [/\bautomatic\s*payment\s*-?\s*thank\s*you\b|\bcredit\s*crd\s*autopay\b/i, 'debt_credit_card'],
+    [/\bedward\s*jones\s*investment\b|\bbuy\s+american\s+growth\b/i, 'investment_transfer'],
+
+    // --- recognisable merchant, category is a best guess: flag for review ----
+    // Brokerage credit; likely an investment transfer, not yet confirmed.
+    [/\bmanual\s*cr-?\s*bkrg\b/i, 'investment_transfer', REVIEW],
+    // Capital gains can be income for support purposes - never assume otherwise.
+    [/\bcapital\s*gain\b|\bdividend\b/i, 'other_income', REVIEW],
+    // Incoming ACH from a business via QuickBooks or Stripe: likely pay for work.
+    [/\bquickbooks\b/i, 'employment_income', REVIEW],
+    [/\bstripe\b/i, 'other_income', REVIEW],
+    [/\bwakefiel\b/i, 'other_income', REVIEW],
+    [/\bredemption\s*credit\b|\bpayyourselfback\b/i, 'other_income', REVIEW],
+    [/\bwestern\s*union\b|\bwu\s*\*|\bwuvisaaft\b/i, 'transfer', REVIEW],
+    [/\btransaction\s*fee\b/i, 'debt_credit_card', REVIEW],
+    // Licensed therapist: could be the parent's own care or the child's.
+    [/\blcsw\b|\blpc\b|\blmft\b|\bpsychologist\b/i, 'medical_unreimbursed', REVIEW],
+    [/\bbraces\b|\borthodont/i, 'child_medical_unreimbursed', REVIEW],
+    [/\blmt\b|\bmassage\b/i, 'disc_beauty', REVIEW],
+    [/\bgloss\s*\*|\ballisonwade\b/i, 'disc_beauty', REVIEW],
+    [/\bintimina\b|\bus\s*intimn\b/i, 'personal_hygiene', REVIEW],
+    [/\bmvd\b|\btitle\s*&\s*tag\b/i, 'transport_maintenance', REVIEW],
+    [/\bu-?haul\b|\bmoving\s*&\s*labo|\bmoving\s*and\s*labor\b/i, 'housing_maintenance', REVIEW],
+    [/\bschool\s*of\s*real\b/i, 'education_tuition', REVIEW],
+    [/\bymca\b|\badventures\b/i, 'child_activities', REVIEW],
+    [/\bblockfit|\bworden\s*physique\b|\bbdyfttrng\b|\bmelt\s*method\b|\bbare\s*performance\b|\bchoose\s*strong\b|\bdeliciouslyfit/i, 'disc_gym', REVIEW],
+    [/\bcycling\b|\bbicycle\b/i, 'disc_entertainment', REVIEW],
+    [/\broad\s*house\s*roadies\b|\broadhouse\s*roadies\b|\bdolce\s*pastello\b|\bdolcepastello|\bcookie\s*cabin\b|\bbottega\b|\bthe\s*landing\b|\bkitchen\b|\bharvest\b/i, 'disc_dining', REVIEW],
+    [/\btory\s*burch\b/i, 'excl_luxury', REVIEW],
+    [/\bdyson\b|\bthermomix\b|\bcoros\b/i, 'disc_shopping', REVIEW],
+    [/\bgoodr\b|\bizipizi\b|\bprocompression\b/i, 'clothing', REVIEW],
+    [/\bwmt\s*plus\b/i, 'disc_subscription_other', REVIEW],
+    [/\bwm\.com\b/i, 'food_groceries', REVIEW],
+    [/\blaird\s*superfood\b|\bthefeed\b/i, 'food_groceries', REVIEW],
+    [/\busps\b|\bups\s*store\b|\bfedex\b/i, 'disc_shopping', REVIEW],
+    [/\btractor\s*supply\b|\bshoptoro\b|\biconic\s*arizona\b/i, 'disc_shopping', REVIEW],
+    [/\bgiv\s*\*|\bbens\s*bells\b|\bdonation\b|\bcharit/i, 'disc_gifts', REVIEW],
+    [/\bdamage\s*insuran|\blimo\s*service\b/i, 'disc_travel', REVIEW],
 
     // --- child-related -------------------------------------------------------
     [/\bday\s*care\b|\bdaycare\b|\bchild\s*care\b|\bchildcare\b|\bpreschool\b|\bmontessori\b/i, 'childcare_daycare'],
@@ -217,7 +281,7 @@
 
     // --- housing -------------------------------------------------------------
     [/\bmortgage\b|\bloan\s*servicing\b|\bmr\s*cooper\b|\bpennymac\b|\bfreedom\s*mortgage\b/i, 'housing_rent_mortgage'],
-    // Confirmed by counsel as the Ossandon rent/mortgage ($1,967.50 monthly).
+    // Confirmed by counsel as a recurring rent/mortgage payment.
     [/\btucson\s*crossroads?\b/i, 'housing_rent_mortgage'],
     [/\brent\b|\bapartment|\bproperty\s*management\b|\bleasing\b/i, 'housing_rent_mortgage'],
     [/\bhoa\b|\bhome\s*owners?\s*assoc|\bcommunity\s*assoc/i, 'housing_hoa'],
@@ -234,7 +298,7 @@
 
     // --- transportation ------------------------------------------------------
     [/\bgeico\b|\bstate\s*farm\b|\bprogressive\b|\ballstate\b|\busaa\b|\bauto\s*insur/i, 'transport_car_insurance'],
-    [/\bchevron\b|\bshell\b|\bcircle\s*k\b|\barco\b|\bexxon\b|\bmobil\b|\bspeedway\b|\bquiktrip\b|\bvalero\b|\bsinclair\b|\bpilot\s*travel\b/i, 'transport_fuel'],
+    [/\bchevron\b|\bshell\b|\bcircle\s*k\b|\barco\b|\bexxon\b|\bmobil\b|\bspeedway\b|\bquiktrip\b|\bvalero\b|\bsinclair\b|\bpilot\s*travel\b|\bmarathon\s*(?:petro|gas)|\bmaverik\b|\bconoco\b|\bphillips\s*66\b|\bloves?\s*travel\b/i, 'transport_fuel'],
     [/\bjiffy\s*lube\b|\bmidas\b|\btire\b|\bauto\s*zone\b|\bo'?reilly\b|\bnapa\s*auto\b|\bpep\s*boys\b|\bdiscount\s*tire\b|\bcollision\b|\bauto\s*repair\b|\bauto\s*m(?:all|otive)?\b|\bhonda\b|\btoyota\b|\bford\b|\bsubaru\b|\bnissan\b|\bdealership\b/i, 'transport_maintenance'],
     [/\bparking\b|\bsun\s*tran\b|\btransit\b|\bmetro\s*(?:card|rail)\b|\btoll\b/i, 'transport_parking_transit'],
     [/\bauto\s*loan\b|\bvehicle\s*loan\b|\bcar\s*payment\b|\bally\s*auto\b|\bcapital\s*one\s*auto\b/i, 'transport_car_payment'],
@@ -251,7 +315,7 @@
 
     // --- discretionary -------------------------------------------------------
     [/\bpetco\b|\bpetsmart\b|\bveterinar|\bvet\s*clinic\b|\bchewy\b|\bgrooming\b.*\bpet\b/i, 'disc_pets'],
-    [/\bsalon\b|\bspa\b|\bnails?\b|\bmassage\b|\bbarber\b|\bhair\b/i, 'disc_beauty'],
+    [/\bsalon\b|\bspa\b|\bnails?\b|\bmassage\b|\bhair\b/i, 'disc_beauty'],
     [/\bliquor\b|\bwine\b|\bspirits\b|\bbrewery\b|\btobacco\b|\bcigar|\bvape\b|\bsmoke\s*shop\b/i, 'disc_alcohol_tobacco'],
     [/\bairlines?\b|\bhotel\b|\bmarriott\b|\bhilton\b|\bairbnb\b|\bexpedia\b|\bresort\b|\bcruise\b|\bvacation\b/i, 'disc_travel'],
     [/\bcinema\b|\bmovie\b|\bamc\b|\bticketmaster\b|\bconcert\b|\bstubhub\b|\bsteam\s*games\b|\bxbox\b|\bplaystation\b/i, 'disc_entertainment'],
@@ -266,18 +330,30 @@
     [/\bjpmorgan\s+chase\s+chase\s+ach\b/i, 'investment_transfer'],
     [/\bpayroll\b|\bdirect\s*dep\b|\bsalary\b|\bpaycheck\b|\bdir\s*dep\b|\bresourcing\s*edge\b|\bpaychex\b|\badp\b|\bgusto\b/i, 'employment_income'],
     [/\bremote\s*online\s*deposit\b|\bmobile\s*deposit\b|\bdeposit\b/i, 'other_income'],
-    [/\birs\b|\btax\s*refund\b|\bfranchise\s*tax\b|\bdept\s*of\s*revenue\b/i, 'tax'],
+    [/\birs\b|\btax\s*refund\b|\btax\s*rebate\b|\bfranchise\s*tax\b|\bdept\s*of\s*rev(?:enue)?\b/i, 'tax'],
     [/\bwithdraw(?:al|n|s)?\b|\bcash\s*advance\b/i, 'cash_withdrawal'],
     [/\btransfer\b|\bzelle\b|\bvenmo\b|\bpaypal\b|\bwire\b|\bonline\s*banking\s*transfer\b/i, 'transfer'],
   ];
 
-  function classify(description) {
+  // A rule may carry a third element, REVIEW: the merchant is recognisable but
+  // the category is a best guess (whose therapist, whether a course is a
+  // child's education, whether a brand is "luxury"). Those rows are still
+  // assigned so totals stay close, but they are flagged for a person to
+  // confirm rather than silently trusted or left unmapped.
+  function classifyDetailed(description) {
     const d = String(description || '');
     if (!d) return null;
     for (let i = 0; i < RULES.length; i++) {
-      if (RULES[i][0].test(d)) return RULES[i][1];
+      if (RULES[i][0].test(d)) {
+        return { code: RULES[i][1], confidence: RULES[i][2] === REVIEW ? 'review' : 'high' };
+      }
     }
     return null;
+  }
+
+  function classify(description) {
+    const hit = classifyDetailed(description);
+    return hit ? hit.code : null;
   }
 
   function get(code) {
@@ -325,6 +401,17 @@
     return MOVEMENT_CODES.includes(normalize(code));
   }
 
+  // Whether a row may be left OUT of income as account movement. A best-guess
+  // category must never be what removes money from income - excluding real
+  // income on a guess understates ability to pay - so an unconfirmed review
+  // guess keeps the row in income until a person confirms it.
+  function excludedFromIncome(code, description, mappingStatus) {
+    if (!isAccountMovement(code)) return false;
+    if (mappingStatus === 'confirmed') return true;
+    const hit = classifyDetailed(description);
+    return !(hit && hit.confidence === 'review' && hit.code === normalize(code));
+  }
+
   function categoriesForSection(sectionKey) {
     return CATEGORIES.filter((c) => c.section === sectionKey);
   }
@@ -335,7 +422,9 @@
     AFI_LINES,
     LEGACY_ALIASES,
     RULES,
+    REVIEW,
     classify,
+    classifyDetailed,
     get,
     normalize,
     afiLineFor,
@@ -344,6 +433,7 @@
     sectionFor,
     countsAsNeed,
     isAccountMovement,
+    excludedFromIncome,
     categoriesForSection,
   };
 });

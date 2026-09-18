@@ -96,12 +96,6 @@ function parseAmount(s) {
 // Zelle, and Web IDs cannot be mistaken for dollar amounts.
 const CURRENCY_AMOUNT = '-?\\$?\\(?[\\d,]+\\.\\d{2}\\)?|-?\\$\\(?[\\d,]+\\)?';
 
-// Categories come from the shared AFI taxonomy so the parser, the mapper UI
-// and the workbook export all agree on what a category means.
-function suggestCategory(description) {
-  return AFITaxonomy.classify(description);
-}
-
 function determineFlow(amount, accountType, description) {
   const d = (description || '').toLowerCase();
   if (accountType === 'credit_card') {
@@ -203,7 +197,18 @@ function parseStatementText(text, filename) {
   const reMDY = new RegExp(`^(\\d{1,2}\\/\\d{1,2}(?:\\/\\d{2,4})?)[,\\s]+(.+?)[,\\s]+(${CURRENCY_AMOUNT})(?:[,\\s]+(${CURRENCY_AMOUNT}))?$`);
   const reText = new RegExp(`^([A-Za-z]{3,9})\\s+(\\d{1,2})(?:,?\\s+(\\d{4}))?[,\\s]+(.+?)[,\\s]+(${CURRENCY_AMOUNT})(?:[,\\s]+(${CURRENCY_AMOUNT}))?$`);
 
+  // Chase checking statements print every amount unsigned and convey
+  // direction by section: rows under ELECTRONIC WITHDRAWALS are money out even
+  // though no minus sign appears. Reading them by sign alone counted every
+  // withdrawal as a deposit.
+  let sectionSign = 0;
+
   for (const line of lines) {
+    const heading = sectionHeadingSign(line);
+    if (heading !== null) {
+      sectionSign = heading;
+      continue;
+    }
     let m = line.match(reMDY);
     let dateStr = null, desc = null, amtStr = null, balStr = null;
 
@@ -235,13 +240,19 @@ function parseStatementText(text, filename) {
       desc = desc.replace(/\s*-$/, '');
       amount = -Math.abs(amount);
     }
+    if (sectionSign !== 0 && accountType !== 'credit_card') {
+      amount = sectionSign * Math.abs(amount);
+    }
 
     // Skip header/summary/total lines
     if (/^(description|details|memo|total|subtotal|balance|ending|beginning|payments?\s+and\s+credits)/i.test(desc.trim())) continue;
 
     const date = normDate(withInferredYear(dateStr, period, fallbackYear));
-    const flowType = determineFlow(amount, accountType, desc);
-    const suggestedCategory = suggestCategory(desc);
+    let flowType = determineFlow(amount, accountType, desc);
+    // A deposits/withdrawals heading only appears on a bank account statement,
+    // so it settles direction even when the account type was not identified.
+    if (flowType === 'unknown' && sectionSign !== 0) flowType = amount >= 0 ? 'income' : 'expense';
+    const suggestedCategory = AFITaxonomy.classify(desc);
 
     transactions.push({
       date: date || dateStr,
@@ -279,6 +290,27 @@ function parseStatementText(text, filename) {
     endingBalance,
     transactions,
   };
+}
+
+// A bare section heading line, e.g. "ELECTRONIC WITHDRAWALS (continued)".
+// Returns +1 for money in, -1 for money out, 0 for a section that carries its
+// own signs, or null when the line is not a heading. Summary lines such as
+// "Deposits and Additions 7,069.18" end in a number and are not headings.
+const SECTION_HEADINGS = [
+  [/^deposits\s+and\s+additions$/i, 1],
+  [/^(?:electronic|other|atm\s*&\s*debit\s*card|atm|debit\s*card)\s+withdrawals$/i, -1],
+  [/^withdrawals(?:\s+and\s+(?:other\s+)?debits)?$/i, -1],
+  [/^checks\s+paid$/i, -1],
+  [/^(?:service\s+)?fees(?:\s+and\s+charges)?$/i, -1],
+  [/^transaction\s+detail$/i, 0],
+];
+
+function sectionHeadingSign(line) {
+  const l = line.trim().replace(/\s*\(continued\)\s*$/i, '');
+  for (const [re, sign] of SECTION_HEADINGS) {
+    if (re.test(l)) return sign;
+  }
+  return null;
 }
 
 function summaryBalance(text, which) {

@@ -25,7 +25,9 @@ function isMappableExpense(txn) {
   const code = AFITaxonomy.normalize(txn.mapped_category || txn.suggested_category) ||
     AFITaxonomy.classify(txn.description);
   const amount = Math.abs(parseFloat(txn.amount) || 0);
-  if (AFITaxonomy.treatmentFor(code) === 'none' ||
+  const detail = AFITaxonomy.classifyDetailed(txn.description);
+  const guessed = detail && detail.confidence === 'review' && detail.code === code;
+  if ((AFITaxonomy.treatmentFor(code) === 'none' && !guessed) ||
       /\bpayment\s+to\s+(?:chase|credit|card)|\bpayment thank you|\btransfer\b|\bzelle\b|\bvenmo\b|\bpaypal\b|\bdeposit\b/.test(description)) {
     return false;
   }

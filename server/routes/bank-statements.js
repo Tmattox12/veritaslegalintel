@@ -7,6 +7,14 @@ const { v4: uuidv4 } = require('uuid');
 const { extractTextFromPDF } = require('../services/pdf-extractor');
 const { parseBankStatement } = require('../services/claude-bank-parser');
 const { detectFlags, insertFlags } = require('../services/flag-detector');
+const AFITaxonomy = require('../../afi-taxonomy');
+
+function categoryReviewNote(r) {
+  if (r.mapping_status === 'confirmed') return 'confirmed';
+  const hit = AFITaxonomy.classifyDetailed(r.description);
+  if (!hit) return 'unmatched';
+  return hit.confidence === 'review' ? 'suggested - needs review' : '';
+}
 
 const router = express.Router({ mergeParams: true });
 
@@ -28,7 +36,9 @@ const TRANSACTION_CSV_COLUMNS = [
   { header: 'Amount', value: (r) => r.amount },
   { header: 'Type', value: (r) => r.transaction_type },
   { header: 'Flow', value: (r) => r.flow_type },
-  { header: 'Category', value: (r) => r.mapped_category || r.suggested_category },
+  { header: 'Category', value: (r) => AFITaxonomy.labelFor(r.mapped_category || r.suggested_category) || r.mapped_category || r.suggested_category },
+  { header: 'AFI Section', value: (r) => { const s = AFITaxonomy.sectionFor(r.mapped_category || r.suggested_category); return s ? s.label : ''; } },
+  { header: 'Category Review', value: categoryReviewNote },
   { header: 'Source File', value: (r) => r.source_file },
 ];
 
@@ -279,7 +289,8 @@ router.get('/export.csv', (req, res) => {
        bt.transaction_type,
        bt.flow_type,
        bt.suggested_category,
-       bt.mapped_category
+       bt.mapped_category,
+       bt.mapping_status
      FROM bank_transactions bt
      JOIN bank_statements bs ON bt.bank_statement_id = bs.id
      LEFT JOIN documents d ON d.id = bs.document_id
@@ -330,7 +341,7 @@ router.get('/:statementId/export.csv', (req, res) => {
 
   req.db.all(
     `SELECT bt.transaction_date, bt.description, bt.amount, bt.transaction_type, bt.flow_type,
-            bt.suggested_category, bt.mapped_category,
+            bt.suggested_category, bt.mapped_category, bt.mapping_status,
             bs.bank_name, bs.account_number_masked, bs.account_type, bs.statement_start, bs.statement_end,
             d.filename AS source_file
      FROM bank_transactions bt
