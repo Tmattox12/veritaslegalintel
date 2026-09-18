@@ -14,7 +14,8 @@ Date: 2026-09-18
 
 ### Matter
 
-Use **`04042bf8-c744-46ee-a2af-583825acee06`** (Ossandon, Pima, AZ, 127 docs).
+Use **`04042bf8-c744-46ee-a2af-583825acee06`** (the active matter, 127 docs).
+Client-identifying details are kept out of this repo on purpose.
 The duplicate `6cdff522…` (the original Sept 5 intake) was archived on
 2026-09-18 — soft-deleted, every row retained, recoverable.
 
