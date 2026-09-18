@@ -8,7 +8,7 @@ Date: 2026-09-18
   Starting it inside a terminal that later closes is what made the app look empty
   twice this week — a stopped backend renders every page as zeros.
 - Frontend: Live Server on `http://127.0.0.1:5502`.
-- Everything is committed and pushed. `origin/main` is at `f804ad2`.
+- Everything is committed and pushed to `origin/main`.
 - Real documents and the database stay local and gitignored. Do not purge
   `.data/` or `server/uploads/`.
 
@@ -18,10 +18,10 @@ Use **`04042bf8-c744-46ee-a2af-583825acee06`** (Ossandon, Pima, AZ, 127 docs).
 The duplicate `6cdff522…` (the original Sept 5 intake) was archived on
 2026-09-18 — soft-deleted, every row retained, recoverable.
 
-Database backups taken today, before each data change:
-`.data/veritas.sqlite.bak-20260917-165728` and `.bak-reclass-*`.
+Database backups, one before each data change:
+`.data/veritas.sqlite.bak-*` (Sept 17: withdrawals, reclass; Sept 18: reparse, rules, matters).
 
-## Completed Today
+## Completed 2026-09-17
 
 - **Bulk intake no longer stalls.** Batches over 20 files ran one at a time and
   looked frozen; reloading to retry abandoned the queue, which is why repeated
@@ -40,7 +40,7 @@ Database backups taken today, before each data change:
   5,539 stored rows re-classified. 81.5% coverage on real data.
 - **CSV exports carry the account.** Account, Account Type and Source File, so a
   figure can be traced back to the statement it came from.
-- Cache versions: `discovery-intake-uploads.js?v=23`, `afi-taxonomy.js?v=1`,
+- Cache versions: `discovery-intake-uploads.js?v=23`, `afi-taxonomy.js?v=2`,
   `discovery-intake-afi.js?v=9`.
 
 ## Completed 2026-09-18
