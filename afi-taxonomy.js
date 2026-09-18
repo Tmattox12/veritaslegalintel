@@ -141,6 +141,7 @@
     C('employment_income', 'non_expense', 'Income', 'Employment income', null, 'none'),
     C('other_income', 'non_expense', 'Income', 'Other income', null, 'none'),
     C('transfer', 'non_expense', 'Transfer', 'Account transfer', null, 'none'),
+    C('investment_transfer', 'non_expense', 'Cash / Investments', 'Cash / investment account transfer', null, 'none'),
     C('cash_withdrawal', 'non_expense', 'Cash', 'Cash withdrawal (purpose untraced)', null, 'none'),
     C('tax', 'non_expense', 'Tax', 'Tax payment / refund', null, 'none'),
   ];
@@ -216,6 +217,8 @@
 
     // --- housing -------------------------------------------------------------
     [/\bmortgage\b|\bloan\s*servicing\b|\bmr\s*cooper\b|\bpennymac\b|\bfreedom\s*mortgage\b/i, 'housing_rent_mortgage'],
+    // Confirmed by counsel as the Ossandon rent/mortgage ($1,967.50 monthly).
+    [/\btucson\s*crossroads?\b/i, 'housing_rent_mortgage'],
     [/\brent\b|\bapartment|\bproperty\s*management\b|\bleasing\b/i, 'housing_rent_mortgage'],
     [/\bhoa\b|\bhome\s*owners?\s*assoc|\bcommunity\s*assoc/i, 'housing_hoa'],
     [/\bproperty\s*tax\b|\btreasurer\b.*\btax\b|\bcounty\s*tax\b/i, 'housing_property_tax'],
@@ -258,6 +261,9 @@
     [/\bmattress\b|\bfurniture\b|\bnordictrack\b|\bwayfair\b|\bikea\b/i, 'disc_shopping'],
 
     // --- not spending --------------------------------------------------------
+    // Confirmed by counsel as movement between cash and investment accounts:
+    // an asset moving, not money earned, so it must never count as income.
+    [/\bjpmorgan\s+chase\s+chase\s+ach\b/i, 'investment_transfer'],
     [/\bpayroll\b|\bdirect\s*dep\b|\bsalary\b|\bpaycheck\b|\bdir\s*dep\b|\bresourcing\s*edge\b|\bpaychex\b|\badp\b|\bgusto\b/i, 'employment_income'],
     [/\bremote\s*online\s*deposit\b|\bmobile\s*deposit\b|\bdeposit\b/i, 'other_income'],
     [/\birs\b|\btax\s*refund\b|\bfranchise\s*tax\b|\bdept\s*of\s*revenue\b/i, 'tax'],
@@ -311,6 +317,14 @@
     return treatmentFor(code) === 'need';
   }
 
+  // Money moving between the party's own accounts, or out as cash: neither
+  // income nor spending, so it is excluded from both analyses.
+  const MOVEMENT_CODES = ['transfer', 'investment_transfer', 'cash_withdrawal'];
+
+  function isAccountMovement(code) {
+    return MOVEMENT_CODES.includes(normalize(code));
+  }
+
   function categoriesForSection(sectionKey) {
     return CATEGORIES.filter((c) => c.section === sectionKey);
   }
@@ -329,6 +343,7 @@
     labelFor,
     sectionFor,
     countsAsNeed,
+    isAccountMovement,
     categoriesForSection,
   };
 });

@@ -5,6 +5,7 @@ const { v4: uuidv4 } = require('uuid');
 require('dotenv').config();
 
 const { initializeDatabase, getDatabase } = require('./db/schema');
+const AFITaxonomy = require('../afi-taxonomy');
 const bankStatementsRouter = require('./routes/bank-statements');
 const documentsRouter = require('./routes/documents');
 const { requireAuth, authEnabled, MODE } = require('./auth');
@@ -143,7 +144,7 @@ app.get('/api/matters/:id', (req, res) => {
         const category = txn.mapped_category || txn.suggested_category;
         const description = (txn.description || '').toLowerCase();
         const isAccountMovement =
-          category === 'transfer' || category === 'employment_income' || category === 'tax' ||
+          AFITaxonomy.isAccountMovement(category) || category === 'employment_income' || category === 'tax' ||
           /\bpayment\s+to\s+(?:chase|credit|card)|\bpayment thank you|\btransfer\b|\bzelle\b|\bvenmo\b|\bpaypal\b|\bdeposit\b/.test(description);
 
         if (txn.flow_type === 'expense' && category && !isAccountMovement && amount <= 100000) {
@@ -151,7 +152,8 @@ app.get('/api/matters/:id', (req, res) => {
         }
         // Only non-credit-card deposits are income candidates. Card payments/refunds
         // are deliberately excluded; a lawyer must review/confirm candidate income.
-        if (txn.flow_type === 'income' && txn.account_type !== 'credit_card') {
+        if (txn.flow_type === 'income' && txn.account_type !== 'credit_card' &&
+            !AFITaxonomy.isAccountMovement(category)) {
           incomeCandidateTotal += amount;
         }
       });
@@ -217,7 +219,7 @@ app.get('/api/matters/:id', (req, res) => {
         const desc = (t.description || '').toLowerCase();
         return t.flow_type === 'income'
           && t.account_type !== 'credit_card'
-          && cat !== 'transfer'
+          && !AFITaxonomy.isAccountMovement(cat)
           && !movement.test(desc);
       });
 
