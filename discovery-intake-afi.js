@@ -3,34 +3,11 @@
 (function () {
   const API_BASE = window.API_BASE || 'http://localhost:3000/api';
 
-  // AFI expense lines 1-8 (must match afi-form-populator.html)
-  const AFI_LINES = [
-    { line: 1, label: 'Health Insurance Premium' },
-    { line: 2, label: 'Childcare/Dependent Care' },
-    { line: 3, label: 'Medical/Dental (Out-of-Pocket)' },
-    { line: 4, label: 'Education/Books/Supplies' },
-    { line: 5, label: 'Housing (Mortgage/Rent/Utilities)' },
-    { line: 6, label: 'Utilities (Phone/Internet/Cable)' },
-    { line: 7, label: 'Transportation (Car/Gas/Insurance)' },
-    { line: 8, label: 'Food/Groceries' },
-  ];
+  // Categories, AFI-line roll-up and merchant rules all come from the shared
+  // taxonomy in afi-taxonomy.js, loaded as a script before this file.
+  const T = window.AFITaxonomy;
+  const AFI_LINES = T.AFI_LINES;
 
-  // Map parser's suggested_category -> AFI line number
-  const CATEGORY_TO_LINE = {
-    insurance: 1,
-    childcare: 2,
-    medical: 3,
-    education: 4,
-    housing: 5,
-    utilities: 6,
-    fuel: 7,
-    groceries: 8,
-    dining: 8,
-    shopping: null, // discretionary shopping is reported separately, not forced into AFI
-    transfer: null,
-    tax: null,
-    employment_income: null, // income, not expense
-  };
 
   let allTransactions = [];
   // merchantKey -> afiLine (number|null) for user overrides
@@ -55,55 +32,20 @@
     if (key) localStorage.setItem(key, JSON.stringify(userMappings));
   }
 
-  // Auto-detect common merchants -> AFI line. Checked against the uppercased
-  // merchant key. User overrides always win; these are just a first-pass guess.
-  const MERCHANT_PATTERNS = [
-    // Order matters: the first match wins, so the rules that disambiguate a
-    // brand from what was actually bought have to come before the brand rules.
-    // Line 6 — piped gas is a household utility, not vehicle fuel.
-    [/\bsouthwest\s*gas\b|\bnatural\s*gas\b|\bgas\s*(?:company|co\b|utility)/i, 6],
-    // Line 7 — fuel bought at a grocery brand's pump is transportation, not food.
-    // "FUEL1521" has no trailing word boundary, so do not anchor the end.
-    [/\bfuel|\bgasoline\b/i, 7],
-    // Line 8 — Food / Groceries
-    [/\bwalmart\b|\bwal-?mart\b|\bwalmartcom\b|\bsafeway\b|\bsams ?club\b|\bsamsclubcom\b|\bcostco\b|\bkroger\b|\bfry'?s\b|\balbertsons?\b|\btrader\s*joe'?s?\b|\bwhole\s*foods?\b|\bsprouts?\b|\btarget\b|\bdollar\s*(?:tree|general)\b|\baldi\b|\bfood\s*city\b|\bel\s*super\b|\bbashas\b|\bwin-?co\b/i, 8],
-    // Line 3 — Medical / Dental (out-of-pocket)
-    [/\bcvs\b|\bwalgreens?\b|\brite\s*aid\b|\bpharmacy\b|\b(derm|dent|ortho|vision|optom|clinic|medical|urgent\s*care|lab|quest|labcorp|hospital|physician|pediatric)\b/i, 3],
-    // Line 7 — Transportation (car / gas / insurance)
-    [/\bchevron\b|\bshell\b|\bcircle\s*k\b|\barco\b|\bexxon\b|\bmobil\b|\bspeedway\b|\bquiktrip\b|\bqt\b|\bgas\b|\bfuel\b|\bvalero\b|\bcostco\s*gas\b|\bhonda\b|\btoyota\b|\bford\b|\bjiffy\s*lube\b|\bmidas\b|\btire\b|\bauto\s*zone\b|\bo'?reilly\b|\bnapa\s*auto\b|\bpep\s*boys\b|\bdmv\b|\bgeico\b|\bstate\s*farm\b|\bprogressive\b|\ballstate\b|\busaa\b|\bAAA\b/i, 7],
-    // Line 5 — Housing (mortgage / rent)
-    [/\bmortgage\b|\brent\b|\bhoa\b|\bhome\s*owners\b|\bproperty\s*management\b|\bhud\b|\bzillow\b|\bapartment/i, 5],
-    // Line 6 — Utilities (phone / internet / cable / electric)
-    [/\bverizon\b|\bat&?t\b|\bt-?mobile\b|\bsprint\b|\bcomcast\b|\bxfinity\b|\bcox\b|\bcenturylink\b|\bspectrum\b|\btep\b|\btucson\s*electric\b|\bsouthwest\s*gas\b|\bwater\b|\btrash\b|\bwm\s*waste\b|\bcity\s*of\b|\butility\b|\binternet\b|\bcable\b/i, 6],
-    // Line 6 — recurring streaming / device subscriptions, billed alongside cable.
-    // Deliberately narrow: Amazon marketplace orders and Apple hardware are
-    // ordinary discretionary shopping and must not be swept into a utility line.
-    [/\bamazon\s*prime\b|\bamzn\s*prime\b|\bprime\s*video\b|apple\.?com\/?bill|\bapplecombill\b|\bitunes\b|\bnetflix\b|\bhulu\b|\bspotify\b|\bhbo\s*max\b|\bpeacock\b|\byoutube\s*(?:tv|premium)\b|\bsling\s*tv\b/i, 6],
-    // Line 1 — Health insurance premium
-    [/\bblue\s*cross\b|\bbcbcs?\b|\bunited\s*health|\baetna\b|\bcigna\b|\bhumana\b|\bkaiser\b|\bhealth\s*insur|\bambetter\b|\boscar\s*health/i, 1],
-    // Line 2 — Childcare / dependent care
-    [/\bday\s*care\b|\bdaycare\b|\bchild\s*care\b|\bchildcare\b|\bpreschool\b|\bmontessori\b|\bafter\s*school\b|\bbabysit|\bnanny\b|\byouth\s*(?:program|camp)\b|\bboys\s*&?\s*girls\s*club/i, 2],
-    // Line 4 — Education / books / supplies
-    [/\bschool\b|\btuition\b|\buniversity\b|\bcollege\b|\bbookstore\b|\bamzn\s*mktp.*book|\bscholastic\b|\bpearson\b|\btusd\b|\bclassroom\b|\bstaples\b|\boffice\s*(?:depot|max)\b/i, 4],
-  ];
-
-  // Returns { line, auto } for a merchant description, or null when unknown.
+  // Returns the AFI line for a description, or null when unknown.
   function detectMerchantLine(description) {
-    const key = (description || '').toUpperCase();
-    for (const [re, line] of MERCHANT_PATTERNS) {
-      if (re.test(key)) return line;
-    }
-    return null;
+    return T.afiLineFor(T.classify(description));
   }
 
   function isMappableExpense(transaction) {
     const description = (transaction.description || '').toLowerCase();
-    const category = transaction.mapped_category || transaction.suggested_category || '';
+    const code = T.normalize(transaction.mapped_category || transaction.suggested_category) ||
+      T.classify(transaction.description);
     const amount = Math.abs(parseFloat(transaction.amount) || 0);
 
-    // Transfers and credit-card payments move money between accounts; they are
-    // not household spending and must never inflate an AFI expense total.
-    if (category === 'transfer' || /\bpayment\s+to\s+(?:chase|credit|card)|\bpayment thank you|\btransfer\b|\bzelle\b|\bvenmo\b|\bpaypal\b|\bdeposit\b/.test(description)) {
+    // Transfers, cash and credit-card payments move money between accounts;
+    // they are not household spending and must never inflate an AFI total.
+    if (T.treatmentFor(code) === 'none' || /\bpayment\s+to\s+(?:chase|credit|card)|\bpayment thank you|\btransfer\b|\bzelle\b|\bvenmo\b|\bpaypal\b|\bdeposit\b/.test(description)) {
       return false;
     }
     // A parsed amount over $100k is almost certainly an OCR/reference-ID error
@@ -169,10 +111,11 @@
     allTransactions.forEach((t) => {
       const amt = Math.abs(parseFloat(t.amount) || 0);
       total += amt;
-      const cat = t.mapped_category || t.suggested_category;
-      let line = cat != null ? CATEGORY_TO_LINE[cat] : undefined;
+      const cat = T.normalize(t.mapped_category || t.suggested_category) || T.classify(t.description);
+      let line = cat != null ? T.afiLineFor(cat) : undefined;
+      const isDiscretionary = T.treatmentFor(cat) === 'discretionary';
 
-      if (cat === 'shopping' || /\bamazon\b|\bamzn\b/i.test(t.description || '')) {
+      if (isDiscretionary) {
         shoppingTotal.total += amt;
         shoppingTotal.rows++;
       }
@@ -191,7 +134,7 @@
         if (!lineTotals[line]) lineTotals[line] = { total: 0, rows: 0 };
         lineTotals[line].total += amt;
         lineTotals[line].rows++;
-      } else if (cat === 'shopping' || /\bamazon\b|\bamzn\b/i.test(t.description || '')) {
+      } else if (isDiscretionary) {
         mapped++;
       } else {
         if (!unmapped[mk]) unmapped[mk] = { rows: 0, amount: 0, desc: t.description };

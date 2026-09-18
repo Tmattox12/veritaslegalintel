@@ -5,62 +5,28 @@
  * discovery-intake-afi.js so the export matches what's shown on screen. */
 
 const XLSX = require('xlsx');
+const AFITaxonomy = require('../../afi-taxonomy');
 
-const AFI_LINES = [
-  { line: 1, label: 'Health Insurance Premium' },
-  { line: 2, label: 'Childcare/Dependent Care' },
-  { line: 3, label: 'Medical/Dental (Out-of-Pocket)' },
-  { line: 4, label: 'Education/Books/Supplies' },
-  { line: 5, label: 'Housing (Mortgage/Rent/Utilities)' },
-  { line: 6, label: 'Utilities (Phone/Internet/Cable)' },
-  { line: 7, label: 'Transportation (Car/Gas/Insurance)' },
-  { line: 8, label: 'Food/Groceries' },
-];
-
-const CATEGORY_TO_LINE = {
-  insurance: 1,
-  childcare: 2,
-  medical: 3,
-  education: 4,
-  housing: 5,
-  utilities: 6,
-  fuel: 7,
-  groceries: 8,
-  dining: 8,
-  shopping: null,
-  transfer: null,
-  tax: null,
-  employment_income: null,
-};
-
-const MERCHANT_PATTERNS = [
-  [/\bwalmart\b|\bwal-?mart\b|\bwalmartcom\b|\bsafeway\b|\bsams ?club\b|\bsamsclubcom\b|\bcostco\b|\bkroger\b|\bfry'?s\b|\balbertsons?\b|\btrader\s*joe'?s?\b|\bwhole\s*foods?\b|\bsprouts?\b|\btarget\b|\bdollar\s*(?:tree|general)\b|\baldi\b|\bfood\s*city\b|\bel\s*super\b|\bbashas\b|\bwin-?co\b/i, 8],
-  [/\bcvs\b|\bwalgreens?\b|\brite\s*aid\b|\bpharmacy\b|\b(derm|dent|ortho|vision|optom|clinic|medical|urgent\s*care|lab|quest|labcorp|hospital|physician|pediatric)\b/i, 3],
-  [/\bchevron\b|\bshell\b|\bcircle\s*k\b|\barco\b|\bexxon\b|\bmobil\b|\bspeedway\b|\bquiktrip\b|\bqt\b|\bgas\b|\bfuel\b|\bvalero\b|\bcostco\s*gas\b|\bhonda\b|\btoyota\b|\bford\b|\bjiffy\s*lube\b|\bmidas\b|\btire\b|\bauto\s*zone\b|\bo'?reilly\b|\bnapa\s*auto\b|\bpep\s*boys\b|\bdmv\b|\bgeico\b|\bstate\s*farm\b|\bprogressive\b|\ballstate\b|\busaa\b|\bAAA\b/i, 7],
-  [/\bmortgage\b|\brent\b|\bhoa\b|\bhome\s*owners\b|\bproperty\s*management\b|\bhud\b|\bzillow\b|\bapartment/i, 5],
-  [/\bverizon\b|\bat&?t\b|\bt-?mobile\b|\bsprint\b|\bcomcast\b|\bxfinity\b|\bcox\b|\bcenturylink\b|\bspectrum\b|\btep\b|\btucson\s*electric\b|\bsouthwest\s*gas\b|\bwater\b|\btrash\b|\bwm\s*waste\b|\bcity\s*of\b|\butility\b|\binternet\b|\bcable\b/i, 6],
-  [/\bblue\s*cross\b|\bbcbcs?\b|\bunited\s*health|\baetna\b|\bcigna\b|\bhumana\b|\bkaiser\b|\bhealth\s*insur|\bambetter\b|\boscar\s*health/i, 1],
-  [/\bday\s*care\b|\bdaycare\b|\bchild\s*care\b|\bchildcare\b|\bpreschool\b|\bmontessori\b|\bafter\s*school\b|\bbabysit|\bnanny\b|\byouth\s*(?:program|camp)\b|\bboys\s*&?\s*girls\s*club/i, 2],
-  [/\bschool\b|\btuition\b|\buniversity\b|\bcollege\b|\bbookstore\b|\bamzn\s*mktp.*book|\bscholastic\b|\bpearson\b|\btusd\b|\bclassroom\b|\bstaples\b|\boffice\s*(?:depot|max)\b/i, 4],
-];
+const { AFI_LINES } = AFITaxonomy;
 
 function detectMerchantLine(description) {
-  const key = (description || '').toUpperCase();
-  for (const [re, line] of MERCHANT_PATTERNS) {
-    if (re.test(key)) return line;
-  }
-  return null;
+  return AFITaxonomy.afiLineFor(AFITaxonomy.classify(description));
 }
 
 function isShopping(category, description) {
-  return category === 'shopping' || /\bamazon\b|\bamzn\b/i.test(description || '');
+  const code = AFITaxonomy.normalize(category) || AFITaxonomy.classify(description);
+  return AFITaxonomy.treatmentFor(code) === 'discretionary';
 }
 
+// Only spending a court would read as a "need" belongs in the eight AFI lines.
+// Transfers and card payments move money between accounts rather than spend it.
 function isMappableExpense(txn) {
   const description = (txn.description || '').toLowerCase();
-  const category = txn.mapped_category || txn.suggested_category || '';
+  const code = AFITaxonomy.normalize(txn.mapped_category || txn.suggested_category) ||
+    AFITaxonomy.classify(txn.description);
   const amount = Math.abs(parseFloat(txn.amount) || 0);
-  if (category === 'transfer' || /\bpayment\s+to\s+(?:chase|credit|card)|\bpayment thank you|\btransfer\b|\bzelle\b|\bvenmo\b|\bpaypal\b|\bdeposit\b/.test(description)) {
+  if (AFITaxonomy.treatmentFor(code) === 'none' ||
+      /\bpayment\s+to\s+(?:chase|credit|card)|\bpayment thank you|\btransfer\b|\bzelle\b|\bvenmo\b|\bpaypal\b|\bdeposit\b/.test(description)) {
     return false;
   }
   return amount > 0 && amount <= 100000;
@@ -103,7 +69,7 @@ function buildExpenseWorkbook(transactions, overrides = {}) {
     const mk = merchantKey(t.description);
     const category = t.mapped_category || t.suggested_category;
 
-    let line = category != null ? CATEGORY_TO_LINE[category] : undefined;
+    let line = category != null ? AFITaxonomy.afiLineFor(category) : undefined;
     if (line == null || line === undefined) line = detectMerchantLine(t.description);
     if (Object.prototype.hasOwnProperty.call(overrides, mk)) line = overrides[mk];
 

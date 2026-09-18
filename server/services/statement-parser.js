@@ -4,6 +4,8 @@
  * paid AI API. Used as the first (free) pass; Claude parser is the fallback.
  */
 
+const AFITaxonomy = require('../../afi-taxonomy');
+
 const MONTHS = {
   jan: 1, january: 1, feb: 2, february: 2, mar: 3, march: 3, apr: 4, april: 4,
   may: 5, jun: 6, june: 6, jul: 7, july: 7, aug: 8, august: 8,
@@ -94,26 +96,10 @@ function parseAmount(s) {
 // Zelle, and Web IDs cannot be mistaken for dollar amounts.
 const CURRENCY_AMOUNT = '-?\\$?\\(?[\\d,]+\\.\\d{2}\\)?|-?\\$\\(?[\\d,]+\\)?';
 
+// Categories come from the shared AFI taxonomy so the parser, the mapper UI
+// and the workbook export all agree on what a category means.
 function suggestCategory(description) {
-  const d = (description || '').toLowerCase();
-  const map = [
-    [/payroll|direct\s*dep|salary|employer|\bpaycheck\b/, 'employment_income'],
-    [/irs|tax\s*refund|\btax\b/, 'tax'],
-    [/safeway|kroger|trader\s*joe|whole\s*foods|grocery|market/, 'groceries'],
-    [/shell|chevron|exxon|bp|gas\s+station|\bfuel\b/, 'fuel'],
-    [/pg&e|electric|water\s+dept|\butility\b|comcast|verizon|at&t/, 'utilities'],
-    [/mortgage|\brent\b|hoa/, 'housing'],
-    [/walgreens|cvs|pharmacy|\bdr\s|medical|dental|hospital/, 'medical'],
-    [/daycare|child\s*care|preschool/, 'childcare'],
-    [/transfer|zelle|venmo|paypal|wire/, 'transfer'],
-    [/restaurant|dining|doordash|uber\s*eats|grubhub/, 'dining'],
-    [/amazon|walmart|target|costco/, 'shopping'],
-    [/insurance|geico|progressive|state\s*farm/, 'insurance'],
-  ];
-  for (const [re, cat] of map) {
-    if (re.test(d)) return cat;
-  }
-  return null;
+  return AFITaxonomy.classify(description);
 }
 
 function determineFlow(amount, accountType, description) {
