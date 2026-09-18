@@ -1,6 +1,6 @@
 # Veritas Morning Handoff
 
-Date: 2026-09-17
+Date: 2026-09-18
 
 ## Current State
 
@@ -12,16 +12,11 @@ Date: 2026-09-17
 - Real documents and the database stay local and gitignored. Do not purge
   `.data/` or `server/uploads/`.
 
-### Matters — unresolved duplicate
+### Matter
 
-| Matter id | Docs | Transactions |
-|---|---|---|
-| `04042bf8-c744-46ee-a2af-583825acee06` | 127 | 3,430 |
-| `6cdff522-2dac-4731-926e-f159da6e29e9` | 127 | 3,485 |
-
-Both are fully populated. Work has been split across them because the matter
-selector used to adopt the first matter on every page load (fixed). Decide which
-is authoritative before either is deleted.
+Use **`04042bf8-c744-46ee-a2af-583825acee06`** (Ossandon, Pima, AZ, 127 docs).
+The duplicate `6cdff522…` (the original Sept 5 intake) was archived on
+2026-09-18 — soft-deleted, every row retained, recoverable.
 
 Database backups taken today, before each data change:
 `.data/veritas.sqlite.bak-20260917-165728` and `.bak-reclass-*`.
@@ -48,20 +43,27 @@ Database backups taken today, before each data change:
 - Cache versions: `discovery-intake-uploads.js?v=23`, `afi-taxonomy.js?v=1`,
   `discovery-intake-afi.js?v=9`.
 
-## Open Defects — imputed income is overstated
+## Completed 2026-09-18
 
-These are known and unfixed. They matter because they feed support calculations.
+- **"Interest Payment" misread fixed.** Chase PDFs drop the amount column from
+  part of the text layer, leaving the balance in its place — $0.39 of interest
+  was recorded as $25,186.83. The parser now resolves each row against the
+  statement's ending balance and Deposits total, and only accepts a proven
+  reading. 29 statements corrected; interest now totals $4.05, not $110,805.
+  A $20,244.80 "Transfer To CD" recorded as income is now an expense.
+- 12-month deposit-derived income: **$116,855 → $19,715** (review-only).
+- `Tucson Crossroad Web Pmts` ($1,967.50/mo) confirmed as **rent/mortgage**.
+- `JPMorgan Chase Chase ACH` confirmed as **cash/investment transfer**; excluded
+  from income. Worth re-confirming: it is biweekly, a fixed $1,570.10, and
+  PPD-coded, which is the pattern of a payroll deposit.
+- Duplicate matter archived; `04042bf8` is authoritative with State set to AZ.
 
-1. **"Interest Payment" — $110,805 across 49 rows.** Not interest. One savings
-   statement shows $25,186; account 1874 shows ~$13,170/month climbing by a near
-   constant ~$967. That is a balance column being read as the transaction
-   amount. This is roughly a third of the deposit-derived income figure and is
-   the single biggest thing to fix.
-2. `Manual CR-Bkrg` ($29,475) and `JPMorgan Chase Chase ACH` ($17,342) look like
-   transfers being counted as income.
-3. `Tucson Crossroad Web Pmts` — 14 payments of exactly $1,967.50 ($27,545,
-   2024-01 to 2026-06). An unidentified fixed obligation, probably rent,
-   mortgage or tuition. Left unclassified rather than guessed.
+## Still Open
+
+1. `Manual CR-Bkrg` ($29,475, 3 rows) still counts as income — likely a
+   brokerage transfer; needs your call.
+2. Two transfer rows on `2024.01 Acct 3063.pdf` have an unproven split (their
+   total is proven). Flagged `amountUncertain` in the parser.
 
 ## First Tasks Tomorrow
 
@@ -70,13 +72,9 @@ These are known and unfixed. They matter because they feed support calculations.
 2. Confirm the AFI mapper renders and that Apple/Prime now appear as
    **discretionary**, not Utilities — your spec reversed an earlier call, so only
    basic cable kept for news or communication is a utility.
-3. Decide what `Tucson Crossroad Web Pmts` is and map it. At $27,545 it is the
-   largest single unclassified obligation.
-4. Fix the "Interest Payment" balance-column misread in the statement parser,
-   then re-run classification.
-5. Decide which of the two Ossandon matters is authoritative.
-6. Review the 489 still-unclassified expense rows ($38,125) in the mapper.
-7. Three documents remain unverified — `2025.12`, `2026.01`, `2026.02 Acct
+3. Say what `Manual CR-Bkrg` is.
+4. Review the still-unclassified expense rows in the mapper.
+5. Three documents remain unverified — `2025.12`, `2026.01`, `2026.02 Acct
    3063.pdf`. Their Chase text layer is boilerplate only; even the balance
    summary is empty, so zero activity cannot be confirmed from text.
    `ANTHROPIC_API_KEY` is configured, so
