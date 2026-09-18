@@ -10,7 +10,7 @@
 
 
   let allTransactions = [];
-  // merchantKey -> afiLine (number|null) for user overrides
+  // merchantKey -> category code chosen by a person (older saves: AFI line number, or null to skip)
   const userMappings = {};
   // merchantKey -> true once a person has accepted a flagged suggestion as-is
   const confirmedGuesses = {};
@@ -133,27 +133,36 @@
         flaggedRows++;
       }
 
-      const line = userSet ? userMappings[mk] : (cat != null ? T.afiLineFor(cat) : null);
+      // A person's choice is stored as a category code. Older choices were
+      // stored as an AFI line number (or null for "Other / Skip") and are
+      // still honoured so nothing already mapped is lost.
+      const override = userMappings[mk];
+      const chosenCat = typeof override === 'string' ? override : null;
+      const effCat = chosenCat || (userSet ? null : cat);
+      const line = typeof override === 'number' ? override
+        : effCat != null ? T.afiLineFor(effCat) : null;
+      const treatment = effCat ? T.treatmentFor(effCat) : null;
 
       if (line != null) {
         mapped++;
         if (!lineTotals[line]) lineTotals[line] = { total: 0, rows: 0 };
         lineTotals[line].total += amt;
         lineTotals[line].rows++;
-      } else if (userSet) {
-        // The person chose "Other / Skip": handled, deliberately outside the form.
+      } else if (override === null || treatment === 'none') {
+        // "Other / Skip", or a person said it is not spending at all (a
+        // transfer, income): handled, and kept out of every expense total.
         mapped++;
-      } else if (cat && T.treatmentFor(cat) === 'discretionary') {
+      } else if (treatment === 'discretionary') {
         mapped++;
         shoppingTotal.total += amt;
         shoppingTotal.rows++;
-      } else if (cat) {
+      } else if (effCat) {
         // Categorised, but a need (or legal/debt/excluded item) with no box on
         // the eight-line form: reported on its own line, not left "unmapped".
         mapped++;
-        if (!offForm[cat]) offForm[cat] = { total: 0, rows: 0 };
-        offForm[cat].total += amt;
-        offForm[cat].rows++;
+        if (!offForm[effCat]) offForm[effCat] = { total: 0, rows: 0 };
+        offForm[effCat].total += amt;
+        offForm[effCat].rows++;
       } else {
         if (!unmapped[mk]) unmapped[mk] = { rows: 0, amount: 0, desc: t.description };
         unmapped[mk].rows++;
@@ -215,7 +224,7 @@
         const tr = document.createElement('tr');
         tr.innerHTML = `
           <td>${esc(sec && sec.afiSection ? '§' + sec.afiSection : sec ? sec.label : '')}</td>
-          <td>${esc(T.labelFor(code))} <span style="color:#8a94a6;">(no box on the 8-line form)</span></td>
+          <td>${esc(T.displayLabel(code))} <span style="color:#8a94a6;">(no box on the 8-line form)</span></td>
           <td>${money(agg.total)}</td>
           <td>${money(agg.total / months)}</td>
           <td>${agg.rows}</td>`;
@@ -230,27 +239,38 @@
     const unBody = document.getElementById('afiUnmappedBody');
     if (unBody) {
       unBody.innerHTML = '';
-      const options = (selected) => [`<option value="">— Select AFI line —</option>`]
-        .concat(AFI_LINES.map(({ line, label }) =>
-          `<option value="${line}" ${selected === line ? 'selected' : ''}>${line}. ${esc(label)}</option>`))
-        .concat([`<option value="none" ${selected === null ? 'selected' : ''}>Other / Skip</option>`])
-        .join('');
+      // Every taxonomy category, grouped by AFI section. `selected` is a
+      // category code, a legacy AFI line number, null for skip, or undefined.
+      const options = (selected) => {
+        let sel = selected;
+        if (typeof sel === 'number') {
+          const firstOnLine = T.CATEGORIES.find((c) => c.afiLine === sel);
+          sel = firstOnLine ? firstOnLine.code : undefined;
+        }
+        const groups = T.SECTIONS.map((s) => {
+          const items = T.categoriesForSection(s.key).map((c) =>
+            `<option value="${esc(c.code)}" ${sel === c.code ? 'selected' : ''}>${esc(T.displayLabel(c.code))}${c.afiLine ? ` — Line ${c.afiLine}` : ''}</option>`).join('');
+          const heading = s.afiSection && /^\d/.test(s.afiSection) ? `§${s.afiSection} ${s.label}` : s.label;
+          return items ? `<optgroup label="${esc(heading)}">${items}</optgroup>` : '';
+        }).join('');
+        return `<option value="">— Select category —</option>${groups}` +
+          `<option value="__skip" ${sel === null ? 'selected' : ''}>Other / Skip (leave out of AFI)</option>`;
+      };
 
       // Best guesses first: recognisable merchants whose category a person
       // should confirm. They already count toward the totals above.
       Object.keys(flagged).sort((a, b) => flagged[b].amount - flagged[a].amount).forEach((mk) => {
         const f = flagged[mk];
-        const line = T.afiLineFor(f.code);
         const tr = document.createElement('tr');
         tr.style.background = '#fffbeb';
         tr.innerHTML = `
           <td title="${esc(f.desc)}">${esc(mk || '(blank)')}
             <div style="margin-top:3px;"><span class="map-badge" style="background:#fef3c7;color:#92400e;">Suggested — review</span>
-            <span style="font-size:10px;color:#6b7280;">${esc(T.labelFor(f.code))}</span></div></td>
+            <span style="font-size:10px;color:#6b7280;">${esc(T.displayLabel(f.code))}</span></div></td>
           <td>${f.rows}</td>
           <td>${money(f.amount)}</td>
           <td><div style="display:flex;gap:6px;align-items:center;">
-            <select class="map-select" data-mk="${esc(mk)}">${options(line == null ? null : line)}</select>
+            <select class="map-select" data-mk="${esc(mk)}">${options(f.code)}</select>
             <button type="button" class="btn ghost" style="padding:3px 8px;font-size:11px;white-space:nowrap;" data-confirm="${esc(mk)}">✓ Confirm</button>
           </div></td>`;
         unBody.appendChild(tr);
@@ -283,8 +303,8 @@
         sel.addEventListener('change', () => {
           const v = sel.value;
           if (v === '') delete userMappings[sel.dataset.mk];
-          else if (v === 'none') userMappings[sel.dataset.mk] = null;
-          else userMappings[sel.dataset.mk] = parseInt(v, 10);
+          else if (v === '__skip') userMappings[sel.dataset.mk] = null;
+          else userMappings[sel.dataset.mk] = v;
           saveUserMappings();
           render();
         });

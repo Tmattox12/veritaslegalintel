@@ -54,7 +54,7 @@ function sheetName(name, used) {
 /**
  * transactions: rows from bank_transactions (amount, description, transaction_date,
  *   suggested_category, mapped_category, flow_type)
- * overrides: { merchantKey: afiLine|null } — the same userMappings from the AFI mapper UI
+ * overrides: { merchantKey: categoryCode | afiLine | null } — the same userMappings from the AFI mapper UI
  */
 function buildExpenseWorkbook(transactions, overrides = {}) {
   const expenses = (transactions || []).filter((t) => t.flow_type === 'expense' && isMappableExpense(t));
@@ -73,7 +73,11 @@ function buildExpenseWorkbook(transactions, overrides = {}) {
 
     let line = category != null ? AFITaxonomy.afiLineFor(category) : undefined;
     if (line == null || line === undefined) line = detectMerchantLine(t.description);
-    if (Object.prototype.hasOwnProperty.call(overrides, mk)) line = overrides[mk];
+    if (Object.prototype.hasOwnProperty.call(overrides, mk)) {
+      // The mapper sends a category code; older saved choices are a line number or null.
+      const v = overrides[mk];
+      line = typeof v === 'string' ? AFITaxonomy.afiLineFor(v) : v;
+    }
 
     const shopping = line == null && isShopping(category, t.description);
     if (shopping) shoppingTotal += amt;

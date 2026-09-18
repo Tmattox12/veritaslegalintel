@@ -36,7 +36,7 @@ const TRANSACTION_CSV_COLUMNS = [
   { header: 'Amount', value: (r) => r.amount },
   { header: 'Type', value: (r) => r.transaction_type },
   { header: 'Flow', value: (r) => r.flow_type },
-  { header: 'Category', value: (r) => AFITaxonomy.labelFor(r.mapped_category || r.suggested_category) || r.mapped_category || r.suggested_category },
+  { header: 'Category', value: (r) => AFITaxonomy.displayLabel(r.mapped_category || r.suggested_category) || r.mapped_category || r.suggested_category },
   { header: 'AFI Section', value: (r) => { const s = AFITaxonomy.sectionFor(r.mapped_category || r.suggested_category); return s ? s.label : ''; } },
   { header: 'Category Review', value: categoryReviewNote },
   { header: 'Source File', value: (r) => r.source_file },

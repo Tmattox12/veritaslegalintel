@@ -381,6 +381,13 @@
     return c ? c.label : null;
   }
 
+  // "Housing: Repairs & maintenance" - labels alone repeat across subsections.
+  function displayLabel(code) {
+    const c = get(code);
+    if (!c) return null;
+    return c.label.toLowerCase().startsWith(c.subsection.toLowerCase()) ? c.label : `${c.subsection}: ${c.label}`;
+  }
+
   function sectionFor(code) {
     const c = get(code);
     if (!c) return null;
@@ -430,6 +437,7 @@
     afiLineFor,
     treatmentFor,
     labelFor,
+    displayLabel,
     sectionFor,
     countsAsNeed,
     isAccountMovement,
