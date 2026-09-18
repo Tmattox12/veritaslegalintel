@@ -21,6 +21,7 @@
   }
 
   function loadUserMappings() {
+    loadCustomCategories();
     [[mappingStorageKey(), userMappings], [mappingStorageKey('confirmed'), confirmedGuesses]].forEach(([key, target]) => {
       if (!key) return;
       try {
@@ -34,6 +35,64 @@
     if (key) localStorage.setItem(key, JSON.stringify(userMappings));
     const ck = mappingStorageKey('confirmed');
     if (ck) localStorage.setItem(ck, JSON.stringify(confirmedGuesses));
+  }
+
+  /* ---------- Category search + custom categories ---------- */
+  const SKIP_TEXT = 'Other / Skip — leave out of AFI';
+  // Kept across matters in this browser, so a category added once is reusable.
+  const CUSTOM_KEY = 'veritas_afi_custom_categories';
+  let customCategories = [];
+
+  function loadCustomCategories() {
+    try {
+      customCategories = JSON.parse(localStorage.getItem(CUSTOM_KEY) || '[]');
+    } catch (error) {
+      customCategories = [];
+    }
+    T.defineCustom(customCategories);
+  }
+
+  function addCustomCategory(label, section, afiLine) {
+    const name = String(label || '').trim().slice(0, 80);
+    if (!name || !section) return null;
+    const slug = name.toLowerCase().replace(/[^a-z0-9]+/g, '_').replace(/^_+|_+$/g, '').slice(0, 40) || 'category';
+    const def = { code: `custom_${slug}`, label: name, section, afiLine: afiLine || null };
+    const i = customCategories.findIndex((c) => c.code === def.code);
+    if (i >= 0) customCategories[i] = def; else customCategories.push(def);
+    localStorage.setItem(CUSTOM_KEY, JSON.stringify(customCategories));
+    T.defineCustom([def]);
+    return def.code;
+  }
+
+  function sectionHeading(s) {
+    return s.afiSection && /^\d/.test(s.afiSection) ? `§${s.afiSection} ${s.label}` : s.label;
+  }
+
+  // The section name is part of the text so typing "legal" or "§10" finds
+  // every category filed there, not just ones with that word in the label.
+  function optionText(c) {
+    const s = T.sectionFor(c.code);
+    return `${T.displayLabel(c.code)}${c.afiLine ? ` — Line ${c.afiLine}` : ''}  [${s ? sectionHeading(s) : ''}]`;
+  }
+
+  function categoryByText(text) {
+    const t = String(text || '').trim().toLowerCase();
+    if (!t) return null;
+    return T.CATEGORIES.find((c) => optionText(c).toLowerCase() === t) ||
+      T.CATEGORIES.find((c) => T.displayLabel(c.code).toLowerCase() === t || c.label.toLowerCase() === t) ||
+      null;
+  }
+
+  function ensureCategoryDatalist() {
+    let list = document.getElementById('afiCategoryOptions');
+    if (!list) {
+      list = document.createElement('datalist');
+      list.id = 'afiCategoryOptions';
+      document.body.appendChild(list);
+    }
+    list.innerHTML = T.SECTIONS
+      .map((s) => T.categoriesForSection(s.key).map((c) => `<option value="${esc(optionText(c))}"></option>`).join(''))
+      .join('') + `<option value="${esc(SKIP_TEXT)}"></option>`;
   }
 
 
@@ -239,23 +298,30 @@
     const unBody = document.getElementById('afiUnmappedBody');
     if (unBody) {
       unBody.innerHTML = '';
-      // Every taxonomy category, grouped by AFI section. `selected` is a
-      // category code, a legacy AFI line number, null for skip, or undefined.
-      const options = (selected) => {
-        let sel = selected;
-        if (typeof sel === 'number') {
-          const firstOnLine = T.CATEGORIES.find((c) => c.afiLine === sel);
-          sel = firstOnLine ? firstOnLine.code : undefined;
-        }
-        const groups = T.SECTIONS.map((s) => {
-          const items = T.categoriesForSection(s.key).map((c) =>
-            `<option value="${esc(c.code)}" ${sel === c.code ? 'selected' : ''}>${esc(T.displayLabel(c.code))}${c.afiLine ? ` — Line ${c.afiLine}` : ''}</option>`).join('');
-          const heading = s.afiSection && /^\d/.test(s.afiSection) ? `§${s.afiSection} ${s.label}` : s.label;
-          return items ? `<optgroup label="${esc(heading)}">${items}</optgroup>` : '';
-        }).join('');
-        return `<option value="">— Select category —</option>${groups}` +
-          `<option value="__skip" ${sel === null ? 'selected' : ''}>Other / Skip (leave out of AFI)</option>`;
-      };
+      ensureCategoryDatalist();
+
+      const sectionOptions = T.SECTIONS.map((s) =>
+        `<option value="${esc(s.key)}">${esc(sectionHeading(s))}</option>`).join('');
+      const lineOptions = AFI_LINES.map(({ line, label }) =>
+        `<option value="${line}">Line ${line} — ${esc(label)}</option>`).join('');
+
+      // Search box over every category (the browser filters the list as you
+      // type); anything typed that matches nothing opens the add panel.
+      const picker = (mk, withConfirm) => `
+        <div style="display:flex;gap:6px;align-items:center;">
+          <input class="map-select" list="afiCategoryOptions" data-mk="${esc(mk)}" autocomplete="off"
+            placeholder="Search or add a category…" style="min-width:240px;">
+          ${withConfirm ? `<button type="button" class="btn ghost" style="padding:3px 8px;font-size:11px;white-space:nowrap;" data-confirm="${esc(mk)}">✓ Confirm</button>` : ''}
+        </div>
+        <div data-add-panel hidden style="margin-top:6px;padding:8px;border:1px dashed #cbd5e1;border-radius:6px;background:#f8fafc;font-size:11px;">
+          <div style="margin-bottom:6px;">Add <strong data-add-name></strong> as a new category:</div>
+          <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;">
+            <select class="map-select" data-add-section style="max-width:220px;"><option value="">AFI section…</option>${sectionOptions}</select>
+            <select class="map-select" data-add-line style="max-width:220px;"><option value="">No form line</option>${lineOptions}</select>
+            <button type="button" class="btn" style="padding:3px 10px;font-size:11px;" data-add-save disabled>Add</button>
+            <button type="button" class="btn ghost" style="padding:3px 8px;font-size:11px;" data-add-cancel>Cancel</button>
+          </div>
+        </div>`;
 
       // Best guesses first: recognisable merchants whose category a person
       // should confirm. They already count toward the totals above.
@@ -269,10 +335,7 @@
             <span style="font-size:10px;color:#6b7280;">${esc(T.displayLabel(f.code))}</span></div></td>
           <td>${f.rows}</td>
           <td>${money(f.amount)}</td>
-          <td><div style="display:flex;gap:6px;align-items:center;">
-            <select class="map-select" data-mk="${esc(mk)}">${options(f.code)}</select>
-            <button type="button" class="btn ghost" style="padding:3px 8px;font-size:11px;white-space:nowrap;" data-confirm="${esc(mk)}">✓ Confirm</button>
-          </div></td>`;
+          <td>${picker(mk, true)}</td>`;
         unBody.appendChild(tr);
       });
 
@@ -283,7 +346,7 @@
           <td title="${esc(u.desc)}">${esc(mk || '(blank)')}</td>
           <td>${u.rows}</td>
           <td>${money(u.amount)}</td>
-          <td><select class="map-select" data-mk="${esc(mk)}">${options(userMappings[mk])}</select></td>`;
+          <td>${picker(mk, false)}</td>`;
         unBody.appendChild(tr);
       });
       if (!unBody.children.length) {
@@ -298,13 +361,43 @@
         });
       });
 
-      // wire selects
-      unBody.querySelectorAll('select[data-mk]').forEach((sel) => {
-        sel.addEventListener('change', () => {
-          const v = sel.value;
-          if (v === '') delete userMappings[sel.dataset.mk];
-          else if (v === '__skip') userMappings[sel.dataset.mk] = null;
-          else userMappings[sel.dataset.mk] = v;
+      unBody.querySelectorAll('input[data-mk]').forEach((input) => {
+        const cell = input.closest('td');
+        const panel = cell.querySelector('[data-add-panel]');
+        const sectionSel = panel.querySelector('[data-add-section]');
+        const saveBtn = panel.querySelector('[data-add-save]');
+        const mk = input.dataset.mk;
+
+        input.addEventListener('change', () => {
+          const text = input.value.trim();
+          panel.hidden = true;
+          if (!text) return;
+          if (text === SKIP_TEXT) {
+            userMappings[mk] = null;
+          } else {
+            const cat = categoryByText(text);
+            if (!cat) {
+              // Nothing matches: offer to add it rather than silently ignore.
+              panel.querySelector('[data-add-name]').textContent = `"${text}"`;
+              panel.hidden = false;
+              sectionSel.focus();
+              return;
+            }
+            userMappings[mk] = cat.code;
+          }
+          saveUserMappings();
+          render();
+        });
+        sectionSel.addEventListener('change', () => { saveBtn.disabled = !sectionSel.value; });
+        panel.querySelector('[data-add-cancel]').addEventListener('click', () => {
+          panel.hidden = true;
+          input.value = '';
+        });
+        saveBtn.addEventListener('click', () => {
+          const lineVal = panel.querySelector('[data-add-line]').value;
+          const code = addCustomCategory(input.value.trim(), sectionSel.value, lineVal ? parseInt(lineVal, 10) : null);
+          if (!code) return;
+          userMappings[mk] = code;
           saveUserMappings();
           render();
         });
@@ -377,7 +470,12 @@
       const response = await fetch(`${API_BASE}/matters/${mid}/documents/expense-workbook`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ overrides: userMappings }),
+        // Custom categories exist only in this browser, so send the form line
+        // they roll into; the server resolves the built-in codes itself.
+        body: JSON.stringify({
+          overrides: Object.fromEntries(Object.entries(userMappings).map(([mk, v]) =>
+            [mk, typeof v === 'string' && v.startsWith('custom_') ? T.afiLineFor(v) : v])),
+        }),
       });
       if (!response.ok) throw new Error('Workbook export failed');
       const blob = await response.blob();

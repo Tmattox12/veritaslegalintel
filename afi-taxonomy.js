@@ -400,6 +400,32 @@
     return treatmentFor(code) === 'need';
   }
 
+  // A section decides how a total may be used, so a custom category inherits
+  // its treatment from the section it is filed under.
+  const SECTION_TREATMENT = {
+    court_ordered: 'support',
+    basic_living: 'need',
+    child_related: 'need',
+    debts: 'debt',
+    legal: 'legal',
+    discretionary: 'discretionary',
+    excluded: 'excluded',
+    non_expense: 'none',
+  };
+
+  // Categories a person adds from the mapper when nothing in the taxonomy
+  // fits. Accepts [{ code, label, section, afiLine }]; safe to call repeatedly.
+  function defineCustom(defs) {
+    (defs || []).forEach((d) => {
+      if (!d || !d.code || !d.label || !SECTION_TREATMENT[d.section]) return;
+      const afiLine = AFI_LINES.some((l) => l.line === d.afiLine) ? d.afiLine : null;
+      const cat = C(d.code, d.section, 'Custom', d.label, afiLine, SECTION_TREATMENT[d.section]);
+      const existing = CATEGORIES.findIndex((c) => c.code === d.code);
+      if (existing >= 0) CATEGORIES[existing] = cat; else CATEGORIES.push(cat);
+      BY_CODE[d.code] = cat;
+    });
+  }
+
   // Money moving between the party's own accounts, or out as cash: neither
   // income nor spending, so it is excluded from both analyses.
   const MOVEMENT_CODES = ['transfer', 'investment_transfer', 'cash_withdrawal'];
@@ -442,6 +468,7 @@
     countsAsNeed,
     isAccountMovement,
     excludedFromIncome,
+    defineCustom,
     categoriesForSection,
   };
 });
