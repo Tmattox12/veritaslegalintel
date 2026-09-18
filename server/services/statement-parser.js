@@ -226,8 +226,15 @@ function parseStatementText(text, filename) {
       }
     }
 
-    const amount = parseAmount(amtStr);
+    let amount = parseAmount(amtStr);
     if (amount === null) continue;
+    // Chase prints the post date twice and sometimes spaces a minus off its
+    // number ("Transfer To CD ... - 20,244.80"); keep the sign, drop the noise.
+    desc = desc.replace(/^\d{1,2}\/\d{1,2}\s+/, '');
+    if (/\s-$/.test(desc)) {
+      desc = desc.replace(/\s*-$/, '');
+      amount = -Math.abs(amount);
+    }
 
     // Skip header/summary/total lines
     if (/^(description|details|memo|total|subtotal|balance|ending|beginning|payments?\s+and\s+credits)/i.test(desc.trim())) continue;
@@ -247,6 +254,10 @@ function parseStatementText(text, filename) {
     });
   }
 
+  const beginningBalance = summaryBalance(text, 'Beginning');
+  const endingBalance = summaryBalance(text, 'Ending');
+  recoverBalanceMisreads(transactions, accountType, beginningBalance, endingBalance, text);
+
   // Fall back to filename-derived period/account when the text didn't yield them.
   let statementStart = period ? period.start : null;
   let statementEnd = period ? period.end : null;
@@ -264,10 +275,123 @@ function parseStatementText(text, filename) {
     accountNumberMasked,
     statementStart,
     statementEnd,
-    beginningBalance: null,
-    endingBalance: null,
+    beginningBalance,
+    endingBalance,
     transactions,
   };
+}
+
+function summaryBalance(text, which) {
+  const m = text.match(new RegExp(`${which}\\s+Balance\\s*\\$?\\s*(-?[\\d,]+\\.\\d{2})`, 'i'));
+  return m ? parseAmount(m[1]) : null;
+}
+
+const cents = (n) => Math.round(n * 100);
+
+function summaryAmount(text, label) {
+  const m = text.match(new RegExp(`${label}\\s*\\$?\\s*(-?[\\d,]+\\.\\d{2})`, 'i'));
+  return m ? parseAmount(m[1]) : null;
+}
+
+// What a description says about direction, when it says anything at all.
+function directionHint(desc) {
+  const d = (desc || '').toLowerCase();
+  if (/\btransfer\s+to\b|\bwithdraw|\bpayment\s+to\b|\bfee\b|\bdebit\b|\bcheck\b/.test(d)) return -1;
+  if (/\btransfer\s+from\b|\bdeposit\b|\binterest\b|\brefund\b|\bpayroll\b|\bdir\s*dep\b/.test(d)) return 1;
+  return 0;
+}
+
+const MAX_RESOLVE_ROWS = 12;
+
+// Some Chase savings PDFs lose the AMOUNT column from part of the text layer,
+// so a row keeps only its BALANCE: "08/29 Interest Payment 25,186.83" is a
+// $0.39 interest credit. Within one statement some rows keep their real amount
+// and others keep only the balance, so each row is read three ways - a credit
+// of that amount, a debit of that amount, or a balance - and a reading is
+// accepted only when the statement itself proves it: the chain must land
+// exactly on the ending balance and its credits must equal the statement's own
+// "Deposits and Additions" total. Of the readings that pass, the one most
+// consistent with the descriptions and closest to the literal text wins, and
+// if two such readings disagree on any amount the statement is left alone.
+function recoverBalanceMisreads(transactions, accountType, beginning, ending, text) {
+  if (accountType === 'credit_card' || beginning == null || ending == null) return;
+  const n = transactions.length;
+  if (!n || n > MAX_RESOLVE_ROWS) return;
+  const additions = summaryAmount(text, 'Deposits and Additions');
+  if (additions == null) return;
+
+  const target = cents(ending);
+  const wantCredits = cents(additions);
+  const values = transactions.map((t) => cents(t.amount));
+  // A row that printed both an amount and a balance is an anchor: its balance
+  // is known, so its only reading is the one that lands on that balance.
+  const anchors = transactions.map((t) => (t.runningBalance == null ? null : cents(t.runningBalance)));
+  const hints = transactions.map((t) => directionHint(t.description));
+  const best = { score: -Infinity, readings: [] };
+  const valid = [];
+
+  // choice per row: 1 = credit, -1 = debit, 0 = the value is a balance
+  const choice = new Array(n);
+  (function search(i, bal, credits, agree, balanceReads) {
+    if (credits > wantCredits) return;
+    if (i === n) {
+      if (bal !== target || credits !== wantCredits) return;
+      const score = agree * 100 - balanceReads;
+      const deltas = [];
+      let prev = cents(beginning);
+      for (let k = 0; k < n; k++) {
+        const next = choice[k] === 'anchor' ? anchors[k]
+          : choice[k] === 0 ? values[k] : prev + choice[k] * values[k];
+        deltas.push(next - prev);
+        prev = next;
+      }
+      valid.push(deltas);
+      if (score > best.score) { best.score = score; best.readings = [deltas]; }
+      else if (score === best.score) best.readings.push(deltas);
+      return;
+    }
+    if (anchors[i] != null) {
+      const delta = anchors[i] - bal;
+      // The printed amount must agree with the printed balance, or this chain is wrong.
+      if (Math.abs(delta) !== values[i]) return;
+      const dir = delta > 0 ? 1 : -1;
+      choice[i] = 'anchor';
+      search(i + 1, anchors[i], credits + (delta > 0 ? delta : 0),
+        agree + (hints[i] === 0 ? 0 : hints[i] === dir ? 1 : -1), balanceReads);
+      return;
+    }
+    for (const c of [1, -1, 0]) {
+      const next = c === 0 ? values[i] : bal + c * values[i];
+      const delta = next - bal;
+      if (delta === 0) continue;
+      const dir = delta > 0 ? 1 : -1;
+      choice[i] = c;
+      search(i + 1, next, credits + (delta > 0 ? delta : 0),
+        agree + (hints[i] === 0 ? 0 : hints[i] === dir ? 1 : -1), balanceReads + (c === 0 ? 1 : 0));
+    }
+  })(0, cents(beginning), 0, 0, 0);
+
+  if (!best.readings.length) return;
+  const [chosen] = best.readings;
+  const ambiguous = best.readings.some((r) => r.some((d, k) => d !== chosen[k]));
+  if (ambiguous) return;
+
+  let prev = cents(beginning);
+  transactions.forEach((t, k) => {
+    const d = chosen[k];
+    const next = prev + d;
+    const changed = Math.abs(d) !== values[k] || (d > 0) !== (t.flowType === 'income');
+    t.amount = Math.abs(d) / 100;
+    t.runningBalance = next / 100;
+    t.flowType = d > 0 ? 'income' : 'expense';
+    t.type = d > 0 ? 'credit' : 'debit';
+    if (changed) t.balanceRecovered = true;
+    // Another reading also satisfies the statement but splits this row
+    // differently. The statement totals are still right; this row's own
+    // amount is a best reading, not a proven one.
+    if (valid.some((r) => r[k] !== d)) t.amountUncertain = true;
+    prev = next;
+  });
 }
 
 module.exports = { parseStatementText };
