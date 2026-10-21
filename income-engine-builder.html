@@ -468,22 +468,59 @@
             <span class="income-card-toggle">▼</span>
           </div>
           <div class="income-card-body">
-            <div class="source-grid">
-              <div class="source-row">
-                <label class="source-label">Annual Amount</label>
-                <input type="number" class="source-input" placeholder="0" min="0" />
+            <div style="font-size: 11px; font-weight: 700; color: #1c3f66; margin-bottom: 12px; text-transform: uppercase;">Income Basis Comparison</div>
+
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-bottom: 16px;">
+              <!-- Last 3 Years Average -->
+              <div style="border: 1px solid #d7e0ec; border-radius: 8px; padding: 12px; background: #f9f7f3;">
+                <div style="font-size: 10px; text-transform: uppercase; color: #7a8a9a; font-weight: 700; margin-bottom: 6px;">Last 3 Years</div>
+                <div style="font-family: 'Fraunces', serif; font-size: 22px; font-weight: 700; color: #1c3f66; margin-bottom: 6px;">
+                  <input type="number" placeholder="0" min="0" class="basis-3yr" style="width: 100%; padding: 4px; border: 1px solid #d4dce8; border-radius: 4px; font-size: 16px; font-family: 'Fraunces', serif;" />
+                </div>
+                <div style="font-size: 9px; color: #7a8a9a;">Averaged 2022-2024</div>
+                <button style="width: 100%; padding: 4px 8px; margin-top: 8px; border: 1px solid #cdd8e7; background: #fff; border-radius: 4px; cursor: pointer; font-size: 10px; color: #1c3f66; font-weight: 600;" onclick="selectBasis(this, '${cardId}', '3yr')">Select</button>
               </div>
-              <div class="source-row">
-                <label class="source-label">Frequency / Period</label>
-                <select class="source-input">
-                  <option>Annual</option>
-                  <option>Monthly</option>
-                  <option>Bi-weekly</option>
-                  <option>Weekly</option>
-                  <option>Quarterly</option>
-                  <option>Per Event</option>
-                </select>
+
+              <!-- YTD Run-Rate -->
+              <div style="border: 1px solid #d7e0ec; border-radius: 8px; padding: 12px; background: #f9f7f3;">
+                <div style="font-size: 10px; text-transform: uppercase; color: #7a8a9a; font-weight: 700; margin-bottom: 6px;">YTD Run-Rate</div>
+                <div style="font-family: 'Fraunces', serif; font-size: 22px; font-weight: 700; color: #1c3f66; margin-bottom: 6px;">
+                  <input type="number" placeholder="0" min="0" class="basis-ytd" style="width: 100%; padding: 4px; border: 1px solid #d4dce8; border-radius: 4px; font-size: 16px; font-family: 'Fraunces', serif;" />
+                </div>
+                <div style="font-size: 9px; color: #7a8a9a;">Annualized YTD</div>
+                <button style="width: 100%; padding: 4px 8px; margin-top: 8px; border: 1px solid #cdd8e7; background: #fff; border-radius: 4px; cursor: pointer; font-size: 10px; color: #1c3f66; font-weight: 600;" onclick="selectBasis(this, '${cardId}', 'ytd')">Select</button>
               </div>
+
+              <!-- Last 2 Years Average -->
+              <div style="border: 1px solid #d7e0ec; border-radius: 8px; padding: 12px; background: #f9f7f3;">
+                <div style="font-size: 10px; text-transform: uppercase; color: #7a8a9a; font-weight: 700; margin-bottom: 6px;">Last 2 Years</div>
+                <div style="font-family: 'Fraunces', serif; font-size: 22px; font-weight: 700; color: #1c3f66; margin-bottom: 6px;">
+                  <input type="number" placeholder="0" min="0" class="basis-2yr" style="width: 100%; padding: 4px; border: 1px solid #d4dce8; border-radius: 4px; font-size: 16px; font-family: 'Fraunces', serif;" />
+                </div>
+                <div style="font-size: 9px; color: #7a8a9a;">Averaged 2023-2024</div>
+                <button style="width: 100%; padding: 4px 8px; margin-top: 8px; border: 1px solid #cdd8e7; background: #fff; border-radius: 4px; cursor: pointer; font-size: 10px; color: #1c3f66; font-weight: 600;" onclick="selectBasis(this, '${cardId}', '2yr')">Select</button>
+              </div>
+
+              <!-- Imputed / Vocational -->
+              <div style="border: 1px solid #d7e0ec; border-radius: 8px; padding: 12px; background: #f9f7f3;">
+                <div style="font-size: 10px; text-transform: uppercase; color: #7a8a9a; font-weight: 700; margin-bottom: 6px;">Imputed</div>
+                <div style="font-family: 'Fraunces', serif; font-size: 22px; font-weight: 700; color: #1c3f66; margin-bottom: 6px;">
+                  <input type="number" placeholder="0" min="0" class="basis-imputed" style="width: 100%; padding: 4px; border: 1px solid #d4dce8; border-radius: 4px; font-size: 16px; font-family: 'Fraunces', serif;" />
+                </div>
+                <div style="font-size: 9px; color: #7a8a9a;">Vocational/Capacity</div>
+                <button style="width: 100%; padding: 4px 8px; margin-top: 8px; border: 1px solid #cdd8e7; background: #fff; border-radius: 4px; cursor: pointer; font-size: 10px; color: #1c3f66; font-weight: 600;" onclick="selectBasis(this, '${cardId}', 'imputed')">Select</button>
+              </div>
+            </div>
+
+            <!-- Selected Basis Display -->
+            <div style="background: #e6f3ec; border: 1px solid #6b9e88; border-radius: 8px; padding: 12px; margin-bottom: 16px;">
+              <div style="font-size: 10px; font-weight: 700; color: #1c6b52; text-transform: uppercase; margin-bottom: 4px;">✓ Selected for Calculations</div>
+              <div style="font-family: 'Fraunces', serif; font-size: 24px; font-weight: 700; color: #1c6b52;" class="selected-amount">\$0</div>
+              <div style="font-size: 9px; color: #1c6b52; margin-top: 4px;" class="selected-basis">— No basis selected yet</div>
+            </div>
+
+            <!-- Additional Fields -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
               <div class="source-row">
                 <label class="source-label">Status</label>
                 <select class="source-input">
@@ -508,36 +545,28 @@
 
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
               <div class="source-row">
-                <label class="source-label">Evidence / Source Document</label>
-                <input type="text" class="source-input" placeholder="E.g., 2024 Tax Return, YTD Paystubs" />
+                <label class="source-label">Supporting Documents</label>
+                <input type="text" class="source-input" placeholder="E.g., 2024 Tax Return, YTD Paystubs, Voc Report" />
               </div>
               <div class="source-row">
-                <label class="source-label">Imputation Methodology</label>
-                <select class="source-input">
-                  <option>Documented (tax/paystubs)</option>
-                  <option>Historical average (2-3 yr)</option>
-                  <option>Vocational / earning capacity</option>
-                  <option>Run-rate / current period</option>
-                  <option>Bank deposit analysis</option>
-                  <option>Custom / explained below</option>
-                </select>
+                <label class="source-label">Data Sources / Evidence</label>
+                <input type="text" class="source-input" placeholder="E.g., Schedule C, 1099s, Paystubs, Expert Report" />
               </div>
             </div>
 
             <div class="source-row" style="margin-top: 12px;">
-              <label class="source-label">Notes / Supporting Explanation</label>
-              <textarea class="source-input" style="min-height: 50px; resize: vertical;" placeholder="Any relevant notes about this income source, disputed amounts, assumptions, etc."></textarea>
+              <label class="source-label">Why This Basis? (Explanation)</label>
+              <textarea class="source-input" style="min-height: 60px; resize: vertical;" placeholder="Explain why this basis was selected. E.g., 'Recent promotion justifies YTD run-rate' or 'Party voluntarily underemployed, using vocational floor'"></textarea>
             </div>
 
             <div class="action-buttons">
               <button class="action-btn" onclick="viewRecon('${cardId}', '${party}', '${type}')">📊 View Recon</button>
-              <button class="action-btn" onclick="linkDocument('${cardId}')">📎 Link Document</button>
+              <button class="action-btn" onclick="linkDocument('${cardId}')">📎 Link Documents</button>
               <button class="action-btn" onclick="linkQuestionnaire('${cardId}')">📋 Link Questionnaire</button>
-              <button class="action-btn" onclick="viewSourcingDetails('${cardId}')">🔍 Sourcing Details</button>
             </div>
 
             <div class="source-note">
-              💡 Link supporting documents via the buttons above (tax returns, paystubs, discovery documents, questionnaire responses). This income feeds AFI, spousal, and child support calculations.
+              💡 Enter amounts for each basis, click "Select" to choose the one for AFI/spousal/child support. The selected amount cascades to all calculations.
             </div>
           </div>
         `;
@@ -549,6 +578,29 @@
     function toggleCard(cardId) {
       const card = document.getElementById(cardId);
       card.classList.toggle('open');
+    }
+
+    function selectBasis(button, cardId, basis) {
+      const card = document.getElementById(cardId);
+      const basesMap = {
+        '3yr': { input: '.basis-3yr', label: 'Last 3 Years Average (2022-2024)' },
+        'ytd': { input: '.basis-ytd', label: 'YTD Run-Rate' },
+        '2yr': { input: '.basis-2yr', label: 'Last 2 Years Average (2023-2024)' },
+        'imputed': { input: '.basis-imputed', label: 'Imputed / Vocational' }
+      };
+
+      const basisInfo = basesMap[basis];
+      const amount = card.querySelector(basisInfo.input).value || '0';
+
+      // Update selected display
+      card.querySelector('.selected-amount').textContent = '$' + parseFloat(amount).toLocaleString('en-US', {maximumFractionDigits: 0});
+      card.querySelector('.selected-basis').textContent = basisInfo.label;
+
+      // Visual feedback on button
+      const allBtns = card.querySelectorAll('.income-card-body button:not(.action-btn)');
+      allBtns.forEach(btn => btn.style.background = '#fff');
+      button.style.background = '#e6f3ec';
+      button.style.borderColor = '#6b9e88';
     }
 
     function linkDocument(cardId) {
