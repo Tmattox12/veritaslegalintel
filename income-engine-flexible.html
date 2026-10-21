@@ -1,0 +1,551 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Income Engine — Flexible Template</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: #fafbfc; color: #1a2f4f; }
+    .container { max-width: 1400px; margin: 0 auto; padding: 24px; }
+
+    .header { margin-bottom: 32px; padding-bottom: 24px; border-bottom: 2px solid #e0e7ff; }
+    h1 { font-size: 32px; font-weight: 700; margin-bottom: 8px; }
+    .subtitle { font-size: 16px; color: #5b6472; }
+
+    .matter-info { background: #f4f8fc; border: 1px solid #d7e0ec; border-radius: 8px; padding: 16px; margin-top: 16px; }
+    .matter-info input, .matter-info select { margin-top: 8px; padding: 8px; border: 1px solid #cdd8e7; border-radius: 4px; width: 100%; }
+
+    /* Income Summary */
+    .income-summary { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+    @media (max-width: 1000px) { .income-summary { grid-template-columns: 1fr; } }
+
+    .summary-card { background: #fff; border: 1px solid #e6ebf1; border-top: 4px solid #1c3f66; border-radius: 8px; padding: 16px; }
+    .summary-card.payee { border-top-color: #2f7d5b; }
+    .summary-card.combined { border-top-color: #b8893b; background: #fffdf8; }
+
+    .summary-role { font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; color: #7a8a9a; font-weight: 700; margin-bottom: 8px; }
+    .summary-amount { font-family: 'Fraunces', serif; font-size: 32px; font-weight: 800; color: #1c3f66; margin: 8px 0; }
+    .summary-detail { font-size: 12px; color: #5b6472; }
+
+    /* Two-Column Layout */
+    .two-column { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px; }
+    @media (max-width: 1000px) { .two-column { grid-template-columns: 1fr; } }
+
+    .panel { background: #fff; border: 1px solid #e0e7ff; border-radius: 8px; padding: 20px; margin-bottom: 20px; }
+    .panel-title { font-size: 16px; font-weight: 700; color: #1c3f66; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 2px solid #e0e7ff; }
+
+    /* Collapsible Sections */
+    .collapsible-section { margin-bottom: 12px; border: 1px solid #d7e0ec; border-radius: 8px; overflow: hidden; }
+    .collapsible-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 12px;
+      background: #f8f9fa;
+      cursor: pointer;
+      user-select: none;
+      font-weight: 600;
+      font-size: 12px;
+      color: #1c3f66;
+      border-bottom: 1px solid #d7e0ec;
+    }
+    .collapsible-header:hover { background: #f0f4fa; }
+    .collapsible-header.open { background: #f0f4fa; border-bottom: 1px solid #d7e0ec; }
+    .collapsible-toggle { font-size: 18px; transition: transform 0.2s; }
+    .collapsible-header.open .collapsible-toggle { transform: rotate(180deg); }
+    .collapsible-body { padding: 16px; display: none; }
+    .collapsible-body.open { display: block; }
+
+    /* Income Source Card */
+    .income-source { background: #f8f9fa; border: 1px solid #d7e0ec; border-radius: 8px; padding: 14px; margin-bottom: 12px; }
+    .source-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+    .source-title { font-weight: 700; color: #1c3f66; font-size: 12px; }
+    .source-type { font-size: 10px; color: #7a8a9a; background: #eef4fb; padding: 2px 8px; border-radius: 999px; margin-left: 8px; }
+    .source-actions { display: flex; gap: 6px; }
+    .action-btn { padding: 4px 8px; border: 1px solid #cdd8e7; background: #fff; border-radius: 4px; cursor: pointer; font-size: 10px; color: #1c3f66; }
+    .action-btn:hover { background: #f0f5fb; }
+    .source-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px; }
+    .source-row { display: flex; flex-direction: column; gap: 4px; }
+    .source-label { font-size: 11px; font-weight: 600; color: #1c3f66; }
+    .source-input { padding: 8px; border: 1px solid #d4dce8; border-radius: 4px; font-size: 11px; }
+    .source-note { font-size: 10px; color: #7a8a9a; font-style: italic; margin-top: 8px; padding-top: 8px; border-top: 1px solid #e0e7ff; }
+
+    /* Add Source Button */
+    .add-source-btn { padding: 8px 12px; background: #e6f3ec; color: #1c6b52; border: 1px solid #6b9e88; border-radius: 4px; cursor: pointer; font-size: 11px; font-weight: 600; }
+    .add-source-btn:hover { background: #c8e6c9; }
+
+    /* Document Link */
+    .doc-link { display: inline-flex; align-items: center; gap: 6px; font-size: 10px; color: #2e5b8a; text-decoration: none; padding: 4px 8px; background: #edf3fb; border-radius: 4px; margin-top: 8px; }
+    .doc-link:hover { background: #dce7f5; }
+
+    /* Methodology Cards */
+    .methodology-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin-top: 12px; }
+    .methodology-card { border: 1px solid #d7e0ec; border-radius: 8px; padding: 12px; background: #fff; }
+    .methodology-card:hover { border-color: #1c3f66; box-shadow: 0 0 0 2px rgba(28,63,102,0.14); }
+    .methodology-title { font-size: 12px; font-weight: 700; color: #1c3f66; margin-bottom: 6px; }
+    .methodology-desc { font-size: 10px; color: #5b6472; line-height: 1.5; }
+    .methodology-value { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 700; color: #1c3f66; margin-top: 8px; }
+
+    /* Comparison Table */
+    .comparison-table { width: 100%; border-collapse: collapse; font-size: 11px; margin-top: 12px; }
+    .comparison-table th { background: #f5f0e8; padding: 8px; text-align: left; font-weight: 600; border: 1px solid #ddd; }
+    .comparison-table td { padding: 8px; border: 1px solid #ddd; }
+    .comparison-table .amount { text-align: right; font-weight: 600; color: #1c3f66; }
+
+    .note { font-size: 11px; color: #5b6472; margin: 12px 0; padding: 12px; background: #f9f7f3; border-radius: 4px; line-height: 1.6; }
+    .flag-box { background: #ffebee; border-left: 4px solid #c62828; padding: 12px; border-radius: 4px; margin: 12px 0; }
+    .flag-title { color: #c62828; font-weight: 700; font-size: 11px; margin-bottom: 4px; }
+    .flag-detail { font-size: 10px; color: #666; line-height: 1.5; }
+
+    .btn { padding: 8px 16px; background: #2e5b8a; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 600; margin-right: 8px; }
+    .btn:hover { background: #1c3f66; }
+    .btn.ghost { background: white; color: #2e5b8a; border: 1px solid #d4dce8; }
+    .btn.ghost:hover { background: #f0f5fb; }
+
+    .footer { text-align: center; padding: 24px; color: #7a8a9a; font-size: 12px; margin-top: 40px; border-top: 2px solid #e0e7ff; }
+
+    .income-types { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 8px; margin-bottom: 16px; }
+    .income-type-badge { padding: 4px 8px; background: #f0f4fa; border: 1px solid #dbe3ef; border-radius: 4px; font-size: 10px; color: #425c7f; text-align: center; cursor: pointer; }
+    .income-type-badge:hover { background: #dce7f5; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <h1>Income Engine — Flexible Analysis</h1>
+      <p class="subtitle">Unlimited income sources · document-backed · comparative analysis · any income type</p>
+
+      <div class="matter-info">
+        <label><strong>Matter</strong>
+          <input type="text" placeholder="Case name & number" />
+        </label>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px;">
+          <label><strong>Party A Name</strong>
+            <input type="text" placeholder="Name" />
+          </label>
+          <label><strong>Party B Name</strong>
+            <input type="text" placeholder="Name" />
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Income Summary -->
+    <div class="income-summary">
+      <div class="summary-card">
+        <div class="summary-role">Party A — Total Annual Income</div>
+        <div class="summary-amount">$0</div>
+        <div class="summary-detail">
+          <div>$0/mo · Sources: 0</div>
+          <div style="font-size: 10px; color: #7a8a9a; margin-top: 4px;">Updates as sources are added</div>
+        </div>
+      </div>
+      <div class="summary-card payee">
+        <div class="summary-role">Party B — Total Annual Income</div>
+        <div class="summary-amount">$0</div>
+        <div class="summary-detail">
+          <div>$0/mo · Sources: 0</div>
+          <div style="font-size: 10px; color: #7a8a9a; margin-top: 4px;">Updates as sources are added</div>
+        </div>
+      </div>
+      <div class="summary-card combined">
+        <div class="summary-role">Combined Annual Income</div>
+        <div class="summary-amount">$0</div>
+        <div class="summary-detail">
+          <div>$0/mo</div>
+          <div style="font-size: 10px; color: #b8893b; margin-top: 4px;">Drives support allocation</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Symmetrical Two-Column Income Analysis -->
+    <div class="two-column">
+      <!-- PARTY A -->
+      <div>
+        <div class="panel">
+          <div class="panel-title">💰 Party A — Income Sources</div>
+
+          <!-- Available Income Types -->
+          <div style="margin-bottom: 16px;">
+            <div style="font-size: 10px; font-weight: 700; text-transform: uppercase; color: #7a8a9a; margin-bottom: 8px;">Add income type:</div>
+            <div class="income-types">
+              <div class="income-type-badge" onclick="addIncomeSource('partyA', 'w2')">W-2 / Salary</div>
+              <div class="income-type-badge" onclick="addIncomeSource('partyA', 'bonus')">Bonus</div>
+              <div class="income-type-badge" onclick="addIncomeSource('partyA', 'rsu')">RSU / Equity</div>
+              <div class="income-type-badge" onclick="addIncomeSource('partyA', 'selfemployment')">Self-Employment</div>
+              <div class="income-type-badge" onclick="addIncomeSource('partyA', 'investment')">Investment Income</div>
+              <div class="income-type-badge" onclick="addIncomeSource('partyA', 'rental')">Rental Income</div>
+              <div class="income-type-badge" onclick="addIncomeSource('partyA', '1099')">1099 / Contract</div>
+              <div class="income-type-badge" onclick="addIncomeSource('partyA', 'unemployment')">Unemployment</div>
+              <div class="income-type-badge" onclick="addIncomeSource('partyA', 'socialsecurity')">Social Security</div>
+              <div class="income-type-badge" onclick="addIncomeSource('partyA', 'spousal')">Spousal Support (Other)</div>
+              <div class="income-type-badge" onclick="addIncomeSource('partyA', 'child')">Child Support (Received)</div>
+              <div class="income-type-badge" onclick="addIncomeSource('partyA', 'other')">Other Income</div>
+            </div>
+          </div>
+
+          <!-- Income Sources Container -->
+          <div id="partyA-sources">
+            <div style="font-size: 11px; color: #7a8a9a; padding: 16px; text-align: center; background: #f9f7f3; border-radius: 4px;">
+              No income sources added yet · Click above to add
+            </div>
+          </div>
+
+          <!-- Methodology Selection -->
+          <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid #e0e7ff;">
+            <div style="font-size: 12px; font-weight: 700; color: #1c3f66; margin-bottom: 8px;">Selected imputation basis:</div>
+            <div class="collapsible-section">
+              <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                <span>📋 Methodology & Basis Selection</span>
+                <span class="collapsible-toggle">▼</span>
+              </div>
+              <div class="collapsible-body">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;">
+                  <label style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: #2b3a4c; cursor: pointer;">
+                    <input type="radio" name="partyA-method" value="documented" /> Documented (tax/paystubs)
+                  </label>
+                  <label style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: #2b3a4c; cursor: pointer;">
+                    <input type="radio" name="partyA-method" value="historical" /> Historical average (2-3 yr)
+                  </label>
+                  <label style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: #2b3a4c; cursor: pointer;">
+                    <input type="radio" name="partyA-method" value="vocational" /> Vocational / earning capacity
+                  </label>
+                  <label style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: #2b3a4c; cursor: pointer;">
+                    <input type="radio" name="partyA-method" value="runrate" /> Run-rate / current period
+                  </label>
+                  <label style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: #2b3a4c; cursor: pointer;">
+                    <input type="radio" name="partyA-method" value="bankdeposit" /> Bank deposit analysis
+                  </label>
+                  <label style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: #2b3a4c; cursor: pointer;">
+                    <input type="radio" name="partyA-method" value="custom" /> Custom basis (explain below)
+                  </label>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 4px;">
+                  <label style="font-size: 11px; font-weight: 600; color: #1c3f66;">Basis explanation & supporting documents</label>
+                  <textarea style="padding: 8px; border: 1px solid #d4dce8; border-radius: 4px; font-size: 11px; min-height: 60px; font-family: monospace;" placeholder="Enter rationale for selected basis..."></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PARTY B -->
+      <div>
+        <div class="panel">
+          <div class="panel-title">💰 Party B — Income Sources</div>
+
+          <!-- Available Income Types -->
+          <div style="margin-bottom: 16px;">
+            <div style="font-size: 10px; font-weight: 700; text-transform: uppercase; color: #7a8a9a; margin-bottom: 8px;">Add income type:</div>
+            <div class="income-types">
+              <div class="income-type-badge" onclick="addIncomeSource('partyB', 'w2')">W-2 / Salary</div>
+              <div class="income-type-badge" onclick="addIncomeSource('partyB', 'bonus')">Bonus</div>
+              <div class="income-type-badge" onclick="addIncomeSource('partyB', 'rsu')">RSU / Equity</div>
+              <div class="income-type-badge" onclick="addIncomeSource('partyB', 'selfemployment')">Self-Employment</div>
+              <div class="income-type-badge" onclick="addIncomeSource('partyB', 'investment')">Investment Income</div>
+              <div class="income-type-badge" onclick="addIncomeSource('partyB', 'rental')">Rental Income</div>
+              <div class="income-type-badge" onclick="addIncomeSource('partyB', '1099')">1099 / Contract</div>
+              <div class="income-type-badge" onclick="addIncomeSource('partyB', 'unemployment')">Unemployment</div>
+              <div class="income-type-badge" onclick="addIncomeSource('partyB', 'socialsecurity')">Social Security</div>
+              <div class="income-type-badge" onclick="addIncomeSource('partyB', 'spousal')">Spousal Support (Other)</div>
+              <div class="income-type-badge" onclick="addIncomeSource('partyB', 'child')">Child Support (Received)</div>
+              <div class="income-type-badge" onclick="addIncomeSource('partyB', 'other')">Other Income</div>
+            </div>
+          </div>
+
+          <!-- Income Sources Container -->
+          <div id="partyB-sources">
+            <div style="font-size: 11px; color: #7a8a9a; padding: 16px; text-align: center; background: #f9f7f3; border-radius: 4px;">
+              No income sources added yet · Click above to add
+            </div>
+          </div>
+
+          <!-- Methodology Selection -->
+          <div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid #e0e7ff;">
+            <div style="font-size: 12px; font-weight: 700; color: #1c3f66; margin-bottom: 8px;">Selected imputation basis:</div>
+            <div class="collapsible-section">
+              <div class="collapsible-header" onclick="toggleCollapsible(this)">
+                <span>📋 Methodology & Basis Selection</span>
+                <span class="collapsible-toggle">▼</span>
+              </div>
+              <div class="collapsible-body">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px;">
+                  <label style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: #2b3a4c; cursor: pointer;">
+                    <input type="radio" name="partyB-method" value="documented" /> Documented (tax/paystubs)
+                  </label>
+                  <label style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: #2b3a4c; cursor: pointer;">
+                    <input type="radio" name="partyB-method" value="historical" /> Historical average (2-3 yr)
+                  </label>
+                  <label style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: #2b3a4c; cursor: pointer;">
+                    <input type="radio" name="partyB-method" value="vocational" /> Vocational / earning capacity
+                  </label>
+                  <label style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: #2b3a4c; cursor: pointer;">
+                    <input type="radio" name="partyB-method" value="runrate" /> Run-rate / current period
+                  </label>
+                  <label style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: #2b3a4c; cursor: pointer;">
+                    <input type="radio" name="partyB-method" value="bankdeposit" /> Bank deposit analysis
+                  </label>
+                  <label style="display: flex; align-items: center; gap: 6px; font-size: 11px; color: #2b3a4c; cursor: pointer;">
+                    <input type="radio" name="partyB-method" value="custom" /> Custom basis (explain below)
+                  </label>
+                </div>
+                <div style="display: flex; flex-direction: column; gap: 4px;">
+                  <label style="font-size: 11px; font-weight: 600; color: #1c3f66;">Basis explanation & supporting documents</label>
+                  <textarea style="padding: 8px; border: 1px solid #d4dce8; border-radius: 4px; font-size: 11px; min-height: 60px; font-family: monospace;" placeholder="Enter rationale for selected basis..."></textarea>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Document & Questionnaire Integration -->
+    <div class="panel">
+      <div class="panel-title">📎 Document & Questionnaire Integration</div>
+
+      <div class="collapsible-section">
+        <div class="collapsible-header" onclick="toggleCollapsible(this)">
+          <span>Party A — Linked Documents & Responses</span>
+          <span class="collapsible-toggle">▼</span>
+        </div>
+        <div class="collapsible-body">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
+            <div style="padding: 12px; border: 1px solid #d7e0ec; border-radius: 8px;">
+              <div style="font-size: 11px; font-weight: 700; color: #1c3f66; margin-bottom: 4px;">Financial Questionnaire</div>
+              <div style="font-size: 10px; color: #7a8a9a;">Completed [date]</div>
+              <button class="action-btn" style="margin-top: 8px;">View</button>
+            </div>
+            <div style="padding: 12px; border: 1px solid #d7e0ec; border-radius: 8px;">
+              <div style="font-size: 11px; font-weight: 700; color: #1c3f66; margin-bottom: 4px;">2024 Tax Return (1040)</div>
+              <div style="font-size: 10px; color: #7a8a9a;">Uploaded [date]</div>
+              <button class="action-btn" style="margin-top: 8px;">View</button>
+            </div>
+            <div style="padding: 12px; border: 1px solid #d7e0ec; border-radius: 8px;">
+              <div style="font-size: 11px; font-weight: 700; color: #1c3f66; margin-bottom: 4px;">YTD Paystubs</div>
+              <div style="font-size: 10px; color: #7a8a9a;">3 documents</div>
+              <button class="action-btn" style="margin-top: 8px;">View</button>
+            </div>
+            <div style="padding: 12px; border: 1px solid #d7e0ec; border-radius: 8px; background: #f4fbf7;">
+              <div style="font-size: 11px; font-weight: 700; color: #1c6b52; margin-bottom: 4px;">+ Attach Document</div>
+              <div style="font-size: 10px; color: #7a8a9a;">or link questionnaire response</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="collapsible-section">
+        <div class="collapsible-header" onclick="toggleCollapsible(this)">
+          <span>Party B — Linked Documents & Responses</span>
+          <span class="collapsible-toggle">▼</span>
+        </div>
+        <div class="collapsible-body">
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px;">
+            <div style="padding: 12px; border: 1px solid #d7e0ec; border-radius: 8px;">
+              <div style="font-size: 11px; font-weight: 700; color: #1c3f66; margin-bottom: 4px;">Financial Questionnaire</div>
+              <div style="font-size: 10px; color: #7a8a9a;">Completed [date]</div>
+              <button class="action-btn" style="margin-top: 8px;">View</button>
+            </div>
+            <div style="padding: 12px; border: 1px solid #d7e0ec; border-radius: 8px; background: #f4fbf7;">
+              <div style="font-size: 11px; font-weight: 700; color: #1c6b52; margin-bottom: 4px;">+ Attach Document</div>
+              <div style="font-size: 10px; color: #7a8a9a;">or link questionnaire response</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Comparison & Analysis -->
+    <div class="panel">
+      <div class="panel-title">📊 Comparative Analysis</div>
+
+      <table class="comparison-table">
+        <tr>
+          <th>Income Category</th>
+          <th class="amount">Party A</th>
+          <th class="amount">Party B</th>
+          <th class="amount">Variance</th>
+          <th style="text-align: center; width: 50px;">Notes</th>
+        </tr>
+        <tr>
+          <td><strong>Total Income</strong></td>
+          <td class="amount">$0</td>
+          <td class="amount">$0</td>
+          <td class="amount">$0</td>
+          <td style="text-align: center;">—</td>
+        </tr>
+        <tr>
+          <td><strong>Income Share (%)</strong></td>
+          <td class="amount">0%</td>
+          <td class="amount">0%</td>
+          <td class="amount">—</td>
+          <td style="text-align: center;">—</td>
+        </tr>
+      </table>
+
+      <div class="note" style="margin-top: 16px;">
+        <strong>Key Discrepancies to Address:</strong><br>
+        • Does Party A's claimed income align with tax returns?<br>
+        • Are there undisclosed income sources in bank deposits?<br>
+        • Does Party B have earning capacity beyond stated income?<br>
+        • Are any income sources disputed or subject to different treatment?
+      </div>
+    </div>
+
+    <!-- Imputation Methodologies Reference -->
+    <div class="panel">
+      <div class="panel-title">🎯 Imputation Methodologies (Reference)</div>
+
+      <div class="methodology-grid">
+        <div class="methodology-card">
+          <div class="methodology-title">1. Documented Income</div>
+          <div class="methodology-desc">Tax returns, W-2s, paystubs as filed. Most conservative. When income is clearly documented and verifiable.</div>
+        </div>
+        <div class="methodology-card">
+          <div class="methodology-title">2. Historical Average</div>
+          <div class="methodology-desc">Average 2–3 years of tax returns. For variable income (bonus, commission, self-employment).</div>
+        </div>
+        <div class="methodology-card">
+          <div class="methodology-title">3. Earning Capacity</div>
+          <div class="methodology-desc">Vocational expert assessment. When party is voluntarily underemployed or unemployed.</div>
+        </div>
+        <div class="methodology-card">
+          <div class="methodology-title">4. Business Income</div>
+          <div class="methodology-desc">Reconstruct from P&L, bank deposits, tax returns. Adjust for add-backs and discretionary expenses.</div>
+        </div>
+        <div class="methodology-card">
+          <div class="methodology-title">5. Bank Deposit Analysis</div>
+          <div class="methodology-desc">When documentation is poor: analyze 12-month deposits to identify undisclosed income streams.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <p><strong>Veritas Income Engine — Flexible Template</strong></p>
+      <p>Unlimited income sources · document-backed · comparative analysis · any income type supported</p>
+    </div>
+  </div>
+
+  <script>
+    function toggleCollapsible(header) {
+      header.classList.toggle('open');
+      const body = header.nextElementSibling;
+      body.classList.toggle('open');
+    }
+
+    function addIncomeSource(party, type) {
+      const container = document.getElementById(`${party}-sources`);
+
+      const sourceId = `${party}-${type}-${Date.now()}`;
+      const typeLabels = {
+        'w2': 'W-2 / Salary',
+        'bonus': 'Bonus',
+        'rsu': 'RSU / Equity',
+        'selfemployment': 'Self-Employment',
+        'investment': 'Investment Income',
+        'rental': 'Rental Income',
+        '1099': '1099 / Contract',
+        'unemployment': 'Unemployment',
+        'socialsecurity': 'Social Security',
+        'spousal': 'Spousal Support (Other)',
+        'child': 'Child Support (Received)',
+        'other': 'Other Income'
+      };
+
+      const sourceHTML = `
+        <div class="income-source" id="${sourceId}">
+          <div class="source-head">
+            <div>
+              <span class="source-title">${typeLabels[type]}</span>
+              <span class="source-type">${type}</span>
+            </div>
+            <div class="source-actions">
+              <button class="action-btn" onclick="linkDocument('${sourceId}')">📎 Link Doc</button>
+              <button class="action-btn" onclick="removeSource('${sourceId}')">Remove</button>
+            </div>
+          </div>
+
+          <div class="source-grid">
+            <div class="source-row">
+              <label class="source-label">Annual Amount</label>
+              <input type="number" class="source-input" placeholder="0" min="0" />
+            </div>
+            <div class="source-row">
+              <label class="source-label">Frequency</label>
+              <select class="source-input">
+                <option>Annual</option>
+                <option>Monthly</option>
+                <option>Bi-weekly</option>
+                <option>Weekly</option>
+                <option>Quarterly</option>
+              </select>
+            </div>
+            <div class="source-row">
+              <label class="source-label">Status</label>
+              <select class="source-input">
+                <option>Active</option>
+                <option>Ending / In transition</option>
+                <option>Pending / Contingent</option>
+                <option>Disputed</option>
+              </select>
+            </div>
+            <div class="source-row">
+              <label class="source-label">Tax Treatment</label>
+              <select class="source-input">
+                <option>W-2 wages (subject to FICA)</option>
+                <option>1099 self-employment</option>
+                <option>Investment income (passive)</option>
+                <option>Qualifying / excluded</option>
+                <option>Disputed treatment</option>
+              </select>
+            </div>
+          </div>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <div class="source-row">
+              <label class="source-label">Evidence / Source Document</label>
+              <input type="text" class="source-input" placeholder="E.g., 2024 Tax Return, YTD Paystubs, 1040 Schedule C" />
+            </div>
+            <div class="source-row">
+              <label class="source-label">Notes / Methodology Basis</label>
+              <input type="text" class="source-input" placeholder="E.g., Documented, Disputed, Imputed, etc." />
+            </div>
+          </div>
+
+          <div class="source-note">
+            💡 Attach supporting documents via the "Link Doc" button above. This income source will cascade to AFI, spousal maintenance, and child support calculations.
+          </div>
+        </div>
+      `;
+
+      if (container.querySelector('[style*="text-align: center"]')) {
+        container.innerHTML = '';
+      }
+
+      container.insertAdjacentHTML('beforeend', sourceHTML);
+    }
+
+    function removeSource(sourceId) {
+      document.getElementById(sourceId).remove();
+      const containers = document.querySelectorAll('[id$="-sources"]');
+      containers.forEach(c => {
+        if (c.children.length === 0) {
+          c.innerHTML = '<div style="font-size: 11px; color: #7a8a9a; padding: 16px; text-align: center; background: #f9f7f3; border-radius: 4px;">No income sources added yet · Click above to add</div>';
+        }
+      });
+    }
+
+    function linkDocument(sourceId) {
+      alert('Document linking UI would appear here.\nSupports: Tax returns, paystubs, questionnaire responses, discovery documents, etc.');
+    }
+
+    console.log('Income Engine Template Loaded');
+    console.log('Ready for document integration and questionnaire linking');
+  </script>
+</body>
+</html>
