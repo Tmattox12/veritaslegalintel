@@ -8,6 +8,8 @@ const { initializeDatabase, getDatabase } = require('./db/schema');
 const AFITaxonomy = require('../afi-taxonomy');
 const bankStatementsRouter = require('./routes/bank-statements');
 const documentsRouter = require('./routes/documents');
+const documentExtractionRouter = require('./routes/document-extraction');
+const merchantMappingRouter = require('./routes/merchant-mapping');
 const { requireAuth, authEnabled, MODE } = require('./auth');
 
 const app = express();
@@ -15,6 +17,9 @@ const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
+
+// Serve static HTML files from root directory
+app.use(express.static(path.join(__dirname, '..')));
 
 // Report whether auth is enforced (frontend uses this to decide whether to show login)
 app.get('/api/auth-status', (req, res) => {
@@ -53,6 +58,8 @@ app.use(async (req, res, next) => {
 // Mount routes
 app.use('/api/matters/:matterId/bank-statements', bankStatementsRouter);
 app.use('/api/matters/:matterId/documents', documentsRouter);
+app.use('/api/matters/:matterId/merchants', merchantMappingRouter);
+app.use('/api/matters/:matterId', documentExtractionRouter);
 
 // Health check
 app.get('/api/health', (req, res) => {

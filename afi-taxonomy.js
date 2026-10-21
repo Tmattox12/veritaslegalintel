@@ -1,21 +1,25 @@
-/* Shared AFI-aligned expense taxonomy (Arizona).
+/* Arizona AFI-aligned expense taxonomy.
  *
- * One definition used by the statement parser, the AFI mapper UI and the
- * expense workbook, so a category means the same thing everywhere.
+ * Aligned with Arizona Supreme Court Form AFI (Affidavit of Financial Information)
+ * Used in child support and spousal maintenance cases per A.R.S. § 25-320 et seq.
  *
- * Structure mirrors the AFI sections a court actually reads:
- *   6  court-ordered support        - feeds the ability-to-pay analysis
- *   7  basic living expenses        - the only expenses treated as "needs"
- *   8  child-related expenses       - feeds the child support worksheet
- *   9  debts and obligations        - financial stability / ability to pay
- *   10 legal and case expenses      - may be allocated between the parties
- *   discretionary                   - lifestyle; NOT needs, kept separate so
- *                                     they cannot inflate a support claim
- *   excluded                        - courts reject these outright
+ * Structure mirrors the AFI sections as they appear on the official form:
+ *   1  Health Insurance Premiums         - mandatory disclosure
+ *   2  Childcare and School Age Care    - work-related childcare
+ *   3  Unreimbursed Medical/Dental/Vision - actual out-of-pocket
+ *   4  Tuition for Private/College      - education expenses
+ *   5  Rent or Mortgage Payment         - housing costs
+ *   6  Utilities                        - essential utilities
+ *   7  Transportation                   - vehicle and transit
+ *   8  Groceries and Household Items    - food and supplies
+ *   9  Court-Ordered Support Payments   - existing support obligations
+ *   10 Other Expenses                   - debts, legal, other
  *
- * afiLine is the roll-up into the eight inputs on afi-form-populator.html.
- * null means the category has no home on that form: it is still reported in
- * its own section, it just cannot be pushed into one of the eight boxes.
+ * Legal basis: Arizona Supreme Court Child Support Guidelines,
+ * A.R.S. § 25-320 (child support), A.R.S. § 25-319 (spousal maintenance).
+ *
+ * Categories not on the form (discretionary, excluded, transfers) are reported
+ * separately so they don't inflate support calculations.
  */
 (function (root, factory) {
   const api = factory();
@@ -25,125 +29,150 @@
   'use strict';
 
   const SECTIONS = [
-    { key: 'court_ordered', label: 'Court-Ordered Payments', afiSection: '6' },
-    { key: 'basic_living', label: 'Basic Living Expenses', afiSection: '7' },
-    { key: 'child_related', label: 'Child-Related Expenses', afiSection: '8' },
-    { key: 'debts', label: 'Debts & Financial Obligations', afiSection: '9' },
-    { key: 'legal', label: 'Legal & Case-Related Expenses', afiSection: '10' },
-    { key: 'discretionary', label: 'Discretionary / Lifestyle', afiSection: '7 (Misc)' },
-    { key: 'excluded', label: 'Excluded — not allowed in AFI', afiSection: null },
-    { key: 'non_expense', label: 'Not an expense', afiSection: null },
+    { key: 'health_insurance', label: 'Section 1: Health Insurance Premiums', afiSection: '1', legalBasis: 'A.R.S. § 25-320(A)(1)' },
+    { key: 'childcare', label: 'Section 2: Childcare & School Age Care', afiSection: '2', legalBasis: 'A.R.S. § 25-320(A)(2)' },
+    { key: 'medical_unreimbursed', label: 'Section 3: Unreimbursed Medical/Dental/Vision', afiSection: '3', legalBasis: 'A.R.S. § 25-320(A)(3)' },
+    { key: 'tuition', label: 'Section 4: Tuition (Private/College)', afiSection: '4', legalBasis: 'A.R.S. § 25-320(A)(4)' },
+    { key: 'housing', label: 'Section 5: Rent or Mortgage Payment', afiSection: '5', legalBasis: 'A.R.S. § 25-320(A)(5)' },
+    { key: 'utilities', label: 'Section 6: Utilities', afiSection: '6', legalBasis: 'A.R.S. § 25-320(A)(6)' },
+    { key: 'transportation', label: 'Section 7: Transportation', afiSection: '7', legalBasis: 'A.R.S. § 25-320(A)(7)' },
+    { key: 'food_household', label: 'Section 8: Groceries & Household Items', afiSection: '8', legalBasis: 'A.R.S. § 25-320(A)(8)' },
+    { key: 'court_ordered', label: 'Section 9: Court-Ordered Support Payments', afiSection: '9', legalBasis: 'A.R.S. § 25-320(A)(9)' },
+    { key: 'other_expenses', label: 'Section 10: Other Expenses', afiSection: '10', legalBasis: 'A.R.S. § 25-320(A)(10)' },
+    { key: 'discretionary', label: 'Discretionary / Lifestyle Expenses', afiSection: null, legalBasis: 'Not reportable on AFI' },
+    { key: 'excluded', label: 'Excluded — Not Allowed in Support Calc', afiSection: null, legalBasis: 'A.R.S. § 25-320(B)' },
+    { key: 'non_expense', label: 'Not an Expense (Income / Transfers)', afiSection: null, legalBasis: null },
   ];
 
   // treatment drives how a total may be used:
-  //   need          - supports a claim of financial need
+  //   need          - supports a claim of financial need (basic living)
   //   support       - court-ordered support in or out
   //   debt          - obligation affecting ability to pay
   //   legal         - case cost, may be allocated
   //   discretionary - lifestyle, reported but never a "need"
   //   excluded      - must not appear in AFI totals
   //   none          - income, transfers: not spending at all
-  const C = (code, section, subsection, label, afiLine, treatment) =>
-    ({ code, section, subsection, label, afiLine, treatment });
+  const C = (code, section, subsection, label, treatment) =>
+    ({ code, section, subsection, label, treatment });
 
   const CATEGORIES = [
-    // ---- Section 6: court-ordered payments -------------------------------
-    C('child_support_paid', 'court_ordered', 'Child Support', 'Child support paid', null, 'support'),
-    C('child_support_received', 'court_ordered', 'Child Support', 'Child support received', null, 'support'),
-    C('child_support_arrears', 'court_ordered', 'Child Support', 'Child support arrears', null, 'support'),
-    C('child_support_addon', 'court_ordered', 'Child Support', 'Add-on reimbursement (medical/childcare/education)', null, 'support'),
-    C('spousal_paid', 'court_ordered', 'Spousal Maintenance', 'Spousal maintenance paid', null, 'support'),
-    C('spousal_received', 'court_ordered', 'Spousal Maintenance', 'Spousal maintenance received', null, 'support'),
-    C('spousal_arrears', 'court_ordered', 'Spousal Maintenance', 'Spousal maintenance arrears', null, 'support'),
+    // ---- Section 1: Health Insurance Premiums ----------------------------
+    C('health_self_premium', 'health_insurance', 'Self', 'Your health insurance premium', 'need'),
+    C('health_spouse_premium', 'health_insurance', 'Spouse', 'Spouse/other parent health insurance premium', 'need'),
+    C('health_child_premium', 'health_insurance', 'Children', "Children's health insurance premium", 'need'),
+    C('dental_vision_self', 'health_insurance', 'Self', 'Dental / vision insurance (self)', 'need'),
+    C('dental_vision_child', 'health_insurance', 'Children', "Dental / vision insurance (children's)", 'need'),
 
-    // ---- Section 7: basic living expenses (the "needs") -------------------
-    C('housing_rent_mortgage', 'basic_living', 'Housing', 'Rent / mortgage', 5, 'need'),
-    C('housing_property_tax', 'basic_living', 'Housing', 'Property taxes', 5, 'need'),
-    C('housing_insurance', 'basic_living', 'Housing', "Homeowner's insurance", 5, 'need'),
-    C('housing_hoa', 'basic_living', 'Housing', 'HOA fees', 5, 'need'),
-    C('housing_maintenance', 'basic_living', 'Housing', 'Repairs & maintenance', 5, 'need'),
-    C('utilities_electric', 'basic_living', 'Utilities', 'Electricity', 6, 'need'),
-    C('utilities_gas', 'basic_living', 'Utilities', 'Natural gas', 6, 'need'),
-    C('utilities_water', 'basic_living', 'Utilities', 'Water / sewer / garbage', 6, 'need'),
-    C('utilities_internet', 'basic_living', 'Utilities', 'Internet', 6, 'need'),
-    C('utilities_phone', 'basic_living', 'Utilities', 'Mobile phone', 6, 'need'),
-    C('utilities_basic_cable', 'basic_living', 'Utilities', 'Basic cable (news/communication)', 6, 'need'),
-    C('food_groceries', 'basic_living', 'Food & Household', 'Groceries', 8, 'need'),
-    C('food_household_supplies', 'basic_living', 'Food & Household', 'Household cleaning supplies', 8, 'need'),
-    C('food_school_lunch', 'basic_living', 'Food & Household', 'School lunches', 8, 'need'),
-    C('transport_car_payment', 'basic_living', 'Transportation', 'Car payment', 7, 'need'),
-    C('transport_car_insurance', 'basic_living', 'Transportation', 'Car insurance', 7, 'need'),
-    C('transport_fuel', 'basic_living', 'Transportation', 'Fuel', 7, 'need'),
-    C('transport_maintenance', 'basic_living', 'Transportation', 'Repairs & maintenance', 7, 'need'),
-    C('transport_parking_transit', 'basic_living', 'Transportation', 'Parking / transit', 7, 'need'),
-    C('medical_premium', 'basic_living', 'Medical', 'Health insurance premium', 1, 'need'),
-    C('medical_dental_vision_premium', 'basic_living', 'Medical', 'Dental / vision premium', 1, 'need'),
-    C('medical_unreimbursed', 'basic_living', 'Medical', 'Unreimbursed medical/dental/vision', 3, 'need'),
-    C('medical_prescriptions', 'basic_living', 'Medical', 'Prescriptions', 3, 'need'),
-    // Clothing and personal necessities are Section 7 needs with no box on the
-    // eight-line form; they report in their own section rather than vanish.
-    C('clothing', 'basic_living', 'Clothing', 'Clothing', null, 'need'),
-    C('clothing_laundry', 'basic_living', 'Clothing', 'Laundry / dry cleaning', null, 'need'),
-    C('personal_grooming', 'basic_living', 'Personal Necessities', 'Basic grooming (haircuts)', null, 'need'),
-    C('personal_hygiene', 'basic_living', 'Personal Necessities', 'Personal hygiene items', null, 'need'),
+    // ---- Section 2: Childcare & School Age Care ---------------------------
+    C('childcare_daycare', 'childcare', 'Work-Related Childcare', 'Daycare / preschool', 'need'),
+    C('childcare_afterschool', 'childcare', 'Work-Related Childcare', 'After-school care / latchkey', 'need'),
+    C('childcare_summer', 'childcare', 'Work-Related Childcare', 'Summer camp / care', 'need'),
+    C('childcare_babysitter', 'childcare', 'Work-Related Childcare', 'Babysitting (work-related)', 'need'),
+    C('childcare_nanny', 'childcare', 'Work-Related Childcare', 'Nanny / in-home care', 'need'),
 
-    // ---- Section 8: child-related ----------------------------------------
-    C('child_health_premium', 'child_related', 'Health & Medical', "Child's health insurance premium", 1, 'need'),
-    C('child_medical_unreimbursed', 'child_related', 'Health & Medical', 'Unreimbursed child medical/dental/vision', 3, 'need'),
-    C('child_therapy', 'child_related', 'Health & Medical', 'Therapy / special needs services', 3, 'need'),
-    C('childcare_daycare', 'child_related', 'Childcare', 'Daycare', 2, 'need'),
-    C('childcare_afterschool', 'child_related', 'Childcare', 'After-school care', 2, 'need'),
-    C('childcare_babysitting', 'child_related', 'Childcare', 'Babysitting (work-related)', 2, 'need'),
-    C('education_tuition', 'child_related', 'Education', 'Tuition', 4, 'need'),
-    C('education_books', 'child_related', 'Education', 'Books', 4, 'need'),
-    C('education_technology', 'child_related', 'Education', 'Technology', 4, 'need'),
-    C('education_supplies', 'child_related', 'Education', 'School supplies', 4, 'need'),
-    C('education_fees', 'child_related', 'Education', 'School fees', 4, 'need'),
-    C('child_activities', 'child_related', 'Activities', 'Sports / clubs / lessons / camps', null, 'need'),
-    C('parenting_time_travel', 'child_related', 'Parenting Time', 'Travel for exchanges', null, 'need'),
-    C('parenting_supervised', 'child_related', 'Parenting Time', 'Supervised visitation fees', null, 'need'),
+    // ---- Section 3: Unreimbursed Medical/Dental/Vision --------------------
+    C('medical_unreimbursed_self', 'medical_unreimbursed', 'Self', 'Unreimbursed medical / dental / vision (self)', 'need'),
+    C('medical_unreimbursed_child', 'medical_unreimbursed', 'Children', 'Unreimbursed medical / dental / vision (children)', 'need'),
+    C('prescriptions_self', 'medical_unreimbursed', 'Self', 'Prescriptions and medications (self)', 'need'),
+    C('prescriptions_child', 'medical_unreimbursed', 'Children', 'Prescriptions and medications (children)', 'need'),
+    C('therapy_child', 'medical_unreimbursed', 'Children', 'Therapy / special needs services', 'need'),
+    C('medical_equipment', 'medical_unreimbursed', 'Medical Equipment', 'Medical equipment / supplies', 'need'),
 
-    // ---- Section 9: debts -------------------------------------------------
-    C('debt_mortgage', 'debts', 'Secured', 'Mortgage', null, 'debt'),
-    C('debt_auto_loan', 'debts', 'Secured', 'Auto loan', null, 'debt'),
-    C('debt_heloc', 'debts', 'Secured', 'HELOC', null, 'debt'),
-    C('debt_credit_card', 'debts', 'Unsecured', 'Credit card', null, 'debt'),
-    C('debt_personal_loan', 'debts', 'Unsecured', 'Personal loan', null, 'debt'),
-    C('debt_medical', 'debts', 'Unsecured', 'Medical debt', null, 'debt'),
-    C('debt_student_loan', 'debts', 'Student Loans', 'Student loan', null, 'debt'),
-    C('debt_garnishment', 'debts', 'Court-Ordered', 'Garnishment / judgment / restitution', null, 'debt'),
+    // ---- Section 4: Tuition (Private School / College) --------------------
+    C('tuition_private_elementary', 'tuition', 'Private School', 'Private elementary school tuition', 'need'),
+    C('tuition_private_secondary', 'tuition', 'Private School', 'Private secondary school tuition', 'need'),
+    C('tuition_college', 'tuition', 'College/University', 'College / university tuition', 'need'),
+    C('tuition_vocational', 'tuition', 'Vocational/Technical', 'Vocational / technical school tuition', 'need'),
+    C('school_books_supplies', 'tuition', 'School Expenses', 'Books and school supplies', 'need'),
+    C('school_technology', 'tuition', 'School Expenses', 'Technology / computers', 'need'),
+    C('school_fees', 'tuition', 'School Expenses', 'School fees and activities', 'need'),
 
-    // ---- Section 10: legal ------------------------------------------------
-    C('legal_attorney_fees', 'legal', 'Attorney Fees', 'Attorney fees / retainer', null, 'legal'),
-    C('legal_expert_fees', 'legal', 'Attorney Fees', 'Expert witness fees', null, 'legal'),
-    C('legal_court_costs', 'legal', 'Court Costs', 'Filing / mediation / parenting coordinator', null, 'legal'),
-    C('legal_professional', 'legal', 'Professional Services', 'Forensic accountant / evaluator / valuation', null, 'legal'),
+    // ---- Section 5: Rent or Mortgage Payment ------------------------------
+    C('housing_rent', 'housing', 'Housing Payment', 'Rent payment', 'need'),
+    C('housing_mortgage', 'housing', 'Housing Payment', 'Mortgage payment', 'need'),
+    C('housing_property_tax', 'housing', 'Housing Expenses', 'Property taxes', 'need'),
+    C('housing_insurance', 'housing', 'Housing Expenses', "Homeowner's / renter's insurance", 'need'),
+    C('housing_hoa', 'housing', 'Housing Expenses', 'HOA / condo fees', 'need'),
+    C('housing_maintenance_repair', 'housing', 'Housing Expenses', 'Repairs and maintenance', 'need'),
 
-    // ---- Discretionary / lifestyle ---------------------------------------
-    C('disc_dining', 'discretionary', 'Entertainment', 'Dining out', null, 'discretionary'),
-    C('disc_entertainment', 'discretionary', 'Entertainment', 'Movies / concerts / events', null, 'discretionary'),
-    C('disc_travel', 'discretionary', 'Entertainment', 'Vacations / travel', null, 'discretionary'),
-    C('disc_streaming', 'discretionary', 'Subscriptions', 'Streaming services', null, 'discretionary'),
-    C('disc_gym', 'discretionary', 'Subscriptions', 'Gym membership', null, 'discretionary'),
-    C('disc_subscription_other', 'discretionary', 'Subscriptions', 'Other subscriptions', null, 'discretionary'),
-    C('disc_pets', 'discretionary', 'Pets', 'Pet food / vet / grooming', null, 'discretionary'),
-    C('disc_beauty', 'discretionary', 'Personal Lifestyle', 'Beauty / spa treatments', null, 'discretionary'),
-    C('disc_alcohol_tobacco', 'discretionary', 'Personal Lifestyle', 'Alcohol / tobacco', null, 'discretionary'),
-    C('disc_gifts', 'discretionary', 'Gifts', 'Gifts / holiday spending', null, 'discretionary'),
-    C('disc_shopping', 'discretionary', 'Personal Lifestyle', 'General retail / shopping', null, 'discretionary'),
+    // ---- Section 6: Utilities ---------------------------------------------
+    C('utilities_electric', 'utilities', 'Essential Utilities', 'Electricity', 'need'),
+    C('utilities_gas', 'utilities', 'Essential Utilities', 'Natural gas', 'need'),
+    C('utilities_water_sewer', 'utilities', 'Essential Utilities', 'Water / sewer / garbage', 'need'),
+    C('utilities_internet', 'utilities', 'Essential Utilities', 'Internet / data', 'need'),
+    C('utilities_phone', 'utilities', 'Essential Utilities', 'Cell phone / mobile', 'need'),
+    C('utilities_basic_cable', 'utilities', 'Essential Utilities', 'Basic cable (news/communication only)', 'need'),
 
-    // ---- Excluded ---------------------------------------------------------
-    C('excl_business', 'excluded', 'Business Expenses', 'Business expense', null, 'excluded'),
-    C('excl_non_party', 'excluded', 'Non-Party Individuals', 'Expense for a non-party', null, 'excluded'),
-    C('excl_luxury', 'excluded', 'Luxury Items', 'Luxury purchase', null, 'excluded'),
+    // ---- Section 7: Transportation ----------------------------------------
+    C('transport_car_payment', 'transportation', 'Vehicle Payment', 'Car payment / lease', 'need'),
+    C('transport_car_insurance', 'transportation', 'Vehicle Expenses', 'Auto insurance', 'need'),
+    C('transport_fuel', 'transportation', 'Vehicle Expenses', 'Fuel / gasoline', 'need'),
+    C('transport_maintenance_repair', 'transportation', 'Vehicle Expenses', 'Repairs and maintenance', 'need'),
+    C('transport_registration_license', 'transportation', 'Vehicle Expenses', 'Vehicle registration / license', 'need'),
+    C('transport_public_transit', 'transportation', 'Alternative Transportation', 'Public transportation / transit', 'need'),
+    C('transport_parking', 'transportation', 'Alternative Transportation', 'Parking', 'need'),
 
-    // ---- Not spending -----------------------------------------------------
-    C('employment_income', 'non_expense', 'Income', 'Employment income', null, 'none'),
-    C('other_income', 'non_expense', 'Income', 'Other income', null, 'none'),
-    C('transfer', 'non_expense', 'Transfer', 'Account transfer', null, 'none'),
-    C('investment_transfer', 'non_expense', 'Cash / Investments', 'Cash / investment account transfer', null, 'none'),
-    C('cash_withdrawal', 'non_expense', 'Cash', 'Cash withdrawal (purpose untraced)', null, 'none'),
-    C('tax', 'non_expense', 'Tax', 'Tax payment / refund', null, 'none'),
+    // ---- Section 8: Groceries & Household Items ---------------------------
+    C('food_groceries', 'food_household', 'Food', 'Groceries', 'need'),
+    C('food_school_lunch', 'food_household', 'Food', 'School lunches', 'need'),
+    C('household_supplies', 'food_household', 'Household Items', 'Household cleaning supplies', 'need'),
+    C('household_paper_products', 'food_household', 'Household Items', 'Paper products / toiletries', 'need'),
+    C('laundry_clothing', 'food_household', 'Clothing Care', 'Laundry / dry cleaning', 'need'),
+    C('clothing_replacement', 'food_household', 'Clothing', 'Clothing (replacement / maintenance)', 'need'),
+
+    // ---- Section 9: Court-Ordered Support Payments ------------------------
+    C('support_child_paid', 'court_ordered', 'Child Support', 'Child support paid', 'support'),
+    C('support_child_received', 'court_ordered', 'Child Support', 'Child support received', 'support'),
+    C('support_child_arrears', 'court_ordered', 'Child Support', 'Child support arrears / past due', 'support'),
+    C('support_spousal_paid', 'court_ordered', 'Spousal Maintenance', 'Spousal maintenance / alimony paid', 'support'),
+    C('support_spousal_received', 'court_ordered', 'Spousal Maintenance', 'Spousal maintenance / alimony received', 'support'),
+    C('support_spousal_arrears', 'court_ordered', 'Spousal Maintenance', 'Spousal maintenance arrears / past due', 'support'),
+
+    // ---- Section 10: Other Expenses ----------------------------------------
+    C('debt_auto_loan', 'other_expenses', 'Secured Debt', 'Auto loan payment', 'debt'),
+    C('debt_heloc', 'other_expenses', 'Secured Debt', 'HELOC / home equity loan payment', 'debt'),
+    C('debt_mortgage_2nd', 'other_expenses', 'Secured Debt', 'Second mortgage / junior lien', 'debt'),
+    C('debt_credit_card', 'other_expenses', 'Unsecured Debt', 'Credit card payment', 'debt'),
+    C('debt_personal_loan', 'other_expenses', 'Unsecured Debt', 'Personal loan payment', 'debt'),
+    C('debt_medical', 'other_expenses', 'Unsecured Debt', 'Medical debt / collection', 'debt'),
+    C('debt_student_loan', 'other_expenses', 'Student Loans', 'Student loan payment', 'debt'),
+    C('debt_garnishment', 'other_expenses', 'Court-Ordered Debt', 'Wage garnishment / court judgment', 'debt'),
+    C('legal_attorney_fees', 'other_expenses', 'Legal Expenses', 'Attorney fees / legal retainer', 'legal'),
+    C('legal_expert_witness', 'other_expenses', 'Legal Expenses', 'Expert witness / appraisal fees', 'legal'),
+    C('legal_court_costs', 'other_expenses', 'Legal Expenses', 'Court filing / mediation / evaluation fees', 'legal'),
+
+    // ---- Discretionary / Lifestyle Expenses --------------------------------
+    C('disc_dining_out', 'discretionary', 'Entertainment & Dining', 'Dining out / restaurants', 'discretionary'),
+    C('disc_entertainment', 'discretionary', 'Entertainment & Dining', 'Movies / concerts / events', 'discretionary'),
+    C('disc_vacation_travel', 'discretionary', 'Travel & Recreation', 'Vacations / leisure travel', 'discretionary'),
+    C('disc_streaming', 'discretionary', 'Subscriptions', 'Streaming services (entertainment)', 'discretionary'),
+    C('disc_gym_fitness', 'discretionary', 'Subscriptions', 'Gym / fitness membership', 'discretionary'),
+    C('disc_subscriptions', 'discretionary', 'Subscriptions', 'Other subscriptions / memberships', 'discretionary'),
+    C('disc_pets', 'discretionary', 'Pets', 'Pet food / veterinary / grooming', 'discretionary'),
+    C('disc_beauty_spa', 'discretionary', 'Personal Lifestyle', 'Beauty / spa / salon services', 'discretionary'),
+    C('disc_alcohol_tobacco', 'discretionary', 'Personal Lifestyle', 'Alcohol / tobacco / cannabis', 'discretionary'),
+    C('disc_shopping', 'discretionary', 'Personal Lifestyle', 'General retail / shopping', 'discretionary'),
+    C('disc_gifts', 'discretionary', 'Gifts & Charity', 'Gifts / presents / holiday spending', 'discretionary'),
+
+    // ---- Excluded - NOT Allowed in Support Calculations -------------------
+    C('excl_business_expense', 'excluded', 'Business', 'Business expense / business tax', 'excluded'),
+    C('excl_business_investment', 'excluded', 'Business', 'Business investment / capital expenditure', 'excluded'),
+    C('excl_non_party_expense', 'excluded', 'Non-Party', 'Expense for non-party individual', 'excluded'),
+    C('excl_luxury_non_essential', 'excluded', 'Luxury Items', 'Luxury / non-essential purchase', 'excluded'),
+    C('excl_investment_contribution', 'excluded', 'Investments', 'Investment / retirement contribution', 'excluded'),
+
+    // ---- Not Spending (Income, Transfers, Non-Expense Items) ---------------
+    C('income_wages', 'non_expense', 'Income', 'Wages / salary / employment income', 'none'),
+    C('income_bonus', 'non_expense', 'Income', 'Bonus / commission', 'none'),
+    C('income_self_employed', 'non_expense', 'Income', 'Self-employment income', 'none'),
+    C('income_investment', 'non_expense', 'Income', 'Dividend / interest / investment income', 'none'),
+    C('income_other', 'non_expense', 'Income', 'Other income source', 'none'),
+    C('transfer_account', 'non_expense', 'Transfers', 'Transfer between own accounts', 'none'),
+    C('transfer_investment', 'non_expense', 'Transfers', 'Investment transfer / reallocation', 'none'),
+    C('transfer_other_person', 'non_expense', 'Transfers', 'Transfer to other person (non-support)', 'none'),
+    C('cash_withdrawal', 'non_expense', 'Cash', 'Cash withdrawal (purpose unknown)', 'none'),
+    C('tax_payment', 'non_expense', 'Tax', 'Income tax payment / withholding', 'none'),
+    C('tax_refund', 'non_expense', 'Tax', 'Tax refund / credit', 'none'),
   ];
 
   const BY_CODE = CATEGORIES.reduce((m, c) => { m[c.code] = c; return m; }, {});
@@ -207,20 +236,20 @@
     // --- specific merchants seen in discovery, high confidence ---------------
     // QuikTrip prints as "QT 1234"; order ids like "*QT8SZ" must not match.
     [/(?:^|\s)qt\s+#?\s*\d|(?:^|\s)qt\s+outside\b/i, 'transport_fuel'],
-    [/\bmister\s*car\s*wash\b|\bcar\s*wash\b/i, 'transport_maintenance'],
-    [/\buber\s*\*?\s*trip\b|\blyft\b/i, 'transport_parking_transit'],
+    [/\bmister\s*car\s*wash\b|\bcar\s*wash\b/i, 'transport_maintenance_repair'],
+    [/\buber\s*\*?\s*trip\b|\blyft\b/i, 'transport_public_transit'],
     [/\bwaste\s*mgmt\b/i, 'utilities_water'],
-    [/\bswpestsolutions\b|\bpest\s*solutions\b/i, 'housing_maintenance'],
+    [/\bswpestsolutions\b|\bpest\s*solutions\b/i, 'housing_maintenance_repair'],
     [/\bsams\s*scan|\bwholefds\b|\bwm\s*supercenter\b/i, 'food_groceries'],
     [/\bbanner\s*(?:health|univ)|\brincon\s*asc\b|\bpathology\s*specialists\b|\bliver\s*health\b|\bkidney\s*institut|\blaboratory\s*corporation\b|\bchiropractic\b|\bphysical\s*medicin|\bm\.?d\.?,?\s*p\b|\bmychart\b/i, 'medical_unreimbursed'],
     [/\bbarber|\bgreat\s*clips\b|\bsupercuts\b|\bsport\s*clips\b/i, 'personal_grooming'],
     [/\bulta\b|\bsephora\b|\bthrivecausemetics\b/i, 'disc_beauty'],
     [/\btaekwondo\b|\bmartial\s*arts\b/i, 'child_activities'],
-    [/\bamphitheater\s*public\s*scho|\bpima\s*county\s*amphithea|\bpublic\s*schools?\b/i, 'education_fees'],
+    [/\bamphitheater\s*public\s*scho|\bpima\s*county\s*amphithea|\bpublic\s*schools?\b/i, 'school_fees'],
     [/\bhtl\s*\*|\bhampton\s*inn|\bhamptoninn|\bsonesta\b|\bclarion\s*hotels?\b|\bcourtyard\b|\bdays\s*inns?\b|\bdaysinn|\bhotels\.?com\b|\bhotelcom\b|\bvrbo\b/i, 'disc_travel'],
     [/\btopgolf\b|\bcinemas?\b|\bultrasignup\b|\braceroster\b|\bmarathon\b(?!\s*(?:petro|gas))|\bstate\s*park\b|\bfarm\s*festival|\bpumpkin\s*pa/i, 'disc_entertainment'],
     // TST* is the Toast point-of-sale, used almost exclusively by restaurants.
-    [/\btst\s*\*|\bristorante\b|\bin-n-out\b|\bchick-fil-a\b|\bjimmy\s*johns\b|\bdairy\s*queen\b|\bburger\s*king\b|\barbys\b|\bwingstop\b|\bdunkin\b|\bcrumbl\b|\btrue\s*food\s*kitchen\b|\bhandels\s*homemade\b|\bchoice\s*greens\b|\bpitalian\b/i, 'disc_dining'],
+    [/\btst\s*\*|\bristorante\b|\bin-n-out\b|\bchick-fil-a\b|\bjimmy\s*johns\b|\bdairy\s*queen\b|\bburger\s*king\b|\barbys\b|\bwingstop\b|\bdunkin\b|\bcrumbl\b|\btrue\s*food\s*kitchen\b|\bhandels\s*homemade\b|\bchoice\s*greens\b|\bpitalian\b|\bpizzeria\b|\bpizza\b/i, 'disc_dining'],
     [/\blululemon|\bpatagonia\b|\bathleta\b|\bnew\s*balance\b|\bnewbalance\b|\bvans\.com\b|\bzara\b|\bann\s*taylor|\banntaylor\b|\bloft\.com\b|\banthropologie\b|\bjcpenney\b|\bspanx\b|\bkipling\b|\bpatriot\s*jean|\blifeisgood\b|\bold\s*navy\b|\bgap\b/i, 'clothing'],
     [/\blulu\s*and\s*georgia\b|\bpotterybarn\b|\bpottery\s*barn\b|\bashley\s*furniture|\bashleyfurniture|\bmagnolia\s*market\b|\bcrate\s*and\s*barrel\b|\ble\s*creuset\b|\bdecor\s*steals\b|\bhobby-?\s*lobby\b|\bthule\b|\bultimate\s*sack\b/i, 'disc_shopping'],
     [/\bpet\s*supplies\s*plus\b/i, 'disc_pets'],
@@ -241,12 +270,12 @@
     [/\btransaction\s*fee\b/i, 'debt_credit_card', REVIEW],
     // Licensed therapist: could be the parent's own care or the child's.
     [/\blcsw\b|\blpc\b|\blmft\b|\bpsychologist\b/i, 'medical_unreimbursed', REVIEW],
-    [/\bbraces\b|\borthodont/i, 'child_medical_unreimbursed', REVIEW],
+    [/\bbraces\b|\borthodont/i, 'medical_unreimbursed_child', REVIEW],
     [/\blmt\b|\bmassage\b/i, 'disc_beauty', REVIEW],
     [/\bgloss\s*\*|\ballisonwade\b/i, 'disc_beauty', REVIEW],
     [/\bintimina\b|\bus\s*intimn\b/i, 'personal_hygiene', REVIEW],
-    [/\bmvd\b|\btitle\s*&\s*tag\b/i, 'transport_maintenance', REVIEW],
-    [/\bu-?haul\b|\bmoving\s*&\s*labo|\bmoving\s*and\s*labor\b/i, 'housing_maintenance', REVIEW],
+    [/\bmvd\b|\btitle\s*&\s*tag\b/i, 'transport_registration_license', REVIEW],
+    [/\bu-?haul\b|\bmoving\s*&\s*labo|\bmoving\s*and\s*labor\b/i, 'housing_maintenance_repair', REVIEW],
     [/\bschool\s*of\s*real\b/i, 'education_tuition', REVIEW],
     [/\bymca\b|\badventures\b/i, 'child_activities', REVIEW],
     [/\bblockfit|\bworden\s*physique\b|\bbdyfttrng\b|\bmelt\s*method\b|\bbare\s*performance\b|\bchoose\s*strong\b|\bdeliciouslyfit/i, 'disc_gym', REVIEW],
@@ -323,6 +352,24 @@
 
     [/\bfleet\s*feet\b|\bshoe\b|\bfootwear\b|\bdsw\b|\bclothing\b|\bapparel\b/i, 'clothing'],
     [/\bmattress\b|\bfurniture\b|\bnordictrack\b|\bwayfair\b|\bikea\b/i, 'disc_shopping'],
+
+    // --- aggressive educated guesses (marked for review) ----------------------
+    // Common household appliances and kitchen items - guess discretionary shopping
+    [/\bkitchen\b|\bappliance\b|\bcooking\b|\bstove\b|\boven\b|\bblender\b|\btoaster\b/i, 'disc_shopping', REVIEW],
+    // Home goods stores and general shopping
+    [/\bbed\s*bath\b|\bwilliams\s*sonoma\b|\bte(?:ch|chnology)(?!\s*support)\b|\bsmall\s*(?:appliance|app)\b/i, 'disc_shopping', REVIEW],
+    // Tech and electronics - guess discretionary shopping
+    [/\btech\b|\belectron\b|\bcomputer\b|\blaptop\b|\bcamera\b|\bjbl\b|\bsonos\b|\bapple\s+store\b|\bgeek\s*squad\b/i, 'disc_shopping', REVIEW],
+    // General retail/stores not caught above
+    [/\bstore\b|\bshop\b|\bmart\b|\bmarket\b/i, 'disc_shopping', REVIEW],
+    // Subscription services
+    [/\bsubscript\b|\bmembership\b|\bclub\b/i, 'disc_subscription_other', REVIEW],
+    // Services and misc
+    [/\bservice\b|\brepair\b|\blabor\b|\binstallat\b/i, 'housing_maintenance_repair', REVIEW],
+    // Names or personal services (guess beauty/grooming)
+    [/\b[a-z]{2,}\s+(?:salon|studio|services?|studio|spa|wellness|health|coach|training)\b/i, 'disc_beauty', REVIEW],
+    // Companies with INC/LLC/Corp that don't match specific patterns (guess shopping)
+    [/\binc\b|\bllc\b|\bcorp\b|\bco\b$|\b&\s*co\b/i, 'disc_shopping', REVIEW],
 
     // --- not spending --------------------------------------------------------
     // Confirmed by counsel as movement between cash and investment accounts:

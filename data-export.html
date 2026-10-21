@@ -1,0 +1,546 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Data Export - Veritas</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: #f8f9fa;
+      color: #333;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #1c3f66 0%, #2c5aa0 100%);
+      color: white;
+      padding: 32px 24px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .header h1 {
+      font-size: 28px;
+      margin-bottom: 8px;
+    }
+
+    .header p {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    .matter-info {
+      background: white;
+      padding: 16px 24px;
+      border-bottom: 1px solid #e0e0e0;
+      font-size: 13px;
+      color: #666;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 32px 24px;
+    }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .stat-card {
+      background: white;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 20px;
+      text-align: center;
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .stat-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+
+    .stat-number {
+      font-size: 32px;
+      font-weight: 700;
+      color: #1c3f66;
+      margin-bottom: 8px;
+    }
+
+    .stat-label {
+      font-size: 13px;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .categories {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+      gap: 24px;
+    }
+
+    .category-card {
+      background: white;
+      border: 1px solid #e0e0e0;
+      border-radius: 12px;
+      overflow: hidden;
+      transition: box-shadow 0.2s;
+    }
+
+    .category-card:hover {
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+    }
+
+    .category-header {
+      padding: 20px;
+      border-bottom: 2px solid #e0e0e0;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .category-icon {
+      font-size: 24px;
+    }
+
+    .category-title {
+      font-size: 16px;
+      font-weight: 600;
+      color: #1c3f66;
+      flex: 1;
+    }
+
+    .category-count {
+      background: #e7edf5;
+      color: #1c3f66;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .category-content {
+      padding: 16px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .document-list {
+      list-style: none;
+    }
+
+    .document-item {
+      padding: 8px 0;
+      border-bottom: 1px solid #f0f0f0;
+      font-size: 13px;
+      color: #666;
+    }
+
+    .document-item:last-child {
+      border-bottom: none;
+    }
+
+    .document-name {
+      font-weight: 500;
+      color: #333;
+      display: block;
+      margin-bottom: 4px;
+      word-break: break-word;
+    }
+
+    .document-meta {
+      font-size: 12px;
+      color: #999;
+    }
+
+    .category-footer {
+      padding: 16px;
+      border-top: 1px solid #f0f0f0;
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn {
+      flex: 1;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: #1c3f66;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #153252;
+    }
+
+    .btn-secondary {
+      background: #f0f0f0;
+      color: #333;
+    }
+
+    .btn-secondary:hover {
+      background: #e0e0e0;
+    }
+
+    .btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .empty-state {
+      padding: 40px 20px;
+      text-align: center;
+      color: #999;
+    }
+
+    .empty-state-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+
+    .loading {
+      text-align: center;
+      padding: 40px;
+      color: #999;
+    }
+
+    .export-all {
+      margin-bottom: 32px;
+    }
+
+    .export-all-card {
+      background: linear-gradient(135deg, #1c3f66 0%, #2c5aa0 100%);
+      color: white;
+      padding: 24px;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .export-all-text h2 {
+      font-size: 18px;
+      margin-bottom: 4px;
+    }
+
+    .export-all-text p {
+      font-size: 13px;
+      opacity: 0.9;
+    }
+
+    .export-buttons {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn-export-all {
+      background: white;
+      color: #1c3f66;
+      padding: 10px 20px;
+      border-radius: 6px;
+      border: none;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-export-all:hover {
+      background: #f0f0f0;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>📊 Extracted Data Export</h1>
+    <p>View and export all documents organized by category</p>
+  </div>
+
+  <div class="matter-info" id="matterInfo"></div>
+
+  <div class="container">
+    <div class="export-all">
+      <div class="export-all-card">
+        <div class="export-all-text">
+          <h2>Export All Data</h2>
+          <p>Download comprehensive CSV files for all categories and bank transactions</p>
+        </div>
+        <div class="export-buttons">
+          <button class="btn-export-all" onclick="downloadAll()">📥 Export All Categories</button>
+          <button class="btn-export-all" onclick="downloadTransactions()">💳 Bank Transactions</button>
+          <button class="btn-export-all" onclick="downloadIncome()">💰 Income Summary</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="stats-grid" id="statsGrid"></div>
+
+    <div id="categoriesContainer">
+      <div class="loading">Loading extracted data...</div>
+    </div>
+  </div>
+
+  <script>
+    let currentMatterId = null;
+    let extractedData = null;
+
+    // Get matter ID from URL or localStorage
+    function getMatterId() {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get('matter') || localStorage.getItem('currentMatterId');
+    }
+
+    // Load extracted data
+    async function loadExtractedData() {
+      currentMatterId = getMatterId();
+
+      if (!currentMatterId) {
+        document.getElementById('categoriesContainer').innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">📋</div>
+            <h2>No Matter Selected</h2>
+            <p>Please select a matter to view extracted data.</p>
+          </div>
+        `;
+        return;
+      }
+
+      // Update matter info
+      document.getElementById('matterInfo').textContent = `Matter ID: ${currentMatterId}`;
+
+      try {
+        const response = await fetch(`/api/matters/${currentMatterId}/data`);
+        if (!response.ok) throw new Error('Failed to load data');
+
+        extractedData = await response.json();
+        renderCategories();
+        renderStats();
+      } catch (error) {
+        console.error('Error loading data:', error);
+        document.getElementById('categoriesContainer').innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">⚠️</div>
+            <h2>Error Loading Data</h2>
+            <p>${error.message}</p>
+          </div>
+        `;
+      }
+    }
+
+    // Render stats grid
+    function renderStats() {
+      const stats = [
+        { label: 'Documents', value: Object.values(extractedData).reduce((sum, arr) => sum + arr.length, 0) },
+        { label: 'Taxes', value: extractedData.taxes?.length || 0 },
+        { label: 'Income', value: extractedData.income?.length || 0 },
+        { label: 'Expenses', value: extractedData.expenses?.length || 0 },
+        { label: 'Property', value: extractedData.property?.length || 0 },
+        { label: 'Investments', value: extractedData.investments?.length || 0 },
+      ];
+
+      const html = stats.map(s => `
+        <div class="stat-card">
+          <div class="stat-number">${s.value}</div>
+          <div class="stat-label">${s.label}</div>
+        </div>
+      `).join('');
+
+      document.getElementById('statsGrid').innerHTML = html;
+    }
+
+    // Render categories
+    function renderCategories() {
+      const categories = [
+        { key: 'taxes', label: 'Taxes', icon: '🧾', color: '#274566' },
+        { key: 'income', label: 'Income', icon: '💰', color: '#2f7d5b' },
+        { key: 'expenses', label: 'Expenses', icon: '💸', color: '#b3402f' },
+        { key: 'property', label: 'Property & Assets', icon: '🏠', color: '#8a6528' },
+        { key: 'investments', label: 'Investments', icon: '📈', color: '#1d6f7a' },
+        { key: 'other', label: 'Other', icon: '📄', color: '#5b4b8a' },
+      ];
+
+      const html = `
+        <div class="categories">
+          ${categories.map(cat => {
+            const docs = extractedData[cat.key] || [];
+            return `
+              <div class="category-card">
+                <div class="category-header">
+                  <span class="category-icon">${cat.icon}</span>
+                  <span class="category-title">${cat.label}</span>
+                  <span class="category-count">${docs.length}</span>
+                </div>
+                <div class="category-content">
+                  ${docs.length === 0 ? `
+                    <div class="empty-state" style="padding: 20px 0;">
+                      <p style="color: #ccc;">No documents</p>
+                    </div>
+                  ` : `
+                    <ul class="document-list">
+                      ${docs.slice(0, 10).map(doc => `
+                        <li class="document-item">
+                          <span class="document-name">${doc.filename || 'Unknown'}</span>
+                          <span class="document-meta">${doc.uploaded_at ? new Date(doc.uploaded_at).toLocaleDateString() : 'Unknown date'}</span>
+                        </li>
+                      `).join('')}
+                      ${docs.length > 10 ? `
+                        <li class="document-item" style="padding-top: 8px; text-align: center; color: #999;">
+                          ... and ${docs.length - 10} more
+                        </li>
+                      ` : ''}
+                    </ul>
+                  `}
+                </div>
+                <div class="category-footer">
+                  <button class="btn btn-primary" onclick="downloadCategory('${cat.key}')" ${docs.length === 0 ? 'disabled' : ''}>
+                    📥 Export ${cat.label}
+                  </button>
+                </div>
+              </div>
+            `;
+          }).join('')}
+        </div>
+      `;
+
+      document.getElementById('categoriesContainer').innerHTML = html;
+    }
+
+    // Download category as CSV
+    async function downloadCategory(category) {
+      if (!currentMatterId) return;
+
+      try {
+        const response = await fetch(`/api/matters/${currentMatterId}/export/${category}.csv`);
+        if (!response.ok) throw new Error('Download failed');
+
+        const csv = await response.text();
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${category}-documents-${new Date().toISOString().split('T')[0]}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+      } catch (error) {
+        alert('Error downloading CSV: ' + error.message);
+      }
+    }
+
+    // Download bank transactions CSV
+    async function downloadTransactions() {
+      if (!currentMatterId) return;
+
+      try {
+        const response = await fetch(`/api/matters/${currentMatterId}/transactions.csv`);
+        if (!response.ok) throw new Error('Download failed');
+
+        const csv = await response.text();
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `transactions-${new Date().toISOString().split('T')[0]}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+      } catch (error) {
+        alert('Error downloading CSV: ' + error.message);
+      }
+    }
+
+    // Download income summary CSV
+    async function downloadIncome() {
+      if (!currentMatterId) return;
+
+      try {
+        const response = await fetch(`/api/matters/${currentMatterId}/income-summary.csv`);
+        if (!response.ok) throw new Error('Download failed');
+
+        const csv = await response.text();
+        const blob = new Blob([csv], { type: 'text/csv' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `income-summary-${new Date().toISOString().split('T')[0]}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+      } catch (error) {
+        alert('Error downloading CSV: ' + error.message);
+      }
+    }
+
+    // Download all categories at once
+    async function downloadAll() {
+      if (!currentMatterId) return;
+
+      const categories = ['taxes', 'income', 'expenses', 'property', 'investments', 'other'];
+      const zip = typeof JSZip !== 'undefined' ? new JSZip() : null;
+
+      if (!zip) {
+        // Fallback: download them one by one
+        alert('Downloading all files...');
+        for (const cat of categories) {
+          await downloadCategory(cat);
+          await new Promise(r => setTimeout(r, 200)); // Small delay between downloads
+        }
+        return;
+      }
+
+      // With JSZip, bundle them
+      for (const cat of categories) {
+        try {
+          const response = await fetch(`/api/matters/${currentMatterId}/export/${cat}.csv`);
+          if (response.ok) {
+            const csv = await response.text();
+            zip.file(`${cat}-documents.csv`, csv);
+          }
+        } catch (e) {
+          console.error(`Failed to download ${cat}:`, e);
+        }
+      }
+
+      try {
+        const blob = await zip.generateAsync({ type: 'blob' });
+        const url = window.URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `extracted-data-${new Date().toISOString().split('T')[0]}.zip`;
+        document.body.appendChild(a);
+        a.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+      } catch (error) {
+        alert('Error creating zip: ' + error.message);
+      }
+    }
+
+    // Load on page load
+    document.addEventListener('DOMContentLoaded', loadExtractedData);
+  </script>
+</body>
+</html>

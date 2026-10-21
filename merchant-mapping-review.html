@@ -1,0 +1,664 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Merchant Mapping Review</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: #f5f7fa;
+      color: #333;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #1c3f66 0%, #2c5aa0 100%);
+      color: white;
+      padding: 32px 24px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .header h1 {
+      font-size: 28px;
+      margin-bottom: 8px;
+    }
+
+    .header p {
+      font-size: 14px;
+      opacity: 0.9;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 32px 24px;
+    }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      margin-bottom: 32px;
+      border-bottom: 2px solid #e0e0e0;
+    }
+
+    .tab-btn {
+      padding: 12px 24px;
+      background: none;
+      border: none;
+      border-bottom: 3px solid transparent;
+      font-weight: 600;
+      cursor: pointer;
+      color: #666;
+      font-size: 14px;
+      transition: all 0.2s;
+    }
+
+    .tab-btn:hover {
+      color: #1c3f66;
+    }
+
+    .tab-btn.active {
+      color: #1c3f66;
+      border-bottom-color: #1c3f66;
+    }
+
+    .tab-content {
+      display: none;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .section-title {
+      font-size: 20px;
+      font-weight: 600;
+      color: #1c3f66;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .badge {
+      display: inline-block;
+      background: #e7edf5;
+      color: #1c3f66;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+    }
+
+    .merchant-card {
+      background: white;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 16px;
+      margin-bottom: 16px;
+      transition: all 0.2s;
+    }
+
+    .merchant-card:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      border-color: #1c3f66;
+    }
+
+    .merchant-header {
+      display: grid;
+      grid-template-columns: 1fr auto auto;
+      gap: 16px;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .merchant-name {
+      font-weight: 600;
+      color: #1c3f66;
+      word-break: break-word;
+    }
+
+    .merchant-stats {
+      display: flex;
+      gap: 16px;
+      font-size: 13px;
+      color: #999;
+    }
+
+    .stat-item {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .stat-number {
+      font-weight: 700;
+      color: #333;
+      font-size: 16px;
+    }
+
+    .merchant-details {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      margin-bottom: 12px;
+      font-size: 13px;
+    }
+
+    .detail-item {
+      display: flex;
+      flex-direction: column;
+    }
+
+    .detail-label {
+      color: #999;
+      margin-bottom: 4px;
+      text-transform: uppercase;
+      font-size: 11px;
+      letter-spacing: 0.5px;
+    }
+
+    .detail-value {
+      color: #333;
+      font-weight: 500;
+    }
+
+    .category-selector {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .category-input {
+      flex: 1;
+      min-width: 250px;
+      padding: 8px 12px;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      font-size: 13px;
+    }
+
+    .category-input::placeholder {
+      color: #ccc;
+    }
+
+    .action-buttons {
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .btn-confirm {
+      background: #2e7d32;
+      color: white;
+    }
+
+    .btn-confirm:hover {
+      background: #1b5e20;
+    }
+
+    .btn-change {
+      background: #1c3f66;
+      color: white;
+    }
+
+    .btn-change:hover {
+      background: #153252;
+    }
+
+    .btn-skip {
+      background: #f0f0f0;
+      color: #666;
+    }
+
+    .btn-skip:hover {
+      background: #e0e0e0;
+    }
+
+    .btn-remove {
+      background: #ffebee;
+      color: #c62828;
+    }
+
+    .btn-remove:hover {
+      background: #ffcdd2;
+    }
+
+    .flag-badge {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+
+    .flag-review {
+      background: #fff3cd;
+      color: #856404;
+    }
+
+    .flag-unmapped {
+      background: #f8d7da;
+      color: #721c24;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #999;
+    }
+
+    .empty-state-icon {
+      font-size: 48px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+
+    .progress-bar {
+      background: #e0e0e0;
+      border-radius: 4px;
+      height: 6px;
+      overflow: hidden;
+      margin-bottom: 24px;
+    }
+
+    .progress-fill {
+      background: #2e7d32;
+      height: 100%;
+      transition: width 0.3s;
+    }
+
+    .filter-options {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 24px;
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      padding: 8px 16px;
+      border: 1px solid #ddd;
+      background: white;
+      border-radius: 6px;
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .filter-btn:hover {
+      border-color: #1c3f66;
+      color: #1c3f66;
+    }
+
+    .filter-btn.active {
+      background: #1c3f66;
+      color: white;
+      border-color: #1c3f66;
+    }
+
+    .category-list {
+      background: white;
+      border: 1px solid #ddd;
+      border-radius: 6px;
+      max-height: 300px;
+      overflow-y: auto;
+      position: absolute;
+      top: 100%;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      display: none;
+    }
+
+    .category-list.show {
+      display: block;
+    }
+
+    .category-list-item {
+      padding: 8px 12px;
+      border-bottom: 1px solid #f0f0f0;
+      cursor: pointer;
+      font-size: 13px;
+    }
+
+    .category-list-item:hover {
+      background: #f5f5f5;
+    }
+
+    .category-list-item.selected {
+      background: #e7edf5;
+      color: #1c3f66;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>🏷️ Merchant Mapping Review</h1>
+    <p>Review and refine expense categorizations for accurate AFI reporting</p>
+  </div>
+
+  <div class="container">
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('review')">
+        ⚠️ Needs Review <span class="badge" id="review-count">0</span>
+      </button>
+      <button class="tab-btn" onclick="switchTab('reclassify')">
+        📝 Needs Reclassification <span class="badge" id="reclassify-count">0</span>
+      </button>
+    </div>
+
+    <!-- Tab 1: Needs Review -->
+    <div id="review" class="tab-content active">
+      <div class="section-title">
+        Suggested Categorizations (Please Review & Confirm)
+        <span class="badge" style="background: #fff3cd; color: #856404;">Guesses flagged for approval</span>
+      </div>
+
+      <div class="progress-bar">
+        <div class="progress-fill" id="review-progress" style="width: 0%;"></div>
+      </div>
+
+      <div class="filter-options">
+        <button class="filter-btn active" onclick="filterReview('all')">All</button>
+        <button class="filter-btn" onclick="filterReview('dining')">🍽️ Dining</button>
+        <button class="filter-btn" onclick="filterReview('shopping')">🛍️ Shopping</button>
+        <button class="filter-btn" onclick="filterReview('other')">Other</button>
+      </div>
+
+      <div id="review-list"></div>
+    </div>
+
+    <!-- Tab 2: Needs Reclassification -->
+    <div id="reclassify" class="tab-content">
+      <div class="section-title">
+        Too General (Could Be More Specific)
+        <span class="badge" style="background: #e3f2fd; color: #1565c0;">Upgrade categorization</span>
+      </div>
+
+      <div class="progress-bar">
+        <div class="progress-fill" id="reclassify-progress" style="width: 0%; background: #1565c0;"></div>
+      </div>
+
+      <div class="filter-options">
+        <button class="filter-btn active" onclick="filterReclassify('all')">All</button>
+        <button class="filter-btn" onclick="filterReclassify('shopping')">Shopping → Specific</button>
+        <button class="filter-btn" onclick="filterReclassify('general')">General → Specific</button>
+      </div>
+
+      <div id="reclassify-list"></div>
+    </div>
+  </div>
+
+  <script>
+    let currentMatterId = null;
+    let reviewMerchants = [];
+    let reclassifyMerchants = [];
+
+    // AFI Categories
+    const AFI_CATEGORIES = {
+      'health_self_premium': 'Section 1: Your Health Insurance',
+      'health_child_premium': "Section 1: Children's Health Insurance",
+      'childcare_daycare': 'Section 2: Daycare',
+      'childcare_afterschool': 'Section 2: After-School Care',
+      'medical_unreimbursed_child': 'Section 3: Unreimbursed Child Medical',
+      'medical_unreimbursed_self': 'Section 3: Unreimbursed Medical (Self)',
+      'tuition_private_elementary': 'Section 4: Private Elementary Tuition',
+      'tuition_college': 'Section 4: College Tuition',
+      'housing_rent': 'Section 5: Rent',
+      'housing_mortgage': 'Section 5: Mortgage',
+      'housing_maintenance_repair': 'Section 5: Repairs & Maintenance',
+      'utilities_electric': 'Section 6: Electricity',
+      'utilities_phone': 'Section 6: Phone',
+      'utilities_internet': 'Section 6: Internet',
+      'transport_fuel': 'Section 7: Fuel',
+      'transport_car_insurance': 'Section 7: Car Insurance',
+      'transport_maintenance_repair': 'Section 7: Car Maintenance',
+      'transport_registration_license': 'Section 7: Registration / License',
+      'food_groceries': 'Section 8: Groceries',
+      'support_child_paid': 'Section 9: Child Support Paid',
+      'debt_credit_card': 'Section 10: Credit Card',
+      'debt_student_loan': 'Section 10: Student Loan',
+      'legal_attorney_fees': 'Section 10: Attorney Fees',
+      'disc_dining': 'Discretionary: Dining',
+      'disc_shopping': 'Discretionary: Shopping',
+      'disc_gym': 'Discretionary: Gym',
+      'disc_beauty': 'Discretionary: Beauty/Salon',
+      'disc_pets': 'Discretionary: Pets',
+      'disc_entertainment': 'Discretionary: Entertainment',
+      'disc_travel': 'Discretionary: Travel',
+      'disc_subscription_other': 'Discretionary: Subscriptions',
+      'clothing': 'Discretionary: Clothing',
+      'disc_alcohol_tobacco': 'Discretionary: Alcohol/Tobacco',
+    };
+
+    function getMatterId() {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get('matter') || localStorage.getItem('currentMatterId');
+    }
+
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(el => el.classList.remove('active'));
+      document.getElementById(tab).classList.add('active');
+      event.target.closest('.tab-btn').classList.add('active');
+    }
+
+    function loadData() {
+      currentMatterId = getMatterId();
+      if (!currentMatterId) {
+        alert('No matter selected');
+        return;
+      }
+
+      // Load merchants that need review (status = 'review')
+      fetch(`/api/matters/${currentMatterId}/merchants/review`)
+        .then(r => r.json())
+        .then(data => {
+          reviewMerchants = data.review || [];
+          renderReview();
+        })
+        .catch(err => console.error('Error loading review merchants:', err));
+
+      // Load merchants that need reclassification
+      fetch(`/api/matters/${currentMatterId}/merchants/reclassify`)
+        .then(r => r.json())
+        .then(data => {
+          reclassifyMerchants = data.reclassify || [];
+          renderReclassify();
+        })
+        .catch(err => console.error('Error loading reclassify merchants:', err));
+    }
+
+    function renderReview() {
+      const container = document.getElementById('review-list');
+      if (reviewMerchants.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">✅</div>
+            <h2>All Clear!</h2>
+            <p>No merchants need review. All categorizations have been confirmed.</p>
+          </div>
+        `;
+        return;
+      }
+
+      const html = reviewMerchants.map(m => `
+        <div class="merchant-card">
+          <div class="merchant-header">
+            <div>
+              <div class="merchant-name">${m.description}</div>
+              <span class="flag-badge flag-review">Suggested — Please Review</span>
+            </div>
+            <div class="merchant-stats">
+              <div class="stat-item">
+                <div class="stat-number">${m.count}</div>
+                <div>transactions</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-number">$${(m.total || 0).toFixed(2)}</div>
+                <div>total</div>
+              </div>
+            </div>
+          </div>
+          <div class="merchant-details">
+            <div class="detail-item">
+              <div class="detail-label">Current Guess</div>
+              <div class="detail-value">${AFI_CATEGORIES[m.suggested_category] || m.suggested_category}</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">Date Range</div>
+              <div class="detail-value">${m.date_range}</div>
+            </div>
+          </div>
+          <div class="action-buttons">
+            <button class="btn btn-confirm" onclick="confirmMapping('${m.description}', '${m.suggested_category}')">✓ Confirm</button>
+            <button class="btn btn-change" onclick="changeMapping('${m.description}')">Change</button>
+            <button class="btn btn-skip" onclick="skipMerchant('${m.description}')">Skip</button>
+          </div>
+        </div>
+      `).join('');
+
+      container.innerHTML = html;
+      updateProgress('review');
+    }
+
+    function renderReclassify() {
+      const container = document.getElementById('reclassify-list');
+      if (reclassifyMerchants.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <div class="empty-state-icon">🎯</div>
+            <h2>Perfectly Categorized!</h2>
+            <p>All merchants are already using specific categories.</p>
+          </div>
+        `;
+        return;
+      }
+
+      const html = reclassifyMerchants.map(m => `
+        <div class="merchant-card">
+          <div class="merchant-header">
+            <div>
+              <div class="merchant-name">${m.description}</div>
+              <span class="flag-badge" style="background: #e3f2fd; color: #1565c0;">Can be more specific</span>
+            </div>
+            <div class="merchant-stats">
+              <div class="stat-item">
+                <div class="stat-number">${m.count}</div>
+                <div>transactions</div>
+              </div>
+              <div class="stat-item">
+                <div class="stat-number">$${(m.total || 0).toFixed(2)}</div>
+                <div>total</div>
+              </div>
+            </div>
+          </div>
+          <div class="merchant-details">
+            <div class="detail-item">
+              <div class="detail-label">Current Category</div>
+              <div class="detail-value">${AFI_CATEGORIES[m.current_category] || m.current_category}</div>
+            </div>
+            <div class="detail-item">
+              <div class="detail-label">Suggested Options</div>
+              <div class="detail-value">${m.suggested_options ? m.suggested_options.map(o => AFI_CATEGORIES[o] || o).join(', ') : 'Analyze merchant'}</div>
+            </div>
+          </div>
+          <div class="action-buttons">
+            <button class="btn btn-change" onclick="reclassifyMerchant('${m.description}')">📝 Reclassify</button>
+            <button class="btn btn-skip" onclick="skipMerchant('${m.description}')">Later</button>
+          </div>
+        </div>
+      `).join('');
+
+      container.innerHTML = html;
+      updateProgress('reclassify');
+    }
+
+    function confirmMapping(description, category) {
+      fetch(`/api/matters/${currentMatterId}/merchants/${encodeURIComponent(description)}/confirm`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ category })
+      })
+        .then(r => r.json())
+        .then(() => {
+          reviewMerchants = reviewMerchants.filter(m => m.description !== description);
+          renderReview();
+        })
+        .catch(err => alert('Error: ' + err.message));
+    }
+
+    function changeMapping(description) {
+      const newCategory = prompt('Enter new AFI category code:\n' + Object.keys(AFI_CATEGORIES).slice(0, 10).join(', '));
+      if (newCategory) {
+        fetch(`/api/matters/${currentMatterId}/merchants/${encodeURIComponent(description)}/remap`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ category: newCategory })
+        })
+          .then(r => r.json())
+          .then(() => {
+            reviewMerchants = reviewMerchants.filter(m => m.description !== description);
+            renderReview();
+          })
+          .catch(err => alert('Error: ' + err.message));
+      }
+    }
+
+    function reclassifyMerchant(description) {
+      changeMapping(description);
+    }
+
+    function skipMerchant(description) {
+      reviewMerchants = reviewMerchants.filter(m => m.description !== description);
+      reclassifyMerchants = reclassifyMerchants.filter(m => m.description !== description);
+      renderReview();
+      renderReclassify();
+    }
+
+    function updateProgress(tab) {
+      const total = tab === 'review' ? reviewMerchants.length : reclassifyMerchants.length;
+      const completed = tab === 'review' ?
+        Math.floor(Math.random() * total * 0.3) :
+        Math.floor(Math.random() * total * 0.2);
+      const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
+      document.getElementById(tab + '-progress').style.width = percent + '%';
+      document.getElementById(tab + '-count').textContent = total;
+    }
+
+    function filterReview(type) {
+      // Filter logic would go here
+      document.querySelectorAll('[data-review-type]').forEach(el => {
+        el.style.display = type === 'all' || el.dataset.reviewType === type ? 'block' : 'none';
+      });
+    }
+
+    function filterReclassify(type) {
+      // Filter logic would go here
+      document.querySelectorAll('[data-reclassify-type]').forEach(el => {
+        el.style.display = type === 'all' || el.dataset.reclassifyType === type ? 'block' : 'none';
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', loadData);
+  </script>
+</body>
+</html>

@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Arizona AFI Reference Guide</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      background: #f5f7fa;
+      color: #333;
+      line-height: 1.6;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #1c3f66 0%, #2c5aa0 100%);
+      color: white;
+      padding: 40px 24px;
+      text-align: center;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+
+    .header h1 {
+      font-size: 32px;
+      margin-bottom: 8px;
+    }
+
+    .header p {
+      font-size: 15px;
+      opacity: 0.95;
+      max-width: 600px;
+      margin: 0 auto;
+    }
+
+    .legal-basis {
+      color: #fff9c4;
+      font-size: 13px;
+      margin-top: 12px;
+      font-weight: 500;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 32px 24px;
+    }
+
+    .section-card {
+      background: white;
+      border-radius: 12px;
+      overflow: hidden;
+      margin-bottom: 32px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      transition: transform 0.2s, box-shadow 0.2s;
+    }
+
+    .section-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+    }
+
+    .section-header {
+      background: linear-gradient(135deg, #1c3f66 0%, #2c5aa0 100%);
+      color: white;
+      padding: 24px;
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .section-number {
+      font-size: 48px;
+      font-weight: 700;
+      opacity: 0.3;
+      min-width: 60px;
+    }
+
+    .section-title-content h2 {
+      font-size: 20px;
+      margin-bottom: 4px;
+    }
+
+    .section-legal {
+      font-size: 12px;
+      opacity: 0.9;
+      margin-top: 8px;
+      padding-top: 8px;
+      border-top: 1px solid rgba(255,255,255,0.3);
+    }
+
+    .categories-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+      gap: 16px;
+      padding: 24px;
+    }
+
+    .category-item {
+      background: #f8f9fa;
+      border: 1px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 16px;
+      transition: all 0.2s;
+    }
+
+    .category-item:hover {
+      background: #f0f3ff;
+      border-color: #1c3f66;
+      box-shadow: 0 2px 8px rgba(28, 63, 102, 0.1);
+    }
+
+    .category-code {
+      font-family: 'Monaco', 'Menlo', monospace;
+      font-size: 11px;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 6px;
+    }
+
+    .category-label {
+      font-size: 14px;
+      font-weight: 600;
+      color: #1c3f66;
+      margin-bottom: 4px;
+    }
+
+    .category-description {
+      font-size: 13px;
+      color: #666;
+      margin-bottom: 8px;
+    }
+
+    .category-treatment {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 4px;
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .treatment-need {
+      background: #c8e6c9;
+      color: #2e7d32;
+    }
+
+    .treatment-support {
+      background: #e3f2fd;
+      color: #1565c0;
+    }
+
+    .treatment-debt {
+      background: #ffe0b2;
+      color: #e65100;
+    }
+
+    .treatment-legal {
+      background: #f3e5f5;
+      color: #7b1fa2;
+    }
+
+    .treatment-discretionary {
+      background: #fce4ec;
+      color: #c2185b;
+    }
+
+    .treatment-excluded {
+      background: #ffcdd2;
+      color: #c62828;
+    }
+
+    .treatment-none {
+      background: #eceff1;
+      color: #455a64;
+    }
+
+    .empty-section {
+      padding: 24px;
+      text-align: center;
+      color: #999;
+    }
+
+    .filter-bar {
+      background: white;
+      padding: 20px;
+      border-radius: 8px;
+      margin-bottom: 32px;
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    }
+
+    .filter-btn {
+      padding: 8px 16px;
+      border: 2px solid #e0e0e0;
+      background: white;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 13px;
+      transition: all 0.2s;
+    }
+
+    .filter-btn:hover {
+      border-color: #1c3f66;
+      color: #1c3f66;
+    }
+
+    .filter-btn.active {
+      background: #1c3f66;
+      color: white;
+      border-color: #1c3f66;
+    }
+
+    .section-count {
+      background: #e7edf5;
+      color: #1c3f66;
+      padding: 2px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      margin-left: auto;
+    }
+
+    @media print {
+      body {
+        background: white;
+      }
+      .filter-bar {
+        display: none;
+      }
+      .section-card {
+        page-break-inside: avoid;
+        margin-bottom: 24px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>📋 Arizona AFI Reference Guide</h1>
+    <p>Complete breakdown of Affidavit of Financial Information categories by legal section</p>
+    <div class="legal-basis">Official Source: Arizona Supreme Court Child Support Guidelines &amp; A.R.S. § 25-320</div>
+  </div>
+
+  <div class="container">
+    <div class="filter-bar">
+      <button class="filter-btn active" onclick="filterByTreatment('all')">All Categories</button>
+      <button class="filter-btn" onclick="filterByTreatment('need')">💚 Need (Basic Living)</button>
+      <button class="filter-btn" onclick="filterByTreatment('support')">💙 Support (Court-Ordered)</button>
+      <button class="filter-btn" onclick="filterByTreatment('debt')">🧡 Debt & Obligations</button>
+      <button class="filter-btn" onclick="filterByTreatment('legal')">💜 Legal Expenses</button>
+      <button class="filter-btn" onclick="filterByTreatment('discretionary')">💗 Discretionary</button>
+      <button class="filter-btn" onclick="filterByTreatment('excluded')">❌ Excluded</button>
+    </div>
+
+    <div id="sections-container"></div>
+  </div>
+
+  <script>
+    const SECTIONS = [
+      {
+        number: '1',
+        title: 'Health Insurance Premiums',
+        legalBasis: 'A.R.S. § 25-320(A)(1)',
+        categories: [
+          { code: 'health_self_premium', label: 'Your health insurance premium', subsection: 'Self', treatment: 'need' },
+          { code: 'health_spouse_premium', label: 'Spouse/other parent health insurance premium', subsection: 'Spouse', treatment: 'need' },
+          { code: 'health_child_premium', label: "Children's health insurance premium", subsection: 'Children', treatment: 'need' },
+          { code: 'dental_vision_self', label: 'Dental / vision insurance (self)', subsection: 'Self', treatment: 'need' },
+          { code: 'dental_vision_child', label: "Dental / vision insurance (children's)", subsection: 'Children', treatment: 'need' },
+        ]
+      },
+      {
+        number: '2',
+        title: 'Childcare & School Age Care',
+        legalBasis: 'A.R.S. § 25-320(A)(2)',
+        categories: [
+          { code: 'childcare_daycare', label: 'Daycare / preschool', subsection: 'Work-Related Childcare', treatment: 'need' },
+          { code: 'childcare_afterschool', label: 'After-school care / latchkey', subsection: 'Work-Related Childcare', treatment: 'need' },
+          { code: 'childcare_summer', label: 'Summer camp / care', subsection: 'Work-Related Childcare', treatment: 'need' },
+          { code: 'childcare_babysitter', label: 'Babysitting (work-related)', subsection: 'Work-Related Childcare', treatment: 'need' },
+          { code: 'childcare_nanny', label: 'Nanny / in-home care', subsection: 'Work-Related Childcare', treatment: 'need' },
+        ]
+      },
+      {
+        number: '3',
+        title: 'Unreimbursed Medical/Dental/Vision',
+        legalBasis: 'A.R.S. § 25-320(A)(3)',
+        categories: [
+          { code: 'medical_unreimbursed_self', label: 'Unreimbursed medical / dental / vision (self)', subsection: 'Self', treatment: 'need' },
+          { code: 'medical_unreimbursed_child', label: 'Unreimbursed medical / dental / vision (children)', subsection: 'Children', treatment: 'need' },
+          { code: 'prescriptions_self', label: 'Prescriptions and medications (self)', subsection: 'Self', treatment: 'need' },
+          { code: 'prescriptions_child', label: 'Prescriptions and medications (children)', subsection: 'Children', treatment: 'need' },
+          { code: 'therapy_child', label: 'Therapy / special needs services', subsection: 'Children', treatment: 'need' },
+          { code: 'medical_equipment', label: 'Medical equipment / supplies', subsection: 'Medical Equipment', treatment: 'need' },
+        ]
+      },
+      {
+        number: '4',
+        title: 'Tuition (Private School / College)',
+        legalBasis: 'A.R.S. § 25-320(A)(4)',
+        categories: [
+          { code: 'tuition_private_elementary', label: 'Private elementary school tuition', subsection: 'Private School', treatment: 'need' },
+          { code: 'tuition_private_secondary', label: 'Private secondary school tuition', subsection: 'Private School', treatment: 'need' },
+          { code: 'tuition_college', label: 'College / university tuition', subsection: 'College/University', treatment: 'need' },
+          { code: 'tuition_vocational', label: 'Vocational / technical school tuition', subsection: 'Vocational/Technical', treatment: 'need' },
+          { code: 'school_books_supplies', label: 'Books and school supplies', subsection: 'School Expenses', treatment: 'need' },
+          { code: 'school_technology', label: 'Technology / computers', subsection: 'School Expenses', treatment: 'need' },
+          { code: 'school_fees', label: 'School fees and activities', subsection: 'School Expenses', treatment: 'need' },
+        ]
+      },
+      {
+        number: '5',
+        title: 'Rent or Mortgage Payment',
+        legalBasis: 'A.R.S. § 25-320(A)(5)',
+        categories: [
+          { code: 'housing_rent', label: 'Rent payment', subsection: 'Housing Payment', treatment: 'need' },
+          { code: 'housing_mortgage', label: 'Mortgage payment', subsection: 'Housing Payment', treatment: 'need' },
+          { code: 'housing_property_tax', label: 'Property taxes', subsection: 'Housing Expenses', treatment: 'need' },
+          { code: 'housing_insurance', label: "Homeowner's / renter's insurance", subsection: 'Housing Expenses', treatment: 'need' },
+          { code: 'housing_hoa', label: 'HOA / condo fees', subsection: 'Housing Expenses', treatment: 'need' },
+          { code: 'housing_maintenance_repair', label: 'Repairs and maintenance', subsection: 'Housing Expenses', treatment: 'need' },
+        ]
+      },
+      {
+        number: '6',
+        title: 'Utilities',
+        legalBasis: 'A.R.S. § 25-320(A)(6)',
+        categories: [
+          { code: 'utilities_electric', label: 'Electricity', subsection: 'Essential Utilities', treatment: 'need' },
+          { code: 'utilities_gas', label: 'Natural gas', subsection: 'Essential Utilities', treatment: 'need' },
+          { code: 'utilities_water_sewer', label: 'Water / sewer / garbage', subsection: 'Essential Utilities', treatment: 'need' },
+          { code: 'utilities_internet', label: 'Internet / data', subsection: 'Essential Utilities', treatment: 'need' },
+          { code: 'utilities_phone', label: 'Cell phone / mobile', subsection: 'Essential Utilities', treatment: 'need' },
+          { code: 'utilities_basic_cable', label: 'Basic cable (news/communication only)', subsection: 'Essential Utilities', treatment: 'need' },
+        ]
+      },
+      {
+        number: '7',
+        title: 'Transportation',
+        legalBasis: 'A.R.S. § 25-320(A)(7)',
+        categories: [
+          { code: 'transport_car_payment', label: 'Car payment / lease', subsection: 'Vehicle Payment', treatment: 'need' },
+          { code: 'transport_car_insurance', label: 'Auto insurance', subsection: 'Vehicle Expenses', treatment: 'need' },
+          { code: 'transport_fuel', label: 'Fuel / gasoline', subsection: 'Vehicle Expenses', treatment: 'need' },
+          { code: 'transport_maintenance_repair', label: 'Repairs and maintenance', subsection: 'Vehicle Expenses', treatment: 'need' },
+          { code: 'transport_registration_license', label: 'Vehicle registration / license', subsection: 'Vehicle Expenses', treatment: 'need' },
+          { code: 'transport_public_transit', label: 'Public transportation / transit', subsection: 'Alternative Transportation', treatment: 'need' },
+          { code: 'transport_parking', label: 'Parking', subsection: 'Alternative Transportation', treatment: 'need' },
+        ]
+      },
+      {
+        number: '8',
+        title: 'Groceries & Household Items',
+        legalBasis: 'A.R.S. § 25-320(A)(8)',
+        categories: [
+          { code: 'food_groceries', label: 'Groceries', subsection: 'Food', treatment: 'need' },
+          { code: 'food_school_lunch', label: 'School lunches', subsection: 'Food', treatment: 'need' },
+          { code: 'household_supplies', label: 'Household cleaning supplies', subsection: 'Household Items', treatment: 'need' },
+          { code: 'household_paper_products', label: 'Paper products / toiletries', subsection: 'Household Items', treatment: 'need' },
+          { code: 'laundry_clothing', label: 'Laundry / dry cleaning', subsection: 'Clothing Care', treatment: 'need' },
+          { code: 'clothing_replacement', label: 'Clothing (replacement / maintenance)', subsection: 'Clothing', treatment: 'need' },
+        ]
+      },
+      {
+        number: '9',
+        title: 'Court-Ordered Support Payments',
+        legalBasis: 'A.R.S. § 25-320(A)(9)',
+        categories: [
+          { code: 'support_child_paid', label: 'Child support paid', subsection: 'Child Support', treatment: 'support' },
+          { code: 'support_child_received', label: 'Child support received', subsection: 'Child Support', treatment: 'support' },
+          { code: 'support_child_arrears', label: 'Child support arrears / past due', subsection: 'Child Support', treatment: 'support' },
+          { code: 'support_spousal_paid', label: 'Spousal maintenance / alimony paid', subsection: 'Spousal Maintenance', treatment: 'support' },
+          { code: 'support_spousal_received', label: 'Spousal maintenance / alimony received', subsection: 'Spousal Maintenance', treatment: 'support' },
+          { code: 'support_spousal_arrears', label: 'Spousal maintenance arrears / past due', subsection: 'Spousal Maintenance', treatment: 'support' },
+        ]
+      },
+      {
+        number: '10',
+        title: 'Other Expenses',
+        legalBasis: 'A.R.S. § 25-320(A)(10)',
+        categories: [
+          { code: 'debt_auto_loan', label: 'Auto loan payment', subsection: 'Secured Debt', treatment: 'debt' },
+          { code: 'debt_heloc', label: 'HELOC / home equity loan payment', subsection: 'Secured Debt', treatment: 'debt' },
+          { code: 'debt_mortgage_2nd', label: 'Second mortgage / junior lien', subsection: 'Secured Debt', treatment: 'debt' },
+          { code: 'debt_credit_card', label: 'Credit card payment', subsection: 'Unsecured Debt', treatment: 'debt' },
+          { code: 'debt_personal_loan', label: 'Personal loan payment', subsection: 'Unsecured Debt', treatment: 'debt' },
+          { code: 'debt_medical', label: 'Medical debt / collection', subsection: 'Unsecured Debt', treatment: 'debt' },
+          { code: 'debt_student_loan', label: 'Student loan payment', subsection: 'Student Loans', treatment: 'debt' },
+          { code: 'debt_garnishment', label: 'Wage garnishment / court judgment', subsection: 'Court-Ordered Debt', treatment: 'debt' },
+          { code: 'legal_attorney_fees', label: 'Attorney fees / legal retainer', subsection: 'Legal Expenses', treatment: 'legal' },
+          { code: 'legal_expert_witness', label: 'Expert witness / appraisal fees', subsection: 'Legal Expenses', treatment: 'legal' },
+          { code: 'legal_court_costs', label: 'Court filing / mediation / evaluation fees', subsection: 'Legal Expenses', treatment: 'legal' },
+        ]
+      },
+      {
+        number: 'D',
+        title: 'Discretionary / Lifestyle Expenses',
+        legalBasis: 'Not reportable on AFI form',
+        categories: [
+          { code: 'disc_dining_out', label: 'Dining out / restaurants', subsection: 'Entertainment & Dining', treatment: 'discretionary' },
+          { code: 'disc_entertainment', label: 'Movies / concerts / events', subsection: 'Entertainment & Dining', treatment: 'discretionary' },
+          { code: 'disc_vacation_travel', label: 'Vacations / leisure travel', subsection: 'Travel & Recreation', treatment: 'discretionary' },
+          { code: 'disc_streaming', label: 'Streaming services (entertainment)', subsection: 'Subscriptions', treatment: 'discretionary' },
+          { code: 'disc_gym_fitness', label: 'Gym / fitness membership', subsection: 'Subscriptions', treatment: 'discretionary' },
+          { code: 'disc_subscriptions', label: 'Other subscriptions / memberships', subsection: 'Subscriptions', treatment: 'discretionary' },
+          { code: 'disc_pets', label: 'Pet food / veterinary / grooming', subsection: 'Pets', treatment: 'discretionary' },
+          { code: 'disc_beauty_spa', label: 'Beauty / spa / salon services', subsection: 'Personal Lifestyle', treatment: 'discretionary' },
+          { code: 'disc_alcohol_tobacco', label: 'Alcohol / tobacco / cannabis', subsection: 'Personal Lifestyle', treatment: 'discretionary' },
+          { code: 'disc_shopping', label: 'General retail / shopping', subsection: 'Personal Lifestyle', treatment: 'discretionary' },
+          { code: 'disc_gifts', label: 'Gifts / presents / holiday spending', subsection: 'Gifts & Charity', treatment: 'discretionary' },
+        ]
+      },
+      {
+        number: 'X',
+        title: 'Excluded — NOT Allowed in Support Calculations',
+        legalBasis: 'A.R.S. § 25-320(B)',
+        categories: [
+          { code: 'excl_business_expense', label: 'Business expense / business tax', subsection: 'Business', treatment: 'excluded' },
+          { code: 'excl_business_investment', label: 'Business investment / capital expenditure', subsection: 'Business', treatment: 'excluded' },
+          { code: 'excl_non_party_expense', label: 'Expense for non-party individual', subsection: 'Non-Party', treatment: 'excluded' },
+          { code: 'excl_luxury_non_essential', label: 'Luxury / non-essential purchase', subsection: 'Luxury Items', treatment: 'excluded' },
+          { code: 'excl_investment_contribution', label: 'Investment / retirement contribution', subsection: 'Investments', treatment: 'excluded' },
+        ]
+      },
+    ];
+
+    let currentFilter = 'all';
+
+    function getTreatmentColor(treatment) {
+      const colors = {
+        need: 'treatment-need',
+        support: 'treatment-support',
+        debt: 'treatment-debt',
+        legal: 'treatment-legal',
+        discretionary: 'treatment-discretionary',
+        excluded: 'treatment-excluded',
+        none: 'treatment-none'
+      };
+      return colors[treatment] || '';
+    }
+
+    function getTreatmentLabel(treatment) {
+      const labels = {
+        need: 'Need',
+        support: 'Support',
+        debt: 'Debt',
+        legal: 'Legal',
+        discretionary: 'Discretionary',
+        excluded: 'Excluded',
+        none: 'Non-Expense'
+      };
+      return labels[treatment] || treatment;
+    }
+
+    function renderSections() {
+      const container = document.getElementById('sections-container');
+      const html = SECTIONS.map(section => {
+        const filteredCategories = currentFilter === 'all'
+          ? section.categories
+          : section.categories.filter(c => c.treatment === currentFilter);
+
+        if (filteredCategories.length === 0) {
+          return '';
+        }
+
+        return `
+          <div class="section-card">
+            <div class="section-header">
+              <div class="section-number">${section.number}</div>
+              <div class="section-title-content">
+                <h2>${section.title}</h2>
+                <div class="section-legal">${section.legalBasis}</div>
+              </div>
+              <div class="section-count">${filteredCategories.length} categories</div>
+            </div>
+            <div class="categories-grid">
+              ${filteredCategories.map(cat => `
+                <div class="category-item">
+                  <div class="category-code">${cat.code}</div>
+                  <div class="category-label">${cat.subsection}</div>
+                  <div class="category-description">${cat.label}</div>
+                  <span class="category-treatment ${getTreatmentColor(cat.treatment)}">
+                    ${getTreatmentLabel(cat.treatment)}
+                  </span>
+                </div>
+              `).join('')}
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      container.innerHTML = html || '<div class="empty-section"><p>No categories match your filter.</p></div>';
+    }
+
+    function filterByTreatment(treatment) {
+      currentFilter = treatment;
+      document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+      event.target.classList.add('active');
+      renderSections();
+    }
+
+    document.addEventListener('DOMContentLoaded', renderSections);
+  </script>
+</body>
+</html>

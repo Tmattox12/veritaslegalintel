@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Income Reconciliation Detail</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; background: rgba(0,0,0,0.5); }
+    .modal { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: white; border-radius: 12px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); max-width: 900px; width: 90%; max-height: 90vh; overflow-y: auto; z-index: 1000; }
+    .modal-header { padding: 24px; border-bottom: 1px solid #e0e0e0; display: flex; justify-content: space-between; align-items: center; }
+    .modal-title { font-size: 18px; font-weight: 600; color: #1c3f66; }
+    .close-btn { background: none; border: none; font-size: 24px; cursor: pointer; color: #999; }
+    .modal-content { padding: 24px; }
+    .section { margin-bottom: 32px; }
+    .section-title { font-size: 14px; font-weight: 600; text-transform: uppercase; color: #1c3f66; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 2px solid #e7edf5; }
+    .table { width: 100%; border-collapse: collapse; font-size: 13px; margin-bottom: 16px; }
+    .table th { background: #f5f5f5; padding: 10px; text-align: left; font-weight: 600; color: #333; border-bottom: 1px solid #e0e0e0; }
+    .table td { padding: 10px; border-bottom: 1px solid #f0f0f0; }
+    .table tr:hover { background: #fafafa; }
+    .summary-box { background: #f8f9fa; border: 1px solid #e0e0e0; border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+    .summary-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 13px; }
+    .summary-label { color: #666; }
+    .summary-value { font-weight: 600; color: #1c3f66; }
+    .calculation-steps { background: #e7edf5; border-left: 4px solid #1c3f66; padding: 16px; margin-bottom: 16px; font-size: 12px; line-height: 1.6; color: #333; }
+    .calculation-step { margin-bottom: 12px; }
+    .step-number { font-weight: 600; color: #1c3f66; }
+    .document-list { border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; }
+    .document-item { padding: 16px; border-bottom: 1px solid #f0f0f0; display: flex; gap: 12px; }
+    .document-item:last-child { border-bottom: none; }
+    .document-icon { font-size: 24px; min-width: 30px; }
+    .document-info { flex: 1; }
+    .document-name { font-weight: 600; color: #1c3f66; margin-bottom: 4px; }
+    .document-details { font-size: 12px; color: #999; margin-bottom: 8px; }
+    .document-contribution { background: #e7edf5; padding: 8px; border-radius: 6px; font-size: 12px; color: #1c3f66; margin-bottom: 8px; }
+    .document-actions { display: flex; gap: 8px; }
+    .doc-btn { padding: 6px 12px; border: 1px solid #ddd; background: white; border-radius: 6px; font-size: 12px; cursor: pointer; }
+    .doc-btn:hover { background: #f5f5f5; border-color: #1c3f66; }
+    .btn-primary { background: #1c3f66; color: white; border: none; }
+    .btn-primary:hover { background: #153252; }
+    .status-badge { display: inline-block; padding: 4px 8px; border-radius: 4px; font-size: 11px; font-weight: 600; }
+    .status-verified { background: #c8e6c9; color: #2e7d32; }
+    .status-pending { background: #fff3cd; color: #856404; }
+    .notes-box { background: #fffacd; border: 1px solid #e6e600; border-radius: 8px; padding: 12px; font-size: 12px; color: #333; }
+  </style>
+</head>
+<body>
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title" id="modalTitle">Income Reconciliation Detail</div>
+      <button class="close-btn" onclick="window.history.back()">×</button>
+    </div>
+
+    <div class="modal-content">
+      <!-- Paycheck Details -->
+      <div class="section">
+        <div class="section-title">📋 Paycheck Details</div>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Gross</th>
+              <th>Tax</th>
+              <th>Net</th>
+              <th>YTD</th>
+              <th>Note</th>
+              <th>Status</th>
+            </tr>
+          </thead>
+          <tbody id="paycheckTable"></tbody>
+        </table>
+      </div>
+
+      <!-- Summary -->
+      <div class="section">
+        <div class="section-title">💰 Summary</div>
+        <div class="summary-box">
+          <div class="summary-row">
+            <span class="summary-label">Check Count:</span>
+            <span class="summary-value" id="checkCount">—</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Total Regular Gross:</span>
+            <span class="summary-value" id="totalGross">—</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Monthly Average:</span>
+            <span class="summary-value" id="monthlyAvg">—</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Annualized Salary:</span>
+            <span class="summary-value" id="annualized">—</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Calculation Methodology -->
+      <div class="section">
+        <div class="section-title">📐 How the Annual Figure Was Calculated</div>
+        <div class="calculation-steps" id="calculationSteps"></div>
+      </div>
+
+      <!-- Supporting Documents -->
+      <div class="section">
+        <div class="section-title">📄 Supporting Documents & Verification</div>
+        <div class="notes-box" style="margin-bottom: 16px;">
+          <strong>⚠️ Document Trail:</strong> All calculations are backed by uploaded discovery documents. Click a document to view the source paystub, W2, tax return, or bank statement.
+        </div>
+        <div class="document-list" id="documentList"></div>
+      </div>
+
+      <!-- Audit Notes -->
+      <div class="section">
+        <div class="section-title">✓ Audit & Verification Notes</div>
+        <div class="summary-box">
+          <div id="auditNotes"></div>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="section" style="border-top: 1px solid #e0e0e0; padding-top: 24px; margin-top: 24px; display: flex; gap: 12px;">
+        <button class="doc-btn btn-primary" onclick="exportReconciliation()">📥 Export as PDF</button>
+        <button class="doc-btn" onclick="window.print()">🖨️ Print</button>
+        <button class="doc-btn" onclick="window.history.back()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const incomeSourceId = urlParams.get('source');
+    const matterId = urlParams.get('matter');
+
+    async function loadReconciliation() {
+      if (!matterId || !incomeSourceId) {
+        alert('Missing required parameters');
+        return;
+      }
+
+      try {
+        const resp = await fetch(`/api/matters/${matterId}/income-source/${incomeSourceId}/reconciliation`);
+        const data = await resp.json();
+
+        document.getElementById('modalTitle').textContent = data.title || 'Income Reconciliation';
+
+        // Render paycheck table
+        const tableHtml = data.paychecks.map(p => `
+          <tr>
+            <td>${p.date}</td>
+            <td>${formatCurrency(p.gross)}</td>
+            <td>${formatCurrency(p.tax)}</td>
+            <td>${formatCurrency(p.net)}</td>
+            <td>${p.ytd}</td>
+            <td>${p.note || '—'}</td>
+            <td><span class="status-badge status-verified">✓ Doc</span></td>
+          </tr>
+        `).join('');
+        document.getElementById('paycheckTable').innerHTML = tableHtml;
+
+        // Render summary
+        document.getElementById('checkCount').textContent = data.summary.checkCount;
+        document.getElementById('totalGross').textContent = formatCurrency(data.summary.totalGross);
+        document.getElementById('monthlyAvg').textContent = formatCurrency(data.summary.monthlyAvg);
+        document.getElementById('annualized').textContent = formatCurrency(data.summary.annualized);
+
+        // Render calculation steps
+        const stepsHtml = data.calculationSteps.map((step, i) => `
+          <div class="calculation-step">
+            <span class="step-number">${i + 1}.</span> ${step}
+          </div>
+        `).join('');
+        document.getElementById('calculationSteps').innerHTML = stepsHtml;
+
+        // Render supporting documents
+        const docsHtml = data.supportingDocuments.map(doc => `
+          <div class="document-item">
+            <div class="document-icon">${doc.icon}</div>
+            <div class="document-info">
+              <div class="document-name">${doc.name}</div>
+              <div class="document-details">
+                ${doc.uploadDate ? `Uploaded: ${doc.uploadDate}` : ''}<br>
+                ${doc.coverage ? `Coverage: ${doc.coverage}` : ''}
+              </div>
+              <div class="document-contribution">
+                <strong>Contribution:</strong> ${doc.contribution}
+              </div>
+              <div class="document-actions">
+                <button class="doc-btn" onclick="viewDocument('${doc.id}')">👁️ View</button>
+                <button class="doc-btn" onclick="downloadDocument('${doc.id}')">⬇️ Download</button>
+                <button class="doc-btn" onclick="citationCopy('${doc.id}')">📋 Citation</button>
+              </div>
+            </div>
+          </div>
+        `).join('');
+        document.getElementById('documentList').innerHTML = docsHtml;
+
+        // Render audit notes
+        const auditHtml = data.auditNotes.map(note => `
+          <div style="margin-bottom: 12px; padding-bottom: 12px; border-bottom: 1px solid #f0f0f0;">
+            <strong>${note.title}:</strong> ${note.text}
+          </div>
+        `).join('');
+        document.getElementById('auditNotes').innerHTML = auditHtml;
+      } catch (error) {
+        alert('Error loading reconciliation: ' + error.message);
+      }
+    }
+
+    function formatCurrency(value) {
+      return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 0 }).format(value || 0);
+    }
+
+    function viewDocument(docId) {
+      // Open document in viewer
+      window.open(`/webapp/document-viewer.html?doc=${docId}&matter=${matterId}`, '_blank');
+    }
+
+    function downloadDocument(docId) {
+      // Trigger download
+      window.location.href = `/api/documents/${docId}/download`;
+    }
+
+    function citationCopy(docId) {
+      const citation = `[Case: ${matterId}, Document ID: ${docId}, Date: ${new Date().toLocaleDateString()}]`;
+      navigator.clipboard.writeText(citation);
+      alert('Citation copied to clipboard:\n' + citation);
+    }
+
+    function exportReconciliation() {
+      // TODO: Implement PDF export
+      alert('PDF export coming soon');
+    }
+
+    document.addEventListener('DOMContentLoaded', loadReconciliation);
+  </script>
+</body>
+</html>
