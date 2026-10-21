@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Income Engine — Builder Mode</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: #fafbfc; color: #1a2f4f; }
+    .container { max-width: 1400px; margin: 0 auto; padding: 24px; }
+
+    .header { margin-bottom: 32px; padding-bottom: 24px; border-bottom: 2px solid #e0e7ff; }
+    h1 { font-size: 32px; font-weight: 700; margin-bottom: 8px; }
+    .subtitle { font-size: 16px; color: #5b6472; }
+
+    .matter-info { background: #f4f8fc; border: 1px solid #d7e0ec; border-radius: 8px; padding: 16px; margin-top: 16px; }
+    .matter-info input, .matter-info select { margin-top: 8px; padding: 8px; border: 1px solid #cdd8e7; border-radius: 4px; width: 100%; }
+
+    /* Income Summary */
+    .income-summary { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+    @media (max-width: 1000px) { .income-summary { grid-template-columns: 1fr; } }
+
+    .summary-card { background: #fff; border: 1px solid #e6ebf1; border-top: 4px solid #1c3f66; border-radius: 8px; padding: 16px; }
+    .summary-card.payee { border-top-color: #2f7d5b; }
+    .summary-card.combined { border-top-color: #b8893b; background: #fffdf8; }
+
+    .summary-role { font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; color: #7a8a9a; font-weight: 700; margin-bottom: 8px; }
+    .summary-amount { font-family: 'Fraunces', serif; font-size: 32px; font-weight: 800; color: #1c3f66; margin: 8px 0; }
+    .summary-detail { font-size: 12px; color: #5b6472; }
+
+    /* Two-Column Layout */
+    .two-column { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px; }
+    @media (max-width: 1000px) { .two-column { grid-template-columns: 1fr; } }
+
+    .panel { background: #fff; border: 1px solid #e0e7ff; border-radius: 8px; padding: 20px; margin-bottom: 20px; }
+    .panel-title { font-size: 16px; font-weight: 700; color: #1c3f66; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 2px solid #e0e7ff; }
+
+    /* Income Builder (Intake) */
+    .builder-section { margin-bottom: 16px; }
+    .builder-title { font-size: 12px; font-weight: 800; text-transform: uppercase; color: #1c3f66; letter-spacing: 0.05em; margin-bottom: 12px; }
+    .builder-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 8px; }
+    .builder-checkbox { display: flex; align-items: center; gap: 8px; padding: 8px; border: 1px solid #d7e0ec; border-radius: 6px; cursor: pointer; background: #fff; transition: all 0.2s; }
+    .builder-checkbox:hover { border-color: #1c3f66; background: #f4f8fc; }
+    .builder-checkbox input { margin: 0; width: 16px; height: 16px; cursor: pointer; }
+    .builder-checkbox label { margin: 0; cursor: pointer; font-size: 11px; font-weight: 600; color: #1c3f66; flex: 1; }
+    .builder-checkbox input:checked + label { font-weight: 700; }
+
+    /* Income Sections Container */
+    .income-sections { margin-top: 24px; }
+
+    /* Collapsible Income Card */
+    .income-card { border: 1px solid #d7e0ec; border-radius: 8px; overflow: hidden; margin-bottom: 12px; }
+    .income-card-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 14px 16px;
+      cursor: pointer;
+      user-select: none;
+      font-weight: 700;
+      font-size: 13px;
+      color: white;
+      transition: all 0.2s;
+    }
+    .income-card-header:hover { opacity: 0.9; }
+    .income-card-toggle { font-size: 20px; transition: transform 0.2s; }
+    .income-card.open .income-card-toggle { transform: rotate(180deg); }
+    .income-card-body { padding: 16px; display: none; background: #fff; }
+    .income-card.open .income-card-body { display: block; }
+
+    /* Color scheme for different income types */
+    .income-card.w2 .income-card-header { background: linear-gradient(135deg, #1c3f66 0%, #2e5b8a 100%); }
+    .income-card.bonus .income-card-header { background: linear-gradient(135deg, #d4a574 0%, #c68a52 100%); }
+    .income-card.rsu .income-card-header { background: linear-gradient(135deg, #7b68ee 0%, #6a5acd 100%); }
+    .income-card.selfemployment .income-card-header { background: linear-gradient(135deg, #2f7d5b 0%, #1c5a3f 100%); }
+    .income-card.investment .income-card-header { background: linear-gradient(135deg, #b8893b 0%, #8b6914 100%); }
+    .income-card.rental .income-card-header { background: linear-gradient(135deg, #d97706 0%, #b45309 100%); }
+    .income-card.contract .income-card-header { background: linear-gradient(135deg, #059669 0%, #047857 100%); }
+    .income-card.unemployment .income-card-header { background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%); }
+    .income-card.socialsecurity .income-card-header { background: linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%); }
+    .income-card.spousal .income-card-header { background: linear-gradient(135deg, #e11d48 0%, #be185d 100%); }
+    .income-card.childsupport .income-card-header { background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%); }
+    .income-card.other .income-card-header { background: linear-gradient(135deg, #64748b 0%, #475569 100%); }
+
+    .source-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 12px; }
+    .source-row { display: flex; flex-direction: column; gap: 4px; }
+    .source-label { font-size: 11px; font-weight: 600; color: #1c3f66; }
+    .source-input { padding: 8px; border: 1px solid #d4dce8; border-radius: 4px; font-size: 11px; }
+
+    .source-note { font-size: 10px; color: #7a8a9a; font-style: italic; margin-top: 12px; padding-top: 12px; border-top: 1px solid #e0e7ff; }
+    .action-buttons { display: flex; gap: 8px; margin-top: 12px; }
+    .action-btn { padding: 6px 12px; border: 1px solid #cdd8e7; background: #fff; border-radius: 4px; cursor: pointer; font-size: 11px; color: #1c3f66; font-weight: 600; }
+    .action-btn:hover { background: #f0f5fb; border-color: #1c3f66; }
+
+    /* Income Summary */
+    .income-summary { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+    @media (max-width: 1000px) { .income-summary { grid-template-columns: 1fr; } }
+
+    .note { font-size: 11px; color: #5b6472; margin: 12px 0; padding: 12px; background: #f9f7f3; border-radius: 4px; line-height: 1.6; }
+    .footer { text-align: center; padding: 24px; color: #7a8a9a; font-size: 12px; margin-top: 40px; border-top: 2px solid #e0e7ff; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <h1>Income Engine — Builder Mode</h1>
+      <p class="subtitle">Select income sources · sections appear automatically · color-coded by type · fully collapsible</p>
+
+      <div class="matter-info">
+        <label><strong>Matter</strong>
+          <input type="text" placeholder="Case name & number" />
+        </label>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px;">
+          <label><strong>Party A Name</strong>
+            <input type="text" placeholder="Name" id="partyA-name" />
+          </label>
+          <label><strong>Party B Name</strong>
+            <input type="text" placeholder="Name" id="partyB-name" />
+          </label>
+        </div>
+      </div>
+    </div>
+
+    <!-- Income Summary -->
+    <div class="income-summary">
+      <div class="summary-card">
+        <div class="summary-role">Party A — Total Annual Income</div>
+        <div class="summary-amount" id="partyA-total">$0</div>
+        <div class="summary-detail">
+          <div id="partyA-detail">$0/mo · Sources: 0</div>
+        </div>
+      </div>
+      <div class="summary-card payee">
+        <div class="summary-role">Party B — Total Annual Income</div>
+        <div class="summary-amount" id="partyB-total">$0</div>
+        <div class="summary-detail">
+          <div id="partyB-detail">$0/mo · Sources: 0</div>
+        </div>
+      </div>
+      <div class="summary-card combined">
+        <div class="summary-role">Combined Annual Income</div>
+        <div class="summary-amount" id="combined-total">$0</div>
+        <div class="summary-detail">
+          <div id="combined-detail">$0/mo</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Symmetrical Two-Column Builder -->
+    <div class="two-column">
+      <!-- PARTY A BUILDER -->
+      <div class="panel">
+        <div class="panel-title">🔨 <span id="partyA-builder-name">Party A</span> — Income Source Builder</div>
+        <p style="font-size: 11px; color: #5b6472; margin-bottom: 12px;">Check which income sources apply to this party. Sections will appear below.</p>
+
+        <div class="builder-section">
+          <div class="builder-title">Employment & W-2 Income</div>
+          <div class="builder-grid">
+            <div class="builder-checkbox">
+              <input type="checkbox" id="partyA-w2" value="w2" onchange="updatePartyASections()" />
+              <label for="partyA-w2">Primary W-2 Job</label>
+            </div>
+            <div class="builder-checkbox">
+              <input type="checkbox" id="partyA-w2-2" value="w2-2" onchange="updatePartyASections()" />
+              <label for="partyA-w2-2">2nd W-2 Job</label>
+            </div>
+            <div class="builder-checkbox">
+              <input type="checkbox" id="partyA-w2-3" value="w2-3" onchange="updatePartyASections()" />
+              <label for="partyA-w2-3">3rd W-2 Job</label>
+            </div>
+            <div class="builder-checkbox">
+              <input type="checkbox" id="partyA-bonus" value="bonus" onchange="updatePartyASections()" />
+              <label for="partyA-bonus">Bonus / Performance</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="builder-section">
+          <div class="builder-title">Investment & Property Income</div>
+          <div class="builder-grid">
+            <div class="builder-checkbox">
+              <input type="checkbox" id="partyA-investment" value="investment" onchange="updatePartyASections()" />
+              <label for="partyA-investment">Investment Income</label>
+            </div>
+            <div class="builder-checkbox">
+              <input type="checkbox" id="partyA-rental" value="rental" onchange="updatePartyASections()" />
+              <label for="partyA-rental">Rental Property</label>
+            </div>
+            <div class="builder-checkbox">
+              <input type="checkbox" id="partyA-rsu" value="rsu" onchange="updatePartyASections()" />
+              <label for="partyA-rsu">RSU / Stock</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="builder-section">
+          <div class="builder-title">Self-Employment & Other</div>
+          <div class="builder-grid">
+            <div class="builder-checkbox">
+              <input type="checkbox" id="partyA-selfemployment" value="selfemployment" onchange="updatePartyASections()" />
+              <label for="partyA-selfemployment">Self-Employment</label>
+            </div>
+            <div class="builder-checkbox">
+              <input type="checkbox" id="partyA-contract" value="contract" onchange="updatePartyASections()" />
+              <label for="partyA-contract">1099 / Contract</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="builder-section">
+          <div class="builder-title">Government & Support Income</div>
+          <div class="builder-grid">
+            <div class="builder-checkbox">
+              <input type="checkbox" id="partyA-unemployment" value="unemployment" onchange="updatePartyASections()" />
+              <label for="partyA-unemployment">Unemployment</label>
+            </div>
+            <div class="builder-checkbox">
+              <input type="checkbox" id="partyA-socialsecurity" value="socialsecurity" onchange="updatePartyASections()" />
+              <label for="partyA-socialsecurity">Social Security</label>
+            </div>
+            <div class="builder-checkbox">
+              <input type="checkbox" id="partyA-spousal" value="spousal" onchange="updatePartyASections()" />
+              <label for="partyA-spousal">Spousal Support</label>
+            </div>
+            <div class="builder-checkbox">
+              <input type="checkbox" id="partyA-childsupport" value="childsupport" onchange="updatePartyASections()" />
+              <label for="partyA-childsupport">Child Support Rcvd</label>
+            </div>
+            <div class="builder-checkbox">
+              <input type="checkbox" id="partyA-other" value="other" onchange="updatePartyASections()" />
+              <label for="partyA-other">Other Income</label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PARTY B BUILDER -->
+      <div class="panel">
+        <div class="panel-title">🔨 <span id="partyB-builder-name">Party B</span> — Income Source Builder</div>
+        <p style="font-size: 11px; color: #5b6472; margin-bottom: 12px;">Check which income sources apply to this party. Sections will appear below.</p>
+
+        <div class="builder-section">
+          <div class="builder-title">Employment & W-2 Income</div>
+          <div class="builder-grid">
+            <div class="builder-checkbox">
+              <input type="checkbox" id="partyB-w2" value="w2" onchange="updatePartyBSections()" />
+              <label for="partyB-w2">Primary W-2 Job</label>
+            </div>
+            <div class="builder-checkbox">
+              <input type="checkbox" id="partyB-w2-2" value="w2-2" onchange="updatePartyBSections()" />
+              <label for="partyB-w2-2">2nd W-2 Job</label>
+            </div>
+            <div class="builder-checkbox">
+              <input type="checkbox" id="partyB-w2-3" value="w2-3" onchange="updatePartyBSections()" />
+              <label for="partyB-w2-3">3rd W-2 Job</label>
+            </div>
+            <div class="builder-checkbox">
+              <input type="checkbox" id="partyB-bonus" value="bonus" onchange="updatePartyBSections()" />
+              <label for="partyB-bonus">Bonus / Performance</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="builder-section">
+          <div class="builder-title">Investment & Property Income</div>
+          <div class="builder-grid">
+            <div class="builder-checkbox">
+              <input type="checkbox" id="partyB-investment" value="investment" onchange="updatePartyBSections()" />
+              <label for="partyB-investment">Investment Income</label>
+            </div>
+            <div class="builder-checkbox">
+              <input type="checkbox" id="partyB-rental" value="rental" onchange="updatePartyBSections()" />
+              <label for="partyB-rental">Rental Property</label>
+            </div>
+            <div class="builder-checkbox">
+              <input type="checkbox" id="partyB-rsu" value="rsu" onchange="updatePartyBSections()" />
+              <label for="partyB-rsu">RSU / Stock</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="builder-section">
+          <div class="builder-title">Self-Employment & Other</div>
+          <div class="builder-grid">
+            <div class="builder-checkbox">
+              <input type="checkbox" id="partyB-selfemployment" value="selfemployment" onchange="updatePartyBSections()" />
+              <label for="partyB-selfemployment">Self-Employment</label>
+            </div>
+            <div class="builder-checkbox">
+              <input type="checkbox" id="partyB-contract" value="contract" onchange="updatePartyBSections()" />
+              <label for="partyB-contract">1099 / Contract</label>
+            </div>
+          </div>
+        </div>
+
+        <div class="builder-section">
+          <div class="builder-title">Government & Support Income</div>
+          <div class="builder-grid">
+            <div class="builder-checkbox">
+              <input type="checkbox" id="partyB-unemployment" value="unemployment" onchange="updatePartyBSections()" />
+              <label for="partyB-unemployment">Unemployment</label>
+            </div>
+            <div class="builder-checkbox">
+              <input type="checkbox" id="partyB-socialsecurity" value="socialsecurity" onchange="updatePartyBSections()" />
+              <label for="partyB-socialsecurity">Social Security</label>
+            </div>
+            <div class="builder-checkbox">
+              <input type="checkbox" id="partyB-spousal" value="spousal" onchange="updatePartyBSections()" />
+              <label for="partyB-spousal">Spousal Support</label>
+            </div>
+            <div class="builder-checkbox">
+              <input type="checkbox" id="partyB-childsupport" value="childsupport" onchange="updatePartyBSections()" />
+              <label for="partyB-childsupport">Child Support Rcvd</label>
+            </div>
+            <div class="builder-checkbox">
+              <input type="checkbox" id="partyB-other" value="other" onchange="updatePartyBSections()" />
+              <label for="partyB-other">Other Income</label>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Income Sections for Party A -->
+    <div class="panel">
+      <div class="panel-title">💰 <span id="partyA-income-name">Party A</span> — Income Details</div>
+      <div id="partyA-income-sections" class="income-sections"></div>
+    </div>
+
+    <!-- Income Sections for Party B -->
+    <div class="panel">
+      <div class="panel-title">💰 <span id="partyB-income-name">Party B</span> — Income Details</div>
+      <div id="partyB-income-sections" class="income-sections"></div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <p><strong>Veritas Income Engine — Builder Mode</strong></p>
+      <p>Check income types · sections appear automatically · color-coded by income type · fully collapsible</p>
+    </div>
+  </div>
+
+  <script>
+    const INCOME_TYPES = {
+      w2: { name: 'Primary W-2 Employment', class: 'w2' },
+      'w2-2': { name: '2nd W-2 Employment', class: 'w2' },
+      'w2-3': { name: '3rd W-2 Employment', class: 'w2' },
+      bonus: { name: 'Bonus / Performance Pay', class: 'bonus' },
+      investment: { name: 'Investment Income', class: 'investment' },
+      rental: { name: 'Rental Property Income', class: 'rental' },
+      rsu: { name: 'RSU / Stock Options', class: 'rsu' },
+      selfemployment: { name: 'Self-Employment Income', class: 'selfemployment' },
+      contract: { name: '1099 / Contract Work', class: 'contract' },
+      unemployment: { name: 'Unemployment Benefits', class: 'unemployment' },
+      socialsecurity: { name: 'Social Security', class: 'socialsecurity' },
+      spousal: { name: 'Spousal Support (Other Case)', class: 'spousal' },
+      childsupport: { name: 'Child Support Received', class: 'childsupport' },
+      other: { name: 'Other Income', class: 'other' }
+    };
+
+    function updatePartyASections() {
+      updateSections('partyA');
+    }
+
+    function updatePartyBSections() {
+      updateSections('partyB');
+    }
+
+    function updateSections(party) {
+      const container = document.getElementById(`${party}-income-sections`);
+      container.innerHTML = '';
+
+      // Get all checked checkboxes for this party
+      const checked = Array.from(document.querySelectorAll(`input[id^="${party}-"]:checked`))
+        .map(cb => cb.value);
+
+      if (checked.length === 0) {
+        container.innerHTML = '<div style="font-size: 11px; color: #7a8a9a; padding: 16px; text-align: center; background: #f9f7f3; border-radius: 4px;">Select income sources above to see input fields</div>';
+        return;
+      }
+
+      checked.forEach(type => {
+        const typeInfo = INCOME_TYPES[type];
+        const cardId = `${party}-${type}-card`;
+
+        const card = document.createElement('div');
+        card.className = `income-card ${typeInfo.class}`;
+        card.id = cardId;
+
+        card.innerHTML = `
+          <div class="income-card-header" onclick="toggleCard('${cardId}')">
+            <span>${typeInfo.name}</span>
+            <span class="income-card-toggle">▼</span>
+          </div>
+          <div class="income-card-body">
+            <div class="source-grid">
+              <div class="source-row">
+                <label class="source-label">Annual Amount</label>
+                <input type="number" class="source-input" placeholder="0" min="0" />
+              </div>
+              <div class="source-row">
+                <label class="source-label">Frequency / Period</label>
+                <select class="source-input">
+                  <option>Annual</option>
+                  <option>Monthly</option>
+                  <option>Bi-weekly</option>
+                  <option>Weekly</option>
+                  <option>Quarterly</option>
+                  <option>Per Event</option>
+                </select>
+              </div>
+              <div class="source-row">
+                <label class="source-label">Status</label>
+                <select class="source-input">
+                  <option>Active / Ongoing</option>
+                  <option>Ending / In transition</option>
+                  <option>Pending / Contingent</option>
+                  <option>Disputed</option>
+                  <option>Seasonal</option>
+                </select>
+              </div>
+              <div class="source-row">
+                <label class="source-label">Tax Treatment</label>
+                <select class="source-input">
+                  <option>W-2 wages (subject to FICA)</option>
+                  <option>1099 self-employment (SE tax)</option>
+                  <option>Investment income (passive)</option>
+                  <option>Qualifying / non-taxable</option>
+                  <option>Disputed treatment</option>
+                </select>
+              </div>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+              <div class="source-row">
+                <label class="source-label">Evidence / Source Document</label>
+                <input type="text" class="source-input" placeholder="E.g., 2024 Tax Return, YTD Paystubs" />
+              </div>
+              <div class="source-row">
+                <label class="source-label">Imputation Methodology</label>
+                <select class="source-input">
+                  <option>Documented (tax/paystubs)</option>
+                  <option>Historical average (2-3 yr)</option>
+                  <option>Vocational / earning capacity</option>
+                  <option>Run-rate / current period</option>
+                  <option>Bank deposit analysis</option>
+                  <option>Custom / explained below</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="source-row" style="margin-top: 12px;">
+              <label class="source-label">Notes / Supporting Explanation</label>
+              <textarea class="source-input" style="min-height: 50px; resize: vertical;" placeholder="Any relevant notes about this income source, disputed amounts, assumptions, etc."></textarea>
+            </div>
+
+            <div class="action-buttons">
+              <button class="action-btn" onclick="linkDocument('${cardId}')">📎 Link Document</button>
+              <button class="action-btn" onclick="linkQuestionnaire('${cardId}')">📋 Link Questionnaire</button>
+              <button class="action-btn" onclick="viewSourcingDetails('${cardId}')">🔍 Sourcing Details</button>
+            </div>
+
+            <div class="source-note">
+              💡 Link supporting documents via the buttons above (tax returns, paystubs, discovery documents, questionnaire responses). This income feeds AFI, spousal, and child support calculations.
+            </div>
+          </div>
+        `;
+
+        container.appendChild(card);
+      });
+    }
+
+    function toggleCard(cardId) {
+      const card = document.getElementById(cardId);
+      card.classList.toggle('open');
+    }
+
+    function linkDocument(cardId) {
+      alert(`Link document for: ${cardId}\nSupports: Tax returns, paystubs, discovery documents, etc.`);
+    }
+
+    function linkQuestionnaire(cardId) {
+      alert(`Link questionnaire response for: ${cardId}`);
+    }
+
+    function viewSourcingDetails(cardId) {
+      alert(`Sourcing details for: ${cardId}`);
+    }
+
+    // Update party names in sections
+    document.getElementById('partyA-name').addEventListener('change', function(e) {
+      document.getElementById('partyA-builder-name').textContent = e.target.value || 'Party A';
+      document.getElementById('partyA-income-name').textContent = e.target.value || 'Party A';
+    });
+
+    document.getElementById('partyB-name').addEventListener('change', function(e) {
+      document.getElementById('partyB-builder-name').textContent = e.target.value || 'Party B';
+      document.getElementById('partyB-income-name').textContent = e.target.value || 'Party B';
+    });
+
+    console.log('Income Engine Builder Mode Loaded');
+  </script>
+</body>
+</html>
