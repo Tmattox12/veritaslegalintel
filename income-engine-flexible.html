@@ -11,10 +11,13 @@
 
     /* Sidebar */
     .sidebar { width: 240px; background: linear-gradient(180deg, #1c3f66 0%, #153252 100%); color: white; padding: 24px 16px; position: fixed; height: 100vh; overflow-y: auto; box-shadow: 2px 0 8px rgba(0,0,0,0.1); }
-    .brand { display: flex; align-items: center; gap: 12px; margin-bottom: 32px; }
-    .brand-logo { width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px; }
-    .brand-text h3 { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
-    .brand-text p { font-size: 11px; color: rgba(255,255,255,0.7); }
+    .brand { display: flex; align-items: center; gap: 12px; padding: 6px 8px 16px; }
+    .brand-mark { width: 54px; height: 54px; border-radius: 12px; background: white; display: grid; place-items: center; box-shadow: 0 4px 14px rgba(0,0,0,0.15); overflow: hidden; flex-shrink: 0; }
+    .brand-mark img { width: 95%; height: 95%; object-fit: contain; }
+    .brand-mark-fallback { font-size: 22px; color: #b8893b; font-family: 'Fraunces', serif; font-weight: 700; }
+    .brand-text { display: flex; flex-direction: column; line-height: 1.1; }
+    .brand-name { font-family: 'Trajan Pro', 'Times New Roman', serif; font-weight: 700; font-size: 18px; color: #fff; letter-spacing: 2px; text-transform: uppercase; }
+    .brand-sub { font-family: 'Trajan Pro', 'Times New Roman', serif; font-size: 10px; color: #b8a080; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 600; }
     .nav-section { margin-bottom: 28px; }
     .nav-section-title { font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; color: rgba(255,255,255,0.5); font-weight: 700; margin-bottom: 12px; }
     .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 6px; cursor: pointer; margin-bottom: 6px; transition: all 0.2s; font-size: 12px; text-decoration: none; color: rgba(255,255,255,0.8); }
@@ -132,7 +135,7 @@
 </head>
 <body>
   <aside class="sidebar">
-    <div class="brand"><div class="brand-logo">VFI</div><div class="brand-text"><h3>Veritas</h3><p>Financial Intelligence</p></div></div>
+    <div class="brand"><div class="brand-mark"><img src="logo-vfi.jpg" alt="VFI Logo" /><span class="brand-mark-fallback">VFI</span></div><div class="brand-text"><span class="brand-name">Veritas</span><span class="brand-sub">Financial Intelligence</span></div></div>
     <div class="nav-section"><div class="nav-section-title">Workspace</div>
       <a href="master-dashboard.html" class="nav-item"><span class="nav-item-icon">◆</span> Dashboard</a><a href="#" class="nav-item"><span class="nav-item-icon">▤</span> Case Intake</a><a href="#" class="nav-item"><span class="nav-item-icon">◯</span> Matters</a><a href="#" class="nav-item"><span class="nav-item-icon">⤓</span> Document Intake</a><a href="document-reconciliation-hub.html" class="nav-item"><span class="nav-item-icon">📁</span> Document Hub</a><a href="#" class="nav-item"><span class="nav-item-icon">◷</span> Calendar</a><a href="#" class="nav-item"><span class="nav-item-icon">☑</span> Tasks</a><a href="#" class="nav-item"><span class="nav-item-icon">◍</span> Clients</a>
     </div>

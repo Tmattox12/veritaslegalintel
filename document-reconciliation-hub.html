@@ -21,10 +21,13 @@
       box-shadow: 2px 0 8px rgba(0,0,0,0.1);
     }
 
-    .brand { display: flex; align-items: center; gap: 12px; margin-bottom: 32px; }
-    .brand-logo { width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px; }
-    .brand-text h3 { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
-    .brand-text p { font-size: 11px; color: rgba(255,255,255,0.7); }
+    .brand { display: flex; align-items: center; gap: 12px; padding: 6px 8px 16px; }
+    .brand-mark { width: 54px; height: 54px; border-radius: 12px; background: white; display: grid; place-items: center; box-shadow: 0 4px 14px rgba(0,0,0,0.15); overflow: hidden; flex-shrink: 0; }
+    .brand-mark img { width: 95%; height: 95%; object-fit: contain; }
+    .brand-mark-fallback { font-size: 22px; color: #b8893b; font-family: 'Fraunces', serif; font-weight: 700; }
+    .brand-text { display: flex; flex-direction: column; line-height: 1.1; }
+    .brand-name { font-family: 'Trajan Pro', 'Times New Roman', serif; font-weight: 700; font-size: 18px; color: #fff; letter-spacing: 2px; text-transform: uppercase; }
+    .brand-sub { font-family: 'Trajan Pro', 'Times New Roman', serif; font-size: 10px; color: #b8a080; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 600; }
 
     .nav-section { margin-bottom: 28px; }
     .nav-section-title { font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; color: rgba(255,255,255,0.5); font-weight: 700; margin-bottom: 12px; }
@@ -100,10 +103,13 @@
   <!-- SIDEBAR -->
   <aside class="sidebar">
     <div class="brand">
-      <div class="brand-logo">VFI</div>
+      <div class="brand-mark">
+        <img src="logo-vfi.jpg" alt="VFI Logo" />
+        <span class="brand-mark-fallback">VFI</span>
+      </div>
       <div class="brand-text">
-        <h3>Veritas</h3>
-        <p>Financial Intelligence</p>
+        <span class="brand-name">Veritas</span>
+        <span class="brand-sub">Financial Intelligence</span>
       </div>
     </div>
 
