@@ -335,6 +335,79 @@
       <div id="partyB-income-sections" class="income-sections"></div>
     </div>
 
+    <!-- Reconciliation Modal -->
+    <div id="recon-modal" style="display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); z-index: 1000; overflow-y: auto; padding: 20px;">
+      <div style="background: white; border-radius: 8px; max-width: 900px; margin: 40px auto; padding: 30px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; border-bottom: 2px solid #e0e7ff; padding-bottom: 16px;">
+          <h2 id="recon-title" style="margin: 0; font-size: 20px; color: #1c3f66; font-weight: 700;">Income Reconciliation Detail</h2>
+          <button type="button" onclick="closeRecon()" style="background: none; border: none; font-size: 24px; cursor: pointer; color: #5b6472;">×</button>
+        </div>
+
+        <!-- Paycheck Details -->
+        <div style="margin-bottom: 24px;">
+          <div style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: #1c3f66; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #e0e7ff;">📋 Paycheck Details</div>
+          <table style="width: 100%; border-collapse: collapse; font-size: 11px;">
+            <thead>
+              <tr style="background: #f5f0e8;">
+                <th style="padding: 8px; text-align: left; font-weight: 600; border: 1px solid #ddd;">Period</th>
+                <th style="padding: 8px; text-align: right; font-weight: 600; border: 1px solid #ddd;">Gross</th>
+                <th style="padding: 8px; text-align: right; font-weight: 600; border: 1px solid #ddd;">Frequency</th>
+                <th style="padding: 8px; text-align: left; font-weight: 600; border: 1px solid #ddd;">Status</th>
+              </tr>
+            </thead>
+            <tbody id="recon-paychecks">
+              <tr>
+                <td style="padding: 8px; border: 1px solid #ddd;">Current Period</td>
+                <td style="padding: 8px; text-align: right; font-weight: 600; color: #1c3f66; border: 1px solid #ddd;">$0</td>
+                <td style="padding: 8px; text-align: right; border: 1px solid #ddd;" id="recon-frequency">—</td>
+                <td style="padding: 8px; border: 1px solid #ddd;" id="recon-status">—</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Summary -->
+        <div style="margin-bottom: 24px;">
+          <div style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: #1c3f66; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #e0e7ff;">💰 Summary</div>
+          <div style="background: #f8f9fa; border: 1px solid #e0e7ff; border-radius: 8px; padding: 14px;">
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+              <div>
+                <div style="font-size: 10px; color: #7a8a9a; text-transform: uppercase; margin-bottom: 4px;">Monthly Amount</div>
+                <div style="font-family: 'Fraunces', serif; font-size: 20px; font-weight: 700; color: #1c3f66;" id="recon-monthly">$0</div>
+              </div>
+              <div>
+                <div style="font-size: 10px; color: #7a8a9a; text-transform: uppercase; margin-bottom: 4px;">Annualized</div>
+                <div style="font-family: 'Fraunces', serif; font-size: 20px; font-weight: 700; color: #1c3f66;" id="recon-annual">$0</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Calculation Methodology -->
+        <div style="margin-bottom: 24px;">
+          <div style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: #1c3f66; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #e0e7ff;">📐 How Calculated</div>
+          <div style="background: #f0f4fa; border-left: 4px solid #2e5b8a; padding: 12px; border-radius: 4px; font-size: 11px; color: #333; line-height: 1.6;" id="recon-methodology">
+            Calculation steps will appear here
+          </div>
+        </div>
+
+        <!-- Supporting Documents -->
+        <div style="margin-bottom: 24px;">
+          <div style="font-size: 12px; font-weight: 700; text-transform: uppercase; color: #1c3f66; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #e0e7ff;">📄 Supporting Documents</div>
+          <div style="border: 1px solid #e0e7ff; border-radius: 8px; overflow: hidden;" id="recon-documents">
+            <div style="padding: 12px; color: #7a8a9a; font-size: 11px; text-align: center;">No documents linked yet</div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div style="display: flex; gap: 12px; padding-top: 16px; border-top: 1px solid #e0e7ff;">
+          <button type="button" onclick="exportReconPDF()" style="padding: 8px 16px; background: #2e5b8a; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 600;">📥 Export as PDF</button>
+          <button type="button" onclick="window.print()" style="padding: 8px 16px; background: white; color: #2e5b8a; border: 1px solid #d4dce8; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 600;">🖨️ Print</button>
+          <button type="button" onclick="closeRecon()" style="padding: 8px 16px; background: white; color: #2e5b8a; border: 1px solid #d4dce8; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 600; margin-left: auto;">Close</button>
+        </div>
+      </div>
+    </div>
+
     <!-- Footer -->
     <div class="footer">
       <p><strong>Veritas Income Engine — Builder Mode</strong></p>
@@ -457,6 +530,7 @@
             </div>
 
             <div class="action-buttons">
+              <button class="action-btn" onclick="viewRecon('${cardId}', '${party}', '${type}')">📊 View Recon</button>
               <button class="action-btn" onclick="linkDocument('${cardId}')">📎 Link Document</button>
               <button class="action-btn" onclick="linkQuestionnaire('${cardId}')">📋 Link Questionnaire</button>
               <button class="action-btn" onclick="viewSourcingDetails('${cardId}')">🔍 Sourcing Details</button>
@@ -489,6 +563,96 @@
       alert(`Sourcing details for: ${cardId}`);
     }
 
+    function viewRecon(cardId, party, type) {
+      const card = document.getElementById(cardId);
+      const inputs = card.querySelectorAll('.source-input');
+
+      // Extract values from form
+      const annualAmount = parseFloat(inputs[0].value) || 0;
+      const frequency = inputs[1].value;
+      const status = inputs[2].value;
+      const taxTreatment = inputs[3].value;
+      const evidence = inputs[4].value;
+      const methodology = inputs[5].value;
+      const notes = card.querySelector('textarea').value;
+
+      const partyName = document.getElementById(`${party}-name`).value || party.toUpperCase();
+      const INCOME_TYPES_DISPLAY = {
+        w2: 'Primary W-2 Employment',
+        'w2-2': '2nd W-2 Employment',
+        'w2-3': '3rd W-2 Employment',
+        bonus: 'Bonus / Performance Pay',
+        investment: 'Investment Income',
+        rental: 'Rental Property Income',
+        rsu: 'RSU / Stock Options',
+        selfemployment: 'Self-Employment Income',
+        contract: '1099 / Contract Work',
+        unemployment: 'Unemployment Benefits',
+        socialsecurity: 'Social Security',
+        spousal: 'Spousal Support (Other Case)',
+        childsupport: 'Child Support Received',
+        other: 'Other Income'
+      };
+
+      // Calculate annualized and monthly
+      let monthlyAmount = annualAmount;
+      let annualizedAmount = annualAmount;
+
+      if (frequency === 'Monthly') {
+        annualizedAmount = annualAmount * 12;
+        monthlyAmount = annualAmount;
+      } else if (frequency === 'Bi-weekly') {
+        annualizedAmount = annualAmount * 26;
+        monthlyAmount = annualAmount * 26 / 12;
+      } else if (frequency === 'Weekly') {
+        annualizedAmount = annualAmount * 52;
+        monthlyAmount = annualAmount * 52 / 12;
+      } else if (frequency === 'Quarterly') {
+        annualizedAmount = annualAmount * 4;
+        monthlyAmount = annualAmount * 4 / 12;
+      }
+
+      // Populate modal
+      document.getElementById('recon-title').textContent = `${INCOME_TYPES_DISPLAY[type]} — ${partyName} — Reconciliation`;
+      document.getElementById('recon-frequency').textContent = frequency;
+      document.getElementById('recon-status').textContent = status;
+      document.getElementById('recon-monthly').textContent = '$' + monthlyAmount.toLocaleString('en-US', {maximumFractionDigits: 0});
+      document.getElementById('recon-annual').textContent = '$' + annualizedAmount.toLocaleString('en-US', {maximumFractionDigits: 0});
+
+      // Calculation methodology
+      const methodologyText = `
+        <div style="margin-bottom: 8px;"><strong>1. Income Type:</strong> ${INCOME_TYPES_DISPLAY[type]}</div>
+        <div style="margin-bottom: 8px;"><strong>2. Amount:</strong> $${annualAmount.toLocaleString('en-US', {maximumFractionDigits: 2})} per ${frequency.toLowerCase()}</div>
+        <div style="margin-bottom: 8px;"><strong>3. Annualization Factor:</strong> ${frequency === 'Monthly' ? '12x' : frequency === 'Bi-weekly' ? '26x' : frequency === 'Weekly' ? '52x' : frequency === 'Quarterly' ? '4x' : '1x'}</div>
+        <div style="margin-bottom: 8px;"><strong>4. Calculated Annual:</strong> $${annualizedAmount.toLocaleString('en-US', {maximumFractionDigits: 0})}</div>
+        <div style="margin-bottom: 8px;"><strong>5. Methodology:</strong> ${methodology}</div>
+        <div style="margin-bottom: 8px;"><strong>6. Tax Treatment:</strong> ${taxTreatment}</div>
+        ${notes ? `<div style="margin-bottom: 8px;"><strong>7. Notes:</strong> ${notes}</div>` : ''}
+      `;
+      document.getElementById('recon-methodology').innerHTML = methodologyText;
+
+      // Supporting documents
+      const docsHTML = evidence ? `
+        <div style="padding: 12px; border-bottom: 1px solid #e0e7ff;">
+          <div style="font-weight: 600; color: #1c3f66; margin-bottom: 4px; font-size: 11px;">Evidence / Source Document</div>
+          <div style="font-size: 10px; color: #7a8a9a; margin-bottom: 8px;">${evidence}</div>
+          <button style="padding: 4px 8px; border: 1px solid #cdd8e7; background: white; border-radius: 4px; cursor: pointer; font-size: 10px; color: #1c3f66; font-weight: 600;">View Document</button>
+        </div>
+      ` : '<div style="padding: 12px; color: #7a8a9a; font-size: 11px; text-align: center;">No documents linked yet</div>';
+      document.getElementById('recon-documents').innerHTML = docsHTML;
+
+      // Show modal
+      document.getElementById('recon-modal').style.display = 'block';
+    }
+
+    function closeRecon() {
+      document.getElementById('recon-modal').style.display = 'none';
+    }
+
+    function exportReconPDF() {
+      alert('PDF export functionality would be implemented here');
+    }
+
     // Update party names in sections
     document.getElementById('partyA-name').addEventListener('change', function(e) {
       document.getElementById('partyA-builder-name').textContent = e.target.value || 'Party A';
@@ -499,6 +663,14 @@
       document.getElementById('partyB-builder-name').textContent = e.target.value || 'Party B';
       document.getElementById('partyB-income-name').textContent = e.target.value || 'Party B';
     });
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+      const modal = document.getElementById('recon-modal');
+      if (event.target === modal) {
+        modal.style.display = 'none';
+      }
+    };
 
     console.log('Income Engine Builder Mode Loaded');
   </script>
