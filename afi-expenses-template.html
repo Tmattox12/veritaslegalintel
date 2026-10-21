@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AFI Expenses Analyzer — Template</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: #fafbfc; color: #1a2f4f; }
+    .container { max-width: 1200px; margin: 0 auto; padding: 24px; }
+    .header { margin-bottom: 32px; padding-bottom: 24px; border-bottom: 2px solid #e0e7ff; }
+    h1 { font-size: 32px; font-weight: 700; margin-bottom: 8px; }
+    .subtitle { font-size: 16px; color: #5b6472; }
+    .matter-info { background: #f4f8fc; border: 1px solid #d7e0ec; border-radius: 8px; padding: 16px; margin-top: 16px; }
+    .matter-info input, .matter-info select { margin-top: 8px; padding: 8px; border: 1px solid #cdd8e7; border-radius: 4px; width: 100%; }
+    .panel { background: #fff; border: 1px solid #e0e7ff; border-radius: 8px; padding: 20px; margin-bottom: 20px; }
+    .panel-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 2px solid #e0e7ff; }
+    .panel-head h3 { font-size: 16px; font-weight: 700; margin: 0; }
+    .tag { display: inline-block; background: #f0f4fa; color: #425c7f; padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 600; }
+    .afi-section { margin-bottom: 28px; }
+    .section-title { font-size: 14px; font-weight: 800; color: #1c3f66; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #e0e7ff; }
+    .section-subtitle { font-size: 11px; color: #5b6472; margin-bottom: 12px; line-height: 1.5; }
+    .expense-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-bottom: 16px; }
+    .expense-card { border: 1px solid #d7e0ec; border-radius: 8px; padding: 12px; background: #fff; }
+    .expense-card:hover { border-color: #1c3f66; box-shadow: 0 0 0 2px rgba(28,63,102,0.14); }
+    .expense-label { font-size: 11px; font-weight: 700; color: #1c3f66; margin-bottom: 6px; }
+    .expense-input { width: 100%; padding: 8px; border: 1px solid #d4dce8; border-radius: 4px; font-size: 12px; font-family: 'Fraunces', serif; }
+    .expense-note { font-size: 10px; color: #7a8a9a; margin-top: 4px; }
+    .comparison-table { width: 100%; border-collapse: collapse; font-size: 11px; margin: 12px 0; }
+    .comparison-table th { background: #f5f0e8; padding: 10px; text-align: left; font-weight: 600; border: 1px solid #ddd; }
+    .comparison-table td { padding: 10px; border: 1px solid #ddd; }
+    .comparison-table .amount { text-align: right; font-weight: 600; color: #1c3f66; font-family: 'Fraunces', serif; }
+    .comparison-table .negative { color: #c62828; }
+    .comparison-table .positive { color: #2e7d32; }
+    .flag-box { background: #ffebee; border-left: 4px solid #c62828; padding: 12px; border-radius: 4px; margin: 12px 0; }
+    .flag-title { color: #c62828; font-weight: 700; font-size: 11px; margin-bottom: 4px; }
+    .flag-detail { font-size: 10px; color: #666; line-height: 1.5; }
+    .summary-box { background: #f8f9fa; border: 1px solid #e0e7ff; border-radius: 8px; padding: 14px; margin: 12px 0; }
+    .summary-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 12px; }
+    .summary-label { color: #5b6472; }
+    .summary-value { font-family: 'Fraunces', serif; font-size: 18px; font-weight: 700; color: #1c3f66; }
+    .note { font-size: 11px; color: #5b6472; margin: 12px 0; padding: 12px; background: #f9f7f3; border-radius: 4px; line-height: 1.6; }
+    .btn { padding: 8px 16px; background: #2e5b8a; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 600; margin-right: 8px; }
+    .btn:hover { background: #1c3f66; }
+    .footer { text-align: center; padding: 24px; color: #7a8a9a; font-size: 12px; margin-top: 40px; border-top: 2px solid #e0e7ff; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <h1>AFI Expenses Analyzer</h1>
+      <p class="subtitle">Arizona Form 12 — Affidavit of Financial Information · expense tracking & comparison · income/need analysis</p>
+
+      <div class="matter-info">
+        <label><strong>Matter</strong>
+          <input type="text" placeholder="Enter case name & number" />
+        </label>
+        <label style="display: grid; margin-top: 12px;"><strong>Filer Name</strong>
+          <input type="text" placeholder="Name" />
+        </label>
+        <label style="display: grid; margin-top: 12px;"><strong>Opposing Party Name</strong>
+          <input type="text" placeholder="Name" />
+        </label>
+        <label style="display: grid; margin-top: 12px;"><strong>Reporting Period</strong>
+          <input type="month" />
+        </label>
+      </div>
+    </div>
+
+    <!-- Income Summary -->
+    <div class="panel">
+      <div class="panel-head">
+        <h3>💰 Income Summary</h3>
+        <span class="tag">From Income Imputation module</span>
+      </div>
+
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px;">
+        <div class="summary-box">
+          <div class="summary-row">
+            <span class="summary-label">Filer Gross Monthly Income</span>
+            <span class="summary-value">$0</span>
+          </div>
+          <div class="summary-row" style="font-size: 10px;">
+            <span style="color: #7a8a9a;">($0 annual)</span>
+          </div>
+        </div>
+        <div class="summary-box">
+          <div class="summary-row">
+            <span class="summary-label">Opposing Party Gross Monthly Income</span>
+            <span class="summary-value">$0</span>
+          </div>
+          <div class="summary-row" style="font-size: 10px;">
+            <span style="color: #7a8a9a;">($0 annual)</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="note">
+        Gross income figures should be pulled from the Income Imputation module to ensure consistency across AFI, spousal, and child-support calculations.
+      </div>
+    </div>
+
+    <!-- Living Expenses (Section 1-7) -->
+    <div class="panel">
+      <div class="panel-head">
+        <h3>🏠 Monthly Living Expenses</h3>
+        <span class="tag">Sections 1–7 of AFI Form 12</span>
+      </div>
+
+      <!-- Health Insurance -->
+      <div class="afi-section">
+        <div class="section-title">1. Health Insurance Premiums</div>
+        <div class="section-subtitle">Monthly cost of health insurance for filer and dependents. Include deductibles and co-pay estimates.</div>
+        <div class="expense-grid">
+          <div class="expense-card">
+            <label class="expense-label">Filer Coverage</label>
+            <input type="number" class="expense-input" placeholder="0" min="0" />
+            <div class="expense-note">Monthly premium</div>
+          </div>
+          <div class="expense-card">
+            <label class="expense-label">Spouse/Dependent Coverage</label>
+            <input type="number" class="expense-input" placeholder="0" min="0" />
+            <div class="expense-note">Monthly premium</div>
+          </div>
+          <div class="expense-card">
+            <label class="expense-label">Deductibles & Co-pays</label>
+            <input type="number" class="expense-input" placeholder="0" min="0" />
+            <div class="expense-note">Estimated monthly</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Childcare -->
+      <div class="afi-section">
+        <div class="section-title">2. Childcare & Education Expenses</div>
+        <div class="section-subtitle">Monthly costs for childcare, preschool, daycare, tutoring, or educational programs.</div>
+        <div class="expense-grid">
+          <div class="expense-card">
+            <label class="expense-label">Childcare/Daycare</label>
+            <input type="number" class="expense-input" placeholder="0" min="0" />
+            <div class="expense-note">All children</div>
+          </div>
+          <div class="expense-card">
+            <label class="expense-label">Preschool/Pre-K</label>
+            <input type="number" class="expense-input" placeholder="0" min="0" />
+            <div class="expense-note">Monthly</div>
+          </div>
+          <div class="expense-card">
+            <label class="expense-label">Tutoring/Academic Programs</label>
+            <input type="number" class="expense-input" placeholder="0" min="0" />
+            <div class="expense-note">Monthly</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Medical/Dental/Vision -->
+      <div class="afi-section">
+        <div class="section-title">3. Medical, Dental & Vision Care</div>
+        <div class="section-subtitle">Unreimbursed medical, dental, vision, and therapy expenses (not covered by insurance).</div>
+        <div class="expense-grid">
+          <div class="expense-card">
+            <label class="expense-label">Medical (unreimbursed)</label>
+            <input type="number" class="expense-input" placeholder="0" min="0" />
+            <div class="expense-note">Estimated monthly</div>
+          </div>
+          <div class="expense-card">
+            <label class="expense-label">Dental (unreimbursed)</label>
+            <input type="number" class="expense-input" placeholder="0" min="0" />
+            <div class="expense-note">Estimated monthly</div>
+          </div>
+          <div class="expense-card">
+            <label class="expense-label">Vision/Glasses/Contacts</label>
+            <input type="number" class="expense-input" placeholder="0" min="0" />
+            <div class="expense-note">Estimated monthly</div>
+          </div>
+          <div class="expense-card">
+            <label class="expense-label">Therapy/Counseling</label>
+            <input type="number" class="expense-input" placeholder="0" min="0" />
+            <div class="expense-note">Estimated monthly</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Higher Education -->
+      <div class="afi-section">
+        <div class="section-title">4. Higher Education Costs</div>
+        <div class="section-subtitle">Monthly allocation for college tuition, student loans, or post-secondary education.</div>
+        <div class="expense-grid">
+          <div class="expense-card">
+            <label class="expense-label">College Tuition</label>
+            <input type="number" class="expense-input" placeholder="0" min="0" />
+            <div class="expense-note">Monthly (annualized)</div>
+          </div>
+          <div class="expense-card">
+            <label class="expense-label">Student Loan Repayment</label>
+            <input type="number" class="expense-input" placeholder="0" min="0" />
+            <div class="expense-note">Monthly</div>
+          </div>
+          <div class="expense-card">
+            <label class="expense-label">Books & Supplies</label>
+            <input type="number" class="expense-input" placeholder="0" min="0" />
+            <div class="expense-note">Monthly (estimated)</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Housing -->
+      <div class="afi-section">
+        <div class="section-title">5. Housing Expenses</div>
+        <div class="section-subtitle">Mortgage/rent, property tax, homeowners insurance, HOA, and maintenance.</div>
+        <div class="expense-grid">
+          <div class="expense-card">
+            <label class="expense-label">Mortgage/Rent</label>
+            <input type="number" class="expense-input" placeholder="0" min="0" />
+            <div class="expense-note">Monthly payment</div>
+          </div>
+          <div class="expense-card">
+            <label class="expense-label">Property Tax</label>
+            <input type="number" class="expense-input" placeholder="0" min="0" />
+            <div class="expense-note">Monthly allocation</div>
+          </div>
+          <div class="expense-card">
+            <label class="expense-label">Homeowners Insurance</label>
+            <input type="number" class="expense-input" placeholder="0" min="0" />
+            <div class="expense-note">Monthly allocation</div>
+          </div>
+          <div class="expense-card">
+            <label class="expense-label">HOA Fees</label>
+            <input type="number" class="expense-input" placeholder="0" min="0" />
+            <div class="expense-note">Monthly</div>
+          </div>
+          <div class="expense-card">
+            <label class="expense-label">Utilities (Electric/Gas/Water)</label>
+            <input type="number" class="expense-input" placeholder="0" min="0" />
+            <div class="expense-note">Monthly average</div>
+          </div>
+          <div class="expense-card">
+            <label class="expense-label">Trash/Recycling</label>
+            <input type="number" class="expense-input" placeholder="0" min="0" />
+            <div class="expense-note">Monthly</div>
+          </div>
+          <div class="expense-card">
+            <label class="expense-label">Maintenance & Repairs</label>
+            <input type="number" class="expense-input" placeholder="0" min="0" />
+            <div class="expense-note">Monthly (estimated)</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Transportation -->
+      <div class="afi-section">
+        <div class="section-title">6. Transportation</div>
+        <div class="section-subtitle">Vehicle payments, insurance, fuel, maintenance, registration, and tolls.</div>
+        <div class="expense-grid">
+          <div class="expense-card">
+            <label class="expense-label">Car Payment (Vehicle 1)</label>
+            <input type="number" class="expense-input" placeholder="0" min="0" />
+            <div class="expense-note">Monthly</div>
+          </div>
+          <div class="expense-card">
+            <label class="expense-label">Car Payment (Vehicle 2)</label>
+            <input type="number" class="expense-input" placeholder="0" min="0" />
+            <div class="expense-note">Monthly</div>
+          </div>
+          <div class="expense-card">
+            <label class="expense-label">Auto Insurance</label>
+            <input type="number" class="expense-input" placeholder="0" min="0" />
+            <div class="expense-note">Monthly allocation</div>
+          </div>
+          <div class="expense-card">
+            <label class="expense-label">Fuel</label>
+            <input type="number" class="expense-input" placeholder="0" min="0" />
+            <div class="expense-note">Monthly average</div>
+          </div>
+          <div class="expense-card">
+            <label class="expense-label">Maintenance & Repairs</label>
+            <input type="number" class="expense-input" placeholder="0" min="0" />
+            <div class="expense-note">Monthly (estimated)</div>
+          </div>
+          <div class="expense-card">
+            <label class="expense-label">Registration & Tags</label>
+            <input type="number" class="expense-input" placeholder="0" min="0" />
+            <div class="expense-note">Monthly allocation</div>
+          </div>
+          <div class="expense-card">
+            <label class="expense-label">Public Transit</label>
+            <input type="number" class="expense-input" placeholder="0" min="0" />
+            <div class="expense-note">Monthly</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Food & Household -->
+      <div class="afi-section">
+        <div class="section-title">7. Food & Household Supplies</div>
+        <div class="section-subtitle">Groceries, dining out, and household items (cleaning, toiletries, etc.).</div>
+        <div class="expense-grid">
+          <div class="expense-card">
+            <label class="expense-label">Groceries</label>
+            <input type="number" class="expense-input" placeholder="0" min="0" />
+            <div class="expense-note">Monthly average</div>
+          </div>
+          <div class="expense-card">
+            <label class="expense-label">Dining Out</label>
+            <input type="number" class="expense-input" placeholder="0" min="0" />
+            <div class="expense-note">Monthly average</div>
+          </div>
+          <div class="expense-card">
+            <label class="expense-label">Household Supplies</label>
+            <input type="number" class="expense-input" placeholder="0" min="0" />
+            <div class="expense-note">Monthly (estimated)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Court-Ordered Obligations -->
+    <div class="panel">
+      <div class="panel-head">
+        <h3>⚖ Court-Ordered Obligations</h3>
+        <span class="tag">Section 8 of AFI Form 12</span>
+      </div>
+
+      <div class="afi-section">
+        <div class="expense-grid">
+          <div class="expense-card">
+            <label class="expense-label">Child Support (Current Case)</label>
+            <input type="number" class="expense-input" placeholder="0" min="0" />
+            <div class="expense-note">Monthly</div>
+          </div>
+          <div class="expense-card">
+            <label class="expense-label">Spousal Support (Current/Prior)</label>
+            <input type="number" class="expense-input" placeholder="0" min="0" />
+            <div class="expense-note">Monthly</div>
+          </div>
+          <div class="expense-card">
+            <label class="expense-label">Court-Ordered Debt Service</label>
+            <input type="number" class="expense-input" placeholder="0" min="0" />
+            <div class="expense-note">Monthly</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Discretionary/Other -->
+    <div class="panel">
+      <div class="panel-head">
+        <h3>🛍 Discretionary Spending</h3>
+        <span class="tag">Entertainment · personal care · subscriptions</span>
+      </div>
+
+      <div class="afi-section">
+        <div class="expense-grid">
+          <div class="expense-card">
+            <label class="expense-label">Clothing & Accessories</label>
+            <input type="number" class="expense-input" placeholder="0" min="0" />
+            <div class="expense-note">Monthly</div>
+          </div>
+          <div class="expense-card">
+            <label class="expense-label">Personal Care (Hair, Spa)</label>
+            <input type="number" class="expense-input" placeholder="0" min="0" />
+            <div class="expense-note">Monthly</div>
+          </div>
+          <div class="expense-card">
+            <label class="expense-label">Entertainment & Hobbies</label>
+            <input type="number" class="expense-input" placeholder="0" min="0" />
+            <div class="expense-note">Monthly</div>
+          </div>
+          <div class="expense-card">
+            <label class="expense-label">Gym/Fitness Memberships</label>
+            <input type="number" class="expense-input" placeholder="0" min="0" />
+            <div class="expense-note">Monthly</div>
+          </div>
+          <div class="expense-card">
+            <label class="expense-label">Subscriptions & Streaming</label>
+            <input type="number" class="expense-input" placeholder="0" min="0" />
+            <div class="expense-note">Monthly total</div>
+          </div>
+          <div class="expense-card">
+            <label class="expense-label">Pets & Veterinary Care</label>
+            <input type="number" class="expense-input" placeholder="0" min="0" />
+            <div class="expense-note">Monthly average</div>
+          </div>
+          <div class="expense-card">
+            <label class="expense-label">Cell Phone / Internet</label>
+            <input type="number" class="expense-input" placeholder="0" min="0" />
+            <div class="expense-note">Monthly</div>
+          </div>
+          <div class="expense-card">
+            <label class="expense-label">Travel & Vacation</label>
+            <input type="number" class="expense-input" placeholder="0" min="0" />
+            <div class="expense-note">Monthly (estimated)</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Expense Comparison & Analysis -->
+    <div class="panel">
+      <div class="panel-head">
+        <h3>📊 Expense Comparison & Analysis</h3>
+        <span class="tag">Filer vs. opposing party</span>
+      </div>
+
+      <table class="comparison-table">
+        <tr>
+          <th>Category</th>
+          <th class="amount">Filer Monthly</th>
+          <th class="amount">Opposing Party Monthly</th>
+          <th class="amount">Variance</th>
+        </tr>
+        <tr>
+          <td><strong>Housing</strong></td>
+          <td class="amount">$0</td>
+          <td class="amount">$0</td>
+          <td class="amount">$0</td>
+        </tr>
+        <tr>
+          <td><strong>Food & Household</strong></td>
+          <td class="amount">$0</td>
+          <td class="amount">$0</td>
+          <td class="amount">$0</td>
+        </tr>
+        <tr>
+          <td><strong>Healthcare</strong></td>
+          <td class="amount">$0</td>
+          <td class="amount">$0</td>
+          <td class="amount">$0</td>
+        </tr>
+        <tr>
+          <td><strong>Transportation</strong></td>
+          <td class="amount">$0</td>
+          <td class="amount">$0</td>
+          <td class="amount">$0</td>
+        </tr>
+        <tr>
+          <td><strong>Children's Expenses</strong></td>
+          <td class="amount">$0</td>
+          <td class="amount">$0</td>
+          <td class="amount">$0</td>
+        </tr>
+        <tr>
+          <td><strong>Discretionary</strong></td>
+          <td class="amount">$0</td>
+          <td class="amount">$0</td>
+          <td class="amount">$0</td>
+        </tr>
+        <tr style="background: #f4f8fc; font-weight: 700;">
+          <td><strong>TOTAL MONTHLY EXPENSES</strong></td>
+          <td class="amount">$0</td>
+          <td class="amount">$0</td>
+          <td class="amount">$0</td>
+        </tr>
+      </table>
+
+      <div class="flag-box">
+        <div class="flag-title">💡 ANALYSIS: Income vs. Need</div>
+        <div class="flag-detail">Compare the filer's gross income against total claimed expenses. If expenses exceed income, this affects spousal and child-support calculations and may support imputation or earning-capacity argument.</div>
+      </div>
+    </div>
+
+    <!-- Income/Need Analysis -->
+    <div class="panel">
+      <div class="panel-head">
+        <h3>⚖ Income/Need Reconciliation</h3>
+        <span class="tag">Discrepancy analysis</span>
+      </div>
+
+      <div class="summary-box">
+        <div class="summary-row">
+          <span class="summary-label">Filer Gross Monthly Income</span>
+          <span class="summary-value">$0</span>
+        </div>
+        <div style="border-bottom: 1px solid #ddd; margin: 8px 0;"></div>
+        <div class="summary-row">
+          <span class="summary-label">Less: Taxes, FICA (est. 25%)</span>
+          <span class="summary-value" style="color: #c62828;">($0)</span>
+        </div>
+        <div class="summary-row">
+          <span class="summary-label"><strong>Filer Net Monthly Income</strong></span>
+          <span class="summary-value">$0</span>
+        </div>
+      </div>
+
+      <div class="summary-box">
+        <div class="summary-row">
+          <span class="summary-label">Total Monthly Expenses (AFI)</span>
+          <span class="summary-value">$0</span>
+        </div>
+        <div style="border-bottom: 1px solid #ddd; margin: 8px 0;"></div>
+        <div class="summary-row">
+          <span class="summary-label"><strong>Monthly Surplus / (Deficit)</strong></span>
+          <span class="summary-value positive">$0</span>
+        </div>
+      </div>
+
+      <div class="note">
+        <strong>Key Questions:</strong><br>
+        • Are expenses reasonable for filer's station in life and income level?<br>
+        • Does the deficit suggest hidden income or that expenses are inflated?<br>
+        • Are discretionary expenses appropriate given child-support and support obligations?<br>
+        • How do filer's expenses compare to opposing party's on same income level?
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <p><strong>Veritas AFI Expenses Analyzer</strong></p>
+      <p style="color: #999;">Arizona Form 12 · comprehensive expense tracking · ready for customization and data entry</p>
+    </div>
+  </div>
+</body>
+</html>

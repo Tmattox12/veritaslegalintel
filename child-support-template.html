@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Child Support Calculator — Template</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: #fafbfc; color: #1a2f4f; }
+    .container { max-width: 1100px; margin: 0 auto; padding: 24px; }
+    .header { margin-bottom: 32px; padding-bottom: 24px; border-bottom: 2px solid #e0e7ff; }
+    h1 { font-size: 32px; font-weight: 700; margin-bottom: 8px; }
+    .subtitle { font-size: 16px; color: #5b6472; }
+    .matter-info { background: #f4f8fc; border: 1px solid #d7e0ec; border-radius: 8px; padding: 16px; margin-top: 16px; }
+    .matter-info input, .matter-info select { margin-top: 8px; padding: 8px; border: 1px solid #cdd8e7; border-radius: 4px; width: 100%; }
+    .panel { background: #fff; border: 1px solid #e0e7ff; border-radius: 8px; padding: 20px; margin-bottom: 20px; }
+    .panel-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 2px solid #e0e7ff; }
+    .panel-head h3 { font-size: 16px; font-weight: 700; margin: 0; }
+    .tag { display: inline-block; background: #f0f4fa; color: #425c7f; padding: 4px 12px; border-radius: 999px; font-size: 11px; font-weight: 600; }
+    .input-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; margin-bottom: 12px; }
+    .input-row { display: flex; flex-direction: column; gap: 4px; }
+    .input-row label { font-size: 11px; font-weight: 600; color: #1c3f66; }
+    .input-row input, .input-row select { padding: 8px; border: 1px solid #d4dce8; border-radius: 4px; font-size: 12px; }
+    .calculation-card { background: #f8f9fa; border: 1px solid #e0e7ff; border-radius: 8px; padding: 16px; margin-bottom: 12px; }
+    .calc-title { font-size: 13px; font-weight: 700; color: #1c3f66; margin-bottom: 12px; }
+    .calc-row { display: grid; grid-template-columns: 2fr 1fr; gap: 12px; align-items: center; margin-bottom: 8px; font-size: 12px; }
+    .calc-label { color: #5b6472; }
+    .calc-value { font-family: 'Fraunces', serif; font-size: 20px; font-weight: 700; color: #1c3f66; text-align: right; }
+    .scenario-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 12px; margin-top: 12px; }
+    .scenario-card { border: 1px solid #d7e0ec; border-radius: 8px; padding: 14px; background: #fff; }
+    .scenario-card.active { border-color: #1c6b52; box-shadow: 0 0 0 2px rgba(28,107,82,0.14); background: #f4fbf7; }
+    .scenario-title { font-size: 12px; font-weight: 800; color: #1a2f4f; margin-bottom: 8px; }
+    .scenario-value { font-family: 'Fraunces', serif; font-size: 26px; font-weight: 700; color: #1c3f66; margin-bottom: 8px; }
+    .scenario-detail { font-size: 10px; color: #51617a; line-height: 1.5; }
+    .table { width: 100%; border-collapse: collapse; font-size: 11px; margin: 12px 0; }
+    .table th { background: #f5f0e8; padding: 8px; text-align: left; font-weight: 600; border: 1px solid #ddd; }
+    .table td { padding: 8px; border: 1px solid #ddd; }
+    .table .amount { text-align: right; font-weight: 600; color: #1c3f66; }
+    .flag-box { background: #fff3cd; border-left: 4px solid #856404; padding: 12px; border-radius: 4px; margin: 12px 0; }
+    .flag-title { color: #856404; font-weight: 700; font-size: 11px; margin-bottom: 4px; }
+    .flag-detail { font-size: 10px; color: #666; line-height: 1.5; }
+    .note { font-size: 11px; color: #5b6472; margin: 12px 0; padding: 12px; background: #f9f7f3; border-radius: 4px; line-height: 1.6; }
+    .btn { padding: 8px 16px; background: #2e5b8a; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px; font-weight: 600; margin-right: 8px; }
+    .btn:hover { background: #1c3f66; }
+    .footer { text-align: center; padding: 24px; color: #7a8a9a; font-size: 12px; margin-top: 40px; border-top: 2px solid #e0e7ff; }
+    .summary-box { background: #f8f9fa; border: 1px solid #e0e7ff; border-radius: 8px; padding: 14px; margin: 12px 0; }
+    .summary-row { display: flex; justify-content: space-between; margin-bottom: 8px; font-size: 12px; }
+    .summary-label { color: #5b6472; }
+    .summary-value { font-family: 'Fraunces', serif; font-size: 18px; font-weight: 700; color: #1c3f66; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <h1>Child Support Calculator</h1>
+      <p class="subtitle">Arizona guideline calculation · income-shares model · adjustments & deviations</p>
+
+      <div class="matter-info">
+        <label><strong>Matter</strong>
+          <input type="text" placeholder="Enter case name & number" />
+        </label>
+        <label style="display: grid; margin-top: 12px;"><strong>Obligor (Payor)</strong>
+          <input type="text" placeholder="Name" />
+        </label>
+        <label style="display: grid; margin-top: 12px;"><strong>Obligee (Payee)</strong>
+          <input type="text" placeholder="Name" />
+        </label>
+        <label style="display: grid; margin-top: 12px;"><strong>Number of Children</strong>
+          <input type="number" value="0" min="0" />
+        </label>
+      </div>
+    </div>
+
+    <!-- Income Inputs -->
+    <div class="panel">
+      <div class="panel-head">
+        <h3>💰 Income Inputs (from Income Imputation)</h3>
+        <span class="tag">Gross monthly income after adjustments</span>
+      </div>
+
+      <div class="input-grid">
+        <div class="input-row">
+          <label>Obligor Gross Monthly Income</label>
+          <input type="number" placeholder="0" min="0" />
+        </div>
+        <div class="input-row">
+          <label>Obligee Gross Monthly Income</label>
+          <input type="number" placeholder="0" min="0" />
+        </div>
+      </div>
+
+      <div class="note">
+        Income should be gross income per Arizona law, from the Income Imputation module. Include W-2 wages, self-employment income, bonuses, and imputed earning capacity as applicable.
+      </div>
+    </div>
+
+    <!-- Adjustments -->
+    <div class="panel">
+      <div class="panel-head">
+        <h3>🔧 Income Adjustments</h3>
+        <span class="tag">A.R.S. § 25-320(B)</span>
+      </div>
+
+      <div class="input-grid">
+        <div class="input-row">
+          <label>Obligor: FICA & Income Tax Deduction</label>
+          <input type="number" placeholder="0" min="0" />
+        </div>
+        <div class="input-row">
+          <label>Obligee: FICA & Income Tax Deduction</label>
+          <input type="number" placeholder="0" min="0" />
+        </div>
+        <div class="input-row">
+          <label>Obligor: Health Insurance Premiums (for children)</label>
+          <input type="number" placeholder="0" min="0" />
+        </div>
+        <div class="input-row">
+          <label>Obligee: Health Insurance Premiums (for children)</label>
+          <input type="number" placeholder="0" min="0" />
+        </div>
+        <div class="input-row">
+          <label>Obligor: Court-Ordered Child Support (other cases)</label>
+          <input type="number" placeholder="0" min="0" />
+        </div>
+        <div class="input-row">
+          <label>Obligee: Court-Ordered Child Support (other cases)</label>
+          <input type="number" placeholder="0" min="0" />
+        </div>
+      </div>
+
+      <div class="note">
+        These adjustments reduce "adjusted gross income" used in the guideline calculation. Include dependent exemptions and prior support obligations, but not spousal maintenance.
+      </div>
+    </div>
+
+    <!-- Guideline Calculation -->
+    <div class="panel">
+      <div class="panel-head">
+        <h3>⚖ Arizona Guideline Calculation</h3>
+        <span class="tag">Income-shares model</span>
+      </div>
+
+      <div class="calculation-card">
+        <div class="calc-title">Step 1: Calculate Adjusted Gross Income</div>
+        <div class="calc-row">
+          <div class="calc-label">Obligor Gross Income</div>
+          <div class="calc-value">$0</div>
+        </div>
+        <div class="calc-row">
+          <div class="calc-label">Less: Taxes, FICA, Health Ins</div>
+          <div class="calc-value" style="color: #c62828;">($0)</div>
+        </div>
+        <div style="border-top: 1px solid #d4dce8; padding-top: 8px; margin-top: 8px;">
+          <div class="calc-row">
+            <div class="calc-label"><strong>Obligor Adjusted Gross Income</strong></div>
+            <div class="calc-value" style="color: #2f7d5b;">$0</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="calculation-card">
+        <div class="calc-title">Step 2: Combined Income & Percentages</div>
+        <div class="calc-row">
+          <div class="calc-label">Obligor AGI</div>
+          <div class="calc-value">$0</div>
+        </div>
+        <div class="calc-row">
+          <div class="calc-label">Obligee AGI</div>
+          <div class="calc-value">$0</div>
+        </div>
+        <div style="border-top: 1px solid #d4dce8; padding-top: 8px; margin-top: 8px;">
+          <div class="calc-row">
+            <div class="calc-label"><strong>Combined AGI</strong></div>
+            <div class="calc-value">$0</div>
+          </div>
+          <div class="calc-row">
+            <div class="calc-label">Obligor % of Combined Income</div>
+            <div class="calc-value">0%</div>
+          </div>
+          <div class="calc-row">
+            <div class="calc-label">Obligee % of Combined Income</div>
+            <div class="calc-value">0%</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="calculation-card">
+        <div class="calc-title">Step 3: Base Child Support Obligation</div>
+        <div class="input-row" style="margin-bottom: 12px;">
+          <label>Number of Children</label>
+          <input type="number" value="0" min="1" max="15" />
+        </div>
+        <div class="calc-row">
+          <div class="calc-label">Combined AGI</div>
+          <div class="calc-value">$0</div>
+        </div>
+        <div class="calc-row">
+          <div class="calc-label">Base Support % per Guidelines</div>
+          <select style="flex: 1; padding: 6px; border: 1px solid #cdd8e7; border-radius: 4px; font-size: 11px;">
+            <option>1 child: 17%</option>
+            <option>2 children: 25%</option>
+            <option>3 children: 32%</option>
+            <option>4 children: 40%</option>
+            <option>5+ children: 50%</option>
+          </select>
+        </div>
+        <div style="border-top: 1px solid #d4dce8; padding-top: 8px; margin-top: 8px;">
+          <div class="calc-row">
+            <div class="calc-label"><strong>Base Child Support Obligation</strong></div>
+            <div class="calc-value" style="color: #2f7d5b;">$0</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="calculation-card">
+        <div class="calc-title">Step 4: Allocate to Obligor & Obligee</div>
+        <div class="calc-row">
+          <div class="calc-label">Obligor's Share (% × Base)</div>
+          <div class="calc-value">$0</div>
+        </div>
+        <div class="calc-row">
+          <div class="calc-label">Obligee's Share (% × Base)</div>
+          <div class="calc-value">$0</div>
+        </div>
+        <div style="border-top: 1px solid #d4dce8; padding-top: 8px; margin-top: 8px;">
+          <div class="calc-row">
+            <div class="calc-label"><strong>Guideline Child Support (Obligor Pays)</strong></div>
+            <div class="calc-value" style="color: #2f7d5b;">$0</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Add-Ons -->
+    <div class="panel">
+      <div class="panel-head">
+        <h3>➕ Mandatory Add-Ons</h3>
+        <span class="tag">Health insurance · childcare · education</span>
+      </div>
+
+      <div class="input-grid">
+        <div class="input-row">
+          <label>Health Insurance Premium (Children)</label>
+          <input type="number" placeholder="0" min="0" />
+        </div>
+        <div class="input-row">
+          <label>Uninsured Medical Expenses (allocation)</label>
+          <input type="number" placeholder="0" min="0" />
+        </div>
+        <div class="input-row">
+          <label>Childcare Costs (allocation)</label>
+          <input type="number" placeholder="0" min="0" />
+        </div>
+        <div class="input-row">
+          <label>Tuition / Private School (allocation)</label>
+          <input type="number" placeholder="0" min="0" />
+        </div>
+      </div>
+
+      <div class="calculation-card">
+        <div class="calc-title">Add-On Summary</div>
+        <div class="calc-row">
+          <div class="calc-label">Guideline Child Support</div>
+          <div class="calc-value">$0</div>
+        </div>
+        <div class="calc-row">
+          <div class="calc-label">Plus: Healthcare & Add-Ons</div>
+          <div class="calc-value">$0</div>
+        </div>
+        <div style="border-top: 1px solid #d4dce8; padding-top: 8px; margin-top: 8px;">
+          <div class="calc-row">
+            <div class="calc-label"><strong>Total Child Support Obligation</strong></div>
+            <div class="calc-value" style="color: #2f7d5b;">$0</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Deviations -->
+    <div class="panel">
+      <div class="panel-head">
+        <h3>⚖ Deviations from Guideline</h3>
+        <span class="tag">Parenting time · financial resources · standard of living</span>
+      </div>
+
+      <div class="input-grid">
+        <div class="input-row">
+          <label>Court finds deviation warranted?</label>
+          <select>
+            <option value="no">No (apply guideline)</option>
+            <option value="up">Yes, upward deviation</option>
+            <option value="down">Yes, downward deviation</option>
+          </select>
+        </div>
+        <div class="input-row">
+          <label>Obligor Parenting Time (%)</label>
+          <input type="number" placeholder="0" min="0" max="100" step="1" />
+        </div>
+        <div class="input-row">
+          <label>Obligee Parenting Time (%)</label>
+          <input type="number" placeholder="0" min="0" max="100" step="1" />
+        </div>
+        <div class="input-row">
+          <label>Deviation Percentage (if applicable)</label>
+          <input type="number" placeholder="0" min="-50" max="50" step="5" />
+        </div>
+      </div>
+
+      <div class="flag-box">
+        <div class="flag-title">📋 Deviation Factors (A.R.S. § 25-320(D))</div>
+        <div class="flag-detail">
+          Parenting time disparity, standard of living, financial resources of each parent, childcare coordination costs, health-care quality variance, extraordinary expense needs, tax consequences, and other relevant factors.
+        </div>
+      </div>
+    </div>
+
+    <!-- Scenarios -->
+    <div class="panel">
+      <div class="panel-head">
+        <h3>📊 Support Scenarios</h3>
+        <span class="tag">Conservative · guideline · aggressive</span>
+      </div>
+
+      <div class="scenario-grid">
+        <div class="scenario-card">
+          <div class="scenario-title">Conservative</div>
+          <div class="scenario-value">$0</div>
+          <div class="scenario-detail">
+            Monthly: $0<br>
+            Includes minimal add-ons<br>
+            Downward deviation applied
+          </div>
+        </div>
+
+        <div class="scenario-card active">
+          <div class="scenario-title">Guideline (20-50%)</div>
+          <div class="scenario-value">$0</div>
+          <div class="scenario-detail">
+            Monthly: $0<br>
+            Per Arizona guidelines<br>
+            Base + mandatory add-ons
+          </div>
+        </div>
+
+        <div class="scenario-card">
+          <div class="scenario-title">Aggressive</div>
+          <div class="scenario-value">$0</div>
+          <div class="scenario-detail">
+            Monthly: $0<br>
+            All add-ons included<br>
+            Upward deviation applied
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Comparison Table -->
+    <div class="panel">
+      <div class="panel-head">
+        <h3>📋 Scenario Comparison</h3>
+        <span class="tag">All cases side-by-side</span>
+      </div>
+
+      <table class="table">
+        <tr>
+          <th>Scenario</th>
+          <th class="amount">Guideline Base</th>
+          <th class="amount">Add-Ons</th>
+          <th class="amount">Total Monthly</th>
+          <th class="amount">Annual</th>
+        </tr>
+        <tr>
+          <td><strong>Conservative</strong></td>
+          <td class="amount">$0</td>
+          <td class="amount">$0</td>
+          <td class="amount">$0</td>
+          <td class="amount">$0</td>
+        </tr>
+        <tr style="background: #f4fbf7;">
+          <td><strong>Guideline</strong></td>
+          <td class="amount">$0</td>
+          <td class="amount">$0</td>
+          <td class="amount">$0</td>
+          <td class="amount">$0</td>
+        </tr>
+        <tr>
+          <td><strong>Aggressive</strong></td>
+          <td class="amount">$0</td>
+          <td class="amount">$0</td>
+          <td class="amount">$0</td>
+          <td class="amount">$0</td>
+        </tr>
+      </table>
+    </div>
+
+    <!-- Legal Framework -->
+    <div class="panel">
+      <div class="panel-head">
+        <h3>⚖ Arizona Legal Framework</h3>
+        <span class="tag">A.R.S. § 25-320 · Income-Shares Model</span>
+      </div>
+
+      <div class="note" style="background: #f4fbf7;">
+        <strong>Guideline Percentages by Children:</strong> 1 child = 17% of combined AGI; 2 children = 25%; 3 = 32%; 4 = 40%; 5+ = 50%. Each parent contributes proportional to income share. Guideline is rebuttable presumption; courts may deviate based on statutory factors including parenting time disparity, standard of living, and special needs.
+      </div>
+
+      <div style="margin-top: 16px;">
+        <h4 style="font-size: 12px; font-weight: 700; color: #1c3f66; margin-bottom: 8px;">Parenting Time Impact on Support:</h4>
+        <table class="table">
+          <tr>
+            <th>Obligor Parenting Time</th>
+            <th>Adjustment Factor</th>
+          </tr>
+          <tr>
+            <td>Less than 10%</td>
+            <td>No reduction (pay full guideline)</td>
+          </tr>
+          <tr>
+            <td>10% to 30%</td>
+            <td>Minor adjustment may apply</td>
+          </tr>
+          <tr>
+            <td>More than 30%</td>
+            <td>May warrant downward deviation</td>
+          </tr>
+          <tr>
+            <td>50% (50/50 custody)</td>
+            <td>Significant deviation / offset likely</td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <p><strong>Veritas Child Support Calculator</strong></p>
+      <p style="color: #999;">Arizona income-shares model · guideline calculation · adjustment & deviation framework</p>
+    </div>
+  </div>
+</body>
+</html>
