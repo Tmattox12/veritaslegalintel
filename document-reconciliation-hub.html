@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Document Reconciliation Hub — Ossandon Matter</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: #fafbfc; color: #1a2f4f; }
+    .container { max-width: 1400px; margin: 0 auto; padding: 24px; }
+
+    .header { margin-bottom: 32px; padding-bottom: 24px; border-bottom: 2px solid #e0e7ff; }
+    h1 { font-size: 32px; font-weight: 700; margin-bottom: 8px; }
+    .subtitle { font-size: 16px; color: #5b6472; }
+
+    .two-column { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-bottom: 24px; }
+    @media (max-width: 1000px) { .two-column { grid-template-columns: 1fr; } }
+
+    .panel { background: #fff; border: 1px solid #e0e7ff; border-radius: 8px; padding: 20px; margin-bottom: 20px; }
+    .panel-title { font-size: 18px; font-weight: 700; color: #1c3f66; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 2px solid #e0e7ff; }
+
+    .document-section { margin-bottom: 20px; }
+    .section-header { font-size: 12px; font-weight: 800; text-transform: uppercase; color: #1c3f66; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 2px solid #e0e7ff; letter-spacing: 0.05em; }
+
+    .doc-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+    .doc-card { border: 1px solid #d7e0ec; border-radius: 8px; padding: 14px; display: flex; flex-direction: column; gap: 8px; }
+    .doc-card.present { background: #f4fbf7; border-color: #1c6b52; }
+    .doc-card.missing { background: #fef2f2; border-color: #dc2626; }
+
+    .doc-status { display: inline-flex; align-items: center; gap: 6px; font-size: 10px; font-weight: 700; padding: 2px 8px; border-radius: 999px; width: fit-content; }
+    .doc-status.present { background: #c8e6c9; color: #2e7d32; }
+    .doc-status.missing { background: #ffcdd2; color: #c62828; }
+
+    .doc-name { font-size: 12px; font-weight: 700; color: #1c3f66; }
+    .doc-detail { font-size: 10px; color: #7a8a9a; }
+    .doc-date { font-size: 9px; color: #999; margin-top: 4px; }
+    .doc-actions { display: flex; gap: 6px; margin-top: 8px; }
+    .doc-btn { padding: 4px 8px; border: 1px solid #cdd8e7; background: #fff; border-radius: 4px; cursor: pointer; font-size: 9px; color: #1c3f66; font-weight: 600; }
+    .doc-btn:hover { background: #f0f5fb; }
+
+    .summary-box { background: #f8f9fa; border: 1px solid #e0e7ff; border-radius: 8px; padding: 12px; margin-bottom: 16px; }
+    .summary-row { display: flex; justify-content: space-between; margin-bottom: 6px; font-size: 11px; }
+    .summary-label { color: #5b6472; }
+    .summary-value { font-weight: 700; color: #1c3f66; }
+
+    .progress-bar { width: 100%; height: 8px; background: #e0e7ff; border-radius: 4px; overflow: hidden; margin-top: 8px; }
+    .progress-fill { height: 100%; background: #2f7d5b; transition: width 0.3s; }
+
+    .footer { text-align: center; padding: 24px; color: #7a8a9a; font-size: 12px; margin-top: 40px; border-top: 2px solid #e0e7ff; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <!-- Header -->
+    <div class="header">
+      <h1>Document Reconciliation Hub</h1>
+      <p class="subtitle">Ossandon v. Ossandon · Document tracking & gap analysis · Income, Expenses, Tax Returns, Bank Statements</p>
+    </div>
+
+    <!-- Two-Column Layout: Constanza & Luis -->
+    <div class="two-column">
+      <!-- CONSTANZA -->
+      <div class="panel">
+        <div class="panel-title">📄 Constanza — Document Inventory</div>
+
+        <div class="summary-box">
+          <div class="summary-row">
+            <span class="summary-label">Documents Present:</span>
+            <span class="summary-value" id="constanza-present">0</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Documents Missing:</span>
+            <span class="summary-value" id="constanza-missing">0</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Completion:</span>
+            <span class="summary-value" id="constanza-completion">0%</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="constanza-progress" style="width: 0%;"></div>
+          </div>
+        </div>
+
+        <!-- Income Documents -->
+        <div class="document-section">
+          <div class="section-header">💰 Income Documents</div>
+          <div class="doc-grid">
+            <div class="doc-card present">
+              <div class="doc-status present">✓ PRESENT</div>
+              <div class="doc-name">2024 W-2 (Helping Hearts)</div>
+              <div class="doc-detail">Gross: $66,086 · Filed Jan 2025</div>
+              <div class="doc-actions">
+                <button class="doc-btn">View</button>
+                <button class="doc-btn">Download</button>
+              </div>
+            </div>
+
+            <div class="doc-card present">
+              <div class="doc-status present">✓ PRESENT</div>
+              <div class="doc-name">2024 W-2 (Fleet Feet)</div>
+              <div class="doc-detail">Gross: $12,000 · Filed Jan 2025</div>
+              <div class="doc-actions">
+                <button class="doc-btn">View</button>
+                <button class="doc-btn">Download</button>
+              </div>
+            </div>
+
+            <div class="doc-card present">
+              <div class="doc-status present">✓ PRESENT</div>
+              <div class="doc-name">YTD Paystubs (Jan-Sep 2025)</div>
+              <div class="doc-detail">Current income: $49,564 YTD</div>
+              <div class="doc-actions">
+                <button class="doc-btn">View</button>
+                <button class="doc-btn">Download</button>
+              </div>
+            </div>
+
+            <div class="doc-card missing">
+              <div class="doc-status missing">✗ MISSING</div>
+              <div class="doc-name">2023 Tax Return (1040)</div>
+              <div class="doc-detail">Needed for 2-3 year average</div>
+              <div class="doc-actions">
+                <button class="doc-btn">Request</button>
+                <button class="doc-btn">Note</button>
+              </div>
+            </div>
+
+            <div class="doc-card missing">
+              <div class="doc-status missing">✗ MISSING</div>
+              <div class="doc-name">2022 Tax Return (1040)</div>
+              <div class="doc-detail">Needed for 3-year average</div>
+              <div class="doc-actions">
+                <button class="doc-btn">Request</button>
+                <button class="doc-btn">Note</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Expense & Bank Documents -->
+        <div class="document-section">
+          <div class="section-header">💳 Bank Statements & Expenses</div>
+          <div class="doc-grid">
+            <div class="doc-card present">
+              <div class="doc-status present">✓ PRESENT</div>
+              <div class="doc-name">Bank Statements (Jan-Sep 2025)</div>
+              <div class="doc-detail">9 months · Checking account</div>
+              <div class="doc-actions">
+                <button class="doc-btn">View</button>
+                <button class="doc-btn">Download</button>
+              </div>
+            </div>
+
+            <div class="doc-card missing">
+              <div class="doc-status missing">✗ MISSING</div>
+              <div class="doc-name">Checking Account (2024)</div>
+              <div class="doc-detail">Full year 2024 statements</div>
+              <div class="doc-actions">
+                <button class="doc-btn">Request</button>
+                <button class="doc-btn">Note</button>
+              </div>
+            </div>
+
+            <div class="doc-card missing">
+              <div class="doc-status missing">✗ MISSING</div>
+              <div class="doc-name">Savings Account Statements</div>
+              <div class="doc-detail">Past 12 months</div>
+              <div class="doc-actions">
+                <button class="doc-btn">Request</button>
+                <button class="doc-btn">Note</button>
+              </div>
+            </div>
+
+            <div class="doc-card missing">
+              <div class="doc-status missing">✗ MISSING</div>
+              <div class="doc-name">Credit Card Statements</div>
+              <div class="doc-detail">For expense verification</div>
+              <div class="doc-actions">
+                <button class="doc-btn">Request</button>
+                <button class="doc-btn">Note</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tax & Legal Documents -->
+        <div class="document-section">
+          <div class="section-header">📋 Tax & Family Court Documents</div>
+          <div class="doc-grid">
+            <div class="doc-card present">
+              <div class="doc-status present">✓ PRESENT</div>
+              <div class="doc-name">Marital Settlement Agreement</div>
+              <div class="doc-detail">Signed & filed court</div>
+              <div class="doc-actions">
+                <button class="doc-btn">View</button>
+                <button class="doc-btn">Download</button>
+              </div>
+            </div>
+
+            <div class="doc-card missing">
+              <div class="doc-status missing">✗ MISSING</div>
+              <div class="doc-name">Recent Court Orders</div>
+              <div class="doc-detail">From past 12 months</div>
+              <div class="doc-actions">
+                <button class="doc-btn">Request</button>
+                <button class="doc-btn">Note</button>
+              </div>
+            </div>
+
+            <div class="doc-card missing">
+              <div class="doc-status missing">✗ MISSING</div>
+              <div class="doc-name">Financial Affidavit (Form 12)</div>
+              <div class="doc-detail">Current AFI filing</div>
+              <div class="doc-actions">
+                <button class="doc-btn">Request</button>
+                <button class="doc-btn">Note</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- LUIS -->
+      <div class="panel">
+        <div class="panel-title">📄 Luis — Document Inventory</div>
+
+        <div class="summary-box">
+          <div class="summary-row">
+            <span class="summary-label">Documents Present:</span>
+            <span class="summary-value" id="luis-present">0</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Documents Missing:</span>
+            <span class="summary-value" id="luis-missing">0</span>
+          </div>
+          <div class="summary-row">
+            <span class="summary-label">Completion:</span>
+            <span class="summary-value" id="luis-completion">0%</span>
+          </div>
+          <div class="progress-bar">
+            <div class="progress-fill" id="luis-progress" style="width: 0%;"></div>
+          </div>
+        </div>
+
+        <!-- Income Documents -->
+        <div class="document-section">
+          <div class="section-header">💰 Income Documents</div>
+          <div class="doc-grid">
+            <div class="doc-card present">
+              <div class="doc-status present">✓ PRESENT</div>
+              <div class="doc-name">2024 W-2 (Primary Employment)</div>
+              <div class="doc-detail">Gross: $236,819 · Filed Jan 2025</div>
+              <div class="doc-actions">
+                <button class="doc-btn">View</button>
+                <button class="doc-btn">Download</button>
+              </div>
+            </div>
+
+            <div class="doc-card present">
+              <div class="doc-status present">✓ PRESENT</div>
+              <div class="doc-name">YTD Paystubs (Jan-Sep 2025)</div>
+              <div class="doc-detail">Current income: $177,614 YTD</div>
+              <div class="doc-actions">
+                <button class="doc-btn">View</button>
+                <button class="doc-btn">Download</button>
+              </div>
+            </div>
+
+            <div class="doc-card present">
+              <div class="doc-status present">✓ PRESENT</div>
+              <div class="doc-name">RSU Vesting & Stock Statements</div>
+              <div class="doc-detail">2025 vesting schedule</div>
+              <div class="doc-actions">
+                <button class="doc-btn">View</button>
+                <button class="doc-btn">Download</button>
+              </div>
+            </div>
+
+            <div class="doc-card missing">
+              <div class="doc-status missing">✗ MISSING</div>
+              <div class="doc-name">2023 Tax Return (1040)</div>
+              <div class="doc-detail">Needed for 2-3 year average</div>
+              <div class="doc-actions">
+                <button class="doc-btn">Request</button>
+                <button class="doc-btn">Note</button>
+              </div>
+            </div>
+
+            <div class="doc-card missing">
+              <div class="doc-status missing">✗ MISSING</div>
+              <div class="doc-name">Bonus Documentation</div>
+              <div class="doc-detail">Bonus history & structure</div>
+              <div class="doc-actions">
+                <button class="doc-btn">Request</button>
+                <button class="doc-btn">Note</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Expense & Bank Documents -->
+        <div class="document-section">
+          <div class="section-header">💳 Bank Statements & Expenses</div>
+          <div class="doc-grid">
+            <div class="doc-card present">
+              <div class="doc-status present">✓ PRESENT</div>
+              <div class="doc-name">Bank Statements (Jan-Sep 2025)</div>
+              <div class="doc-detail">9 months · Checking account</div>
+              <div class="doc-actions">
+                <button class="doc-btn">View</button>
+                <button class="doc-btn">Download</button>
+              </div>
+            </div>
+
+            <div class="doc-card missing">
+              <div class="doc-status missing">✗ MISSING</div>
+              <div class="doc-name">Brokerage/Investment Accounts</div>
+              <div class="doc-detail">E*TRADE, fidelity, etc</div>
+              <div class="doc-actions">
+                <button class="doc-btn">Request</button>
+                <button class="doc-btn">Note</button>
+              </div>
+            </div>
+
+            <div class="doc-card missing">
+              <div class="doc-status missing">✗ MISSING</div>
+              <div class="doc-name">Retirement Account Statements</div>
+              <div class="doc-detail">401k, IRA balances & contributions</div>
+              <div class="doc-actions">
+                <button class="doc-btn">Request</button>
+                <button class="doc-btn">Note</button>
+              </div>
+            </div>
+
+            <div class="doc-card missing">
+              <div class="doc-status missing">✗ MISSING</div>
+              <div class="doc-name">Real Property Documentation</div>
+              <div class="doc-detail">Deed, mortgage, property tax</div>
+              <div class="doc-actions">
+                <button class="doc-btn">Request</button>
+                <button class="doc-btn">Note</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tax & Legal Documents -->
+        <div class="document-section">
+          <div class="section-header">📋 Tax & Family Court Documents</div>
+          <div class="doc-grid">
+            <div class="doc-card present">
+              <div class="doc-status present">✓ PRESENT</div>
+              <div class="doc-name">Marital Settlement Agreement</div>
+              <div class="doc-detail">Signed & filed court</div>
+              <div class="doc-actions">
+                <button class="doc-btn">View</button>
+                <button class="doc-btn">Download</button>
+              </div>
+            </div>
+
+            <div class="doc-card missing">
+              <div class="doc-status missing">✗ MISSING</div>
+              <div class="doc-name">Recent Court Orders</div>
+              <div class="doc-detail">From past 12 months</div>
+              <div class="doc-actions">
+                <button class="doc-btn">Request</button>
+                <button class="doc-btn">Note</button>
+              </div>
+            </div>
+
+            <div class="doc-card missing">
+              <div class="doc-status missing">✗ MISSING</div>
+              <div class="doc-name">Financial Affidavit (Form 12)</div>
+              <div class="doc-detail">Current AFI filing</div>
+              <div class="doc-actions">
+                <button class="doc-btn">Request</button>
+                <button class="doc-btn">Note</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <p><strong>Document Reconciliation Hub</strong></p>
+      <p>Ossandon Matter · Track document collection & identify gaps · Organized by income, expenses, tax, court documents</p>
+    </div>
+  </div>
+
+  <script>
+    // Calculate completion percentages
+    function updateStats() {
+      // Constanza: 4 present, 5 missing = 44%
+      document.getElementById('constanza-present').textContent = '4';
+      document.getElementById('constanza-missing').textContent = '5';
+      document.getElementById('constanza-completion').textContent = '44%';
+      document.getElementById('constanza-progress').style.width = '44%';
+
+      // Luis: 4 present, 6 missing = 40%
+      document.getElementById('luis-present').textContent = '4';
+      document.getElementById('luis-missing').textContent = '6';
+      document.getElementById('luis-completion').textContent = '40%';
+      document.getElementById('luis-progress').style.width = '40%';
+    }
+
+    document.addEventListener('DOMContentLoaded', updateStats);
+  </script>
+</body>
+</html>
