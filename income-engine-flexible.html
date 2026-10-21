@@ -470,11 +470,33 @@
             </div>
           </div>
 
-          <div class="source-grid">
-            <div class="source-row">
-              <label class="source-label">Annual Amount</label>
-              <input type="number" class="source-input" placeholder="0" min="0" />
+          <div style="background: #f8f9fa; border: 1px solid #d7e0ec; border-radius: 8px; padding: 12px; margin-bottom: 12px;">
+            <div style="font-size: 10px; font-weight: 700; text-transform: uppercase; color: #1c3f66; margin-bottom: 10px;">Income Basis Selection</div>
+            <div class="source-grid">
+              <div class="source-row">
+                <label class="source-label">3-Year Average (2022-2024)</label>
+                <input type="number" class="basis-3yr" placeholder="0" min="0" style="padding: 8px; border: 1px solid #d4dce8; border-radius: 4px; font-size: 11px;" />
+              </div>
+              <div class="source-row">
+                <label class="source-label">2-Year Average (2023-2024)</label>
+                <input type="number" class="basis-2yr" placeholder="0" min="0" style="padding: 8px; border: 1px solid #d4dce8; border-radius: 4px; font-size: 11px;" />
+              </div>
+              <div class="source-row">
+                <label class="source-label">Select Basis for Calculations</label>
+                <select class="selected-basis" style="padding: 8px; border: 1px solid #d4dce8; border-radius: 4px; font-size: 11px;">
+                  <option value="">— Select one —</option>
+                  <option value="3yr">Use 3-Year Average</option>
+                  <option value="2yr">Use 2-Year Average</option>
+                </select>
+              </div>
+              <div class="source-row">
+                <label class="source-label" style="color: #1c6b52;">✓ Selected Amount</label>
+                <div style="padding: 8px; background: #e6f3ec; border-radius: 4px; font-family: 'Fraunces', serif; font-size: 14px; font-weight: 700; color: #1c6b52;" class="selected-amount">$0</div>
+              </div>
             </div>
+          </div>
+
+          <div class="source-grid">
             <div class="source-row">
               <label class="source-label">Frequency</label>
               <select class="source-input">
@@ -528,6 +550,30 @@
       }
 
       container.insertAdjacentHTML('beforeend', sourceHTML);
+
+      // Add event listener for basis selection
+      const sourceElement = container.querySelector(`#${sourceId}`);
+      const basisSelect = sourceElement.querySelector('.selected-basis');
+      const basis3yr = sourceElement.querySelector('.basis-3yr');
+      const basis2yr = sourceElement.querySelector('.basis-2yr');
+      const selectedAmount = sourceElement.querySelector('.selected-amount');
+
+      const updateSelected = () => {
+        const selectedBasis = basisSelect.value;
+        if (selectedBasis === '3yr') {
+          const amount = parseFloat(basis3yr.value) || 0;
+          selectedAmount.textContent = '$' + amount.toLocaleString('en-US', {maximumFractionDigits: 0});
+        } else if (selectedBasis === '2yr') {
+          const amount = parseFloat(basis2yr.value) || 0;
+          selectedAmount.textContent = '$' + amount.toLocaleString('en-US', {maximumFractionDigits: 0});
+        } else {
+          selectedAmount.textContent = '$0';
+        }
+      };
+
+      basisSelect.addEventListener('change', updateSelected);
+      basis3yr.addEventListener('change', updateSelected);
+      basis2yr.addEventListener('change', updateSelected);
     }
 
     function removeSource(sourceId) {
