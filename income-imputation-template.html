@@ -47,6 +47,11 @@
     .nav-item.active { background: rgba(255,255,255,0.2); color: white; font-weight: 600; }
     .nav-item-icon { font-size: 16px; min-width: 20px; }
 
+    .sidebar-footer { margin-top: auto; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.1); }
+    .sidebar-footer p { font-size: 10px; color: rgba(255,255,255,0.6); line-height: 1.4; }
+    .sidebar-footer .status { display: flex; align-items: center; gap: 6px; color: rgba(255,255,255,0.7); }
+    .status-dot { width: 6px; height: 6px; border-radius: 50%; background: #10b981; }
+
     .main {
       margin-left: 240px;
       flex: 1;
@@ -158,56 +163,92 @@
       </div>
     </div>
 
+    <!-- WORKSPACE -->
     <div class="nav-section">
-      <div class="nav-section-title">Primary Modules</div>
+      <div class="nav-section-title">Workspace</div>
       <a href="master-dashboard.html" class="nav-item">
-        <span class="nav-item-icon">🏠</span>
-        <span>Dashboard</span>
+        <span class="nav-item-icon">◆</span> Dashboard
       </a>
-      <a href="income-imputation-template.html" class="nav-item active">
-        <span class="nav-item-icon">💰</span>
-        <span>Income Engine</span>
+      <a href="#" class="nav-item">
+        <span class="nav-item-icon">▤</span> Case Intake
+      </a>
+      <a href="#" class="nav-item">
+        <span class="nav-item-icon">◯</span> Matters
+      </a>
+      <a href="#" class="nav-item">
+        <span class="nav-item-icon">⤓</span> Document Intake
       </a>
       <a href="document-reconciliation-hub.html" class="nav-item">
-        <span class="nav-item-icon">📄</span>
-        <span>Document Hub</span>
+        <span class="nav-item-icon">📁</span> Document Hub
       </a>
-      <a href="afi-expenses-template.html" class="nav-item">
-        <span class="nav-item-icon">🏠</span>
-        <span>AFI Expenses</span>
+      <a href="#" class="nav-item">
+        <span class="nav-item-icon">◷</span> Calendar
+      </a>
+      <a href="#" class="nav-item">
+        <span class="nav-item-icon">☑</span> Tasks
+      </a>
+      <a href="#" class="nav-item">
+        <span class="nav-item-icon">◍</span> Clients
       </a>
     </div>
 
+    <!-- ANALYSIS MODULES -->
     <div class="nav-section">
-      <div class="nav-section-title">Support Calculations</div>
-      <a href="spousal-maintenance-template.html" class="nav-item">
-        <span class="nav-item-icon">⚖</span>
-        <span>Spousal Support</span>
+      <div class="nav-section-title">Analysis Modules</div>
+      <a href="income-imputation-template.html" class="nav-item active">
+        <span class="nav-item-icon">💠</span> Income Engine
+      </a>
+      <a href="#" class="nav-item">
+        <span class="nav-item-icon">⚖</span> Support Calculator
       </a>
       <a href="child-support-template.html" class="nav-item">
-        <span class="nav-item-icon">👶</span>
-        <span>Child Support</span>
+        <span class="nav-item-icon">◈</span> Child Support
+      </a>
+      <a href="#" class="nav-item">
+        <span class="nav-item-icon">⊟</span> Assets
+      </a>
+      <a href="#" class="nav-item">
+        <span class="nav-item-icon">⌘</span> Custody
+      </a>
+      <a href="afi-expenses-template.html" class="nav-item">
+        <span class="nav-item-icon">🧾</span> AFI Expenses
+      </a>
+      <a href="#" class="nav-item">
+        <span class="nav-item-icon">⊕</span> Credits &amp; Adjustments
       </a>
     </div>
 
+    <!-- TOOLS -->
     <div class="nav-section">
-      <div class="nav-section-title">Reference</div>
-      <a href="afi-reference-guide.html" class="nav-item">
-        <span class="nav-item-icon">🧾</span>
-        <span>AFI Guide</span>
-      </a>
+      <div class="nav-section-title">Tools</div>
       <a href="data-export.html" class="nav-item">
-        <span class="nav-item-icon">📊</span>
-        <span>Export Data</span>
+        <span class="nav-item-icon">▧</span> Reports
+      </a>
+      <a href="#" class="nav-item">
+        <span class="nav-item-icon">⌕</span> Forensic Tracing
+      </a>
+      <a href="#" class="nav-item">
+        <span class="nav-item-icon">⇄</span> Settlement Modeling
+      </a>
+      <a href="#" class="nav-item">
+        <span class="nav-item-icon">⚖</span> Regulations
+      </a>
+      <a href="#" class="nav-item">
+        <span class="nav-item-icon">§</span> Prenup Module
+      </a>
+      <a href="merchant-mapping-review.html" class="nav-item">
+        <span class="nav-item-icon">🏪</span> Merchant Review
+      </a>
+      <a href="#" class="nav-item">
+        <span class="nav-item-icon">◉</span> Compliance
+      </a>
+      <a href="#" class="nav-item">
+        <span class="nav-item-icon">🚩</span> Red-Flag Detection
       </a>
     </div>
 
-    <div class="nav-section">
-      <div class="nav-section-title">Administration</div>
-      <a href="merchant-mapping-review.html" class="nav-item">
-        <span class="nav-item-icon">🏪</span>
-        <span>Merchant Review</span>
-      </a>
+    <div class="sidebar-footer">
+      <p class="status"><span class="status-dot"></span> Secure Connection · encrypted &amp; confidential</p>
     </div>
   </aside>
 
