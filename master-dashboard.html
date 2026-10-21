@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Veritas Financial Intelligence — Master Dashboard</title>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Inter', sans-serif; background: #fafbfc; color: #1a2f4f; display: flex; min-height: 100vh; }
+
+    /* Sidebar */
+    .sidebar {
+      width: 240px;
+      background: linear-gradient(180deg, #1c3f66 0%, #153252 100%);
+      color: white;
+      padding: 24px 16px;
+      position: fixed;
+      height: 100vh;
+      overflow-y: auto;
+      box-shadow: 2px 0 8px rgba(0,0,0,0.1);
+    }
+
+    .brand { display: flex; align-items: center; gap: 12px; margin-bottom: 32px; }
+    .brand-logo { width: 40px; height: 40px; background: rgba(255,255,255,0.2); border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: 18px; }
+    .brand-text h1 { font-size: 14px; font-weight: 700; margin-bottom: 2px; }
+    .brand-text p { font-size: 11px; color: rgba(255,255,255,0.7); }
+
+    .nav-section { margin-bottom: 28px; }
+    .nav-section-title { font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; color: rgba(255,255,255,0.5); font-weight: 700; margin-bottom: 12px; }
+
+    .nav-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 6px;
+      cursor: pointer;
+      margin-bottom: 6px;
+      transition: all 0.2s;
+      font-size: 12px;
+      text-decoration: none;
+      color: rgba(255,255,255,0.8);
+    }
+
+    .nav-item:hover { background: rgba(255,255,255,0.1); color: white; }
+    .nav-item.active { background: rgba(255,255,255,0.2); color: white; font-weight: 600; }
+    .nav-item-icon { font-size: 16px; min-width: 20px; }
+
+    /* Main Content */
+    .main {
+      margin-left: 240px;
+      flex: 1;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header */
+    .topbar {
+      background: white;
+      border-bottom: 2px solid #e0e7ff;
+      padding: 20px 32px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+    }
+
+    .topbar-title h1 { font-size: 24px; font-weight: 700; color: #1c3f66; }
+    .topbar-title p { font-size: 12px; color: #7a8a9a; margin-top: 2px; }
+
+    .matter-selector {
+      background: #f4f8fc;
+      border: 1px solid #d7e0ec;
+      border-radius: 8px;
+      padding: 8px 16px;
+      font-size: 12px;
+      color: #1c3f66;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    /* Content Area */
+    .content {
+      padding: 32px;
+      flex: 1;
+      overflow-y: auto;
+    }
+
+    .page-header { margin-bottom: 32px; }
+    .page-header h2 { font-size: 28px; font-weight: 700; color: #1c3f66; margin-bottom: 8px; }
+    .page-header p { font-size: 14px; color: #5b6472; }
+
+    /* Module Grid */
+    .module-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 20px;
+    }
+
+    .module-card {
+      background: white;
+      border: 1px solid #e0e7ff;
+      border-radius: 12px;
+      padding: 24px;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      text-decoration: none;
+      color: inherit;
+    }
+
+    .module-card:hover {
+      border-color: #1c3f66;
+      box-shadow: 0 8px 24px rgba(28, 63, 102, 0.15);
+      transform: translateY(-4px);
+    }
+
+    .module-icon { font-size: 40px; }
+    .module-title { font-size: 16px; font-weight: 700; color: #1c3f66; }
+    .module-description { font-size: 12px; color: #5b6472; line-height: 1.5; }
+    .module-tag { display: inline-block; background: #f0f4fa; color: #425c7f; padding: 4px 10px; border-radius: 999px; font-size: 10px; font-weight: 600; width: fit-content; margin-top: 8px; }
+
+    .section-group { margin-bottom: 40px; }
+    .section-title {
+      font-size: 14px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: #1c3f66;
+      margin-bottom: 16px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid #e0e7ff;
+    }
+
+    /* Responsive */
+    @media (max-width: 1200px) {
+      .module-grid { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); }
+    }
+
+    @media (max-width: 768px) {
+      .sidebar { width: 180px; padding: 16px 12px; }
+      .main { margin-left: 180px; }
+      .content { padding: 20px; }
+      .topbar { padding: 16px 20px; flex-direction: column; gap: 12px; text-align: center; }
+      .module-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-logo">VFI</div>
+      <div class="brand-text">
+        <h1>Veritas</h1>
+        <p>Financial Intelligence</p>
+      </div>
+    </div>
+
+    <!-- Primary Modules -->
+    <div class="nav-section">
+      <div class="nav-section-title">Primary Modules</div>
+      <a href="income-imputation-template.html" class="nav-item active">
+        <span class="nav-item-icon">💰</span>
+        <span>Income Engine</span>
+      </a>
+      <a href="document-reconciliation-hub.html" class="nav-item">
+        <span class="nav-item-icon">📄</span>
+        <span>Document Hub</span>
+      </a>
+      <a href="afi-expenses-template.html" class="nav-item">
+        <span class="nav-item-icon">🏠</span>
+        <span>AFI Expenses</span>
+      </a>
+    </div>
+
+    <!-- Support Calculations -->
+    <div class="nav-section">
+      <div class="nav-section-title">Support Calculations</div>
+      <a href="spousal-maintenance-template.html" class="nav-item">
+        <span class="nav-item-icon">⚖</span>
+        <span>Spousal Support</span>
+      </a>
+      <a href="child-support-template.html" class="nav-item">
+        <span class="nav-item-icon">👶</span>
+        <span>Child Support</span>
+      </a>
+    </div>
+
+    <!-- Analysis & Reference -->
+    <div class="nav-section">
+      <div class="nav-section-title">Reference</div>
+      <a href="afi-reference-guide.html" class="nav-item">
+        <span class="nav-item-icon">🧾</span>
+        <span>AFI Guide</span>
+      </a>
+      <a href="data-export.html" class="nav-item">
+        <span class="nav-item-icon">📊</span>
+        <span>Export Data</span>
+      </a>
+    </div>
+
+    <!-- Administration -->
+    <div class="nav-section">
+      <div class="nav-section-title">Administration</div>
+      <a href="merchant-mapping-review.html" class="nav-item">
+        <span class="nav-item-icon">🏪</span>
+        <span>Merchant Review</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <div class="main">
+    <!-- HEADER -->
+    <div class="topbar">
+      <div class="topbar-title">
+        <h1>Dashboard</h1>
+        <p>Ossandon v. Ossandon · No. D2024-1669</p>
+      </div>
+      <select class="matter-selector">
+        <option>Ossandon v. Ossandon (D2024-1669)</option>
+        <option>— Select Matter —</option>
+      </select>
+    </div>
+
+    <!-- CONTENT -->
+    <div class="content">
+      <div class="page-header">
+        <h2>Welcome to Veritas Financial Intelligence</h2>
+        <p>Comprehensive financial analysis platform for family law practice</p>
+      </div>
+
+      <!-- Intake & Setup -->
+      <div class="section-group">
+        <div class="section-title">📥 Intake & Setup</div>
+        <div class="module-grid">
+          <a href="income-imputation-template.html" class="module-card">
+            <div class="module-icon">💰</div>
+            <div class="module-title">Income Imputation Engine</div>
+            <div class="module-description">Build and compare income from multiple sources: W-2s, bonuses, RSUs, self-employment, investment, spousal/child support received.</div>
+            <div class="module-tag">Multi-basis analysis</div>
+          </a>
+
+          <a href="document-reconciliation-hub.html" class="module-card">
+            <div class="module-icon">📄</div>
+            <div class="module-title">Document Hub & Reconciliation</div>
+            <div class="module-description">Track all discovery documents by category. See what you have and what's missing. Organize by income, expenses, tax, court documents.</div>
+            <div class="module-tag">Intake tracking</div>
+          </a>
+        </div>
+      </div>
+
+      <!-- Financial Analysis -->
+      <div class="section-group">
+        <div class="section-title">📊 Financial Analysis</div>
+        <div class="module-grid">
+          <a href="afi-expenses-template.html" class="module-card">
+            <div class="module-icon">🏠</div>
+            <div class="module-title">AFI Expenses (Form 12)</div>
+            <div class="module-description">Complete Arizona Affidavit of Financial Information with all expense categories organized by AFI sections 1-8. Comparative analysis between parties.</div>
+            <div class="module-tag">Form 12 compliant</div>
+          </a>
+        </div>
+      </div>
+
+      <!-- Support Calculations -->
+      <div class="section-group">
+        <div class="section-title">⚖ Support Calculations</div>
+        <div class="module-grid">
+          <a href="spousal-maintenance-template.html" class="module-card">
+            <div class="module-icon">⚖</div>
+            <div class="module-title">Spousal Maintenance Calculator</div>
+            <div class="module-description">Arizona income-gap formula (20%) with duration caps by marriage length. Three scenarios: conservative, guideline, aggressive.</div>
+            <div class="module-tag">A.R.S. § 25-319(F)</div>
+          </a>
+
+          <a href="child-support-template.html" class="module-card">
+            <div class="module-icon">👶</div>
+            <div class="module-title">Child Support Calculator</div>
+            <div class="module-description">Arizona income-shares guideline (17%-50% by child count). Base obligation plus mandatory add-ons. Parenting time deviations.</div>
+            <div class="module-tag">A.R.S. § 25-320</div>
+          </a>
+        </div>
+      </div>
+
+      <!-- Reference & Export -->
+      <div class="section-group">
+        <div class="section-title">📚 Reference & Export</div>
+        <div class="module-grid">
+          <a href="afi-reference-guide.html" class="module-card">
+            <div class="module-icon">🧾</div>
+            <div class="module-title">AFI Reference Guide</div>
+            <div class="module-description">Complete Arizona Form 12 sections with legal basis citations (A.R.S. § 25-320). Each expense category explained with statutory context.</div>
+            <div class="module-tag">Legal reference</div>
+          </a>
+
+          <a href="data-export.html" class="module-card">
+            <div class="module-icon">📊</div>
+            <div class="module-title">Data Export & Reporting</div>
+            <div class="module-description">Export income, expenses, and analysis to CSV format organized by category. Ready for exhibits and court filings.</div>
+            <div class="module-tag">CSV export</div>
+          </a>
+
+          <a href="merchant-mapping-review.html" class="module-card">
+            <div class="module-icon">🏪</div>
+            <div class="module-title">Merchant Review & Classification</div>
+            <div class="module-description">Two-phase merchant review: categorize auto-guessed transactions and reclassify generic categories to specific AFI expense types.</div>
+            <div class="module-tag">Bank statement mapping</div>
+          </a>
+        </div>
+      </div>
+
+      <!-- System Info -->
+      <div style="margin-top: 40px; padding-top: 24px; border-top: 2px solid #e0e7ff; text-align: center; color: #7a8a9a; font-size: 12px;">
+        <p><strong>Veritas Financial Intelligence</strong> — Master Template v1.0</p>
+        <p style="margin-top: 4px;">Professional financial analysis platform for family law practice</p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Handle sidebar navigation
+    document.querySelectorAll('.nav-item').forEach(item => {
+      item.addEventListener('click', function() {
+        document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+        this.classList.add('active');
+      });
+    });
+
+    // Handle module card clicks
+    document.querySelectorAll('.module-card').forEach(card => {
+      card.addEventListener('click', function(e) {
+        if (this.href) {
+          window.location.href = this.href;
+        }
+      });
+    });
+  </script>
+</body>
+</html>
