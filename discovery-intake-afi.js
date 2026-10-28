@@ -83,16 +83,129 @@
       null;
   }
 
-  function ensureCategoryDatalist() {
-    let list = document.getElementById('afiCategoryOptions');
-    if (!list) {
-      list = document.createElement('datalist');
-      list.id = 'afiCategoryOptions';
-      document.body.appendChild(list);
+  /* ---------- Category picker ----------
+   * One shared dropdown: every category grouped by AFI section, scrollable,
+   * filtered by whatever is typed (section names match too). Picking an item
+   * writes its text into the input and fires "change", so the row's existing
+   * change handler does the saving exactly as before. */
+  let pickerEl = null;
+  let pickerInput = null;
+  let pickerItems = [];
+  let pickerActive = -1;
+
+  function pickerChoose(text) {
+    const input = pickerInput;
+    closePicker();
+    if (!input) return;
+    input.value = text;
+    input.dispatchEvent(new Event('change', { bubbles: true }));
+  }
+
+  function closePicker() {
+    if (pickerEl) pickerEl.hidden = true;
+    pickerInput = null;
+  }
+
+  function positionPicker() {
+    if (!pickerEl || !pickerInput) return;
+    const r = pickerInput.getBoundingClientRect();
+    if (r.bottom < 0 || r.top > window.innerHeight) { closePicker(); return; }
+    const below = window.innerHeight - r.bottom - 12;
+    const above = r.top - 12;
+    const openUp = below < 260 && above > below;
+    pickerEl.style.maxHeight = `${Math.max(180, Math.min(420, openUp ? above : below))}px`;
+    pickerEl.style.width = `${Math.max(r.width, 420)}px`;
+    pickerEl.style.left = `${Math.max(8, Math.min(r.left, window.innerWidth - Math.max(r.width, 420) - 8))}px`;
+    pickerEl.style.top = openUp ? '' : `${r.bottom + 4}px`;
+    pickerEl.style.bottom = openUp ? `${window.innerHeight - r.top + 4}px` : '';
+  }
+
+  function renderPicker() {
+    const q = (pickerInput.value || '').trim().toLowerCase();
+    const words = q.split(/\s+/).filter(Boolean);
+    const matches = (c) => {
+      const hay = optionText(c).toLowerCase();
+      return words.every((w) => hay.includes(w));
+    };
+    pickerItems = [];
+    let html = '';
+    T.SECTIONS.forEach((s) => {
+      const cats = T.categoriesForSection(s.key).filter(matches);
+      if (!cats.length) return;
+      html += `<div style="position:sticky;top:0;background:#eef2f7;color:#1c3f66;font-weight:700;font-size:11px;letter-spacing:.3px;padding:6px 10px;border-bottom:1px solid #dde3ea;">${esc(sectionHeading(s))}</div>`;
+      cats.forEach((c) => {
+        const line = T.afiLineFor(c.code);
+        html += `<div data-i="${pickerItems.length}" style="padding:7px 12px;cursor:pointer;font-size:12.5px;color:#1a2432;display:flex;justify-content:space-between;gap:10px;align-items:center;">
+          <span>${esc(T.displayLabel(c.code))}</span>
+          ${line ? `<span style="flex:none;font-size:10.5px;font-weight:600;color:#2f7d5b;background:#e3f2ea;border-radius:10px;padding:1px 8px;">Line ${line}</span>` : ''}</div>`;
+        pickerItems.push(optionText(c));
+      });
+    });
+    const exact = q && categoryByText(pickerInput.value);
+    if (q && !exact) {
+      html += `<div data-i="${pickerItems.length}" style="padding:8px 12px;cursor:pointer;font-size:12.5px;color:#1c3f66;font-weight:600;border-top:1px solid #dde3ea;">+ Add “${esc(pickerInput.value.trim())}” as a new category</div>`;
+      pickerItems.push(pickerInput.value.trim());
     }
-    list.innerHTML = T.SECTIONS
-      .map((s) => T.categoriesForSection(s.key).map((c) => `<option value="${esc(optionText(c))}"></option>`).join(''))
-      .join('') + `<option value="${esc(SKIP_TEXT)}"></option>`;
+    if (!words.length || SKIP_TEXT.toLowerCase().includes(q)) {
+      html += `<div data-i="${pickerItems.length}" style="padding:8px 12px;cursor:pointer;font-size:12.5px;color:#55637a;border-top:1px solid #dde3ea;">${esc(SKIP_TEXT)}</div>`;
+      pickerItems.push(SKIP_TEXT);
+    }
+    pickerEl.innerHTML = html;
+    pickerActive = words.length && pickerItems.length ? 0 : -1;
+    highlightPicker();
+  }
+
+  function highlightPicker() {
+    pickerEl.querySelectorAll('[data-i]').forEach((el) => {
+      const on = Number(el.dataset.i) === pickerActive;
+      el.style.background = on ? '#e8f0fa' : '';
+      if (on) el.scrollIntoView({ block: 'nearest' });
+    });
+  }
+
+  function openPicker(input) {
+    if (!pickerEl) {
+      pickerEl = document.createElement('div');
+      pickerEl.style.cssText = 'position:fixed;z-index:6000;overflow-y:auto;background:#fff;border:1px solid #cdd8e7;border-radius:10px;box-shadow:0 12px 32px rgba(16,27,44,.18);';
+      // mousedown, not click: fires before the input's blur closes the list.
+      pickerEl.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        const item = e.target.closest('[data-i]');
+        if (item) pickerChoose(pickerItems[Number(item.dataset.i)]);
+      });
+      pickerEl.addEventListener('mousemove', (e) => {
+        const item = e.target.closest('[data-i]');
+        if (item && Number(item.dataset.i) !== pickerActive) { pickerActive = Number(item.dataset.i); highlightPicker(); }
+      });
+      window.addEventListener('scroll', positionPicker, true);
+      window.addEventListener('resize', positionPicker);
+      document.body.appendChild(pickerEl);
+    }
+    pickerInput = input;
+    pickerEl.hidden = false;
+    renderPicker();
+    positionPicker();
+  }
+
+  function attachCategoryPicker(input) {
+    input.addEventListener('focus', () => openPicker(input));
+    input.addEventListener('click', () => { if (pickerInput !== input) openPicker(input); });
+    input.addEventListener('input', () => { if (pickerInput === input) { renderPicker(); positionPicker(); } else openPicker(input); });
+    input.addEventListener('blur', () => { if (pickerInput === input) closePicker(); });
+    input.addEventListener('keydown', (e) => {
+      if (pickerInput !== input) { if (e.key === 'ArrowDown') openPicker(input); return; }
+      if (e.key === 'ArrowDown' || e.key === 'ArrowUp') {
+        e.preventDefault();
+        if (!pickerItems.length) return;
+        pickerActive = (pickerActive + (e.key === 'ArrowDown' ? 1 : -1) + pickerItems.length) % pickerItems.length;
+        highlightPicker();
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        if (pickerActive >= 0) pickerChoose(pickerItems[pickerActive]);
+      } else if (e.key === 'Escape') {
+        closePicker();
+      }
+    });
   }
 
 
@@ -298,19 +411,19 @@
     const unBody = document.getElementById('afiUnmappedBody');
     if (unBody) {
       unBody.innerHTML = '';
-      ensureCategoryDatalist();
+      closePicker();
 
       const sectionOptions = T.SECTIONS.map((s) =>
         `<option value="${esc(s.key)}">${esc(sectionHeading(s))}</option>`).join('');
       const lineOptions = AFI_LINES.map(({ line, label }) =>
         `<option value="${line}">Line ${line} — ${esc(label)}</option>`).join('');
 
-      // Search box over every category (the browser filters the list as you
-      // type); anything typed that matches nothing opens the add panel.
+      // Search box over every category (see attachCategoryPicker); anything
+      // typed that matches nothing opens the add panel.
       const picker = (mk, withConfirm) => `
         <div style="display:flex;gap:6px;align-items:center;">
-          <input class="map-select" list="afiCategoryOptions" data-mk="${esc(mk)}" autocomplete="off"
-            placeholder="Search or add a category…" style="min-width:240px;">
+          <input class="map-select" data-mk="${esc(mk)}" autocomplete="off"
+            placeholder="Click to see all categories, or type to search…" style="min-width:240px;">
           ${withConfirm ? `<button type="button" class="btn ghost" style="padding:3px 8px;font-size:11px;white-space:nowrap;" data-confirm="${esc(mk)}">✓ Confirm</button>` : ''}
         </div>
         <div data-add-panel hidden style="margin-top:6px;padding:8px;border:1px dashed #cbd5e1;border-radius:6px;background:#f8fafc;font-size:11px;">
@@ -353,6 +466,51 @@
         unBody.innerHTML = '<tr><td colspan="4" style="color:#999;padding:12px;">No unmapped or flagged merchants. 🎉</td></tr>';
       }
 
+      // Merchants a person already decided stay listed so a wrong choice can be
+      // changed or undone (undo returns the merchant to suggested / unmapped).
+      const decided = {};
+      allTransactions.forEach((t) => {
+        const mk = merchantKey(t.description);
+        if (userMappings[mk] === undefined && !confirmedGuesses[mk]) return;
+        if (!decided[mk]) decided[mk] = { rows: 0, amount: 0, desc: t.description };
+        decided[mk].rows++;
+        decided[mk].amount += Math.abs(parseFloat(t.amount) || 0);
+      });
+      const decidedKeys = Object.keys(decided).sort((a, b) => a.localeCompare(b));
+      if (decidedKeys.length) {
+        const head = document.createElement('tr');
+        head.innerHTML = `<td colspan="4" style="background:#eef2f7;font-weight:600;color:#1c3f66;padding:8px 10px;">
+          Already classified (${decidedKeys.length}) — pick a new category to change one, or ↺ Undo to start over</td>`;
+        unBody.appendChild(head);
+      }
+      decidedKeys.forEach((mk) => {
+        const d = decided[mk];
+        const choice = userMappings[mk];
+        const current = choice === null ? SKIP_TEXT
+          : typeof choice === 'number' ? `Line ${choice} — ${(AFI_LINES.find((l) => l.line === choice) || {}).label || ''}`
+          : typeof choice === 'string' ? (T.displayLabel(choice) || choice)
+          : `${T.displayLabel((T.classifyDetailed(d.desc) || {}).code) || 'Suggested category'} (suggestion accepted)`;
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td title="${esc(d.desc)}">${esc(mk || '(blank)')}
+            <div style="margin-top:3px;"><span class="map-badge" style="background:#e3f2ea;color:#2f7d5b;">Classified</span>
+            <span style="font-size:10px;color:#6b7280;">${esc(current)}</span></div></td>
+          <td>${d.rows}</td>
+          <td>${money(d.amount)}</td>
+          <td>${picker(mk, false)}
+            <button type="button" class="btn ghost" style="margin-top:4px;padding:3px 8px;font-size:11px;" data-undo="${esc(mk)}">↺ Undo</button></td>`;
+        unBody.appendChild(tr);
+      });
+
+      unBody.querySelectorAll('button[data-undo]').forEach((btn) => {
+        btn.addEventListener('click', () => {
+          delete userMappings[btn.dataset.undo];
+          delete confirmedGuesses[btn.dataset.undo];
+          saveUserMappings();
+          render();
+        });
+      });
+
       unBody.querySelectorAll('button[data-confirm]').forEach((btn) => {
         btn.addEventListener('click', () => {
           confirmedGuesses[btn.dataset.confirm] = true;
@@ -367,6 +525,7 @@
         const sectionSel = panel.querySelector('[data-add-section]');
         const saveBtn = panel.querySelector('[data-add-save]');
         const mk = input.dataset.mk;
+        attachCategoryPicker(input);
 
         input.addEventListener('change', () => {
           const text = input.value.trim();

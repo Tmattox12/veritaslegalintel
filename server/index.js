@@ -10,6 +10,7 @@ const bankStatementsRouter = require('./routes/bank-statements');
 const documentsRouter = require('./routes/documents');
 const documentExtractionRouter = require('./routes/document-extraction');
 const merchantMappingRouter = require('./routes/merchant-mapping');
+const chatRouter = require('./routes/chat');
 const { requireAuth, authEnabled, MODE } = require('./auth');
 
 const app = express();
@@ -60,6 +61,7 @@ app.use('/api/matters/:matterId/bank-statements', bankStatementsRouter);
 app.use('/api/matters/:matterId/documents', documentsRouter);
 app.use('/api/matters/:matterId/merchants', merchantMappingRouter);
 app.use('/api/matters/:matterId', documentExtractionRouter);
+app.use('/api/chat', chatRouter);
 
 // Health check
 app.get('/api/health', (req, res) => {

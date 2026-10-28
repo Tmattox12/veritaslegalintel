@@ -52,8 +52,16 @@
   //   discretionary - lifestyle, reported but never a "need"
   //   excluded      - must not appear in AFI totals
   //   none          - income, transfers: not spending at all
+  // afiLine is the roll-up into the eight inputs on afi-form-populator.html:
+  // AFI sections 1-8 map one-to-one onto form lines 1-8. Clothing sits in
+  // section 8 but has never been part of the Food/Groceries line.
+  const SECTION_LINE = {
+    health_insurance: 1, childcare: 2, medical_unreimbursed: 3, tuition: 4,
+    housing: 5, utilities: 6, transportation: 7, food_household: 8,
+  };
+  const NO_FORM_LINE = ['laundry_clothing', 'clothing_replacement'];
   const C = (code, section, subsection, label, treatment) =>
-    ({ code, section, subsection, label, treatment });
+    ({ code, section, subsection, label, afiLine: NO_FORM_LINE.includes(code) ? null : SECTION_LINE[section] || null, treatment });
 
   const CATEGORIES = [
     // ---- Section 1: Health Insurance Premiums ----------------------------
@@ -189,21 +197,68 @@
     { line: 8, label: 'Food/Groceries' },
   ];
 
-  // Categories carried by rows parsed before this taxonomy existed.
+  // Codes from earlier versions of this taxonomy, still carried by parsed rows,
+  // saved merchant choices and the RULES below. Codes with no honest
+  // equivalent (basic grooming, parenting-time costs, child support add-ons)
+  // are left out on purpose so those rows surface as unmapped for a person.
   const LEGACY_ALIASES = {
+    // flat categories from before the taxonomy
     groceries: 'food_groceries',
-    dining: 'disc_dining',
+    dining: 'disc_dining_out',
     shopping: 'disc_shopping',
     fuel: 'transport_fuel',
     utilities: 'utilities_electric',
-    housing: 'housing_rent_mortgage',
-    medical: 'medical_unreimbursed',
+    housing: 'housing_rent',
+    medical: 'medical_unreimbursed_self',
     childcare: 'childcare_daycare',
-    insurance: 'medical_premium',
-    education: 'education_tuition',
-    employment_income: 'employment_income',
-    transfer: 'transfer',
-    tax: 'tax',
+    insurance: 'health_self_premium',
+    education: 'tuition_private_elementary',
+    // codes renamed when the categories were realigned to the AFI sections
+    child_support_paid: 'support_child_paid',
+    child_support_received: 'support_child_received',
+    child_support_arrears: 'support_child_arrears',
+    spousal_paid: 'support_spousal_paid',
+    spousal_received: 'support_spousal_received',
+    spousal_arrears: 'support_spousal_arrears',
+    housing_rent_mortgage: 'housing_rent',
+    housing_maintenance: 'housing_maintenance_repair',
+    debt_mortgage: 'housing_mortgage',
+    utilities_water: 'utilities_water_sewer',
+    food_household_supplies: 'household_supplies',
+    personal_hygiene: 'household_paper_products',
+    clothing: 'clothing_replacement',
+    clothing_laundry: 'laundry_clothing',
+    transport_maintenance: 'transport_maintenance_repair',
+    transport_parking_transit: 'transport_parking',
+    medical_premium: 'health_self_premium',
+    medical_dental_vision_premium: 'dental_vision_self',
+    medical_unreimbursed: 'medical_unreimbursed_self',
+    medical_prescriptions: 'prescriptions_self',
+    child_health_premium: 'health_child_premium',
+    child_medical_unreimbursed: 'medical_unreimbursed_child',
+    child_therapy: 'therapy_child',
+    childcare_babysitting: 'childcare_babysitter',
+    education_tuition: 'tuition_private_elementary',
+    education_books: 'school_books_supplies',
+    education_supplies: 'school_books_supplies',
+    education_technology: 'school_technology',
+    education_fees: 'school_fees',
+    child_activities: 'school_fees',
+    legal_expert_fees: 'legal_expert_witness',
+    legal_professional: 'legal_expert_witness',
+    disc_dining: 'disc_dining_out',
+    disc_travel: 'disc_vacation_travel',
+    disc_gym: 'disc_gym_fitness',
+    disc_subscription_other: 'disc_subscriptions',
+    disc_beauty: 'disc_beauty_spa',
+    excl_business: 'excl_business_expense',
+    excl_non_party: 'excl_non_party_expense',
+    excl_luxury: 'excl_luxury_non_essential',
+    employment_income: 'income_wages',
+    other_income: 'income_other',
+    transfer: 'transfer_account',
+    investment_transfer: 'transfer_investment',
+    tax: 'tax_payment',
   };
 
   const REVIEW = 'review';
@@ -242,7 +297,8 @@
     [/\bswpestsolutions\b|\bpest\s*solutions\b/i, 'housing_maintenance_repair'],
     [/\bsams\s*scan|\bwholefds\b|\bwm\s*supercenter\b/i, 'food_groceries'],
     [/\bbanner\s*(?:health|univ)|\brincon\s*asc\b|\bpathology\s*specialists\b|\bliver\s*health\b|\bkidney\s*institut|\blaboratory\s*corporation\b|\bchiropractic\b|\bphysical\s*medicin|\bm\.?d\.?,?\s*p\b|\bmychart\b/i, 'medical_unreimbursed'],
-    [/\bbarber|\bgreat\s*clips\b|\bsupercuts\b|\bsport\s*clips\b/i, 'personal_grooming'],
+    // Basic haircuts have no category of their own on the AFI; a person decides.
+    [/\bbarber|\bgreat\s*clips\b|\bsupercuts\b|\bsport\s*clips\b/i, 'disc_beauty_spa', REVIEW],
     [/\bulta\b|\bsephora\b|\bthrivecausemetics\b/i, 'disc_beauty'],
     [/\btaekwondo\b|\bmartial\s*arts\b/i, 'child_activities'],
     [/\bamphitheater\s*public\s*scho|\bpima\s*county\s*amphithea|\bpublic\s*schools?\b/i, 'school_fees'],
@@ -309,7 +365,7 @@
     [/\b(?:derm|dent|ortho|optom|clinic|medical|urgent\s*care|labcorp|quest\s*diag|hospital|physician|pediatric|radiolog|anesthes)/i, 'medical_unreimbursed'],
 
     // --- housing -------------------------------------------------------------
-    [/\bmortgage\b|\bloan\s*servicing\b|\bmr\s*cooper\b|\bpennymac\b|\bfreedom\s*mortgage\b/i, 'housing_rent_mortgage'],
+    [/\bmortgage\b|\bloan\s*servicing\b|\bmr\s*cooper\b|\bpennymac\b|\bfreedom\s*mortgage\b/i, 'housing_mortgage'],
     // Confirmed by counsel as a recurring rent/mortgage payment.
     [/\btucson\s*crossroads?\b/i, 'housing_rent_mortgage'],
     [/\brent\b|\bapartment|\bproperty\s*management\b|\bleasing\b/i, 'housing_rent_mortgage'],
@@ -450,11 +506,16 @@
   // A section decides how a total may be used, so a custom category inherits
   // its treatment from the section it is filed under.
   const SECTION_TREATMENT = {
+    health_insurance: 'need',
+    childcare: 'need',
+    medical_unreimbursed: 'need',
+    tuition: 'need',
+    housing: 'need',
+    utilities: 'need',
+    transportation: 'need',
+    food_household: 'need',
     court_ordered: 'support',
-    basic_living: 'need',
-    child_related: 'need',
-    debts: 'debt',
-    legal: 'legal',
+    other_expenses: 'debt',
     discretionary: 'discretionary',
     excluded: 'excluded',
     non_expense: 'none',
@@ -466,7 +527,7 @@
     (defs || []).forEach((d) => {
       if (!d || !d.code || !d.label || !SECTION_TREATMENT[d.section]) return;
       const afiLine = AFI_LINES.some((l) => l.line === d.afiLine) ? d.afiLine : null;
-      const cat = C(d.code, d.section, 'Custom', d.label, afiLine, SECTION_TREATMENT[d.section]);
+      const cat = Object.assign(C(d.code, d.section, 'Custom', d.label, SECTION_TREATMENT[d.section]), { afiLine });
       const existing = CATEGORIES.findIndex((c) => c.code === d.code);
       if (existing >= 0) CATEGORIES[existing] = cat; else CATEGORIES.push(cat);
       BY_CODE[d.code] = cat;
@@ -475,7 +536,7 @@
 
   // Money moving between the party's own accounts, or out as cash: neither
   // income nor spending, so it is excluded from both analyses.
-  const MOVEMENT_CODES = ['transfer', 'investment_transfer', 'cash_withdrawal'];
+  const MOVEMENT_CODES = ['transfer_account', 'transfer_investment', 'cash_withdrawal'];
 
   function isAccountMovement(code) {
     return MOVEMENT_CODES.includes(normalize(code));

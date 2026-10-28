@@ -727,7 +727,7 @@ function updateStatusBadge(online, docCount, txCount) {
   if (!b) {
     b = document.createElement('div');
     b.id = 'diStatusBadge';
-    b.style.cssText = 'position:fixed;bottom:12px;right:12px;z-index:5000;padding:8px 12px;border-radius:8px;font-size:11px;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,0.15);';
+    b.style.cssText = 'position:fixed;bottom:12px;right:92px;z-index:5000;padding:8px 12px;border-radius:8px;font-size:11px;font-weight:600;box-shadow:0 2px 8px rgba(0,0,0,0.15);';
     document.body.appendChild(b);
   }
   if (online) {

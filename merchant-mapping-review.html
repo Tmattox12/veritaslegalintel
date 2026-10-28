@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <script src="matter-context.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Merchant Mapping Review</title>
   <style>
@@ -17,7 +18,7 @@
       min-height: 100vh;
     }
 
-    .sidebar { width: 240px; background: linear-gradient(180deg, #1c3f66 0%, #153252 100%); color: white; padding: 24px 16px; position: fixed; height: 100vh; overflow-y: auto; box-shadow: 2px 0 8px rgba(0,0,0,0.1); }
+    .sidebar { width: 280px; background: linear-gradient(180deg, #0e1b2c 0%, #14273d 100%); color: white; padding: 24px 16px; position: fixed; height: 100vh; overflow-y: auto; box-shadow: 2px 0 8px rgba(0,0,0,0.1); }
     .brand { display: flex; align-items: center; gap: 12px; padding: 6px 8px 16px; }
     .brand-mark { width: 54px; height: 54px; border-radius: 12px; background: white; display: grid; place-items: center; box-shadow: 0 4px 14px rgba(0,0,0,0.15); overflow: hidden; flex-shrink: 0; }
     .brand-mark img { width: 95%; height: 95%; object-fit: contain; }
@@ -26,16 +27,17 @@
     .brand-name { font-family: 'Trajan Pro', 'Times New Roman', serif; font-weight: 700; font-size: 18px; color: #fff; letter-spacing: 2px; text-transform: uppercase; }
     .brand-sub { font-family: 'Trajan Pro', 'Times New Roman', serif; font-size: 10px; color: #b8a080; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 600; }
     .nav-section { margin-bottom: 28px; }
-    .nav-section-title { font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; color: rgba(255,255,255,0.5); font-weight: 700; margin-bottom: 12px; }
+    .nav-section-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.2px; color: #64748e; font-weight: 600; margin: 10px 10px 5px; }
     .nav-item { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 6px; cursor: pointer; margin-bottom: 6px; transition: all 0.2s; font-size: 12px; text-decoration: none; color: rgba(255,255,255,0.8); }
-    .nav-item:hover { background: rgba(255,255,255,0.1); color: white; }
-    .nav-item.active { background: rgba(255,255,255,0.2); color: white; font-weight: 600; }
+    .sidebar .nav-item { padding: 6px 12px; margin-bottom: 1px; border-radius: 9px; color: #b7c3d6; font-size: 13.5px; font-weight: 500; }
+    .sidebar .nav-item:hover { background: rgba(255,255,255,.05); color: #fff; }
+    .sidebar .nav-item.active { background: #274566; color: #fff; font-weight: 500; box-shadow: inset 3px 0 0 #b8893b; }
     .nav-item-icon { font-size: 16px; min-width: 20px; }
     .sidebar-footer { margin-top: auto; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.1); }
     .sidebar-footer p { font-size: 10px; color: rgba(255,255,255,0.6); line-height: 1.4; }
     .sidebar-footer .status { display: flex; align-items: center; gap: 6px; color: rgba(255,255,255,0.7); }
     .status-dot { width: 6px; height: 6px; border-radius: 50%; background: #10b981; }
-    .main-content { margin-left: 240px; flex: 1; display: flex; flex-direction: column;
+    .main-content { margin-left: 280px; flex: 1; display: flex; flex-direction: column;
       background: #f5f7fa;
       color: #333;
     }
@@ -374,15 +376,17 @@
 </head>
 <body>
   <aside class="sidebar">
-    <div class="brand"><div class="brand-mark"><svg width="54" height="54" viewBox="0 0 54 54" fill="none" xmlns="http://www.w3.org/2000/svg"><rect width="54" height="54" rx="8" fill="white"/><text x="27" y="38" font-family="'Fraunces', serif" font-size="28" font-weight="700" text-anchor="middle" fill="#1c3f66">V</text><text x="27" y="38" font-family="'Fraunces', serif" font-size="28" font-weight="700" text-anchor="middle" fill="#b8893b" dx="8">F</text><text x="27" y="38" font-family="'Fraunces', serif" font-size="28" font-weight="700" text-anchor="middle" fill="#b8893b" dx="14">I</text></svg></div><div class="brand-text"><span class="brand-name">Veritas</span><span class="brand-sub">Financial Intelligence</span></div></div>
+    <div class="brand"><div class="brand-mark">
+        <img src="logo-vfi.jpg" alt="VFI" />
+      </div><div class="brand-text"><span class="brand-name">Veritas</span><span class="brand-sub">Legal Financial Intelligence</span></div></div>
     <div class="nav-section"><div class="nav-section-title">Workspace</div>
-      <a href="master-dashboard.html" class="nav-item"><span class="nav-item-icon">◆</span> Dashboard</a><a href="#" class="nav-item"><span class="nav-item-icon">▤</span> Case Intake</a><a href="#" class="nav-item"><span class="nav-item-icon">◯</span> Matters</a><a href="#" class="nav-item"><span class="nav-item-icon">⤓</span> Document Intake</a><a href="document-reconciliation-hub.html" class="nav-item"><span class="nav-item-icon">📁</span> Document Hub</a><a href="#" class="nav-item"><span class="nav-item-icon">◷</span> Calendar</a><a href="#" class="nav-item"><span class="nav-item-icon">☑</span> Tasks</a><a href="#" class="nav-item"><span class="nav-item-icon">◍</span> Clients</a>
+      <a href="master-dashboard.html" class="nav-item">Dashboard</a><a href="#" class="nav-item">Case Intake</a><a href="#" class="nav-item">Matters</a><a href="#" class="nav-item">Document Intake</a><a href="document-reconciliation-hub.html" class="nav-item">Document Hub</a><a href="#" class="nav-item">Calendar</a><a href="#" class="nav-item">Tasks</a><a href="#" class="nav-item">Clients</a>
     </div>
     <div class="nav-section"><div class="nav-section-title">Analysis Modules</div>
-      <a href="income-imputation-template.html" class="nav-item"><span class="nav-item-icon">💠</span> Income Engine</a><a href="spousal-maintenance-template.html" class="nav-item"><span class="nav-item-icon">⚖</span> Support Calculator</a><a href="child-support-template.html" class="nav-item"><span class="nav-item-icon">◈</span> Child Support</a><a href="#" class="nav-item"><span class="nav-item-icon">⊟</span> Assets</a><a href="#" class="nav-item"><span class="nav-item-icon">⌘</span> Custody</a><a href="afi-expenses-template.html" class="nav-item"><span class="nav-item-icon">🧾</span> AFI Expenses</a><a href="#" class="nav-item"><span class="nav-item-icon">⊕</span> Credits &amp; Adjustments</a>
+      <a href="income-imputation-template.html" class="nav-item">Income Engine</a><a href="spousal-maintenance-template.html" class="nav-item">Support Calculator</a><a href="child-support-template.html" class="nav-item">Child Support</a><a href="#" class="nav-item">Assets</a><a href="#" class="nav-item">Custody</a><a href="afi-expenses-template.html" class="nav-item">AFI Expenses</a><a href="#" class="nav-item">Credits &amp; Adjustments</a>
     </div>
     <div class="nav-section"><div class="nav-section-title">Tools</div>
-      <a href="data-export.html" class="nav-item"><span class="nav-item-icon">▧</span> Reports</a><a href="#" class="nav-item"><span class="nav-item-icon">⌕</span> Forensic Tracing</a><a href="#" class="nav-item"><span class="nav-item-icon">⇄</span> Settlement Modeling</a><a href="#" class="nav-item"><span class="nav-item-icon">⚖</span> Regulations</a><a href="#" class="nav-item"><span class="nav-item-icon">§</span> Prenup Module</a><a href="merchant-mapping-review.html" class="nav-item active"><span class="nav-item-icon">🏪</span> Merchant Review</a><a href="#" class="nav-item"><span class="nav-item-icon">◉</span> Compliance</a><a href="#" class="nav-item"><span class="nav-item-icon">🚩</span> Red-Flag Detection</a>
+      <a href="data-export.html" class="nav-item">Reports</a><a href="#" class="nav-item">Forensic Tracing</a><a href="#" class="nav-item">Settlement Modeling</a><a href="#" class="nav-item">Regulations</a><a href="#" class="nav-item">Prenup Module</a><a href="merchant-mapping-review.html" class="nav-item active">Merchant Review</a><a href="#" class="nav-item">Compliance</a><a href="#" class="nav-item">Red-Flag Detection</a>
     </div>
     <div class="sidebar-footer"><p class="status"><span class="status-dot"></span> Secure Connection · encrypted &amp; confidential</p></div>
   </aside>
@@ -506,7 +510,7 @@
       }
 
       // Load merchants that need review (status = 'review')
-      fetch(`/api/matters/${currentMatterId}/merchants/review`)
+      fetch(`http://localhost:3000/api/matters/${currentMatterId}/merchants/review`)
         .then(r => r.json())
         .then(data => {
           reviewMerchants = data.review || [];
@@ -515,7 +519,7 @@
         .catch(err => console.error('Error loading review merchants:', err));
 
       // Load merchants that need reclassification
-      fetch(`/api/matters/${currentMatterId}/merchants/reclassify`)
+      fetch(`http://localhost:3000/api/matters/${currentMatterId}/merchants/reclassify`)
         .then(r => r.json())
         .then(data => {
           reclassifyMerchants = data.reclassify || [];
@@ -630,7 +634,7 @@
     }
 
     function confirmMapping(description, category) {
-      fetch(`/api/matters/${currentMatterId}/merchants/${encodeURIComponent(description)}/confirm`, {
+      fetch(`http://localhost:3000/api/matters/${currentMatterId}/merchants/${encodeURIComponent(description)}/confirm`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ category })
@@ -646,7 +650,7 @@
     function changeMapping(description) {
       const newCategory = prompt('Enter new AFI category code:\n' + Object.keys(AFI_CATEGORIES).slice(0, 10).join(', '));
       if (newCategory) {
-        fetch(`/api/matters/${currentMatterId}/merchants/${encodeURIComponent(description)}/remap`, {
+        fetch(`http://localhost:3000/api/matters/${currentMatterId}/merchants/${encodeURIComponent(description)}/remap`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ category: newCategory })

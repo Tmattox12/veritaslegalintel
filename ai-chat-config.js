@@ -52,6 +52,18 @@ Important: Focus on the technical process of document management and linking. Be
     ]
   },
 
+  discovery: {
+    pageContext: 'Ask me how to classify an expense or what the category options are',
+    systemPrompt: `The user is on Discovery Intake, mapping parsed bank and card transactions to AFI categories in the "Unmapped merchant" table. Typical questions: what category a merchant belongs in, what the options are for a kind of expense, the difference between two categories, and how to fix a wrong classification.`,
+    suggestedQuestions: [
+      'What are the options to classify an expense?',
+      "Where does a child's therapist or psychologist go?",
+      'Where do hair, salon, or spa appointments go?',
+      'Which categories land on the 8-line AFI form?',
+      'How do I fix a merchant I classified wrong?'
+    ]
+  },
+
   index: {
     pageContext: 'Ask me about the AFI system, how to get started, or what documents you need',
     systemPrompt: `You introduce users to the Veritas AFI system. Explain how the system works, what it's used for, and what documents are needed. Keep answers concise and welcoming, typically 2-3 sentences max.
@@ -110,6 +122,8 @@ if (document.currentScript) {
     pageKey = 'afi';
   } else if (pathname.includes('intake-questionnaire.html')) {
     pageKey = 'intake';
+  } else if (pathname.includes('discovery-intake.html') || pathname.includes('discovery-management.html')) {
+    pageKey = 'discovery';
   } else if (pathname.includes('document-management.html')) {
     pageKey = 'document-management';
   } else if (pathname.includes('index.html') || pathname === '/' || pathname === '') {

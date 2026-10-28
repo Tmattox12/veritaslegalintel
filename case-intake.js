@@ -278,7 +278,7 @@ async function handleSubmit(event) {
     const matter = await resp.json();
     boundMatterId = matter.id;
 
-    // Make this the active matter everywhere (matter-selector + discovery pages listen for this).
+    // Make this the active matter everywhere (matter-context.js re-scopes storage on this write).
     localStorage.setItem('currentMatterId', matter.id);
     window.dispatchEvent(new CustomEvent('matterSelected', { detail: matter }));
 

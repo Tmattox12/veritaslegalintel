@@ -14,7 +14,7 @@ document.addEventListener('DOMContentLoaded', () => {
     loadUploadedDocuments();
   }
 
-  // Listen for matter selection from matter-selector.js
+  // Listen for matter selection (case intake dispatches this after creating a matter)
   window.addEventListener('matterSelected', (e) => {
     currentMatterId = e.detail.id;
     const errorDiv = document.querySelector('[style*="ffebee"]');
@@ -90,7 +90,7 @@ async function checkForDuplicate(file) {
     const hash = await calculateFileHash(file);
 
     // Get existing documents
-    const response = await fetch(`/api/matters/${currentMatterId}/documents`);
+    const response = await fetch(`http://localhost:3000/api/matters/${currentMatterId}/documents`);
     const documents = await response.json();
 
     // Check for matching filename or hash
@@ -211,7 +211,7 @@ async function uploadFile(file, uploadId, replace = false) {
       }
     }, 100);
 
-    const uploadUrl = `/api/matters/${currentMatterId}/bank-statements/upload`;
+    const uploadUrl = `http://localhost:3000/api/matters/${currentMatterId}/bank-statements/upload`;
     console.log('Uploading to:', uploadUrl);
 
     const response = await fetch(uploadUrl, {
@@ -266,7 +266,7 @@ async function loadUploadedDocuments() {
 
   try {
     // Load bank statements
-    const response = await fetch(`/api/matters/${currentMatterId}/bank-statements`);
+    const response = await fetch(`http://localhost:3000/api/matters/${currentMatterId}/bank-statements`);
     const statements = await response.json();
 
     const container = document.querySelector('.category-section') || createCategorySection();
@@ -317,7 +317,7 @@ async function loadTransactionTable() {
   if (!currentMatterId) return;
 
   try {
-    const response = await fetch(`/api/matters/${currentMatterId}/bank-statements/transactions?limit=500`);
+    const response = await fetch(`http://localhost:3000/api/matters/${currentMatterId}/bank-statements/transactions?limit=500`);
     const transactions = await response.json();
 
     const container = document.querySelector('.category-section');
@@ -391,7 +391,7 @@ async function downloadTransactionsCSV() {
   if (!currentMatterId) return;
 
   try {
-    const response = await fetch(`/api/matters/${currentMatterId}/bank-statements/export.csv`);
+    const response = await fetch(`http://localhost:3000/api/matters/${currentMatterId}/bank-statements/export.csv`);
 
     if (!response.ok) {
       const error = await response.json().catch(() => ({ error: response.statusText }));

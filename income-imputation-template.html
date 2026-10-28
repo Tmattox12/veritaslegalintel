@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <script src="matter-context.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Income Engine — Builder Mode</title>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -11,8 +12,8 @@
 
     /* Sidebar */
     .sidebar {
-      width: 240px;
-      background: linear-gradient(180deg, #1c3f66 0%, #153252 100%);
+      width: 280px;
+      background: linear-gradient(180deg, #0e1b2c 0%, #14273d 100%);
       color: white;
       padding: 24px 16px;
       position: fixed;
@@ -30,7 +31,7 @@
     .brand-sub { font-family: 'Trajan Pro', 'Times New Roman', serif; font-size: 10px; color: #b8a080; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 600; }
 
     .nav-section { margin-bottom: 28px; }
-    .nav-section-title { font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; color: rgba(255,255,255,0.5); font-weight: 700; margin-bottom: 12px; }
+    .nav-section-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.2px; color: #64748e; font-weight: 600; margin: 10px 10px 5px; }
 
     .nav-item {
       display: flex;
@@ -46,8 +47,9 @@
       color: rgba(255,255,255,0.8);
     }
 
-    .nav-item:hover { background: rgba(255,255,255,0.1); color: white; }
-    .nav-item.active { background: rgba(255,255,255,0.2); color: white; font-weight: 600; }
+    .sidebar .nav-item { padding: 6px 12px; margin-bottom: 1px; border-radius: 9px; color: #b7c3d6; font-size: 13.5px; font-weight: 500; }
+    .sidebar .nav-item:hover { background: rgba(255,255,255,.05); color: #fff; }
+    .sidebar .nav-item.active { background: #274566; color: #fff; font-weight: 500; box-shadow: inset 3px 0 0 #b8893b; }
     .nav-item-icon { font-size: 16px; min-width: 20px; }
 
     .sidebar-footer { margin-top: auto; padding-top: 16px; border-top: 1px solid rgba(255,255,255,0.1); }
@@ -56,7 +58,7 @@
     .status-dot { width: 6px; height: 6px; border-radius: 50%; background: #10b981; }
 
     .main {
-      margin-left: 240px;
+      margin-left: 280px;
       flex: 1;
       display: flex;
       flex-direction: column;
@@ -160,16 +162,11 @@
   <aside class="sidebar">
     <div class="brand">
       <div class="brand-mark">
-        <svg width="54" height="54" viewBox="0 0 54 54" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <rect width="54" height="54" rx="8" fill="white"/>
-          <text x="27" y="38" font-family="'Fraunces', serif" font-size="28" font-weight="700" text-anchor="middle" fill="#1c3f66">V</text>
-          <text x="27" y="38" font-family="'Fraunces', serif" font-size="28" font-weight="700" text-anchor="middle" fill="#b8893b" letter-spacing="-2" dx="8">F</text>
-          <text x="27" y="38" font-family="'Fraunces', serif" font-size="28" font-weight="700" text-anchor="middle" fill="#b8893b" dx="14">I</text>
-        </svg>
+        <img src="logo-vfi.jpg" alt="VFI" />
       </div>
       <div class="brand-text">
         <span class="brand-name">Veritas</span>
-        <span class="brand-sub">Financial Intelligence</span>
+        <span class="brand-sub">Legal Financial Intelligence</span>
       </div>
     </div>
 
@@ -177,28 +174,28 @@
     <div class="nav-section">
       <div class="nav-section-title">Workspace</div>
       <a href="master-dashboard.html" class="nav-item">
-        <span class="nav-item-icon">◆</span> Dashboard
+        Dashboard
       </a>
       <a href="#" class="nav-item">
-        <span class="nav-item-icon">▤</span> Case Intake
+        Case Intake
       </a>
       <a href="#" class="nav-item">
-        <span class="nav-item-icon">◯</span> Matters
+        Matters
       </a>
       <a href="#" class="nav-item">
-        <span class="nav-item-icon">⤓</span> Document Intake
+        Document Intake
       </a>
       <a href="document-reconciliation-hub.html" class="nav-item">
-        <span class="nav-item-icon">📁</span> Document Hub
+        Document Hub
       </a>
       <a href="#" class="nav-item">
-        <span class="nav-item-icon">◷</span> Calendar
+        Calendar
       </a>
       <a href="#" class="nav-item">
-        <span class="nav-item-icon">☑</span> Tasks
+        Tasks
       </a>
       <a href="#" class="nav-item">
-        <span class="nav-item-icon">◍</span> Clients
+        Clients
       </a>
     </div>
 
@@ -206,25 +203,25 @@
     <div class="nav-section">
       <div class="nav-section-title">Analysis Modules</div>
       <a href="income-imputation-template.html" class="nav-item active">
-        <span class="nav-item-icon">💠</span> Income Engine
+        Income Engine
       </a>
       <a href="#" class="nav-item">
-        <span class="nav-item-icon">⚖</span> Support Calculator
+        Support Calculator
       </a>
       <a href="child-support-template.html" class="nav-item">
-        <span class="nav-item-icon">◈</span> Child Support
+        Child Support
       </a>
       <a href="#" class="nav-item">
-        <span class="nav-item-icon">⊟</span> Assets
+        Assets
       </a>
       <a href="#" class="nav-item">
-        <span class="nav-item-icon">⌘</span> Custody
+        Custody
       </a>
       <a href="afi-expenses-template.html" class="nav-item">
-        <span class="nav-item-icon">🧾</span> AFI Expenses
+        AFI Expenses
       </a>
       <a href="#" class="nav-item">
-        <span class="nav-item-icon">⊕</span> Credits &amp; Adjustments
+        Credits &amp; Adjustments
       </a>
     </div>
 
@@ -232,28 +229,28 @@
     <div class="nav-section">
       <div class="nav-section-title">Tools</div>
       <a href="data-export.html" class="nav-item">
-        <span class="nav-item-icon">▧</span> Reports
+        Reports
       </a>
       <a href="#" class="nav-item">
-        <span class="nav-item-icon">⌕</span> Forensic Tracing
+        Forensic Tracing
       </a>
       <a href="#" class="nav-item">
-        <span class="nav-item-icon">⇄</span> Settlement Modeling
+        Settlement Modeling
       </a>
       <a href="#" class="nav-item">
-        <span class="nav-item-icon">⚖</span> Regulations
+        Regulations
       </a>
       <a href="#" class="nav-item">
-        <span class="nav-item-icon">§</span> Prenup Module
+        Prenup Module
       </a>
       <a href="merchant-mapping-review.html" class="nav-item">
-        <span class="nav-item-icon">🏪</span> Merchant Review
+        Merchant Review
       </a>
       <a href="#" class="nav-item">
-        <span class="nav-item-icon">◉</span> Compliance
+        Compliance
       </a>
       <a href="#" class="nav-item">
-        <span class="nav-item-icon">🚩</span> Red-Flag Detection
+        Red-Flag Detection
       </a>
     </div>
 
@@ -270,32 +267,19 @@
       <h1>Income Engine — Builder Mode</h1>
       <p class="subtitle">Select income sources · sections appear automatically · color-coded by type · fully collapsible</p>
 
-      <div class="matter-info">
-        <label><strong>Matter</strong>
-          <input type="text" placeholder="Case name & number" />
-        </label>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px;">
-          <label><strong>Party A Name</strong>
-            <input type="text" placeholder="Name" id="partyA-name" />
-          </label>
-          <label><strong>Party B Name</strong>
-            <input type="text" placeholder="Name" id="partyB-name" />
-          </label>
-        </div>
-      </div>
     </div>
 
     <!-- Income Summary -->
     <div class="income-summary">
       <div class="summary-card">
-        <div class="summary-role">Party A — Total Annual Income</div>
+        <div class="summary-role"><span data-party="a">Party A</span> — Total Annual Income</div>
         <div class="summary-amount" id="partyA-total">$0</div>
         <div class="summary-detail">
           <div id="partyA-detail">$0/mo · Sources: 0</div>
         </div>
       </div>
       <div class="summary-card payee">
-        <div class="summary-role">Party B — Total Annual Income</div>
+        <div class="summary-role"><span data-party="b">Party B</span> — Total Annual Income</div>
         <div class="summary-amount" id="partyB-total">$0</div>
         <div class="summary-detail">
           <div id="partyB-detail">$0/mo · Sources: 0</div>
@@ -314,7 +298,7 @@
     <div class="two-column">
       <!-- PARTY A BUILDER -->
       <div class="panel">
-        <div class="panel-title">🔨 <span id="partyA-builder-name">Party A</span> — Income Source Builder</div>
+        <div class="panel-title">🔨 <span id="partyA-builder-name" data-party="a">Party A</span> — Income Source Builder</div>
         <p style="font-size: 11px; color: #5b6472; margin-bottom: 12px;">Check which income sources apply to this party. Sections will appear below.</p>
 
         <div class="builder-section">
@@ -400,7 +384,7 @@
 
       <!-- PARTY B BUILDER -->
       <div class="panel">
-        <div class="panel-title">🔨 <span id="partyB-builder-name">Party B</span> — Income Source Builder</div>
+        <div class="panel-title">🔨 <span id="partyB-builder-name" data-party="b">Party B</span> — Income Source Builder</div>
         <p style="font-size: 11px; color: #5b6472; margin-bottom: 12px;">Check which income sources apply to this party. Sections will appear below.</p>
 
         <div class="builder-section">
@@ -487,13 +471,13 @@
 
     <!-- Income Sections for Party A -->
     <div class="panel">
-      <div class="panel-title">💰 <span id="partyA-income-name">Party A</span> — Income Details</div>
+      <div class="panel-title">💰 <span id="partyA-income-name" data-party="a">Party A</span> — Income Details</div>
       <div id="partyA-income-sections" class="income-sections"></div>
     </div>
 
     <!-- Income Sections for Party B -->
     <div class="panel">
-      <div class="panel-title">💰 <span id="partyB-income-name">Party B</span> — Income Details</div>
+      <div class="panel-title">💰 <span id="partyB-income-name" data-party="b">Party B</span> — Income Details</div>
       <div id="partyB-income-sections" class="income-sections"></div>
     </div>
 
@@ -790,7 +774,7 @@
       const methodology = inputs[5].value;
       const notes = card.querySelector('textarea').value;
 
-      const partyName = document.getElementById(`${party}-name`).value || party.toUpperCase();
+      const partyName = ((window.VeritasMatter && window.VeritasMatter.partyNames) || {})[party === 'partyA' ? 'a' : 'b'] || (party === 'partyA' ? 'Party A' : 'Party B');
       const INCOME_TYPES_DISPLAY = {
         w2: 'Primary W-2 Employment',
         'w2-2': '2nd W-2 Employment',
@@ -866,17 +850,6 @@
     function exportReconPDF() {
       alert('PDF export functionality would be implemented here');
     }
-
-    // Update party names in sections
-    document.getElementById('partyA-name').addEventListener('change', function(e) {
-      document.getElementById('partyA-builder-name').textContent = e.target.value || 'Party A';
-      document.getElementById('partyA-income-name').textContent = e.target.value || 'Party A';
-    });
-
-    document.getElementById('partyB-name').addEventListener('change', function(e) {
-      document.getElementById('partyB-builder-name').textContent = e.target.value || 'Party B';
-      document.getElementById('partyB-income-name').textContent = e.target.value || 'Party B';
-    });
 
     // Close modal when clicking outside
     window.onclick = function(event) {

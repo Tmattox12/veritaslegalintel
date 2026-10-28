@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <script src="matter-context.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Income Engine — Builder Mode</title>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -108,32 +109,19 @@
       <h1>Income Engine — Builder Mode</h1>
       <p class="subtitle">Select income sources · sections appear automatically · color-coded by type · fully collapsible</p>
 
-      <div class="matter-info">
-        <label><strong>Matter</strong>
-          <input type="text" placeholder="Case name & number" />
-        </label>
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 12px;">
-          <label><strong>Party A Name</strong>
-            <input type="text" placeholder="Name" id="partyA-name" />
-          </label>
-          <label><strong>Party B Name</strong>
-            <input type="text" placeholder="Name" id="partyB-name" />
-          </label>
-        </div>
-      </div>
     </div>
 
     <!-- Income Summary -->
     <div class="income-summary">
       <div class="summary-card">
-        <div class="summary-role">Party A — Total Annual Income</div>
+        <div class="summary-role"><span data-party="a">Party A</span> — Total Annual Income</div>
         <div class="summary-amount" id="partyA-total">$0</div>
         <div class="summary-detail">
           <div id="partyA-detail">$0/mo · Sources: 0</div>
         </div>
       </div>
       <div class="summary-card payee">
-        <div class="summary-role">Party B — Total Annual Income</div>
+        <div class="summary-role"><span data-party="b">Party B</span> — Total Annual Income</div>
         <div class="summary-amount" id="partyB-total">$0</div>
         <div class="summary-detail">
           <div id="partyB-detail">$0/mo · Sources: 0</div>
@@ -152,7 +140,7 @@
     <div class="two-column">
       <!-- PARTY A BUILDER -->
       <div class="panel">
-        <div class="panel-title">🔨 <span id="partyA-builder-name">Party A</span> — Income Source Builder</div>
+        <div class="panel-title">🔨 <span id="partyA-builder-name" data-party="a">Party A</span> — Income Source Builder</div>
         <p style="font-size: 11px; color: #5b6472; margin-bottom: 12px;">Check which income sources apply to this party. Sections will appear below.</p>
 
         <div class="builder-section">
@@ -238,7 +226,7 @@
 
       <!-- PARTY B BUILDER -->
       <div class="panel">
-        <div class="panel-title">🔨 <span id="partyB-builder-name">Party B</span> — Income Source Builder</div>
+        <div class="panel-title">🔨 <span id="partyB-builder-name" data-party="b">Party B</span> — Income Source Builder</div>
         <p style="font-size: 11px; color: #5b6472; margin-bottom: 12px;">Check which income sources apply to this party. Sections will appear below.</p>
 
         <div class="builder-section">
@@ -325,13 +313,13 @@
 
     <!-- Income Sections for Party A -->
     <div class="panel">
-      <div class="panel-title">💰 <span id="partyA-income-name">Party A</span> — Income Details</div>
+      <div class="panel-title">💰 <span id="partyA-income-name" data-party="a">Party A</span> — Income Details</div>
       <div id="partyA-income-sections" class="income-sections"></div>
     </div>
 
     <!-- Income Sections for Party B -->
     <div class="panel">
-      <div class="panel-title">💰 <span id="partyB-income-name">Party B</span> — Income Details</div>
+      <div class="panel-title">💰 <span id="partyB-income-name" data-party="b">Party B</span> — Income Details</div>
       <div id="partyB-income-sections" class="income-sections"></div>
     </div>
 
@@ -441,7 +429,214 @@
       updateSections('partyB');
     }
 
+    // Basis periods are relative to today so the labels never go stale.
+    const THIS_YEAR = new Date().getFullYear();
+    const BASES = {
+      '3yr': { short: 'Last 3 Years Avg', hint: `Average of ${THIS_YEAR - 3}–${THIS_YEAR - 1}`, label: `Last 3 Years Average (${THIS_YEAR - 3}-${THIS_YEAR - 1})` },
+      '2yr': { short: 'Last 2 Years Avg', hint: `Average of ${THIS_YEAR - 2}–${THIS_YEAR - 1}`, label: `Last 2 Years Average (${THIS_YEAR - 2}-${THIS_YEAR - 1})` },
+      'ytd': { short: 'YTD Run-Rate', hint: `${THIS_YEAR} YTD annualized`, label: `${THIS_YEAR} YTD Run-Rate (annualized)` },
+      'imputed': { short: 'Imputed', hint: 'Vocational / earning capacity', label: 'Imputed / Vocational' },
+      'excluded': { label: 'Excluded from income (bonus not counted)' }
+    };
+    const STATE_KEY = 'veritas_income_builder'; // scoped to the active matter by matter-context.js
+    let restoring = false;
+
+    function readState() {
+      try { return JSON.parse(localStorage.getItem(STATE_KEY) || '{}'); } catch (e) { return {}; }
+    }
+
+    function num(card, field) {
+      const el = card.querySelector(`[data-field="${field}"]`);
+      const v = el ? parseFloat(el.value) : NaN;
+      return isNaN(v) ? null : Math.max(0, v);
+    }
+
+    // Averages use only the years actually entered, and say how many that was;
+    // a blank year is "not provided", not $0.
+    function computeBases(card) {
+      const avg = (vals) => {
+        const got = vals.filter((v) => v != null);
+        return got.length ? { value: got.reduce((a, b) => a + b, 0) / got.length, n: got.length, of: vals.length } : null;
+      };
+      const ytd = num(card, 'ytd');
+      const months = num(card, 'ytdMonths') || Math.max(1, new Date().getMonth());
+      return {
+        '3yr': avg([num(card, 'y3'), num(card, 'y2'), num(card, 'y1')]),
+        '2yr': avg([num(card, 'y2'), num(card, 'y1')]),
+        'ytd': ytd != null ? { value: (ytd / Math.min(12, months)) * 12, months: Math.min(12, months) } : null,
+        'imputed': num(card, 'imputed') != null ? { value: num(card, 'imputed') } : null,
+        'excluded': { value: 0 },
+      };
+    }
+
+    function refreshCard(card) {
+      const bases = computeBases(card);
+      ['3yr', '2yr', 'ytd'].forEach((b) => {
+        const r = bases[b];
+        card.querySelector(`[data-basis-val="${b}"]`).textContent = r ? money(r.value) : '—';
+        card.querySelector(`[data-basis-note="${b}"]`).textContent = !r ? BASES[b].hint
+          : b === 'ytd' ? `${r.months} month(s) annualized`
+          : r.n < r.of ? `Only ${r.n} of ${r.of} years entered` : BASES[b].hint;
+      });
+      if (card.dataset.basis) card.querySelector('.selected-amount').textContent = money(selectedAmount(card));
+      if (card.dataset.type === 'bonus') renderBonusReco(card);
+    }
+
+    // Capture every card's entries so re-rendering (checking another source) loses nothing.
+    function saveState() {
+      if (restoring) return;
+      const state = readState();
+      ['partyA', 'partyB'].forEach((party) => {
+        const cards = Object.assign({}, (state[party] && state[party].cards) || {});
+        document.querySelectorAll(`#${party}-income-sections .income-card`).forEach((card) => {
+          cards[card.dataset.type] = {
+            open: card.classList.contains('open'),
+            basis: card.dataset.basis || null,
+            inputs: Object.fromEntries(Array.from(card.querySelectorAll('[data-field]')).map((el) =>
+              [el.dataset.field, el.type === 'checkbox' ? el.checked : el.value])),
+          };
+        });
+        state[party] = {
+          types: Array.from(document.querySelectorAll(`input[id^="${party}-"]:checked`)).map((cb) => cb.value),
+          cards,
+        };
+      });
+      localStorage.setItem(STATE_KEY, JSON.stringify(state));
+    }
+
+    function restoreCards(party) {
+      const saved = (readState()[party] || {}).cards || {};
+      restoring = true;
+      document.querySelectorAll(`#${party}-income-sections .income-card`).forEach((card) => {
+        const s = saved[card.dataset.type];
+        if (s) {
+          Object.entries(s.inputs || {}).forEach(([field, v]) => {
+            const el = card.querySelector(`[data-field="${field}"]`);
+            if (!el) return;
+            if (el.type === 'checkbox') el.checked = !!v; else el.value = v;
+          });
+          if (s.basis && BASES[s.basis]) applyBasis(card, s.basis);
+          card.classList.toggle('open', s.open !== false);
+        } else {
+          card.classList.add('open'); // a newly checked source opens ready for entry
+        }
+        refreshCard(card);
+      });
+      restoring = false;
+    }
+
+    function selectedAmount(card) {
+      const r = card.dataset.basis ? computeBases(card)[card.dataset.basis] : null;
+      return r ? r.value : 0;
+    }
+
+    /* ---------- Bonus characterization ----------
+     * Whether a bonus counts as income for support turns on its character.
+     * Arizona's Child Support Guidelines list bonuses within gross income, and
+     * the Spousal Maintenance Guidelines generally measure income the same way;
+     * courts weigh whether the bonus is regular and likely to continue, and
+     * often average a fluctuating bonus over several years. */
+    const BONUS_TRAITS = [
+      { key: 'routine', label: 'Routine / paid every year', verdict: 'INCLUDE', text: 'A bonus paid routinely every year is generally treated as income for support. Use the 2- or 3-year average.' },
+      { key: 'performance', label: 'Performance-based (regularly paid)', verdict: 'INCLUDE', text: 'A regularly paid performance bonus is typically counted, often averaged over 2–3 years because the amount varies.' },
+      { key: 'predictable', label: 'Predictable amount / formula or contract', verdict: 'INCLUDE', text: 'A bonus set by formula, plan or contract is reasonably certain to continue and is usually counted.' },
+      { key: 'discretionary', label: "Discretionary (employer's option)", verdict: 'LEAN EXCLUDE', text: 'An employer-discretionary bonus is often excluded, or averaged only where there is a consistent history of payment.' },
+      { key: 'onetime', label: 'One-time / non-recurring', verdict: 'EXCLUDE', text: 'A one-time bonus (signing, retention, special project) is typically excluded from ongoing support income.' },
+      { key: 'speculative', label: 'Speculative / uncertain', verdict: 'EXCLUDE', text: 'A speculative or uncertain bonus should not be treated as ongoing income.' },
+    ];
+    const VERDICT_STYLE = {
+      INCLUDE: { tone: '#2f7d5b', bg: '#e5f3ec', bd: '#bfe3d0' },
+      'LEAN EXCLUDE': { tone: '#9a6b1e', bg: '#fbf1df', bd: '#f0dcb4' },
+      EXCLUDE: { tone: '#b3402f', bg: '#fbe9e6', bd: '#f0c9c2' },
+      MIXED: { tone: '#9a6b1e', bg: '#fbf1df', bd: '#f0dcb4' },
+    };
+
+    function bonusPanelHtml(cardId) {
+      return `
+        <div style="border: 1px solid #e0d2b4; background: #fffaf0; border-radius: 8px; padding: 12px 14px; margin-bottom: 16px;">
+          <div style="font-weight: 700; color: #1c3f66; margin-bottom: 4px;">⚖ Is the bonus counted as income? <span style="font-weight: 400; color: #8a94a3; font-size: 11px;">(check all that apply)</span></div>
+          <div style="font-size: 11px; color: #5b6472; margin-bottom: 8px; line-height: 1.5;">Arizona's Child Support Guidelines include bonuses in gross income, and the Spousal Maintenance Guidelines generally measure income the same way. Whether a particular bonus counts turns on its character: is it regular and likely to continue? Verify current guideline sections before filing.</div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 4px 12px;">
+            ${BONUS_TRAITS.map((t) => `
+              <label style="display: flex; align-items: center; gap: 8px; font-size: 12.5px; color: #2b3a4c; cursor: pointer;">
+                <input type="checkbox" data-field="trait_${t.key}" style="width: 15px; height: 15px;"> ${t.label}
+              </label>`).join('')}
+          </div>
+          <div class="bonus-reco" style="margin-top: 10px; padding: 10px 12px; border-radius: 8px; border: 1px solid #dbe3ef; background: #f0f4fa; font-size: 12px; line-height: 1.5;"></div>
+          <div style="display: flex; gap: 8px; margin-top: 8px; flex-wrap: wrap;">
+            <button type="button" class="action-btn" data-basis="excluded" onclick="selectBasis(this, '${cardId}', 'excluded')">Exclude bonus from totals ($0)</button>
+          </div>
+        </div>`;
+    }
+
+    function renderBonusReco(card) {
+      const box = card.querySelector('.bonus-reco');
+      if (!box) return;
+      const picked = BONUS_TRAITS.filter((t) => { const el = card.querySelector(`[data-field="trait_${t.key}"]`); return el && el.checked; });
+      if (!picked.length) {
+        Object.assign(box.style, { background: '#f0f4fa', borderColor: '#dbe3ef', color: '#425c7f' });
+        box.innerHTML = 'Check the traits that describe this bonus to see whether it should be counted.';
+        return;
+      }
+      const inc = picked.some((t) => t.verdict === 'INCLUDE');
+      const exc = picked.some((t) => t.verdict !== 'INCLUDE');
+      const hard = picked.some((t) => t.verdict === 'EXCLUDE');
+      const bases = computeBases(card);
+      // Name the average by how many years actually went into it.
+      const avg = bases['3yr'] && bases['3yr'].n === 3 ? bases['3yr'] : (bases['2yr'] || bases['3yr']);
+      const avgText = avg ? `${money(avg.value)} (${avg.n}-year average)` : 'the multi-year average (enter yearly amounts above)';
+      let verdict, note;
+      if (inc && exc) {
+        verdict = 'MIXED'; note = `Fact-dependent: courts commonly average the bonus over 2–3 years or count only the consistently recurring portion. Consider ${avgText} for the recurring part and excluding the non-recurring part.`;
+      } else if (inc) {
+        verdict = 'INCLUDE'; note = `Every selected trait supports counting the bonus. Select ${avgText} above.`;
+      } else {
+        verdict = hard ? 'EXCLUDE' : 'LEAN EXCLUDE';
+        note = `The selected traits weigh against counting the bonus as ongoing income. Use "Exclude bonus from totals"${hard ? '' : ', or average it only if there is a consistent history'}.`;
+      }
+      const st = VERDICT_STYLE[verdict];
+      Object.assign(box.style, { background: st.bg, borderColor: st.bd, color: '#2b3a4c' });
+      box.innerHTML = `<strong style="color:${st.tone}">Recommendation: ${verdict === 'MIXED' ? 'mixed — fact-dependent.' : `${verdict} the bonus.`}</strong>
+        <ul style="margin: 6px 0 6px 18px; padding: 0;">${picked.map((t) => `<li style="margin: 2px 0;"><strong style="color:${VERDICT_STYLE[t.verdict].tone}">${t.label.split(' (')[0]} → ${t.verdict}</strong> — ${t.text}</li>`).join('')}</ul>
+        ${note}<br><span style="color: #8a94a3;">Guidance only — the attorney makes the call.</span>`;
+    }
+
+    function money(n) {
+      return '$' + Math.round(n).toLocaleString('en-US');
+    }
+
+    // Top-of-page totals: the sum of the selected basis on every checked source.
+    function recalcTotals() {
+      const totals = {};
+      ['partyA', 'partyB'].forEach((party) => {
+        let total = 0, count = 0;
+        document.querySelectorAll(`#${party}-income-sections .income-card`).forEach((card) => {
+          const amt = selectedAmount(card);
+          if (card.dataset.basis && card.dataset.basis !== 'excluded') count++;
+          total += amt;
+        });
+        totals[party] = total;
+        document.getElementById(`${party}-total`).textContent = money(total);
+        document.getElementById(`${party}-detail`).textContent = `${money(total / 12)}/mo · Sources: ${count}`;
+      });
+      const combined = totals.partyA + totals.partyB;
+      const pct = (n) => (combined ? Math.round((n / combined) * 100) : 0);
+      document.getElementById('combined-total').textContent = money(combined);
+      document.getElementById('combined-detail').textContent =
+        `${money(combined / 12)}/mo · ${pct(totals.partyA)}% / ${pct(totals.partyB)}%`;
+
+      // Hand the totals to the support calculators, the same way the income page does.
+      const mid = window.VeritasMatter && window.VeritasMatter.id;
+      if (mid && !restoring) {
+        localStorage.setItem(`veritas_income_selection_${mid}`, JSON.stringify({
+          party_a: { basis: 'builder', amount: Math.round(totals.partyA) },
+          party_b: { basis: 'builder', amount: Math.round(totals.partyB) },
+        }));
+      }
+    }
+
     function updateSections(party) {
+      saveState();
       const container = document.getElementById(`${party}-income-sections`);
       container.innerHTML = '';
 
@@ -451,6 +646,8 @@
 
       if (checked.length === 0) {
         container.innerHTML = '<div style="font-size: 11px; color: #7a8a9a; padding: 16px; text-align: center; background: #f9f7f3; border-radius: 4px;">Select income sources above to see input fields</div>';
+        saveState();
+        recalcTotals();
         return;
       }
 
@@ -461,6 +658,7 @@
         const card = document.createElement('div');
         card.className = `income-card ${typeInfo.class}`;
         card.id = cardId;
+        card.dataset.type = type;
 
         card.innerHTML = `
           <div class="income-card-header" onclick="toggleCard('${cardId}')">
@@ -468,49 +666,41 @@
             <span class="income-card-toggle">▼</span>
           </div>
           <div class="income-card-body">
+            <div style="font-size: 11px; font-weight: 700; color: #1c3f66; margin-bottom: 8px; text-transform: uppercase;">Annual Amounts (from W-2s, tax returns, paystubs)</div>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-bottom: 14px;">
+              ${[3, 2, 1].map((back) => `
+                <label class="source-row" style="margin:0;">
+                  <span class="source-label">${THIS_YEAR - back} total</span>
+                  <input type="number" min="0" step="0.01" placeholder="not provided" class="source-input" data-field="y${back}" />
+                </label>`).join('')}
+              <label class="source-row" style="margin:0;">
+                <span class="source-label">${THIS_YEAR} year-to-date</span>
+                <input type="number" min="0" step="0.01" placeholder="not provided" class="source-input" data-field="ytd" />
+              </label>
+              <label class="source-row" style="margin:0;">
+                <span class="source-label">YTD covers (months)</span>
+                <input type="number" min="1" max="12" step="1" placeholder="${Math.max(1, new Date().getMonth())}" class="source-input" data-field="ytdMonths" />
+              </label>
+            </div>
+
             <div style="font-size: 11px; font-weight: 700; color: #1c3f66; margin-bottom: 12px; text-transform: uppercase;">Income Basis Comparison</div>
-
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 12px; margin-bottom: 16px;">
-              <!-- Last 3 Years Average -->
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; margin-bottom: 16px;">
+              ${['3yr', '2yr', 'ytd'].map((b) => `
+                <div style="border: 1px solid #d7e0ec; border-radius: 8px; padding: 12px; background: #f9f7f3;">
+                  <div style="font-size: 10px; text-transform: uppercase; color: #7a8a9a; font-weight: 700; margin-bottom: 6px;">${BASES[b].short}</div>
+                  <div style="font-family: 'Fraunces', serif; font-size: 22px; font-weight: 700; color: #1c3f66;" class="basis-val" data-basis-val="${b}">—</div>
+                  <div style="font-size: 9px; color: #7a8a9a; min-height: 12px;" class="basis-note" data-basis-note="${b}">${BASES[b].hint}</div>
+                  <button style="width: 100%; padding: 4px 8px; margin-top: 8px; border: 1px solid #cdd8e7; background: #fff; border-radius: 4px; cursor: pointer; font-size: 10px; color: #1c3f66; font-weight: 600;" data-basis="${b}" onclick="selectBasis(this, '${cardId}', '${b}')">Select</button>
+                </div>`).join('')}
               <div style="border: 1px solid #d7e0ec; border-radius: 8px; padding: 12px; background: #f9f7f3;">
-                <div style="font-size: 10px; text-transform: uppercase; color: #7a8a9a; font-weight: 700; margin-bottom: 6px;">Last 3 Years</div>
-                <div style="font-family: 'Fraunces', serif; font-size: 22px; font-weight: 700; color: #1c3f66; margin-bottom: 6px;">
-                  <input type="number" placeholder="0" min="0" class="basis-3yr" style="width: 100%; padding: 4px; border: 1px solid #d4dce8; border-radius: 4px; font-size: 16px; font-family: 'Fraunces', serif;" />
-                </div>
-                <div style="font-size: 9px; color: #7a8a9a;">Averaged 2022-2024</div>
-                <button style="width: 100%; padding: 4px 8px; margin-top: 8px; border: 1px solid #cdd8e7; background: #fff; border-radius: 4px; cursor: pointer; font-size: 10px; color: #1c3f66; font-weight: 600;" onclick="selectBasis(this, '${cardId}', '3yr')">Select</button>
-              </div>
-
-              <!-- YTD Run-Rate -->
-              <div style="border: 1px solid #d7e0ec; border-radius: 8px; padding: 12px; background: #f9f7f3;">
-                <div style="font-size: 10px; text-transform: uppercase; color: #7a8a9a; font-weight: 700; margin-bottom: 6px;">YTD Run-Rate</div>
-                <div style="font-family: 'Fraunces', serif; font-size: 22px; font-weight: 700; color: #1c3f66; margin-bottom: 6px;">
-                  <input type="number" placeholder="0" min="0" class="basis-ytd" style="width: 100%; padding: 4px; border: 1px solid #d4dce8; border-radius: 4px; font-size: 16px; font-family: 'Fraunces', serif;" />
-                </div>
-                <div style="font-size: 9px; color: #7a8a9a;">Annualized YTD</div>
-                <button style="width: 100%; padding: 4px 8px; margin-top: 8px; border: 1px solid #cdd8e7; background: #fff; border-radius: 4px; cursor: pointer; font-size: 10px; color: #1c3f66; font-weight: 600;" onclick="selectBasis(this, '${cardId}', 'ytd')">Select</button>
-              </div>
-
-              <!-- Last 2 Years Average -->
-              <div style="border: 1px solid #d7e0ec; border-radius: 8px; padding: 12px; background: #f9f7f3;">
-                <div style="font-size: 10px; text-transform: uppercase; color: #7a8a9a; font-weight: 700; margin-bottom: 6px;">Last 2 Years</div>
-                <div style="font-family: 'Fraunces', serif; font-size: 22px; font-weight: 700; color: #1c3f66; margin-bottom: 6px;">
-                  <input type="number" placeholder="0" min="0" class="basis-2yr" style="width: 100%; padding: 4px; border: 1px solid #d4dce8; border-radius: 4px; font-size: 16px; font-family: 'Fraunces', serif;" />
-                </div>
-                <div style="font-size: 9px; color: #7a8a9a;">Averaged 2023-2024</div>
-                <button style="width: 100%; padding: 4px 8px; margin-top: 8px; border: 1px solid #cdd8e7; background: #fff; border-radius: 4px; cursor: pointer; font-size: 10px; color: #1c3f66; font-weight: 600;" onclick="selectBasis(this, '${cardId}', '2yr')">Select</button>
-              </div>
-
-              <!-- Imputed / Vocational -->
-              <div style="border: 1px solid #d7e0ec; border-radius: 8px; padding: 12px; background: #f9f7f3;">
-                <div style="font-size: 10px; text-transform: uppercase; color: #7a8a9a; font-weight: 700; margin-bottom: 6px;">Imputed</div>
-                <div style="font-family: 'Fraunces', serif; font-size: 22px; font-weight: 700; color: #1c3f66; margin-bottom: 6px;">
-                  <input type="number" placeholder="0" min="0" class="basis-imputed" style="width: 100%; padding: 4px; border: 1px solid #d4dce8; border-radius: 4px; font-size: 16px; font-family: 'Fraunces', serif;" />
-                </div>
-                <div style="font-size: 9px; color: #7a8a9a;">Vocational/Capacity</div>
-                <button style="width: 100%; padding: 4px 8px; margin-top: 8px; border: 1px solid #cdd8e7; background: #fff; border-radius: 4px; cursor: pointer; font-size: 10px; color: #1c3f66; font-weight: 600;" onclick="selectBasis(this, '${cardId}', 'imputed')">Select</button>
+                <div style="font-size: 10px; text-transform: uppercase; color: #7a8a9a; font-weight: 700; margin-bottom: 6px;">${BASES.imputed.short}</div>
+                <input type="number" placeholder="0" min="0" class="source-input" data-field="imputed" style="font-size: 16px; font-family: 'Fraunces', serif;" />
+                <div style="font-size: 9px; color: #7a8a9a; margin-top: 4px;">${BASES.imputed.hint}</div>
+                <button style="width: 100%; padding: 4px 8px; margin-top: 8px; border: 1px solid #cdd8e7; background: #fff; border-radius: 4px; cursor: pointer; font-size: 10px; color: #1c3f66; font-weight: 600;" data-basis="imputed" onclick="selectBasis(this, '${cardId}', 'imputed')">Select</button>
               </div>
             </div>
+
+            ${type === 'bonus' ? bonusPanelHtml(cardId) : ''}
 
             <!-- Selected Basis Display -->
             <div style="background: #e6f3ec; border: 1px solid #6b9e88; border-radius: 8px; padding: 12px; margin-bottom: 16px;">
@@ -523,7 +713,7 @@
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
               <div class="source-row">
                 <label class="source-label">Status</label>
-                <select class="source-input">
+                <select class="source-input" data-field="status">
                   <option>Active / Ongoing</option>
                   <option>Ending / In transition</option>
                   <option>Pending / Contingent</option>
@@ -533,7 +723,7 @@
               </div>
               <div class="source-row">
                 <label class="source-label">Tax Treatment</label>
-                <select class="source-input">
+                <select class="source-input" data-field="tax">
                   <option>W-2 wages (subject to FICA)</option>
                   <option>1099 self-employment (SE tax)</option>
                   <option>Investment income (passive)</option>
@@ -546,17 +736,17 @@
             <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
               <div class="source-row">
                 <label class="source-label">Supporting Documents</label>
-                <input type="text" class="source-input" placeholder="E.g., 2024 Tax Return, YTD Paystubs, Voc Report" />
+                <input type="text" class="source-input" data-field="docs" placeholder="E.g., ${THIS_YEAR - 1} Tax Return, YTD Paystubs, Voc Report" />
               </div>
               <div class="source-row">
                 <label class="source-label">Data Sources / Evidence</label>
-                <input type="text" class="source-input" placeholder="E.g., Schedule C, 1099s, Paystubs, Expert Report" />
+                <input type="text" class="source-input" data-field="evidence" placeholder="E.g., Schedule C, 1099s, Paystubs, Expert Report" />
               </div>
             </div>
 
             <div class="source-row" style="margin-top: 12px;">
               <label class="source-label">Why This Basis? (Explanation)</label>
-              <textarea class="source-input" style="min-height: 60px; resize: vertical;" placeholder="Explain why this basis was selected. E.g., 'Recent promotion justifies YTD run-rate' or 'Party voluntarily underemployed, using vocational floor'"></textarea>
+              <textarea class="source-input" data-field="why" style="min-height: 60px; resize: vertical;" placeholder="Explain why this basis was selected. E.g., 'Recent promotion justifies YTD run-rate' or 'Party voluntarily underemployed, using vocational floor'"></textarea>
             </div>
 
             <div class="action-buttons">
@@ -566,42 +756,54 @@
             </div>
 
             <div class="source-note">
-              💡 Enter amounts for each basis, click "Select" to choose the one for AFI/spousal/child support. The selected amount cascades to all calculations.
+              💡 Enter each year's total; the averages calculate themselves. Click "Select" on the basis to use for AFI / spousal / child support. The selected amount flows into the totals at the top.
             </div>
           </div>
         `;
 
         container.appendChild(card);
       });
+      restoreCards(party);
+      saveState();
+      recalcTotals();
     }
 
     function toggleCard(cardId) {
       const card = document.getElementById(cardId);
       card.classList.toggle('open');
+      saveState();
     }
 
     function selectBasis(button, cardId, basis) {
-      const card = document.getElementById(cardId);
-      const basesMap = {
-        '3yr': { input: '.basis-3yr', label: 'Last 3 Years Average (2022-2024)' },
-        'ytd': { input: '.basis-ytd', label: 'YTD Run-Rate' },
-        '2yr': { input: '.basis-2yr', label: 'Last 2 Years Average (2023-2024)' },
-        'imputed': { input: '.basis-imputed', label: 'Imputed / Vocational' }
-      };
-
-      const basisInfo = basesMap[basis];
-      const amount = card.querySelector(basisInfo.input).value || '0';
-
-      // Update selected display
-      card.querySelector('.selected-amount').textContent = '$' + parseFloat(amount).toLocaleString('en-US', {maximumFractionDigits: 0});
-      card.querySelector('.selected-basis').textContent = basisInfo.label;
-
-      // Visual feedback on button
-      const allBtns = card.querySelectorAll('.income-card-body button:not(.action-btn)');
-      allBtns.forEach(btn => btn.style.background = '#fff');
-      button.style.background = '#e6f3ec';
-      button.style.borderColor = '#6b9e88';
+      applyBasis(document.getElementById(cardId), basis);
+      saveState();
+      recalcTotals();
     }
+
+    function applyBasis(card, basis) {
+      card.dataset.basis = basis;
+      card.querySelector('.selected-amount').textContent = money(selectedAmount(card));
+      card.querySelector('.selected-basis').textContent = BASES[basis].label;
+      card.querySelectorAll('button[data-basis]').forEach((btn) => {
+        const on = btn.dataset.basis === basis;
+        btn.style.background = on ? '#e6f3ec' : '#fff';
+        btn.style.borderColor = on ? '#6b9e88' : '#cdd8e7';
+      });
+    }
+
+    // Editing an amount (or any field) saves it; editing the selected basis updates the totals live.
+    ['partyA', 'partyB'].forEach((party) => {
+      const container = document.getElementById(`${party}-income-sections`);
+      const onEdit = (e) => {
+        const card = e.target.closest('.income-card');
+        if (!card) return;
+        refreshCard(card);
+        saveState();
+        recalcTotals();
+      };
+      container.addEventListener('input', onEdit);
+      container.addEventListener('change', onEdit);
+    });
 
     function linkDocument(cardId) {
       alert(`Link document for: ${cardId}\nSupports: Tax returns, paystubs, discovery documents, etc.`);
@@ -617,18 +819,17 @@
 
     function viewRecon(cardId, party, type) {
       const card = document.getElementById(cardId);
-      const inputs = card.querySelectorAll('.source-input');
+      const field = (name) => (card.querySelector(`[data-field="${name}"]`) || {}).value || '';
 
-      // Extract values from form
-      const annualAmount = parseFloat(inputs[0].value) || 0;
-      const frequency = inputs[1].value;
-      const status = inputs[2].value;
-      const taxTreatment = inputs[3].value;
-      const evidence = inputs[4].value;
-      const methodology = inputs[5].value;
-      const notes = card.querySelector('textarea').value;
+      const annualAmount = selectedAmount(card);
+      const frequency = 'Annual';
+      const status = field('status');
+      const taxTreatment = field('tax');
+      const evidence = [field('docs'), field('evidence')].filter(Boolean).join(' · ');
+      const methodology = card.dataset.basis ? BASES[card.dataset.basis].label : 'No basis selected yet';
+      const notes = field('why');
 
-      const partyName = document.getElementById(`${party}-name`).value || party.toUpperCase();
+      const partyName = ((window.VeritasMatter && window.VeritasMatter.partyNames) || {})[party === 'partyA' ? 'a' : 'b'] || (party === 'partyA' ? 'Party A' : 'Party B');
       const INCOME_TYPES_DISPLAY = {
         w2: 'Primary W-2 Employment',
         'w2-2': '2nd W-2 Employment',
@@ -705,17 +906,6 @@
       alert('PDF export functionality would be implemented here');
     }
 
-    // Update party names in sections
-    document.getElementById('partyA-name').addEventListener('change', function(e) {
-      document.getElementById('partyA-builder-name').textContent = e.target.value || 'Party A';
-      document.getElementById('partyA-income-name').textContent = e.target.value || 'Party A';
-    });
-
-    document.getElementById('partyB-name').addEventListener('change', function(e) {
-      document.getElementById('partyB-builder-name').textContent = e.target.value || 'Party B';
-      document.getElementById('partyB-income-name').textContent = e.target.value || 'Party B';
-    });
-
     // Close modal when clicking outside
     window.onclick = function(event) {
       const modal = document.getElementById('recon-modal');
@@ -724,7 +914,17 @@
       }
     };
 
-    console.log('Income Engine Builder Mode Loaded');
+    // Bring back this matter's saved sources, amounts and selected bases.
+    (function restoreBuilder() {
+      const state = readState();
+      ['partyA', 'partyB'].forEach((party) => {
+        ((state[party] || {}).types || []).forEach((type) => {
+          const cb = document.getElementById(`${party}-${type}`);
+          if (cb) cb.checked = true;
+        });
+        updateSections(party);
+      });
+    })();
   </script>
 </body>
 </html>

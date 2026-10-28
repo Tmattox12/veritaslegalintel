@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <script src="matter-context.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Income Reconciliation Detail</title>
   <style>
@@ -138,7 +139,7 @@
       }
 
       try {
-        const resp = await fetch(`/api/matters/${matterId}/income-source/${incomeSourceId}/reconciliation`);
+        const resp = await fetch(`http://localhost:3000/api/matters/${matterId}/income-source/${incomeSourceId}/reconciliation`);
         const data = await resp.json();
 
         document.getElementById('modalTitle').textContent = data.title || 'Income Reconciliation';
@@ -217,7 +218,7 @@
 
     function downloadDocument(docId) {
       // Trigger download
-      window.location.href = `/api/documents/${docId}/download`;
+      window.location.href = `http://localhost:3000/api/documents/${docId}/download`;
     }
 
     function citationCopy(docId) {

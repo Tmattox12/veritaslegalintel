@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
+  <script src="matter-context.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Veritas Financial Intelligence — Master Dashboard</title>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -11,8 +12,8 @@
 
     /* Sidebar */
     .sidebar {
-      width: 240px;
-      background: linear-gradient(180deg, #1c3f66 0%, #153252 100%);
+      width: 280px;
+      background: linear-gradient(180deg, #0e1b2c 0%, #14273d 100%);
       color: white;
       padding: 24px 16px;
       position: fixed;
@@ -27,7 +28,7 @@
     .brand-text p { font-size: 11px; color: rgba(255,255,255,0.7); }
 
     .nav-section { margin-bottom: 28px; }
-    .nav-section-title { font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; color: rgba(255,255,255,0.5); font-weight: 700; margin-bottom: 12px; }
+    .nav-section-title { font-size: 11px; text-transform: uppercase; letter-spacing: 1.2px; color: #64748e; font-weight: 600; margin: 10px 10px 5px; }
 
     .nav-item {
       display: flex;
@@ -43,13 +44,14 @@
       color: rgba(255,255,255,0.8);
     }
 
-    .nav-item:hover { background: rgba(255,255,255,0.1); color: white; }
-    .nav-item.active { background: rgba(255,255,255,0.2); color: white; font-weight: 600; }
+    .sidebar .nav-item { padding: 6px 12px; margin-bottom: 1px; border-radius: 9px; color: #b7c3d6; font-size: 13.5px; font-weight: 500; }
+    .sidebar .nav-item:hover { background: rgba(255,255,255,.05); color: #fff; }
+    .sidebar .nav-item.active { background: #274566; color: #fff; font-weight: 500; box-shadow: inset 3px 0 0 #b8893b; }
     .nav-item-icon { font-size: 16px; min-width: 20px; }
 
     /* Main Content */
     .main {
-      margin-left: 240px;
+      margin-left: 280px;
       flex: 1;
       padding: 0;
       display: flex;
@@ -165,15 +167,15 @@
     <div class="nav-section">
       <div class="nav-section-title">Primary Modules</div>
       <a href="income-imputation-template.html" class="nav-item active">
-        <span class="nav-item-icon">💰</span>
+        
         <span>Income Engine</span>
       </a>
       <a href="document-reconciliation-hub.html" class="nav-item">
-        <span class="nav-item-icon">📄</span>
+        
         <span>Document Hub</span>
       </a>
       <a href="afi-expenses-template.html" class="nav-item">
-        <span class="nav-item-icon">🏠</span>
+        
         <span>AFI Expenses</span>
       </a>
     </div>
@@ -182,11 +184,11 @@
     <div class="nav-section">
       <div class="nav-section-title">Support Calculations</div>
       <a href="spousal-maintenance-template.html" class="nav-item">
-        <span class="nav-item-icon">⚖</span>
+        
         <span>Spousal Support</span>
       </a>
       <a href="child-support-template.html" class="nav-item">
-        <span class="nav-item-icon">👶</span>
+        
         <span>Child Support</span>
       </a>
     </div>
@@ -195,11 +197,11 @@
     <div class="nav-section">
       <div class="nav-section-title">Reference</div>
       <a href="afi-reference-guide.html" class="nav-item">
-        <span class="nav-item-icon">🧾</span>
+        
         <span>AFI Guide</span>
       </a>
       <a href="data-export.html" class="nav-item">
-        <span class="nav-item-icon">📊</span>
+        
         <span>Export Data</span>
       </a>
     </div>
@@ -208,7 +210,7 @@
     <div class="nav-section">
       <div class="nav-section-title">Administration</div>
       <a href="merchant-mapping-review.html" class="nav-item">
-        <span class="nav-item-icon">🏪</span>
+        
         <span>Merchant Review</span>
       </a>
     </div>
@@ -220,12 +222,13 @@
     <div class="topbar">
       <div class="topbar-title">
         <h1>Dashboard</h1>
-        <p>Ossandon v. Ossandon · No. D2024-1669</p>
+        <p>Active client shown at right</p>
       </div>
-      <select class="matter-selector">
-        <option>Ossandon v. Ossandon (D2024-1669)</option>
-        <option>— Select Matter —</option>
-      </select>
+      <button class="matter-selector matter-btn" type="button">
+        <strong>Loading client…</strong>
+        <span class="case-no"></span>
+        <span class="chev">▾</span>
+      </button>
     </div>
 
     <!-- CONTENT -->

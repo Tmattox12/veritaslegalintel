@@ -15,7 +15,7 @@ async function resetTemplate() {
     console.log('✓ Cleared localStorage');
 
     // Call backend reset API
-    const response = await fetch('/api/admin/reset', { method: 'POST' });
+    const response = await fetch('http://localhost:3000/api/admin/reset', { method: 'POST' });
     if (!response.ok) {
       throw new Error('Backend reset failed');
     }
