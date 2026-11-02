@@ -762,14 +762,25 @@ function renderStatements(stmts) {
         <span class="doc-name">${label}</span>
         <div style="font-size:11px;color:#999;margin-top:2px;">${st.bank_name || ''}${acct}${type ? ' · ' + type : ''}</div>
         <div style="font-size:11px;color:#6b7280;margin-top:1px;">${period} · ${st.transaction_count || 0} transactions</div>
+        <div style="font-size:11px;color:#6b7280;margin-top:1px;">${balanceLine(st)}</div>
       </div>
-      <button class="btn ghost" style="padding:4px 10px;font-size:11px;" data-csv="${st.id}">⬇ CSV</button>`;
-    row.querySelector('[data-csv]').addEventListener('click', () => downloadStatementCSV(st.id));
+      <div style="display:flex;gap:6px;flex-shrink:0;">
+        ${st.document_id ? `<a class="btn ghost" style="padding:4px 10px;font-size:11px;text-decoration:none;" target="_blank" rel="noopener"
+            href="${API_BASE}/matters/${matterId()}/documents/${st.document_id}/original">📄 View PDF</a>` : ''}
+        <button class="btn ghost" style="padding:4px 10px;font-size:11px;" data-csv="${st.id}">⬇ CSV</button>
+      </div>`;
+    row.querySelector('[data-csv]').addEventListener('click', () => downloadStatementCSV(st.id, st.filename));
     host.appendChild(row);
   });
 }
 
-async function downloadStatementCSV(statementId) {
+function balanceLine(st) {
+  const money = (n) => (n == null ? 'not found' : '$' + Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }));
+  return `Beginning ${money(st.beginning_balance)}${st.statement_start ? ' (' + st.statement_start + ')' : ''}
+    → Ending ${money(st.ending_balance)}${st.statement_end ? ' (' + st.statement_end + ')' : ''}`;
+}
+
+async function downloadStatementCSV(statementId, filename) {
   const mid = matterId();
   if (!mid) return;
   try {
@@ -779,7 +790,7 @@ async function downloadStatementCSV(statementId) {
     const blob = new Blob([csv], { type: 'text/csv' });
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = `statement-${statementId}.csv`;
+    a.download = filename ? filename.replace(/\.[^.]+$/, '') + '.csv' : `statement-${statementId}.csv`;
     document.body.appendChild(a); a.click(); a.remove();
     URL.revokeObjectURL(a.href);
   } catch (e) {

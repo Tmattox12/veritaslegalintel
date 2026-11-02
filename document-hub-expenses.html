@@ -3,220 +3,71 @@
 <head>
   <meta charset="UTF-8" />
   <script src="matter-context.js"></script>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />  <title>Expense Documents - Document Hub - Veritas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />  <title>Expense Hub - Veritas</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
   <!-- Veritas AI Chat Widget -->
   <link rel="stylesheet" href="ai-chat-widget.css" />
-  <!-- Reconciliation Modal -->
-  <link rel="stylesheet" href="reconciliation-modal.css" />
   <style>
-    .doc-mgmt-header {
-      background: linear-gradient(135deg, #2e5b8a 0%, #1f5f9d 100%);
-      color: white;
-      padding: 36px 0;
-      margin-bottom: 36px;
+    .hub-header { background: linear-gradient(135deg, #2e5b8a 0%, #1f5f9d 100%); color: white; padding: 36px 0; margin-bottom: 28px; }
+    .hub-container { max-width: 1200px; margin: 0 auto; padding: 0 18px; }
+    .hub-title { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+    .hub-subtitle { font-size: 14px; opacity: 0.9; }
+    .hub-links { font-size: 12px; margin-top: 12px; display: flex; gap: 18px; flex-wrap: wrap; }
+    .hub-links a { color: white; text-decoration: none; font-weight: 600; opacity: 0.85; }
+    .hub-links a:hover { opacity: 1; text-decoration: underline; }
+
+    .hub-section { background: white; border-radius: 8px; padding: 22px 24px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #e5e0d5; }
+    .hub-section-title { font-size: 16px; font-weight: 700; color: #333; margin-bottom: 6px; }
+    .hub-section-note { font-size: 12px; color: #666; margin-bottom: 16px; line-height: 1.5; }
+
+    /* Intake recon strip */
+    .recon-strip { border-left: 4px solid #2e5b8a; }
+    .recon-strip.has-gap { border-left-color: #c62828; }
+    .recon-flow { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; align-items: stretch; }
+    .recon-step { background: #f5f8fc; border: 1px solid #d8e3f1; border-radius: 6px; padding: 12px; position: relative; }
+    .recon-step:not(:last-child)::after { content: '→'; position: absolute; right: -10px; top: 50%; transform: translate(50%, -50%); color: #7a8a9a; font-weight: 700; }
+    .recon-step-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.04em; color: #5f6b7a; font-weight: 600; }
+    .recon-step-value { font-size: 20px; font-weight: 700; color: #1c3f66; margin: 4px 0; }
+    .recon-step-detail { font-size: 11px; color: #51617a; line-height: 1.6; }
+    .recon-step-detail a { color: #2e5b8a; font-weight: 600; }
+    .recon-gap { color: #c62828; font-weight: 700; }
+    .recon-ok { color: #2e7d32; font-weight: 600; }
+    .recon-checks { margin-top: 12px; font-size: 12px; display: flex; flex-direction: column; gap: 4px; }
+    .excluded-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-top: 12px; }
+    .excluded-item { background: #f9f9f9; border-left: 3px solid #9aa7b8; border-radius: 4px; padding: 8px 12px; font-size: 12px; color: #42526e; }
+    .excluded-item strong { color: #1c3f66; }
+    @media (max-width: 900px) {
+      .recon-flow { grid-template-columns: 1fr 1fr; }
+      .recon-step::after { display: none; }
     }
 
-    .doc-mgmt-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 18px;
-    }
+    /* AFI mapper (discovery-intake-afi.js) */
+    .map-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
+    .map-summary-grid { display: grid; grid-template-columns: repeat(4, minmax(140px, 1fr)); gap: 8px; margin-bottom: 12px; }
+    .map-stat { background: #f5f8fc; border: 1px solid #d8e3f1; border-radius: 6px; padding: 8px; }
+    .map-stat-label { font-size: 10px; color: #5f6b7a; text-transform: uppercase; letter-spacing: 0.03em; }
+    .map-stat-value { font-size: 14px; font-weight: 700; color: #1c3f66; margin-top: 3px; }
+    .map-table-wrap { overflow: auto; max-height: 420px; border: 1px solid #e4e9f1; border-radius: 6px; }
+    .map-table { width: 100%; border-collapse: collapse; font-size: 11px; background: #fff; }
+    .map-table th, .map-table td { border-bottom: 1px solid #edf2f7; padding: 8px; text-align: left; vertical-align: top; }
+    .map-table th { position: sticky; top: 0; background: #f6f9fd; color: #2a4461; z-index: 1; }
+    .map-badge { display: inline-block; padding: 2px 6px; border-radius: 999px; font-size: 10px; font-weight: 700; }
+    .map-select { width: 100%; font-size: 11px; padding: 4px 6px; border: 1px solid #cdd8e7; border-radius: 4px; background: #fff; }
+    .map-subtitle { font-size: 12px; font-weight: 700; color: #1c3f66; margin: 16px 0 8px; }
+    .note { font-size: 11px; color: #666; margin-top: 12px; padding: 12px; background: #f9f7f3; border-radius: 4px; line-height: 1.5; }
+    @media (max-width: 960px) { .map-summary-grid { grid-template-columns: repeat(2, minmax(120px, 1fr)); } }
 
-    .doc-mgmt-title {
-      font-size: 28px;
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
-
-    .doc-mgmt-subtitle {
-      font-size: 14px;
-      opacity: 0.9;
-    }
-
-    .doc-mgmt-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-      gap: 24px;
-      margin-bottom: 36px;
-    }
-
-    .doc-mgmt-card {
-      background: white;
-      border-radius: 8px;
-      padding: 24px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-      border: 1px solid #e5e0d5;
-      transition: all 0.3s;
-    }
-
-    .doc-mgmt-card:hover {
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-      transform: translateY(-2px);
-    }
-
-    .doc-mgmt-card-icon {
-      font-size: 32px;
-      margin-bottom: 12px;
-    }
-
-    .doc-mgmt-card-title {
-      font-size: 16px;
-      font-weight: 700;
-      color: #333;
-      margin-bottom: 8px;
-    }
-
-    .doc-mgmt-card-desc {
-      font-size: 13px;
-      color: #666;
-      line-height: 1.5;
-      margin-bottom: 16px;
-    }
-
-    .doc-mgmt-card-btn {
-      padding: 10px 18px;
-      background: #2e5b8a;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 12px;
-      font-weight: 600;
-      transition: all 0.2s;
-      width: 100%;
-      text-align: center;
-      text-decoration: none;
-      display: inline-block;
-    }
-
-    .doc-mgmt-card-btn:hover {
-      background: #1f5f9d;
-    }
-
-    .doc-mgmt-section {
-      background: white;
-      border-radius: 8px;
-      padding: 24px;
-      margin-bottom: 24px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-      border: 1px solid #e5e0d5;
-    }
-
-    .doc-mgmt-section-title {
-      font-size: 16px;
-      font-weight: 700;
-      color: #333;
-      margin-bottom: 18px;
-      padding-bottom: 12px;
-      border-bottom: 2px solid #e5e0d5;
-    }
-
-    .doc-mgmt-list {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .doc-mgmt-list-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 12px;
-      background: #f9f9f9;
-      border-radius: 6px;
-      border-left: 3px solid #2e5b8a;
-    }
-
-    .doc-mgmt-list-item-info {
-      flex: 1;
-    }
-
-    .doc-mgmt-list-item-name {
-      font-size: 13px;
-      font-weight: 600;
-      color: #333;
-    }
-
-    .doc-mgmt-list-item-meta {
-      font-size: 11px;
-      color: #999;
-      margin-top: 4px;
-    }
-
-    .doc-mgmt-list-item-stat {
-      background: #e8f3ff;
-      color: #2e5b8a;
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: 600;
-      white-space: nowrap;
-    }
-
-    .empty-state {
-      text-align: center;
-      padding: 48px 24px;
-      color: #999;
-    }
-
-    .empty-state-icon {
-      font-size: 48px;
-      margin-bottom: 12px;
-    }
-
-    .empty-state-title {
-      font-size: 16px;
-      font-weight: 600;
-      color: #333;
-      margin-bottom: 6px;
-    }
-
-    .empty-state-text {
-      font-size: 13px;
-      color: #999;
-    }
-
-    .stats-row {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 16px;
-      margin-bottom: 24px;
-    }
-
-    .stat-box {
-      background: #f0f4f8;
-      border-left: 4px solid #2e5b8a;
-      padding: 16px;
-      border-radius: 6px;
-    }
-
-    .stat-label {
-      font-size: 11px;
-      color: #666;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 6px;
-    }
-
-    .stat-value {
-      font-size: 24px;
-      font-weight: 700;
-      color: #2e5b8a;
-    }
-
-    @media (max-width: 768px) {
-      .doc-mgmt-grid {
-        grid-template-columns: 1fr;
-      }
-
-      .doc-mgmt-title {
-        font-size: 22px;
-      }
-    }
+    /* Statements on file */
+    .doc-list { display: flex; flex-direction: column; gap: 8px; }
+    .doc-row { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: #f9f9f9; border-radius: 6px; border-left: 3px solid #2e5b8a; }
+    .doc-row-name { font-size: 13px; font-weight: 600; color: #333; }
+    .doc-row-meta { font-size: 11px; color: #999; margin-top: 3px; }
+    .doc-row-stat { background: #e8f3ff; color: #2e5b8a; padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; white-space: nowrap; }
+    .empty-state { text-align: center; padding: 32px 20px; color: #999; font-size: 13px; }
+    .empty-state strong { display: block; color: #333; margin-bottom: 4px; font-size: 14px; }
   </style>
 </head>
 <body>
@@ -252,16 +103,12 @@
 
       <div class="nav-group-label">Tools</div>
       <a class="nav-item" href="index.html">Dashboard</a>
-      <a class="nav-item" href="document-hub-master.html" data-module="document-hub">Document Hub</a>
-
-      <div class="nav-group-label">Tools</div>
+      <a class="nav-item active" href="document-hub-master.html" data-module="document-hub">Document Hub</a>
+      <a class="nav-item" href="discovery-intake.html">Document Intake</a>
       <a class="nav-item" href="forensic-tracing.html">Forensic Tracing</a>
       <a class="nav-item" href="settlement.html">Settlement Modeling</a>
       <a class="nav-item" href="credits.html">Credits &amp; Adjustments</a>
       <a class="nav-item" href="regulations.html">Regulations</a>
-      <a class="nav-item" href="equitable-distribution.html">Prenup Module</a>
-      <a class="nav-item" href="discovery-intake.html">Document Intake</a>
-      <a class="nav-item" href="discovery-intake.html">Compliance</a>
       <a class="nav-item" href="red-flags.html">Red-Flag Detection</a>
     </nav>
 
@@ -271,290 +118,216 @@
 
   <!-- ===================== MAIN ===================== -->
   <main class="main">
-    <!-- Header -->
-    <div class="doc-mgmt-header">
-      <div class="doc-mgmt-container">
-        <div class="doc-mgmt-title">💰 Expense Documents</div>
-        <div class="doc-mgmt-subtitle">Import, map, and manage expense documents with automatic categorization</div>
-        <div style="font-size: 12px; opacity: 0.8; margin-top: 12px;">
-          <a href="document-hub-master.html" style="color: white; text-decoration: none; font-weight: 600;">← Back to Document Hub</a>        </div>
+    <div class="hub-header">
+      <div class="hub-container">
+        <div class="hub-title">💰 Expense Hub</div>
+        <div class="hub-subtitle">Reconcile expenses from Document Intake, then map each merchant to its AFI category</div>
+        <div class="hub-links">
+          <a href="document-hub-master.html">← Back to Document Hub</a>
+          <a href="discovery-intake.html" data-intake-link>Document Intake</a>
+          <a href="document-hub-income.html">Income Hub</a>
+          <a href="afi.html">AFI Expenses →</a>
+        </div>
         <div style="font-size: 13px; margin-top: 8px;" id="activeMatterBanner"></div>
       </div>
     </div>
 
-    <!-- Content -->
-    <div class="doc-mgmt-container">
-      <!-- Quick Stats -->
-      <div class="stats-row">
-        <div class="stat-box">
-          <div class="stat-label">Financial Statements on File</div>
-          <div class="stat-value" id="totalImports">0</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-label">Processed</div>
-          <div class="stat-value" id="totalItems">0</div>
-        </div>
-        <div class="stat-box">
-          <div class="stat-label">Needs Review</div>
-          <div class="stat-value" id="avgMappingRate">0</div>        </div>
+    <div class="hub-container">
+      <!-- 1 · Intake → Expense reconciliation -->
+      <div class="hub-section recon-strip" id="reconStrip">
+        <div class="hub-section-title">🔁 Intake → Expense Reconciliation</div>
+        <div class="hub-section-note">Everything Document Intake parsed, and where the money going out went. Nothing should leave intake without landing somewhere.</div>
+        <div id="reconBody"><div class="empty-state">Loading…</div></div>
       </div>
 
-      <!-- Quick Actions -->
-      <div class="doc-mgmt-grid">
-        <div class="doc-mgmt-card">
-          <div class="doc-mgmt-card-icon">📤</div>
-          <div class="doc-mgmt-card-title">Import Expenses</div>
-          <div class="doc-mgmt-card-desc">Expense documents are uploaded once, in Document Intake, and classified automatically. This page only displays what's already on file for the active case.</div>
-          <a id="goToIntakeBtn" class="doc-mgmt-card-btn" href="discovery-intake.html">Go to Document Intake →</a>
+      <!-- 2 · Mapping -->
+      <div class="hub-section">
+        <div class="hub-section-title">🧭 Map Expenses to AFI Categories</div>
+        <div class="hub-section-note">Merchants are auto-mapped where the rule is certain (for example, Safeway → Groceries). Confirm the suggested ones, assign the unmapped ones, then push the monthly totals to the AFI. Unmapped amounts stay visible so the AFI still ties to the statements.</div>
+
+        <div class="map-actions">
+          <button type="button" class="btn ghost" id="afiMapCsvBtn">Reload from Discovery</button>
+          <button type="button" class="btn" id="afiPushMappedBtn">Push mapped totals to AFI</button>
+          <button type="button" class="btn ghost" id="afiExportReconBtn">Export reconciliation CSV</button>
+          <button type="button" class="btn ghost" id="afiExportWorkbookBtn">⬇ Export vendor workbook (.xlsx)</button>
         </div>
 
-        <div class="doc-mgmt-card">
-          <div class="doc-mgmt-card-icon">📋</div>
-          <div class="doc-mgmt-card-title">View Reconciliations</div>
-          <div class="doc-mgmt-card-desc">Review all expense reconciliations across categories with auto-mapped and manually mapped items.</div>
-          <a href="afi.html" class="doc-mgmt-card-btn">View All →</a>
+        <div class="map-summary-grid">
+          <div class="map-stat"><div class="map-stat-label">Mappable transactions</div><div class="map-stat-value" id="afiMapRows">0</div></div>
+          <div class="map-stat"><div class="map-stat-label">Mapped</div><div class="map-stat-value" id="afiMapMapped">0</div></div>
+          <div class="map-stat"><div class="map-stat-label">Needs review</div><div class="map-stat-value" id="afiMapUnmapped" style="color:#8a6a1f;">0</div></div>
+          <div class="map-stat"><div class="map-stat-label">Total expense amount</div><div class="map-stat-value" id="afiMapTotal">$0.00</div></div>
         </div>
 
-        <div class="doc-mgmt-card">
-          <div class="doc-mgmt-card-icon">📖</div>
-          <div class="doc-mgmt-card-title">Learn More</div>
-          <div class="doc-mgmt-card-desc">Read the complete document management guide with file format examples, workflow steps, and troubleshooting.</div>
-          <button class="doc-mgmt-card-btn" onclick="showGuide()">Open Guide →</button>        </div>
+        <div class="map-subtitle">Merchants to review</div>
+        <div class="map-table-wrap">
+          <table class="map-table">
+            <thead>
+              <tr>
+                <th>Merchant</th>
+                <th>Rows</th>
+                <th>Amount</th>
+                <th>Assign to AFI category</th>
+              </tr>
+            </thead>
+            <tbody id="afiUnmappedBody"></tbody>
+          </table>
+        </div>
+
+        <div class="map-subtitle">Totals by AFI line</div>
+        <div class="map-table-wrap">
+          <table class="map-table">
+            <thead>
+              <tr>
+                <th>Section</th>
+                <th>AFI Category</th>
+                <th>Total amount</th>
+                <th>Monthly</th>
+                <th>Rows</th>
+              </tr>
+            </thead>
+            <tbody id="afiMapCategoryBody"></tbody>
+          </table>
+        </div>
+        <p class="note" id="afiMapNote">Loading parsed transactions…</p>
       </div>
 
-      <!-- Recent Imports -->
-      <div class="doc-mgmt-section">
-        <div class="doc-mgmt-section-title">📊 Recent Documents</div>
-        <div id="recentImportsList">
-          <div class="empty-state">
-            <div class="empty-state-icon">📭</div>
-            <div class="empty-state-title">No documents on file yet</div>
-            <div class="empty-state-text">Upload bank or credit card statements in Document Intake to get started.</div>          </div>
-        </div>
+      <!-- 3 · Statements on file -->
+      <div class="hub-section">
+        <div class="hub-section-title">📊 Statements on File</div>
+        <div class="hub-section-note">Bank and credit card statements classified at intake for this matter, most recent first.</div>
+        <div id="recentImportsList"><div class="empty-state">Loading…</div></div>
       </div>
-
-      <!-- Supported Categories -->
-      <div class="doc-mgmt-section">
-        <div class="doc-mgmt-section-title">🏷️ Supported Expense Categories</div>
-        <div class="doc-mgmt-list">
-          <div class="doc-mgmt-list-item">
-            <div class="doc-mgmt-list-item-info">
-              <div class="doc-mgmt-list-item-name">🏥 Health Insurance</div>              <div class="doc-mgmt-list-item-meta">Premiums, coverage, medical insurance ($50-$2,000)</div>
-            </div>
-            <div class="doc-mgmt-list-item-stat">Auto-Mapping: 95%</div>
-          </div>
-
-          <div class="doc-mgmt-list-item">
-            <div class="doc-mgmt-list-item-info">
-              <div class="doc-mgmt-list-item-name">👶 Childcare</div>              <div class="doc-mgmt-list-item-meta">Daycare, preschool, babysitter, nanny ($500-$3,000)</div>
-            </div>
-            <div class="doc-mgmt-list-item-stat">Auto-Mapping: 92%</div>
-          </div>
-
-          <div class="doc-mgmt-list-item">
-            <div class="doc-mgmt-list-item-info">
-              <div class="doc-mgmt-list-item-name">🦷 Medical/Dental</div>              <div class="doc-mgmt-list-item-meta">Doctor, dental, pharmacy, medical visits ($20-$1,000)</div>
-            </div>
-            <div class="doc-mgmt-list-item-stat">Auto-Mapping: 88%</div>
-          </div>
-
-          <div class="doc-mgmt-list-item">
-            <div class="doc-mgmt-list-item-info">
-              <div class="doc-mgmt-list-item-name">📚 Education</div>              <div class="doc-mgmt-list-item-meta">School tuition, supplies, books ($100-$2,000)</div>
-            </div>
-            <div class="doc-mgmt-list-item-stat">Auto-Mapping: 90%</div>
-          </div>
-
-          <div class="doc-mgmt-list-item">
-            <div class="doc-mgmt-list-item-info">
-              <div class="doc-mgmt-list-item-name">🏠 Housing</div>              <div class="doc-mgmt-list-item-meta">Mortgage, rent, property tax, maintenance ($500-$5,000)</div>
-            </div>
-            <div class="doc-mgmt-list-item-stat">Auto-Mapping: 93%</div>
-          </div>
-
-          <div class="doc-mgmt-list-item">
-            <div class="doc-mgmt-list-item-info">
-              <div class="doc-mgmt-list-item-name">⚡ Utilities</div>              <div class="doc-mgmt-list-item-meta">Electric, gas, water, internet, phone ($20-$500)</div>
-            </div>
-            <div class="doc-mgmt-list-item-stat">Auto-Mapping: 89%</div>
-          </div>
-
-          <div class="doc-mgmt-list-item">
-            <div class="doc-mgmt-list-item-info">
-              <div class="doc-mgmt-list-item-name">🚗 Transportation</div>              <div class="doc-mgmt-list-item-meta">Car payment, fuel, insurance, maintenance ($50-$1,500)</div>
-            </div>
-            <div class="doc-mgmt-list-item-stat">Auto-Mapping: 87%</div>
-          </div>
-
-          <div class="doc-mgmt-list-item">
-            <div class="doc-mgmt-list-item-info">
-              <div class="doc-mgmt-list-item-name">🍔 Food</div>              <div class="doc-mgmt-list-item-meta">Groceries, restaurants, dining ($20-$800)</div>
-            </div>
-            <div class="doc-mgmt-list-item-stat">Auto-Mapping: 85%</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- File Formats -->
-      <div class="doc-mgmt-section">
-        <div class="doc-mgmt-section-title">📄 Supported File Formats</div>
-        <div class="doc-mgmt-list">
-          <div class="doc-mgmt-list-item">
-            <div class="doc-mgmt-list-item-info">
-              <div class="doc-mgmt-list-item-name">🔴 PDF (Portable Document Format)</div>
-              <div class="doc-mgmt-list-item-meta">Bank statements, invoices, receipts | Auto-extract text & tables</div>
-            </div>
-            <div class="doc-mgmt-list-item-stat">⭐ Most Used</div>          </div>
-
-          <div class="doc-mgmt-list-item">
-            <div class="doc-mgmt-list-item-info">
-              <div class="doc-mgmt-list-item-name">🖼️ Images (JPG, PNG)</div>
-              <div class="doc-mgmt-list-item-meta">Receipts, screenshots, scanned documents | OCR text extraction</div>
-            </div>
-            <div class="doc-mgmt-list-item-stat">⭐ Important</div>          </div>
-
-          <div class="doc-mgmt-list-item">
-            <div class="doc-mgmt-list-item-info">
-              <div class="doc-mgmt-list-item-name">📊 Excel (XLSX, XLS)</div>
-              <div class="doc-mgmt-list-item-meta">Spreadsheets, financial data | Multi-sheet support</div>
-            </div>
-            <div class="doc-mgmt-list-item-stat">⭐ Recommended</div>          </div>
-
-          <div class="doc-mgmt-list-item">
-            <div class="doc-mgmt-list-item-info">
-              <div class="doc-mgmt-list-item-name">📝 Word (DOCX, DOC)</div>
-              <div class="doc-mgmt-list-item-meta">Documents, reports, statements | Text & table extraction</div>
-            </div>
-            <div class="doc-mgmt-list-item-stat">⭐ Recommended</div>          </div>
-
-          <div class="doc-mgmt-list-item">
-            <div class="doc-mgmt-list-item-info">
-              <div class="doc-mgmt-list-item-name">TXT (Plain Text)</div>
-              <div class="doc-mgmt-list-item-meta">Simple format | Date | Description | Amount</div>
-            </div>
-            <div class="doc-mgmt-list-item-stat">Simple</div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Unmapped Items Section removed — mapping happens in the real AFI mapper on Document Intake -->
     </div>
 
     <footer class="foot" style="margin-top: 48px;">
-      <span>Veritas · Expense Documents</span>      <span class="foot-dim">Part of Master Document Hub</span>
+      <span>Veritas · Expense Hub</span>      <span class="foot-dim">Part of Master Document Hub</span>
     </footer>
   </main>
 
   <!-- Veritas AI Chat Widget -->
   <script src="ai-chat-config.js"></script>
   <script src="ai-chat-widget.js"></script>
-  <!-- Notification System -->
-  <script src="notification-system.js"></script>
+  <script src="safe-text.js"></script>
+  <script src="afi-taxonomy.js?v=6"></script>
+  <script src="discovery-intake-afi.js?v=15"></script>
 
   <script>
-    function showGuide() {
-      NotificationSystem.info(
-        'Document Management Guide',
-        'Open DOCUMENT-MANAGEMENT-GUIDE.md in your project folder for the complete guide.\n\nIncludes:\n• File format examples\n• Step-by-step workflows\n• Troubleshooting\n• API reference'
-      );
-    }
-
-    function matterId() {
-      return (
-        (window.Veritas && window.Veritas.currentMatterId) ||
-        new URLSearchParams(location.search).get('matter') ||
-        localStorage.getItem('currentMatterId') ||
-        null
-      );
-    }
-
-    function renderBanner(matter) {
-      const el = document.getElementById('activeMatterBanner');
-      if (!el) return;
-      if (!matter) {
-        el.innerHTML = '<a href="case-intake.html" style="color:#fff;">No active case — start Case Intake →</a>';
-        return;
-      }
-      el.innerHTML = `Active case: <strong>${matter.name || 'Untitled Case'}</strong>`;
-    }
-
-    // Loads real Financial Statements (bank/credit card statements) for the
-    // active matter — no localStorage, no fake parsing, no mock mapping rates.
-    async function loadRecentImports() {
+    (function () {
       const API_BASE = window.API_BASE || 'http://localhost:3000/api';
-      const list = document.getElementById('recentImportsList');
-      const mid = matterId();
-      const goToIntake = document.getElementById('goToIntakeBtn');
-      if (goToIntake) goToIntake.href = `discovery-intake.html?matter=${mid || ''}`;
+      const esc = window.renderSafeText;
+      const money = (n) => '$' + (Number(n) || 0).toLocaleString('en-US', { maximumFractionDigits: 0 });
 
-      if (!mid) {
-        renderBanner(null);
-        list.innerHTML = `
-          <div class="empty-state">
-            <div class="empty-state-icon">📭</div>
-            <div class="empty-state-title">No active case selected</div>
-            <div class="empty-state-text">Select or create a case, then upload documents in Document Intake.</div>
-          </div>
-        `;
-        return;
+      function matterId() {
+        return (window.VeritasMatter && window.VeritasMatter.id) || localStorage.getItem('currentMatterId') || null;
       }
 
-      try {
-        const [matterRes, docsRes] = await Promise.all([
-          fetch(`${API_BASE}/matters/${mid}`),
-          fetch(`${API_BASE}/matters/${mid}/documents`),
-        ]);
-        renderBanner(matterRes.ok ? await matterRes.json() : null);
-        const docs = (docsRes.ok ? await docsRes.json() : []).filter((d) => !d.deleted_at && d.category === 'Financial Statements');
+      function empty(title, text) {
+        return `<div class="empty-state"><strong>${esc(title)}</strong>${esc(text)}</div>`;
+      }
 
-        document.getElementById('totalImports').textContent = docs.length;
-        document.getElementById('totalItems').textContent = docs.filter((d) => d.extraction_status === 'parsed' || d.extraction_status === 'manual').length;
-        document.getElementById('avgMappingRate').textContent = docs.filter((d) => d.ocr_needed).length;
+      function renderRecon(hub) {
+        const el = document.getElementById('reconBody');
+        const i = hub.intake;
+        const f = i.byFlow;
+        const o = hub.outflows;
+        const ex = o.excluded;
+        const excludedCount = Object.values(ex).reduce((s, b) => s + b.count, 0);
+        const unparsed = i.statementDocuments - i.statementsParsed;
 
-        if (!docs.length) {
-          list.innerHTML = `
-            <div class="empty-state">
-              <div class="empty-state-icon">📭</div>
-              <div class="empty-state-title">No financial statements on file yet</div>
-              <div class="empty-state-text">Upload bank or credit card statements in Document Intake — they'll appear here automatically once classified.</div>
-            </div>
-          `;
+        const checks = [];
+        if (unparsed > 0) checks.push(`<span class="recon-gap">⚠ ${unparsed} statement(s) uploaded but not parsed${i.statementsFailed ? ` (${i.statementsFailed} failed)` : ''} — their expenses are missing below.</span>`);
+        if (f.unknown > 0) checks.push(`<span class="recon-gap">⚠ ${f.unknown} transaction(s) with no direction (in/out/transfer) — resolve at intake.</span>`);
+        if (ex.amount_review.count > 0) checks.push(`<span class="recon-gap">⚠ ${ex.amount_review.count} outflow(s) over $100,000 held back as likely parsing errors — check the statement.</span>`);
+        if (f.income + f.expense + f.transfer + f.unknown !== i.transactions || o.mappable.count + excludedCount !== o.count) checks.push('<span class="recon-gap">⚠ Transaction counts do not tie — re-run parsing at intake.</span>');
+        if (!checks.length && i.documents) checks.push('<span class="recon-ok">✓ Everything parsed at intake is accounted for.</span>');
+        document.getElementById('reconStrip').classList.toggle('has-gap', checks.some((c) => c.includes('recon-gap')));
+
+        if (!i.statementDocuments) {
+          el.innerHTML = empty('No statements at intake yet', 'Upload bank and credit card statements in Document Intake to start.');
           return;
         }
 
-        const recent = docs
-          .filter((d) => d.uploaded_at)
-          .sort((a, b) => new Date(b.uploaded_at) - new Date(a.uploaded_at))
-          .slice(0, 5);
+        const excluded = [
+          ['Account movement', 'transfers, cash, card payments by category', ex.account_movement],
+          ['Transfers / payments / P2P', 'Zelle, Venmo, PayPal, card payments by description', ex.transfer_or_payment],
+          ['Held for review', 'over $100,000 — likely a parsing error', ex.amount_review],
+          ['Zero amount', 'no amount parsed', ex.zero_amount],
+        ].filter(([, , b]) => b.count);
 
-        list.innerHTML = recent.map((d) => `
-          <div class="doc-mgmt-list-item">
-            <div class="doc-mgmt-list-item-info">
-              <div class="doc-mgmt-list-item-name">${d.filename}</div>
-              <div class="doc-mgmt-list-item-meta">${new Date(d.uploaded_at).toLocaleDateString()} · ${d.document_type || 'Document type pending'}</div>
+        el.innerHTML = `
+          <div class="recon-flow">
+            <div class="recon-step">
+              <div class="recon-step-label">Statements parsed</div>
+              <div class="recon-step-value">${i.statementsParsed} / ${i.statementDocuments}</div>
+              <div class="recon-step-detail"><span class="${unparsed ? 'recon-gap' : ''}">${unparsed} not parsed</span><br>${i.documents} documents at intake</div>
             </div>
-            <div class="doc-mgmt-list-item-stat">${d.ocr_needed ? 'Review' : (d.extraction_status || 'Uploaded')}</div>
+            <div class="recon-step">
+              <div class="recon-step-label">Transactions</div>
+              <div class="recon-step-value">${i.transactions}</div>
+              <div class="recon-step-detail">${f.income} in → <a href="document-hub-income.html">Income Hub</a> · ${f.transfer} transfers<br><span class="${f.unknown ? 'recon-gap' : ''}">${f.unknown} unclassified</span></div>
+            </div>
+            <div class="recon-step">
+              <div class="recon-step-label">Money out</div>
+              <div class="recon-step-value">${o.count}</div>
+              <div class="recon-step-detail">${excludedCount} excluded as not spending<br>(listed below)</div>
+            </div>
+            <div class="recon-step">
+              <div class="recon-step-label">To map</div>
+              <div class="recon-step-value">${o.mappable.count}</div>
+              <div class="recon-step-detail">${money(o.mappable.amount)} household spending<br>mapped below ↓</div>
+            </div>
           </div>
-        `).join('');
-      } catch (error) {
-        list.innerHTML = `
-          <div class="empty-state">
-            <div class="empty-state-icon">⚠️</div>
-            <div class="empty-state-title">Could not reach the backend</div>
-            <div class="empty-state-text">Start the Node server on :3000, then reload this page.</div>
-          </div>
-        `;
+          ${excluded.length ? `<div class="excluded-list">${excluded.map(([title, why, b]) => `<div class="excluded-item"><strong>${b.count} · ${money(b.amount)}</strong> ${esc(title)}<br><span style="font-size:11px;color:#7a8a9a;">${esc(why)}</span></div>`).join('')}</div>` : ''}
+          <div class="recon-checks">${checks.join('')}</div>`;
       }
-    }
 
-    // Load on page load
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', loadRecentImports);
-    } else {
-      loadRecentImports();
-    }
-    window.addEventListener('matterSelected', loadRecentImports);
+      function renderStatements(docs) {
+        const list = document.getElementById('recentImportsList');
+        if (!docs.length) {
+          list.innerHTML = empty('No financial statements on file yet', "Upload bank or credit card statements in Document Intake — they'll appear here once classified.");
+          return;
+        }
+        list.innerHTML = `<div class="doc-list">${docs
+          .sort((a, b) => new Date(b.uploaded_at || 0) - new Date(a.uploaded_at || 0))
+          .map((d) => `
+            <div class="doc-row">
+              <div>
+                <div class="doc-row-name">${esc(d.filename)}</div>
+                <div class="doc-row-meta">${d.uploaded_at ? new Date(d.uploaded_at).toLocaleDateString() : 'Date unknown'} · ${esc(d.document_type || 'Document type pending')}</div>
+              </div>
+              <div class="doc-row-stat">${esc(d.ocr_needed ? 'Review' : (d.extraction_status || 'Uploaded'))}</div>
+            </div>`).join('')}</div>`;
+      }
+
+      async function load() {
+        const mid = matterId();
+        document.querySelectorAll('[data-intake-link]').forEach((a) => { a.href = `discovery-intake.html?matter=${mid || ''}`; });
+        if (!mid) return;
+        try {
+          const [hubRes, docsRes] = await Promise.all([
+            fetch(`${API_BASE}/matters/${mid}/expense-hub`),
+            fetch(`${API_BASE}/matters/${mid}/documents`),
+          ]);
+          if (!hubRes.ok || !docsRes.ok) throw new Error('API error');
+          renderRecon(await hubRes.json());
+          renderStatements((await docsRes.json()).filter((d) => d.category === 'Financial Statements'));
+        } catch (e) {
+          const msg = empty('Could not reach the backend', 'Start the Node server on :3000 (start-veritas.bat), then reload. Zeros here do not mean data was lost.');
+          document.getElementById('reconBody').innerHTML = msg;
+          document.getElementById('recentImportsList').innerHTML = msg;
+        }
+      }
+
+      window.addEventListener('veritas:matter', (e) => {
+        document.getElementById('activeMatterBanner').innerHTML = `Active case: <strong>${esc(e.detail.matter.name || 'Untitled Case')}</strong>`;
+      });
+
+      if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', load);
+      else load();
+    })();
   </script>
   <script src="logo-handler.js"></script>
+  <script src="sidebar-loader.js"></script>
 </body>
 </html>

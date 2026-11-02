@@ -44,6 +44,9 @@ function setActiveNavItem() {
 
   if (activeItem) {
     activeItem.classList.add('active');
+    // Keep the submenu holding the current page open.
+    const group = activeItem.closest('details.nav-sub');
+    if (group) group.open = true;
   }
 }
 

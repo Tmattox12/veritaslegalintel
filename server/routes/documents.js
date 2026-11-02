@@ -363,13 +363,13 @@ router.post('/reprocess', async (req, res) => {
         });
         if (existing) {
           await run(req, 'DELETE FROM bank_transactions WHERE bank_statement_id = ?', [existing.id]);
-          await run(req, 'UPDATE bank_statements SET bank_name=?, account_type=?, account_number_masked=?, statement_start=?, statement_end=? WHERE id=?',
-            [parsed.bankName, parsed.accountType, parsed.accountNumberMasked, parsed.statementStart, parsed.statementEnd, existing.id]);
+          await run(req, 'UPDATE bank_statements SET bank_name=?, account_type=?, account_number_masked=?, statement_start=?, statement_end=?, beginning_balance=?, ending_balance=? WHERE id=?',
+            [parsed.bankName, parsed.accountType, parsed.accountNumberMasked, parsed.statementStart, parsed.statementEnd, parsed.beginningBalance, parsed.endingBalance, existing.id]);
           var statementId = existing.id;
         } else {
           var statementId = uuidv4();
-          await run(req, `INSERT INTO bank_statements (id, document_id, matter_id, bank_name, account_type, account_number_masked, statement_start, statement_end, processing_status) VALUES (?,?,?,?,?,?,?,?,?)`,
-            [statementId, doc.id, matterId, parsed.bankName, parsed.accountType, parsed.accountNumberMasked, parsed.statementStart, parsed.statementEnd, 'completed']);
+          await run(req, `INSERT INTO bank_statements (id, document_id, matter_id, bank_name, account_type, account_number_masked, statement_start, statement_end, beginning_balance, ending_balance, processing_status) VALUES (?,?,?,?,?,?,?,?,?,?,?)`,
+            [statementId, doc.id, matterId, parsed.bankName, parsed.accountType, parsed.accountNumberMasked, parsed.statementStart, parsed.statementEnd, parsed.beginningBalance, parsed.endingBalance, 'completed']);
         }
         for (const txn of parsed.transactions) {
           await run(req, `INSERT INTO bank_transactions (id, bank_statement_id, transaction_date, description, amount, transaction_type, running_balance, flow_type, suggested_category, mapped_category, mapping_status) VALUES (?,?,?,?,?,?,?,?,?,?,?)`,
@@ -387,6 +387,28 @@ router.post('/reprocess', async (req, res) => {
     console.error('Reprocess error:', error);
     res.status(500).json({ error: error.message });
   }
+});
+
+// GET /api/matters/:matterId/documents/:documentId/original
+// Streams the uploaded file inline so the source document can be checked
+// against what was parsed. Scoped to the matter: another matter's id 404s.
+router.get('/:documentId/original', (req, res) => {
+  const { matterId, documentId } = req.params;
+  req.db.get('SELECT filename, content_type, s3_key FROM documents WHERE id = ? AND matter_id = ? AND deleted_at IS NULL',
+    [documentId, matterId], async (err, doc) => {
+      if (err) return res.status(500).json({ error: err.message });
+      if (!doc || !doc.s3_key) return res.status(404).json({ error: 'Original file not on file' });
+      try {
+        const { getOriginal } = require('../services/storage');
+        const buf = await getOriginal(doc.s3_key);
+        const isPdf = /\.pdf$/i.test(doc.filename);
+        res.type(isPdf ? 'application/pdf' : (doc.content_type || 'application/octet-stream'));
+        res.header('Content-Disposition', `inline; filename="${doc.filename.replace(/"/g, '')}"`);
+        res.send(buf);
+      } catch (e) {
+        res.status(404).json({ error: 'Original file could not be read' });
+      }
+    });
 });
 
 // GET /api/matters/:matterId/documents/gap-analysis

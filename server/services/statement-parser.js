@@ -64,6 +64,10 @@ function detectStatementPeriod(text) {
   let m = text.match(/statement\s*(?:period|cycle|dates?)?[:\s]*(\d{1,2}\/\d{1,2}\/\d{2,4})\s*(?:to|-|through)\s*(\d{1,2}\/\d{1,2}\/\d{2,4})/i);
   if (m) return { start: normDate(m[1]), end: normDate(m[2]) };
 
+  // Card statements: "Opening/Closing Date 07/21/23 - 08/20/23"
+  m = text.match(/opening\s*\/\s*closing\s+date[:\s]*(\d{1,2}\/\d{1,2}\/\d{2,4})\s*(?:to|-|through)\s*(\d{1,2}\/\d{1,2}\/\d{2,4})/i);
+  if (m) return { start: normDate(m[1]), end: normDate(m[2]) };
+
   m = text.match(/statement\s*(?:period|cycle|dates?)?[:\s]*([A-Za-z]+\s+\d{1,2})\s*(?:to|-|through)\s*([A-Za-z]+\s+\d{1,2}),?\s*(\d{4})/i);
   if (m) {
     const y = m[3];
@@ -265,8 +269,9 @@ function parseStatementText(text, filename) {
     });
   }
 
-  const beginningBalance = summaryBalance(text, 'Beginning');
-  const endingBalance = summaryBalance(text, 'Ending');
+  // Card statements say "Previous Balance" / "New Balance" instead.
+  const beginningBalance = summaryBalance(text, 'Beginning') ?? summaryBalance(text, 'Previous');
+  const endingBalance = summaryBalance(text, 'Ending') ?? summaryBalance(text, 'New');
   recoverBalanceMisreads(transactions, accountType, beginningBalance, endingBalance, text);
 
   // Fall back to filename-derived period/account when the text didn't yield them.
@@ -314,7 +319,7 @@ function sectionHeadingSign(line) {
 }
 
 function summaryBalance(text, which) {
-  const m = text.match(new RegExp(`${which}\\s+Balance\\s*\\$?\\s*(-?[\\d,]+\\.\\d{2})`, 'i'));
+  const m = text.match(new RegExp(`${which}\\s+Balance\\s*:?\\s*\\$?\\s*(-?[\\d,]+\\.\\d{2})`, 'i'));
   return m ? parseAmount(m[1]) : null;
 }
 

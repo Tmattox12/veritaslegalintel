@@ -1,4 +1,5 @@
-/* Discovery Intake — AFI Expense Mapping from parsed discovery transactions. */
+/* Expense Hub — AFI expense mapping from parsed discovery transactions.
+   Loaded by document-hub-expenses.html; intake only parses. */
 
 (function () {
   const API_BASE = window.API_BASE || 'http://localhost:3000/api';
@@ -685,7 +686,6 @@
   function init() {
     const loadBtn = document.getElementById('afiMapCsvBtn');
     if (loadBtn) {
-      loadBtn.textContent = 'Load from Discovery';
       loadBtn.addEventListener('click', loadTransactions);
     }
     const applyBtn = document.getElementById('afiApplyUnmappedBtn');

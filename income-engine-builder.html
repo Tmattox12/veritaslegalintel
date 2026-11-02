@@ -111,17 +111,20 @@
 
     </div>
 
+    <!-- Parties: names + roles from the matter; editable here -->
+    <div data-party-box></div>
+
     <!-- Income Summary -->
     <div class="income-summary">
       <div class="summary-card">
-        <div class="summary-role"><span data-party="a">Party A</span> — Total Annual Income</div>
+        <div class="summary-role"><span data-party="a">Party A</span> (<span data-party-role="a">Petitioner</span>) — Total Annual Income</div>
         <div class="summary-amount" id="partyA-total">$0</div>
         <div class="summary-detail">
           <div id="partyA-detail">$0/mo · Sources: 0</div>
         </div>
       </div>
       <div class="summary-card payee">
-        <div class="summary-role"><span data-party="b">Party B</span> — Total Annual Income</div>
+        <div class="summary-role"><span data-party="b">Party B</span> (<span data-party-role="b">Respondent</span>) — Total Annual Income</div>
         <div class="summary-amount" id="partyB-total">$0</div>
         <div class="summary-detail">
           <div id="partyB-detail">$0/mo · Sources: 0</div>
@@ -926,5 +929,6 @@
       });
     })();
   </script>
+  <script src="party-box.js"></script>
 </body>
 </html>

@@ -169,19 +169,46 @@
     document.body.appendChild(wrap);
   }
 
-  // Party names come from the matter (Case Intake), never from per-page inputs:
-  // any element marked data-party="a" (petitioner) or "b" (respondent) is filled.
+  function partyLabelsOf(matter) {
+    let details = matter.details;
+    if (typeof details === 'string') { try { details = JSON.parse(details); } catch (e) { details = null; } }
+    const l = (details && details.partyLabels) || {};
+    return { a: l.a || 'Petitioner', b: l.b || 'Respondent' };
+  }
+
+  // Party names come from the matter (Case Intake or the party box), never from
+  // per-page inputs: data-party="a"|"b" gets the name, data-party-role="a"|"b"
+  // the role label (Petitioner/Respondent, Plaintiff/Defendant, ...).
   function announceMatter(matter) {
+    const labels = partyLabelsOf(matter);
     const names = {
-      a: (matter.petitioner || '').trim() || 'Petitioner',
-      b: (matter.respondent || '').trim() || 'Respondent',
+      a: (matter.petitioner || '').trim() || labels.a,
+      b: (matter.respondent || '').trim() || labels.b,
     };
     document.querySelectorAll('[data-party]').forEach((el) => {
       if (names[el.dataset.party]) el.textContent = names[el.dataset.party];
     });
+    document.querySelectorAll('[data-party-role]').forEach((el) => {
+      if (labels[el.dataset.partyRole]) el.textContent = labels[el.dataset.partyRole];
+    });
     window.VeritasMatter.matter = matter;
     window.VeritasMatter.partyNames = names;
-    window.dispatchEvent(new CustomEvent('veritas:matter', { detail: { matter, partyNames: names } }));
+    window.VeritasMatter.partyLabels = labels;
+    window.dispatchEvent(new CustomEvent('veritas:matter', { detail: { matter, partyNames: names, partyLabels: labels } }));
+  }
+
+  // Saves names/labels to the matter, then refreshes every party label on the page.
+  async function saveParties({ petitioner, respondent, partyLabels }) {
+    if (!activeId) throw new Error('No client selected');
+    const r = await fetch(`${API}/matters/${encodeURIComponent(activeId)}/parties`, {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ petitioner, respondent, partyLabels }),
+    });
+    if (!r.ok) throw new Error(`Save failed (${r.status})`);
+    const matter = await r.json();
+    announceMatter(matter);
+    return matter;
   }
 
   async function showSwitcher() {
@@ -220,6 +247,7 @@
     switchTo,
     newClient,
     showSwitcher,
+    saveParties,
   };
   // Names older pages/sidebar already call.
   window.showMatterDropdownFromSidebar = showSwitcher;

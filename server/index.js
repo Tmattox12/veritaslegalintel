@@ -6,6 +6,7 @@ require('dotenv').config();
 
 const { initializeDatabase, getDatabase } = require('./db/schema');
 const AFITaxonomy = require('../afi-taxonomy');
+const { expenseExclusion } = require('./services/expense-workbook');
 const bankStatementsRouter = require('./routes/bank-statements');
 const documentsRouter = require('./routes/documents');
 const documentExtractionRouter = require('./routes/document-extraction');
@@ -198,6 +199,149 @@ app.get('/api/matters/:id', (req, res) => {
     }).catch((err) => res.status(500).json({ error: err.message }));
   });
 
+  // Why an inflow is not an income deposit, or null if it is one. The Income
+  // Engine and the Income Hub both use this so they always count the same rows.
+  const INCOME_MOVEMENT_RE = /\bpayment\s+to\s+(?:chase|credit|card)|\bpayment thank you|\btransfer\b|\bzelle\b|\bvenmo\b|\bpaypal\b|\brefund\b|\bcredit\b/i;
+  function incomeExclusion(t) {
+    if (t.account_type === 'credit_card') return 'card_credit';
+    if (AFITaxonomy.excludedFromIncome(t.mapped_category || t.suggested_category, t.description, t.mapping_status)) return 'account_movement';
+    if (INCOME_MOVEMENT_RE.test(t.description || '')) return 'transfer_or_refund';
+    return null;
+  }
+
+  // What Document Intake took in for a matter: documents by category, how many
+  // statements parsed, and every parsed transaction. Both hubs start from this.
+  function loadIntake(req, id) {
+    const all = (sql, params) => new Promise((resolve, reject) => {
+      req.db.all(sql, params, (err, rows) => err ? reject(err) : resolve(rows || []));
+    });
+    return Promise.all([
+      all(`SELECT id, category FROM documents WHERE matter_id = ? AND deleted_at IS NULL`, [id]),
+      all(`SELECT document_id, processing_status FROM bank_statements WHERE matter_id = ?`, [id]),
+      all(`SELECT bt.amount, bt.description, bt.transaction_date, bt.flow_type,
+                  bt.suggested_category, bt.mapped_category, bt.mapping_status, bs.account_type,
+                  bs.bank_name, bs.account_number_masked
+           FROM bank_transactions bt
+           JOIN bank_statements bs ON bs.id = bt.bank_statement_id
+           WHERE bs.matter_id = ?`, [id]),
+    ]).then(([docs, statements, transactions]) => {
+      const byCategory = {};
+      docs.forEach((d) => { const c = d.category || 'Unclassified'; byCategory[c] = (byCategory[c] || 0) + 1; });
+
+      const statementDocs = new Set(docs.filter((d) => d.category === 'Financial Statements').map((d) => d.id));
+      const parsedDocs = new Set(statements.filter((s) => s.processing_status === 'completed').map((s) => s.document_id));
+      const failedDocs = new Set(statements.filter((s) => s.processing_status === 'error').map((s) => s.document_id));
+
+      const byFlow = { income: 0, expense: 0, transfer: 0, unknown: 0 };
+      transactions.forEach((t) => { byFlow[t.flow_type in byFlow ? t.flow_type : 'unknown']++; });
+
+      return {
+        transactions,
+        intake: {
+          documents: docs.length,
+          byCategory,
+          incomeDocuments: byCategory['Tax Returns & Income'] || 0,
+          unclassifiedDocuments: (byCategory.Unclassified || 0) + (byCategory.Other || 0),
+          statementDocuments: statementDocs.size,
+          statementsParsed: [...statementDocs].filter((d) => parsedDocs.has(d)).length,
+          statementsFailed: [...statementDocs].filter((d) => failedDocs.has(d) && !parsedDocs.has(d)).length,
+          transactions: transactions.length,
+          byFlow,
+        },
+      };
+    });
+  }
+
+  const bucket = () => ({ count: 0, amount: 0 });
+  const roundBucket = (b) => ({ count: b.count, amount: +b.amount.toFixed(2) });
+
+  // Expense Hub: reconciles intake against what reaches expense mapping. The
+  // mapping itself (which category each merchant goes to) happens on the page.
+  app.get('/api/matters/:id/expense-hub', (req, res) => {
+    loadIntake(req, req.params.id).then(({ intake, transactions }) => {
+      const mappable = bucket();
+      const excluded = { account_movement: bucket(), transfer_or_payment: bucket(), amount_review: bucket(), zero_amount: bucket() };
+      transactions.forEach((t) => {
+        if (t.flow_type !== 'expense') return;
+        const reason = expenseExclusion(t);
+        const target = reason ? excluded[reason] : mappable;
+        target.count++;
+        target.amount += Math.abs(Number(t.amount) || 0);
+      });
+      res.json({
+        matterId: req.params.id,
+        intake,
+        outflows: {
+          count: intake.byFlow.expense,
+          mappable: roundBucket(mappable),
+          excluded: Object.fromEntries(Object.entries(excluded).map(([k, b]) => [k, roundBucket(b)])),
+        },
+        generatedAt: new Date().toISOString(),
+      });
+    }).catch((err) => res.status(500).json({ error: err.message }));
+  });
+
+  // Income Hub: reconciles what Document Intake took in against what reached
+  // income, and groups deposit candidates into recurring sources for review.
+  app.get('/api/matters/:id/income-hub', (req, res) => {
+    const { id } = req.params;
+    loadIntake(req, id).then(({ intake, transactions }) => {
+      const candidates = bucket();
+      const excluded = { card_credit: bucket(), account_movement: bucket(), transfer_or_refund: bucket() };
+      const sources = {};
+
+      transactions.forEach((t) => {
+        if (t.flow_type !== 'income') return;
+        const amount = Math.abs(Number(t.amount) || 0);
+        const reason = incomeExclusion(t);
+        const target = reason ? excluded[reason] : candidates;
+        target.count++;
+        target.amount += amount;
+        if (reason) return;
+
+        const name = (t.description || '').toUpperCase().replace(/[^A-Z0-9 ]/g, '').split(/\s+/).slice(0, 4).join(' ').trim() || 'UNKNOWN';
+        const s = sources[name] || (sources[name] = { name, count: 0, total: 0, months: new Set(), first: null, last: null, accounts: {}, deposits: [] });
+        s.count++;
+        s.total += amount;
+        const date = t.transaction_date || '';
+        // Which account the money landed in lets the page suggest whose income it is.
+        const last4 = String(t.account_number_masked || '').replace(/\D/g, '').slice(-4);
+        const account = [t.bank_name, t.account_type, last4 ? `••${last4}` : null].filter(Boolean).join(' ') || 'Unknown account';
+        s.accounts[account] = (s.accounts[account] || 0) + 1;
+        s.deposits.push({ date, amount: +amount.toFixed(2), account, description: t.description || '' });
+        if (date) {
+          s.months.add(date.slice(0, 7));
+          if (!s.first || date < s.first) s.first = date;
+          if (!s.last || date > s.last) s.last = date;
+        }
+      });
+
+      res.json({
+        matterId: id,
+        intake,
+        inflows: {
+          count: intake.byFlow.income,
+          candidates: roundBucket(candidates),
+          excluded: Object.fromEntries(Object.entries(excluded).map(([k, b]) => [k, roundBucket(b)])),
+        },
+        sources: Object.values(sources)
+          .map((s) => ({
+            name: s.name,
+            count: s.count,
+            total: +s.total.toFixed(2),
+            months: s.months.size,
+            monthly: +(s.total / Math.max(1, s.months.size)).toFixed(2),
+            first: s.first,
+            last: s.last,
+            accounts: s.accounts,
+            deposits: s.deposits.sort((a, b) => a.date.localeCompare(b.date)),
+          }))
+          .sort((a, b) => b.total - a.total),
+        generatedAt: new Date().toISOString(),
+      });
+    }).catch((err) => res.status(500).json({ error: err.message }));
+  });
+
   // Income analysis across multiple bases for the Income Engine cards.
   // Computes 12-month average, 6-month average, last-month run-rate, and
   // trailing-3-month average from non-card deposits, plus accepted document
@@ -220,17 +364,8 @@ app.get('/api/matters/:id', (req, res) => {
            JOIN documents d ON d.id = ier.document_id
            WHERE ier.matter_id = ? AND ier.status = 'accepted' AND ier.annual_amount > 0 AND d.deleted_at IS NULL`, [id]),
     ]).then(([transactions, acceptedEvidence]) => {
-      const movement = /\bpayment\s+to\s+(?:chase|credit|card)|\bpayment thank you|\btransfer\b|\bzelle\b|\bvenmo\b|\bpaypal\b|\brefund\b|\bcredit\b/i;
-
       // Employment income deposits only (non-card, categorized as income, not a transfer).
-      const incomeDeposits = transactions.filter((t) => {
-        const cat = t.mapped_category || t.suggested_category;
-        const desc = (t.description || '').toLowerCase();
-        return t.flow_type === 'income'
-          && t.account_type !== 'credit_card'
-          && !AFITaxonomy.excludedFromIncome(cat, t.description, t.mapping_status)
-          && !movement.test(desc);
-      });
+      const incomeDeposits = transactions.filter((t) => t.flow_type === 'income' && !incomeExclusion(t));
 
       // Group deposits by YYYY-MM month. Fill calendar gaps with zero so a
       // trailing-period average cannot overstate income by skipping months.
@@ -349,6 +484,28 @@ app.put('/api/matters/:id', (req, res) => {
       res.json({ id, name, clientName, status, caseNo, county, state, court, petitioner, respondent });
     }
   );
+});
+
+// Update only the parties (names + role labels) - used by the party box on
+// template pages. Other matter fields and details keys are left as they are.
+app.patch('/api/matters/:id/parties', (req, res) => {
+  const { id } = req.params;
+  const { petitioner, respondent, partyLabels } = req.body || {};
+  req.db.get('SELECT details FROM matters WHERE id = ? AND deleted_at IS NULL', [id], (err, row) => {
+    if (err) return res.status(500).json({ error: err.message });
+    if (!row) return res.status(404).json({ error: 'Matter not found' });
+    let details = {};
+    try { details = row.details ? JSON.parse(row.details) : {}; } catch (e) { details = {}; }
+    if (partyLabels && partyLabels.a && partyLabels.b) {
+      details.partyLabels = { a: String(partyLabels.a).slice(0, 40), b: String(partyLabels.b).slice(0, 40) };
+    }
+    req.db.run('UPDATE matters SET petitioner = ?, respondent = ?, details = ? WHERE id = ?',
+      [(petitioner || '').trim() || null, (respondent || '').trim() || null, JSON.stringify(details), id],
+      (err2) => {
+        if (err2) return res.status(500).json({ error: err2.message });
+        req.db.get('SELECT * FROM matters WHERE id = ?', [id], (e3, m) => (e3 ? res.status(500).json({ error: e3.message }) : res.json(m)));
+      });
+  });
 });
 
 // Assign user to matter

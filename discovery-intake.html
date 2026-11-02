@@ -62,20 +62,6 @@
     .note { font-size: 11px; color: #666; margin-top: 12px; padding: 12px; background: #f9f7f3; border-radius: 4px; line-height: 1.5; }
 
     .map-actions { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 12px; }
-    .map-summary-grid { display: grid; grid-template-columns: repeat(4, minmax(140px, 1fr)); gap: 8px; margin-bottom: 12px; }
-    .map-stat { background: #f5f8fc; border: 1px solid #d8e3f1; border-radius: 6px; padding: 8px; }
-    .map-stat-label { font-size: 10px; color: #5f6b7a; text-transform: uppercase; letter-spacing: 0.03em; }
-    .map-stat-value { font-size: 14px; font-weight: 700; color: #1c3f66; margin-top: 3px; }
-    .map-table-wrap { overflow: auto; max-height: 240px; border: 1px solid #e4e9f1; border-radius: 6px; }
-    .map-table { width: 100%; border-collapse: collapse; font-size: 11px; background: #fff; }
-    .map-table th, .map-table td { border-bottom: 1px solid #edf2f7; padding: 8px; text-align: left; vertical-align: top; }
-    .map-table th { position: sticky; top: 0; background: #f6f9fd; color: #2a4461; z-index: 1; }
-    .map-badge { display: inline-block; padding: 2px 6px; border-radius: 999px; font-size: 10px; font-weight: 700; }
-    .map-badge.necessary { background: #e8f3ff; color: #1b5fae; }
-    .map-badge.discretionary { background: #fef0e8; color: #b45410; }
-    .map-badge.other { background: #f0f3f6; color: #4b5563; }
-    .map-select { width: 100%; font-size: 11px; padding: 4px 6px; border: 1px solid #cdd8e7; border-radius: 4px; background: #fff; }
-    @media (max-width: 960px) { .map-summary-grid { grid-template-columns: repeat(2, minmax(120px, 1fr)); } }
   </style>
   <link rel="stylesheet" href="ai-chat-widget.css" />
 </head>
@@ -163,7 +149,7 @@
           <li><strong>1 · Case Intake</strong> — create the matter (<a href="case-intake.html">case-intake.html</a>). This makes it the <em>active matter</em>.</li>
           <li><strong>2 · Import Documents</strong> — drag &amp; drop below. Files auto-categorize into the buckets on this page.</li>
           <li><strong>3 · Auto-parse</strong> — bank / card statements become transaction lists (see <em>View Parsed Transactions</em> / CSV export).</li>
-          <li><strong>4 · Map &amp; push</strong> — the AFI panel below turns transactions into AFI lines; the Income Engine imports detected income.</li>
+          <li><strong>4 · Clear &amp; allocate</strong> — map expenses to AFI lines in the <a href="document-hub-expenses.html">Expense Hub</a>; assign income to each party in the <a href="document-hub-income.html">Income Hub</a>.</li>
           <li><strong>5 · Track completeness</strong> — the <em>Document Checklist</em> (bottom) shows what Rule&nbsp;49 items are still missing.</li>
         </ol>
       </div>
@@ -188,56 +174,17 @@
             <div class="upload-queue" id="uploadQueue"></div>
           </div>
 
+          <!-- Parsed transactions are cleared and allocated in the hubs, not here. -->
           <div class="panel" style="margin-top: 20px;">
             <div class="panel-head">
-              <h3>🧭 AFI Expense Mapping from Discovery Transactions</h3>
-              <span class="tag">Map every transaction to Necessary, Discretionary, or Other</span>
+              <h3>➡ Next: clear &amp; allocate</h3>
+              <span class="tag">Intake parses · the hubs map and allocate</span>
             </div>
-            <p class="panel-note">Load a transaction CSV, auto-map merchants (for example, Safeway → Groceries), then resolve unmapped merchants. Unmapped amounts stay in <strong>Other / Unmapped</strong> so AFI reconciliation still ties to supporting documents.</p>
-
+            <p class="panel-note">Once files are parsed here, money out is mapped to AFI categories in the Expense Hub, and income documents are assigned to each party in the Income Hub. Each hub opens with a reconciliation back to this page.</p>
             <div class="map-actions">
-              <button type="button" class="btn ghost" id="afiMapCsvBtn">Load transaction CSV</button>
-                <input type="file" id="afiMapCsvInput" hidden accept=".csv,text/csv" />
-              <button type="button" class="btn" id="afiApplyUnmappedBtn">Apply selected mappings</button>
-              <button type="button" class="btn ghost" id="afiPushMappedBtn">Push mapped totals to AFI</button>
-              <button type="button" class="btn ghost" id="afiExportReconBtn">Export mapper reconciliation CSV</button>
-              <button type="button" class="btn ghost" id="afiExportWorkbookBtn">⬇ Export vendor workbook (.xlsx)</button>
+              <a class="btn" href="document-hub-expenses.html">Expense Hub — map expenses →</a>
+              <a class="btn" href="document-hub-income.html">Income Hub — allocate income →</a>
             </div>
-
-            <div class="map-summary-grid" id="afiMapSummaryGrid">
-              <div class="map-stat"><div class="map-stat-label">Rows processed</div><div class="map-stat-value" id="afiMapRows">0</div></div>
-              <div class="map-stat"><div class="map-stat-label">Auto/user mapped</div><div class="map-stat-value" id="afiMapMapped">0</div></div>
-              <div class="map-stat"><div class="map-stat-label">Needs review</div><div class="map-stat-value" id="afiMapUnmapped">0</div></div>
-              <div class="map-stat"><div class="map-stat-label">Total expense amount</div><div class="map-stat-value" id="afiMapTotal">$0.00</div></div>
-            </div>
-
-            <div class="map-table-wrap" style="margin-bottom:10px;">              <table class="map-table">
-                <thead>
-                  <tr>
-                    <th>Section</th>
-                    <th>AFI Category</th>
-                    <th>Total amount</th>
-                    <th>Monthly mapped</th>
-                    <th>Rows</th>
-                  </tr>
-                </thead>
-                <tbody id="afiMapCategoryBody"></tbody>              </table>
-            </div>
-
-            <div class="map-table-wrap">
-              <table class="map-table">
-                <thead>
-                  <tr>
-                    <th>Unmapped merchant</th>
-                    <th>Rows</th>
-                    <th>Amount</th>
-                    <th>Assign to AFI category</th>
-                  </tr>
-                </thead>
-                <tbody id="afiUnmappedBody"></tbody>
-              </table>
-            </div>
-            <p class="note" id="afiMapNote">No transaction CSV loaded yet.</p>
           </div>
 
           <!-- Processed Documents by Category -->
@@ -365,9 +312,7 @@
   <script src="api-client.js"></script>
   <script src="case-manager.js"></script>
   <script src="safe-text.js"></script>
-  <script src="discovery-intake-uploads.js?v=24"></script>
-  <script src="afi-taxonomy.js?v=6"></script>
-  <script src="discovery-intake-afi.js?v=14"></script>
+  <script src="discovery-intake-uploads.js?v=25"></script>
   <script src="discovery-checklist.js?v=3"></script>
   <script src="logo-handler.js"></script>
   <script src="ai-chat-config.js?v=2"></script>

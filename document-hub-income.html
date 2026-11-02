@@ -3,244 +3,99 @@
 <head>
   <meta charset="UTF-8" />
   <script src="matter-context.js"></script>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />  <title>Income Documents - Document Hub - Veritas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />  <title>Income Hub - Veritas</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
   <link rel="stylesheet" href="ai-chat-widget.css" />
   <style>
-    .area-header {
-      background: linear-gradient(135deg, #2e5b8a 0%, #1f5f9d 100%);
-      color: white;
-      padding: 36px 0;
-      margin-bottom: 36px;
+    .hub-header { background: linear-gradient(135deg, #2e5b8a 0%, #1f5f9d 100%); color: white; padding: 36px 0; margin-bottom: 28px; }
+    .hub-container { max-width: 1200px; margin: 0 auto; padding: 0 18px; }
+    .hub-title { font-size: 28px; font-weight: 700; margin-bottom: 8px; }
+    .hub-subtitle { font-size: 14px; opacity: 0.9; }
+    .hub-links { font-size: 12px; margin-top: 12px; display: flex; gap: 18px; flex-wrap: wrap; }
+    .hub-links a { color: white; text-decoration: none; font-weight: 600; opacity: 0.85; }
+    .hub-links a:hover { opacity: 1; text-decoration: underline; }
+
+    .hub-section { background: white; border-radius: 8px; padding: 22px 24px; margin-bottom: 24px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #e5e0d5; }
+    .hub-section-title { font-size: 16px; font-weight: 700; color: #333; margin-bottom: 6px; }
+    .hub-section-note { font-size: 12px; color: #666; margin-bottom: 16px; line-height: 1.5; }
+
+    /* Intake recon strip */
+    .recon-strip { border-left: 4px solid #2e5b8a; }
+    .recon-strip.has-gap { border-left-color: #c62828; }
+    .recon-flow { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; align-items: stretch; }
+    .recon-step { background: #f5f8fc; border: 1px solid #d8e3f1; border-radius: 6px; padding: 12px; position: relative; }
+    .recon-step:not(:last-child)::after { content: '→'; position: absolute; right: -10px; top: 50%; transform: translate(50%, -50%); color: #7a8a9a; font-weight: 700; }
+    .recon-step-label { font-size: 10px; text-transform: uppercase; letter-spacing: 0.04em; color: #5f6b7a; font-weight: 600; }
+    .recon-step-value { font-size: 20px; font-weight: 700; color: #1c3f66; margin: 4px 0; }
+    .recon-step-detail { font-size: 11px; color: #51617a; line-height: 1.6; }
+    .recon-gap { color: #c62828; font-weight: 700; }
+    .recon-ok { color: #2e7d32; font-weight: 600; }
+    .recon-checks { margin-top: 12px; font-size: 12px; display: flex; flex-direction: column; gap: 4px; }
+    @media (max-width: 900px) {
+      .recon-flow { grid-template-columns: 1fr 1fr; }
+      .recon-step::after { display: none; }
     }
 
-    .area-container {
-      max-width: 1200px;
-      margin: 0 auto;
-      padding: 0 18px;
-    }
+    /* Allocation summary */
+    .stats-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
+    .stat-box { background: #f0f4f8; border-left: 4px solid #2e5b8a; padding: 16px; border-radius: 6px; }
+    .stat-label { font-size: 11px; color: #666; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+    .stat-value { font-size: 24px; font-weight: 700; color: #2e5b8a; }
+    .stat-sub { font-size: 11px; color: #7a8a9a; margin-top: 2px; }
 
-    .area-title {
-      font-size: 28px;
-      font-weight: 700;
-      margin-bottom: 8px;
-    }
+    /* Tables */
+    .hub-table-wrap { overflow-x: auto; border: 1px solid #e4e9f1; border-radius: 6px; }
+    .hub-table { width: 100%; border-collapse: collapse; font-size: 12px; background: #fff; }
+    .hub-table th, .hub-table td { border-bottom: 1px solid #edf2f7; padding: 9px 10px; text-align: left; vertical-align: middle; }
+    .hub-table th { background: #f6f9fd; color: #2a4461; font-size: 11px; text-transform: uppercase; letter-spacing: 0.03em; }
+    .hub-table td.num, .hub-table th.num { text-align: right; white-space: nowrap; }
+    .hub-table select, .hub-table input { padding: 5px 6px; border: 1px solid #cdd8e7; border-radius: 4px; font-size: 12px; background: #fff; }
+    .hub-table input { width: 120px; }
+    .doc-file { font-weight: 600; color: #1c3f66; }
+    .doc-sub { font-size: 11px; color: #6b7280; margin-top: 2px; }
+    .status-pill { display: inline-block; padding: 2px 8px; border-radius: 999px; font-size: 10px; font-weight: 700; text-transform: uppercase; }
+    .status-pill.accepted { background: #e8f5e9; color: #2e7d32; }
+    .status-pill.rejected { background: #ffebee; color: #c62828; }
+    .status-pill.pending { background: #fff3cd; color: #856404; }
+    .row-actions { display: flex; gap: 6px; }
+    .btn-accept { padding: 5px 9px; border: 0; border-radius: 4px; background: #2e7d32; color: #fff; cursor: pointer; font-size: 11px; font-weight: 600; }
+    .btn-reject { padding: 5px 9px; border: 1px solid #c62828; border-radius: 4px; background: #fff; color: #c62828; cursor: pointer; font-size: 11px; font-weight: 600; }
+    .row-msg { font-size: 11px; color: #c62828; }
 
-    .area-subtitle {
-      font-size: 14px;
-      opacity: 0.9;
-    }
+    .excluded-list { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px; margin-top: 14px; }
+    .excluded-item { background: #f9f9f9; border-left: 3px solid #9aa7b8; border-radius: 4px; padding: 10px 12px; font-size: 12px; color: #42526e; }
+    .excluded-item strong { color: #1c3f66; }
 
-    .breadcrumb {
-      font-size: 12px;
-      opacity: 0.8;
-      margin-top: 12px;
-    }
-
-    .breadcrumb a {
-      color: white;
-      text-decoration: none;
-      font-weight: 600;
-    }
-
-    .breadcrumb a:hover {
-      text-decoration: underline;
-    }
-
-    .upload-section {
-      background: white;
-      border-radius: 8px;
-      padding: 24px;
-      margin-bottom: 24px;
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-      border: 1px solid #e5e0d5;
-    }
-
-    .section-title {
-      font-size: 16px;
-      font-weight: 700;
-      color: #333;
-      margin-bottom: 18px;
-      padding-bottom: 12px;
-      border-bottom: 2px solid #e5e0d5;
-    }
-
-    .upload-area {
-      border: 2px dashed #2e5b8a;
-      border-radius: 8px;
-      padding: 40px;
-      text-align: center;
-      background: #f8f9fa;
-      cursor: pointer;
-      transition: all 0.3s;
-      margin-bottom: 20px;
-    }
-
-    .upload-area:hover {
-      background: #e8f3ff;
-      border-color: #1f5f9d;
-    }
-
-    .upload-text {
-      font-size: 14px;
-      color: #2e5b8a;
-      margin-bottom: 8px;
-      font-weight: 600;
-    }
-
-    .upload-sub {
-      font-size: 12px;
-      color: #666;
-    }
-
-    .file-input {
-      display: none;
-    }
-
-    .btn-upload {
-      padding: 12px 24px;
-      background: #2e5b8a;
-      color: white;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      font-size: 13px;
-      font-weight: 600;
-      transition: all 0.2s;
-      width: 100%;
-    }
-
-    .btn-upload:hover {
-      background: #1f5f9d;
-    }
-
-    .categories-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-      gap: 16px;
-      margin-top: 20px;
-    }
-
-    .category-item {
-      background: #f9f9f9;
-      border-left: 3px solid #2e5b8a;
-      padding: 16px;
-      border-radius: 6px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .category-item:hover {
-      background: #e8f3ff;
-      border-left-color: #1f5f9d;
-    }
-
-    .category-icon {
-      font-size: 24px;
-      margin-bottom: 8px;
-    }
-
-    .category-name {
-      font-size: 13px;
-      font-weight: 600;
-      color: #333;
-      margin-bottom: 4px;
-    }
-
-    .category-desc {
-      font-size: 11px;
-      color: #666;
-    }
-
-    .documents-list {
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-    }
-
-    .doc-item {
-      background: #f9f9f9;
-      border: 1px solid #ddd;
-      border-radius: 6px;
-      padding: 16px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    .doc-info {
-      flex: 1;
-    }
-
-    .doc-name {
-      font-size: 13px;
-      font-weight: 600;
-      color: #333;
-      margin-bottom: 4px;
-    }
-
-    .doc-meta {
-      font-size: 11px;
-      color: #999;
-    }
-
-    .doc-stat {
-      background: #e8f3ff;
-      color: #2e5b8a;
-      padding: 6px 12px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: 600;
-      white-space: nowrap;
-    }
-
-    .empty-state {
-      text-align: center;
-      padding: 40px 20px;
-      color: #999;
-    }
-
-    .empty-icon {
-      font-size: 48px;
-      margin-bottom: 12px;
-    }
-
-    .empty-title {
-      font-size: 14px;
-      font-weight: 600;
-      color: #333;
-    }
-
-    .stat-row {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-      gap: 16px;
-      margin-bottom: 24px;
-    }
-
-    .stat-box {
-      background: #f0f4f8;
-      border-left: 4px solid #2e5b8a;
-      padding: 16px;
-      border-radius: 6px;
-    }
-
-    .stat-label {
-      font-size: 11px;
-      color: #666;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-      margin-bottom: 6px;
-    }
-
-    .stat-value {
-      font-size: 24px;
-      font-weight: 700;
-      color: #2e5b8a;
-    }
+    .map-summary { margin-bottom: 18px; }
+    .map-sub-title { font-size: 12px; font-weight: 700; color: #1c3f66; margin: 4px 0 6px; }
+    .map-sub-note { font-size: 11.5px; color: #6b7280; margin-bottom: 8px; }
+    .map-total td { font-weight: 700; background: #f6f9fd; }
+    .map-flags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .map-flag { font-size: 11px; padding: 4px 9px; border-radius: 999px; background: #f1f4f8; color: #42526e; }
+    .map-flag.warn { background: #fff3cd; color: #856404; font-weight: 600; }
+    .map-flag.ok { background: #e8f5e9; color: #2e7d32; }
+    .map-accounts { background: #f9fbfd; border: 1px solid #e4e9f1; border-radius: 6px; padding: 12px 14px; margin-bottom: 16px; }
+    .map-account-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 8px; }
+    .map-account { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-size: 12px; color: #1c3f66; background: #fff; border: 1px solid #e4e9f1; border-radius: 4px; padding: 6px 8px; }
+    .map-account em { color: #7a8a9a; font-style: normal; font-size: 11px; }
+    .map-account select { padding: 4px 6px; border: 1px solid #cdd8e7; border-radius: 4px; font-size: 12px; }
+    .map-toolbar { display: flex; justify-content: space-between; align-items: center; gap: 10px; margin-bottom: 8px; }
+    .btn-plain { padding: 5px 9px; border: 1px solid #cdd8e7; border-radius: 4px; background: #fff; color: #1c3f66; cursor: pointer; font-size: 11px; font-weight: 600; }
+    .map-table .doc-sub { margin-left: 22px; }
+    .map-table input { width: 100px; text-align: right; }
+    .map-table select { max-width: 190px; }
+    .map-table select.map-missing { border-color: #c58b10; background: #fff8e6; }
+    .map-table tr.map-notincome td { color: #8a96aa; }
+    .map-table tr.map-notincome .doc-file { color: #8a96aa; text-decoration: line-through; }
+    .map-expand { border: 0; background: none; cursor: pointer; color: #2e5b8a; font-size: 12px; width: 18px; padding: 0; }
+    .map-detail > td { background: #fafcff; padding: 8px 10px 12px 30px; }
+    .empty-state { text-align: center; padding: 32px 20px; color: #999; font-size: 13px; }
+    .empty-state strong { display: block; color: #333; margin-bottom: 4px; font-size: 14px; }
+    .hub-cta { display: inline-block; padding: 10px 18px; background: #2e5b8a; color: white; border-radius: 4px; font-size: 12px; font-weight: 600; text-decoration: none; }
+    .hub-cta:hover { background: #1f5f9d; }
   </style>
 </head>
 <body>
@@ -257,13 +112,27 @@
     </div>
 
     <nav class="nav">
+      <div class="nav-group-label">Workspace</div>
+      <a class="nav-item" href="#">Matters</a>
+      <a class="nav-item" href="schedules.html">Calendar</a>
+      <a class="nav-item" href="#">Tasks</a>
+      <a class="nav-item" href="discovery-intake.html">Documents</a>
+      <a class="nav-item" href="#">Clients</a>
+
       <div class="nav-group-label">Analysis Modules</div>
       <a class="nav-item" href="income-imputation.html">Income Engine</a>
+      <a class="nav-item" href="spousal.html">Support Calculator</a>
+      <a class="nav-item" href="child-support.html">Child Support</a>
+      <a class="nav-item" href="equitable-distribution.html">Assets</a>
+      <a class="nav-item" href="discovery-intake.html">Discovery</a>
+      <a class="nav-item" href="custody.html">Custody</a>
       <a class="nav-item" href="afi.html">AFI Expenses</a>
+      <a class="nav-item" href="estate.html">Reports</a>
 
       <div class="nav-group-label">Tools</div>
       <a class="nav-item" href="index.html">Dashboard</a>
-      <a class="nav-item" href="document-hub-master.html" data-module="document-hub">Document Hub</a>
+      <a class="nav-item active" href="document-hub-master.html" data-module="document-hub">Document Hub</a>
+      <a class="nav-item" href="discovery-intake.html">Document Intake</a>
     </nav>
 
     <div class="sidebar-foot">
@@ -272,110 +141,76 @@
 
   <!-- ===================== MAIN ===================== -->
   <main class="main">
-    <!-- Header -->
-    <div class="area-header">
-      <div class="area-container">
-        <div class="area-title">💵 Income Documents</div>
-        <div class="area-subtitle">W2s, 1099s, pay stubs, business income, and other income sources</div>
-        <div class="breadcrumb">
-          <a href="document-hub-master.html">← Back to Document Hub</a>        </div>
-        <div class="breadcrumb" id="activeMatterBanner" style="margin-top:6px;"></div>
+    <div class="hub-header">
+      <div class="hub-container">
+        <div class="hub-title">💵 Income Hub</div>
+        <div class="hub-subtitle">Reconcile income from Document Intake, then review and allocate it to each party</div>
+        <div class="hub-links">
+          <a href="document-hub-master.html">← Back to Document Hub</a>
+          <a href="discovery-intake.html" data-intake-link>Document Intake</a>
+          <a href="income-imputation.html">Income Engine →</a>
+        </div>
+        <div style="font-size: 13px; margin-top: 8px;" id="activeMatterBanner"></div>
       </div>
     </div>
 
-    <!-- Content -->
-    <div class="area-container">
-      <!-- Stats -->
-      <div class="stat-row">
+    <div class="hub-container">
+      <!-- 1 · Intake → Income reconciliation -->
+      <div class="hub-section recon-strip" id="reconStrip">
+        <div class="hub-section-title">🔁 Intake → Income Reconciliation</div>
+        <div class="hub-section-note">Everything Document Intake parsed, and where it went. Nothing should leave intake without landing somewhere.</div>
+        <div id="reconBody"><div class="empty-state">Loading…</div></div>
+      </div>
+
+      <!-- 2 · Allocation summary -->
+      <div class="stats-row">
         <div class="stat-box">
-          <div class="stat-label">Documents Uploaded</div>
-          <div class="stat-value" id="totalDocs">0</div>
+          <div class="stat-label"><span data-party="a">Party A</span> — accepted</div>
+          <div class="stat-value" id="acceptedA">$0</div>
+          <div class="stat-sub" id="acceptedAMonthly">$0 / mo</div>
         </div>
         <div class="stat-box">
-          <div class="stat-label">Items Extracted</div>
-          <div class="stat-value" id="totalItems">0</div>
+          <div class="stat-label"><span data-party="b">Party B</span> — accepted</div>
+          <div class="stat-value" id="acceptedB">$0</div>
+          <div class="stat-sub" id="acceptedBMonthly">$0 / mo</div>
         </div>
-        <div class="stat-box">
-          <div class="stat-label">Needs Review</div>
-          <div class="stat-value" id="totalValue">0</div>
-        </div>
-      </div>
-
-      <!-- Upload Section -->
-      <div class="upload-section">
-        <div class="section-title">📤 Upload Documents</div>
-        <p style="font-size:12px;color:#666;margin-bottom:14px;">
-          Income documents are uploaded once, in Document Intake, and classified automatically.
-          This page only displays what has already been uploaded and classified for the active case —
-          it does not store files itself.
-        </p>
-        <a id="goToIntakeBtn" class="btn-upload" style="display:inline-block;text-decoration:none;text-align:center;" href="discovery-intake.html">Go to Document Intake →</a>
-      </div>
-
-        <div style="background: #f0f4f8; border-left: 3px solid #2e5b8a; padding: 12px 15px; border-radius: 4px; margin-top: 20px; font-size: 12px; color: #333;">
-          <strong>Income Sources:</strong>
-          <div style="margin-top: 8px;">
-            💼 W-2 Income | 1099 Contracts | Self-Employment | Bonuses | Dividends | Capital Gains | Rental Income | Other Income
-          </div>
-        </div>
-
-        <div style="background: #fff8e1; border-left: 3px solid #fbc02d; padding: 12px 15px; border-radius: 4px; margin-top: 12px; font-size: 12px; color: #333;">
-          <strong>💡 Tip:</strong> Upload pay stubs to auto-extract employment history and income verification. Upload tax returns for comprehensive income summary.        </div>
-      </div>
-
-      <!-- Income Categories -->
-      <div class="upload-section">
-        <div class="section-title">📋 Income Categories</div>
-        <p style="font-size: 12px; color: #666; margin-bottom: 16px;">
-          Select the type of income document you're uploading for better auto-categorization:
-        </p>
-        <div class="categories-grid">
-          <div class="category-item" onclick="selectCategory('w2')">
-            <div class="category-icon">📄</div>
-            <div class="category-name">W-2 Income</div>
-            <div class="category-desc">Employee wages, salaries, tips</div>
-          </div>
-          <div class="category-item" onclick="selectCategory('1099')">
-            <div class="category-icon">📋</div>
-            <div class="category-name">1099 Income</div>
-            <div class="category-desc">Contractor, freelance, misc income</div>
-          </div>
-          <div class="category-item" onclick="selectCategory('self-employed')">
-            <div class="category-icon">👔</div>
-            <div class="category-name">Self-Employment</div>
-            <div class="category-desc">Business income, net profit</div>
-          </div>
-          <div class="category-item" onclick="selectCategory('investment')">
-            <div class="category-icon">📈</div>
-            <div class="category-name">Investment Income</div>
-            <div class="category-desc">Dividends, interest, capital gains</div>
-          </div>
-          <div class="category-item" onclick="selectCategory('rental')">
-            <div class="category-icon">🏠</div>
-            <div class="category-name">Rental Income</div>
-            <div class="category-desc">Rental property income</div>
-          </div>
-          <div class="category-item" onclick="selectCategory('other')">
-            <div class="category-icon">💰</div>            <div class="category-name">Other Income</div>
-            <div class="category-desc">Bonuses, gifts, settlements</div>
-          </div>
+        <div class="stat-box" style="border-left-color:#c58b10;">
+          <div class="stat-label">Income documents pending review</div>
+          <div class="stat-value" id="pendingCount" style="color:#8a6a1f;">0</div>
+          <div class="stat-sub">must be accepted to reach the Income Engine</div>
         </div>
       </div>
 
-      <!-- Uploaded Documents -->
-      <div class="upload-section">
-        <div class="section-title">📥 Uploaded Documents</div>
-        <div id="documentsList">
-          <div class="empty-state">
-            <div class="empty-icon">📭</div>
-            <div class="empty-title">No documents uploaded yet</div>
-            <p style="font-size: 12px; margin-top: 6px;">Upload income documents above to get started</p>          </div>
+      <!-- 3 · Income documents: review & allocate -->
+      <div class="hub-section">
+        <div class="hub-section-title">📄 Income Documents — Review &amp; Allocate</div>
+        <div class="hub-section-note">Pay stubs, W-2s, 1099s, and benefit statements classified at intake. Assign each one to a party, enter the annual amount it supports, and accept it. Only accepted documents flow to the Income Engine.</div>
+        <div id="incomeDocs"><div class="empty-state">Loading…</div></div>
+      </div>
+
+      <!-- 4 · Business income -->
+      <div class="hub-section" style="border-left:4px solid #6b4f9a;">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;flex-wrap:wrap;">
+          <div>
+            <div class="hub-section-title">💼 Business Income</div>
+            <div class="hub-section-note" style="margin-bottom:0;">K-1s, partnership/corporate returns (1065, 1120, 1120-S), Schedule C, and P&amp;L statements. Allocate them in the table above like any income document; business ownership and operating records live on the Business page.</div>
+          </div>
+          <a class="hub-cta" href="document-hub-business.html" style="background:#6b4f9a;">Open Business Documents →</a>
         </div>
+        <div id="businessIncome" style="margin-top:14px;"></div>
+      </div>
+
+      <!-- 5 · Bank deposits: map to person & income type -->
+      <div class="hub-section">
+        <div class="hub-section-title">🏦 Bank Deposits — Map to Person &amp; Income Type</div>
+        <div class="hub-section-note">Non-card deposits from parsed statements, grouped by payer. Each payer starts with a suggested person and income type — change any of them, pick how the annual amount is figured, or type your own amount. Choices are saved for this client. Click ▸ to see the individual deposits.</div>
+        <div id="incomeMapSummary" class="map-summary"></div>
+        <div id="depositSources"><div class="empty-state">Loading…</div></div>
       </div>
     </div>
 
     <footer class="foot" style="margin-top: 48px;">
-      <span>Veritas · Income Documents</span>      <span class="foot-dim">Part of Master Document Hub</span>
+      <span>Veritas · Income Hub</span>      <span class="foot-dim">Part of Master Document Hub</span>
     </footer>
   </main>
 
@@ -383,14 +218,8 @@
   <script src="ai-chat-config.js"></script>
   <script src="ai-chat-widget.js"></script>
   <script src="logo-handler.js"></script>
-
-  <script>
-    window.HUB_CONFIG = {
-      category: 'Tax Returns & Income',
-      emptyTitle: 'No income documents on file yet',
-      emptyHint: "Upload pay stubs, W-2s, 1099s, or benefit statements in Document Intake — they'll appear here automatically once classified.",
-    };
-  </script>
-  <script src="document-hub-category.js"></script>
+  <script src="safe-text.js"></script>
+  <script src="income-hub.js?v=3"></script>
+  <script src="sidebar-loader.js"></script>
 </body>
 </html>

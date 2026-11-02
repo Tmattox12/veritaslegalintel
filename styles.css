@@ -85,6 +85,13 @@ body {
 }
 .nav-item:hover { background: rgba(255,255,255,.05); color: #fff; }
 .nav-item.active { background: var(--navy-600); color: #fff; box-shadow: inset 3px 0 0 var(--gold); }
+/* Collapsible sidebar group (e.g. Document Hubs) */
+.nav-sub > summary { cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; }
+.nav-sub > summary::-webkit-details-marker { display: none; }
+.nav-sub > summary::after { content: '▸'; font-size: 10px; margin-right: 2px; transition: transform .15s; }
+.nav-sub[open] > summary::after { transform: rotate(90deg); }
+.nav-sub > summary:hover { color: #b7c3d6; }
+.nav-sub > .nav-item { padding-left: 24px; font-size: 13px; }
 .nav-ico { width: 16px; text-align: center; opacity: .85; font-size: 13px; }
 
 .sidebar-foot { padding-top: 14px; border-top: 1px solid rgba(255,255,255,.07); }

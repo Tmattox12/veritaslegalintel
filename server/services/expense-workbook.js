@@ -20,18 +20,25 @@ function isShopping(category, description) {
 
 // Only spending a court would read as a "need" belongs in the eight AFI lines.
 // Transfers and card payments move money between accounts rather than spend it.
-function isMappableExpense(txn) {
+// Why an outflow is not mappable household spending, or null if it is. The
+// mapper in discovery-intake-afi.js applies the same rule in the browser.
+function expenseExclusion(txn) {
   const description = (txn.description || '').toLowerCase();
   const code = AFITaxonomy.normalize(txn.mapped_category || txn.suggested_category) ||
     AFITaxonomy.classify(txn.description);
   const amount = Math.abs(parseFloat(txn.amount) || 0);
   const detail = AFITaxonomy.classifyDetailed(txn.description);
   const guessed = detail && detail.confidence === 'review' && detail.code === code;
-  if ((AFITaxonomy.treatmentFor(code) === 'none' && !guessed) ||
-      /\bpayment\s+to\s+(?:chase|credit|card)|\bpayment thank you|\btransfer\b|\bzelle\b|\bvenmo\b|\bpaypal\b|\bdeposit\b/.test(description)) {
-    return false;
-  }
-  return amount > 0 && amount <= 100000;
+  if (AFITaxonomy.treatmentFor(code) === 'none' && !guessed) return 'account_movement';
+  if (/\bpayment\s+to\s+(?:chase|credit|card)|\bpayment thank you|\btransfer\b|\bzelle\b|\bvenmo\b|\bpaypal\b|\bdeposit\b/.test(description)) return 'transfer_or_payment';
+  if (amount <= 0) return 'zero_amount';
+  // Over $100k is almost certainly an OCR / reference-number error.
+  if (amount > 100000) return 'amount_review';
+  return null;
+}
+
+function isMappableExpense(txn) {
+  return !expenseExclusion(txn);
 }
 
 function merchantKey(desc) {
@@ -162,4 +169,4 @@ function buildExpenseWorkbook(transactions, overrides = {}) {
   return XLSX.write(wb, { type: 'buffer', bookType: 'xlsx' });
 }
 
-module.exports = { buildExpenseWorkbook };
+module.exports = { buildExpenseWorkbook, expenseExclusion };
