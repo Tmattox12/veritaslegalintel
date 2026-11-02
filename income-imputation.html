@@ -1,3 +1,137 @@
 <!DOCTYPE html>
-<html lang="en"><head><meta charset="UTF-8">
-  <script src="matter-context.js"></script><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>Income Imputation & Analysis - Veritas</title><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#f5f7fa;color:#333}.header{background:#fff;border-bottom:1px solid #e0e0e0;padding:24px}.matter-info{font-size:13px;color:#666;margin-bottom:12px}.matter-name{font-size:20px;font-weight:600;color:#1c3f66}.subtitle{font-size:14px;color:#999;margin-top:4px}.container{max-width:1400px;margin:0 auto;padding:32px 24px}.section-title{font-size:28px;font-weight:700;color:#1c3f66;margin-bottom:8px}.section-desc{font-size:14px;color:#666;margin-bottom:32px}.income-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:24px;margin-bottom:32px}.income-card{background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:24px;position:relative}.income-card::before{content:"";position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,#1c3f66,#2c5aa0)}.income-card.spouse-b::before{background:linear-gradient(90deg,#2e7d5b,#4caf50)}.income-card.combined::before{background:linear-gradient(90deg,#8a6528,#d4a574)}.party-label{font-size:11px;text-transform:uppercase;letter-spacing:.5px;color:#999;margin-bottom:8px}.party-name{font-size:13px;font-weight:600;color:#666;margin-bottom:16px}.income-amount{font-size:48px;font-weight:700;color:#1c3f66;margin-bottom:12px}.income-monthly{font-size:13px;color:#999;margin-bottom:16px}.income-percentage{display:inline-block;background:#e7edf5;color:#1c3f66;padding:4px 12px;border-radius:20px;font-size:12px;font-weight:600}.income-breakdown{border-top:1px solid #f0f0f0;margin-top:16px;padding-top:16px;font-size:12px}.breakdown-item{display:flex;justify-content:space-between;margin-bottom:8px}.section-box{background:#fff;border:1px solid #e0e0e0;border-radius:8px;padding:24px;margin-bottom:32px}.section-box h3{font-size:16px;font-weight:600;color:#1c3f66;margin-bottom:16px}.source-table{width:100%;border-collapse:collapse;font-size:13px}.source-table th{background:#f5f5f5;padding:12px;text-align:left;font-weight:600;border-bottom:1px solid #e0e0e0}.source-table td{padding:12px;border-bottom:1px solid #f0f0f0}.amount-value{font-weight:600;color:#1c3f66}.loading{text-align:center;padding:40px;color:#999}.error{background:#ffebee;color:#c62828;padding:16px;border-radius:8px;margin-bottom:24px;border-left:4px solid #c62828}</style></head><body><div class="header"><div class="matter-info">ACTIVE MATTER</div><div class="matter-name" id="matterName">—</div><div class="subtitle" id="matterDetails">Loading...</div></div><div class="container"><h1 class="section-title">Income Imputation & Analysis</h1><p class="section-desc">Evaluate claimed vs. actual vs. imputable income · identify discrepancies · build defense</p><div id="errorContainer"></div><div id="loadingState" class="loading">Loading income data from discovery documents...</div><div id="contentArea" style="display: none;"><div class="income-grid" id="incomeCardsContainer"></div><div class="section-box"><h3>📊 Income By Source</h3><table class="source-table"><thead><tr><th>Party</th><th>Source</th><th>Annual Amount</th><th>Monthly Amount</th></tr></thead><tbody id="sourceTableBody"><tr><td colspan="4" style="text-align: center; color: #999; padding: 40px;">Loading sources...</td></tr></tbody></table></div></div></div><script>function formatCurrency(n){return new Intl.NumberFormat("en-US",{style:"currency",currency:"USD",minimumFractionDigits:0}).format(n||0)}function formatMonthly(n){return formatCurrency((n||0)/12)}async function loadIncomeData(){const matterId=new URLSearchParams(window.location.search).get("matter")||localStorage.getItem("currentMatterId");if(!matterId){document.getElementById("errorContainer").innerHTML='<div class="error">No matter selected</div>';document.getElementById("loadingState").style.display="none";return}try{const matterResp=await fetch(`http://localhost:3000/api/matters/${matterId}`);const matter=await matterResp.json();document.getElementById("matterName").textContent=matter.name||"—";document.getElementById("matterDetails").textContent=[matter.case_no,matter.county,matter.state].filter(Boolean).join(" · ")||"No details";const incomeResp=await fetch(`http://localhost:3000/api/matters/${matterId}/income-data`);const incomeData=await incomeResp.json();document.getElementById("loadingState").style.display="none";document.getElementById("contentArea").style.display="block";const parties=incomeData.parties||[];const combined=parties.reduce((sum,p)=>sum+(p.annual||0),0);let cardsHtml="";parties.forEach((party,idx)=>{const percent=combined>0?Math.round(party.annual/combined*100):0;const cls=0===idx?"":"spouse-b";cardsHtml+=`<div class="income-card ${cls}"><div class="party-label">${0===idx?"PETITIONER":"RESPONDENT"}</div><div class="party-name">${party.name}</div><div class="income-amount">${formatCurrency(party.annual)}</div><div class="income-monthly">${formatMonthly(party.annual)}/mo</div><div class="income-percentage">${percent}% of combined</div><div class="income-breakdown">${(party.sources||[]).map(s=>`<div class="breakdown-item"><span>${s.source}</span><span><strong>${formatCurrency(s.amount)}</strong></span></div>`).join("")}</div></div>`});if(combined>0){const pct1=parties[0]?Math.round(parties[0].annual/combined*100):0;const pct2=parties[1]?Math.round(parties[1].annual/combined*100):0;cardsHtml+=`<div class="income-card combined"><div class="party-label">COMBINED INCOME</div><div class="party-name">Both Parties</div><div class="income-amount">${formatCurrency(combined)}</div><div class="income-monthly">${formatMonthly(combined)}/mo</div><div style="margin-top: 16px; padding-top: 16px; border-top: 1px solid rgba(0,0,0,0.1);"><div class="breakdown-item"><span>Income share</span><span><strong>${pct1}% · ${pct2}%</strong></span></div></div></div>`}document.getElementById("incomeCardsContainer").innerHTML=cardsHtml;const sources=incomeData.sources||[];const tableHtml=0===sources.length?'<tr><td colspan="4" style="text-align: center; color: #999; padding: 40px;">No income sources found</td></tr>':sources.map(s=>`<tr><td>${s.type}</td><td>${s.description}</td><td class="amount-value">${formatCurrency(s.annual)}</td><td class="amount-value">${formatMonthly(s.annual)}</td></tr>`).join("");document.getElementById("sourceTableBody").innerHTML=tableHtml}catch(error){document.getElementById("errorContainer").innerHTML=`<div class="error">Error: ${error.message}</div>`;document.getElementById("loadingState").style.display="none"}}document.addEventListener("DOMContentLoaded",loadIncomeData)</script></body></html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <script src="matter-context.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Income Engine - Veritas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .inc-section { background: var(--card); border: 1px solid var(--line); border-radius: var(--radius); padding: 20px 22px; box-shadow: var(--shadow); margin-bottom: 22px; }
+    .inc-section h2 { font-family: 'Fraunces', serif; font-size: 19px; font-weight: 600; margin-bottom: 4px; }
+    .inc-note { font-size: 12.5px; color: var(--slate); margin-bottom: 14px; line-height: 1.55; }
+    .party-row { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; margin-bottom: 22px; }
+    @media (max-width: 1000px) { .party-row { grid-template-columns: 1fr; } }
+    .kpi .kpi-sub { font-size: 12.5px; color: var(--slate); }
+    .tag-ok { display: inline-block; font-size: 10.5px; font-weight: 700; padding: 2px 8px; border-radius: 20px; background: var(--green-soft); color: var(--green); text-transform: uppercase; letter-spacing: .03em; }
+    .tag-review { display: inline-block; font-size: 10.5px; font-weight: 700; padding: 2px 8px; border-radius: 20px; background: var(--amber-soft); color: #7a5414; text-transform: uppercase; letter-spacing: .03em; }
+    .tbl-wrap { overflow-x: auto; border: 1px solid var(--line); border-radius: var(--radius-sm); }
+    table.inc { width: 100%; border-collapse: collapse; font-size: 13px; }
+    table.inc th, table.inc td { padding: 9px 12px; border-bottom: 1px solid var(--line-soft); text-align: left; }
+    table.inc th { background: var(--bg); font-size: 11px; text-transform: uppercase; letter-spacing: .04em; color: var(--slate); }
+    table.inc td.num, table.inc th.num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+    .empty { padding: 18px; color: var(--mute); font-size: 13px; text-align: center; }
+    .callout { padding: 12px 14px; border-left: 4px solid var(--gold); background: #fffdf8; color: var(--slate); border-radius: 6px; font-size: 13px; line-height: 1.55; margin-bottom: 22px; }
+    .callout.err { border-left-color: var(--red); background: var(--red-soft); color: #7a2b1f; }
+    .callout a { color: var(--navy-600); font-weight: 600; }
+  </style>
+</head>
+<body>
+  <aside class="sidebar"></aside>
+  <main class="main">
+    <header class="topbar">
+      <div class="matter-switcher">
+        <span class="matter-label">Active Matter</span>
+        <button class="matter-btn"><strong>Loading client…</strong><span class="chev">▾</span></button>
+      </div>
+    </header>
+
+    <div class="content">
+      <section class="page-head">
+        <div>
+          <h1>Income Engine</h1>
+          <div class="sub">Income each party has for support calculations: attorney-accepted figures from the Income Hub, with bank-deposit figures for comparison.</div>
+        </div>
+        <div class="head-actions">
+          <a class="btn ghost" href="document-hub-income.html" style="text-decoration:none;">Review income in Income Hub</a>
+          <a class="btn primary" href="income-engine-builder.html" style="text-decoration:none;">Build income scenario</a>
+        </div>
+      </section>
+
+      <div id="status"></div>
+      <div class="party-row" id="partyCards"></div>
+
+      <section class="inc-section">
+        <h2>Accepted income sources <span class="tag-ok">Calculation-ready</span></h2>
+        <div class="inc-note">Pay stubs, benefit statements, and tax records an attorney accepted in the Income Hub. Only these figures feed support calculations.</div>
+        <div class="tbl-wrap"><table class="inc" id="acceptedTable"></table></div>
+      </section>
+
+      <section class="inc-section">
+        <h2>Bank deposit comparison <span class="tag-review">Review only</span></h2>
+        <div class="inc-note">Income-type deposits found in the parsed bank statements, after removing transfers, card credits, and refunds. Use these to test the accepted figures. They are never counted as income on their own.</div>
+        <div class="tbl-wrap"><table class="inc" id="depositTable"></table></div>
+      </section>
+    </div>
+  </main>
+
+  <script src="safe-text.js"></script>
+  <script>
+  (function () {
+    const API = 'http://localhost:3000/api';
+    const esc = window.renderSafeText;
+    const money = (n) => (Number(n) || 0).toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
+    const monthLabel = (m) => (m ? new Date(`${m}-01T12:00:00`).toLocaleDateString('en-US', { month: 'short', year: 'numeric' }) : '—');
+    const matterId = () => (window.VeritasMatter && window.VeritasMatter.id) || null;
+    const names = () => (window.VeritasMatter && window.VeritasMatter.partyNames) || { a: 'Party A', b: 'Party B' };
+
+    let data = null;
+
+    function render() {
+      if (!data) return;
+      const n = names();
+      const acc = data.accepted;
+      const share = (v) => (acc.combined > 0 ? `${Math.round((v / acc.combined) * 100)}% of combined` : 'No accepted income yet');
+      const card = (label, value, sub) => `<div class="kpi"><span class="kpi-label">${esc(label)}</span><span class="kpi-value">${money(value)}</span><span class="kpi-sub">${money(value / 12)}/mo · ${sub}</span></div>`;
+      document.getElementById('partyCards').innerHTML =
+        card(n.a, acc.party_a, share(acc.party_a)) + card(n.b, acc.party_b, share(acc.party_b)) + card('Combined', acc.combined, 'accepted, annual');
+
+      document.getElementById('status').innerHTML = acc.combined > 0 ? '' :
+        `<div class="callout"><strong>No income has been accepted for this client yet.</strong> Open the <a href="document-hub-income.html">Income Hub</a>, assign each pay stub, benefit statement, or tax record to a party, and accept it. Accepted figures appear here and in the support calculators.</div>`;
+
+      const partyName = (p) => (p === 'party_a' ? n.a : p === 'party_b' ? n.b : '—');
+      document.getElementById('acceptedTable').innerHTML = acc.sources.length
+        ? `<thead><tr><th>Party</th><th>Document</th><th>Type</th><th class="num">Annual</th><th class="num">Monthly</th></tr></thead>
+           <tbody>${acc.sources.map((s) => `<tr><td>${esc(partyName(s.party))}</td><td>${esc(s.filename)}</td><td>${esc(s.type || '')}</td>
+             <td class="num"><strong>${money(s.annualAmount)}</strong></td><td class="num">${money(s.annualAmount / 12)}</td></tr>`).join('')}</tbody>`
+        : '<tr><td class="empty">No accepted income documents.</td></tr>';
+
+      const d = data.depositCandidates;
+      document.getElementById('depositTable').innerHTML = d.monthsCovered
+        ? `<thead><tr><th>Basis</th><th class="num">Annualized</th><th class="num">Monthly</th></tr></thead>
+           <tbody>
+             <tr><td>12-month average</td><td class="num">${money(d.avg12Month)}</td><td class="num">${money(d.avg12Month / 12)}</td></tr>
+             <tr><td>6-month average</td><td class="num">${money(d.avg6Month)}</td><td class="num">${money(d.avg6Month / 12)}</td></tr>
+             <tr><td>3-month average</td><td class="num">${money(d.avg3Month)}</td><td class="num">${money(d.avg3Month / 12)}</td></tr>
+             <tr><td>Last month, run rate</td><td class="num">${money(d.lastMonthRunRate)}</td><td class="num">${money(d.lastMonthRunRate / 12)}</td></tr>
+             <tr><td colspan="3" style="color:var(--mute);font-size:12px;">Statements cover ${d.monthsCovered} months, ${monthLabel(d.firstMonth)} – ${monthLabel(d.lastMonth)}. Deposits are not split by party; see the Income Hub for each source and account.</td></tr>
+           </tbody>`
+        : '<tr><td class="empty">No parsed bank statements yet. Upload statements in Document Intake.</td></tr>';
+    }
+
+    async function load() {
+      const status = document.getElementById('status');
+      if (!matterId()) return;
+      try {
+        const r = await fetch(`${API}/matters/${encodeURIComponent(matterId())}/income-analysis`);
+        if (!r.ok) throw new Error(`Server error ${r.status}`);
+        data = await r.json();
+        render();
+      } catch (e) {
+        status.innerHTML = `<div class="callout err"><strong>Can't reach the Veritas backend.</strong> Your data is safe — the server just isn't running. Double-click <strong>start-veritas.bat</strong>, leave that window open, then <a href="#" id="retry">retry</a>.</div>`;
+        document.getElementById('retry').addEventListener('click', (ev) => { ev.preventDefault(); location.reload(); });
+      }
+    }
+
+    // Party names arrive from the matter after load; re-render with them.
+    window.addEventListener('veritas:matter', render);
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', load);
+    else load();
+  })();
+  </script>
+  <script src="sidebar-loader.js"></script>
+</body>
+</html>
