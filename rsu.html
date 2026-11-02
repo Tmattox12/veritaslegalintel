@@ -4,62 +4,173 @@
   <meta charset="UTF-8" />
   <script src="matter-context.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>RSU Analysis | Veritas</title>
+  <title>RSU / Stock Analysis | Veritas</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="styles.css" />
   <style>
-    .rsu-layout { display:grid; grid-template-columns:minmax(0,1fr) 310px; gap:18px; align-items:start; }
-    .dropzone { border:2px dashed #cfd8e6; border-radius:8px; background:var(--bg); padding:30px 20px; text-align:center; transition:.15s; }
-    .dropzone.dragging { border-color:var(--gold); background:var(--gold-soft); }
-    .dropzone input { display:none; }
-    .dropzone label { display:block; color:var(--navy-700); font-weight:600; cursor:pointer; font-size:14px; }
-    .dropzone p { color:var(--mute); margin-top:6px; font-size:12px; }
-    .document-list { display:grid; gap:7px; margin-top:14px; }
-    .document-item { display:flex; justify-content:space-between; gap:12px; align-items:center; border:1px solid var(--line-soft); border-radius:6px; background:var(--bg); padding:9px 11px; color:var(--slate); font-size:12px; }
-    .document-item button { border:0; background:none; color:var(--red); cursor:pointer; font:600 12px Inter,sans-serif; }
-    .field-grid { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
-    .field { display:flex; flex-direction:column; gap:6px; }
-    .field label { font-size:12px; color:var(--slate); font-weight:600; }
-    .field input, .field select { border:1px solid #cfd8e6; border-radius:6px; padding:9px; color:var(--ink); background:#fff; font:13px Inter,sans-serif; }
-    .field input:focus, .field select:focus { outline:2px solid rgba(39,69,102,.16); border-color:var(--navy-600); }
-    .formula-note { margin-top:15px; padding:11px 13px; border-left:4px solid var(--green); background:var(--green-soft); color:#295d49; border-radius:6px; font-size:12px; line-height:1.5; }
-    .result-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
-    .result { padding:13px; border:1px solid var(--line); border-radius:8px; background:var(--bg); }
-    .result span { display:block; color:var(--slate); font-size:10px; font-weight:700; letter-spacing:.45px; text-transform:uppercase; }
-    .result output { display:block; margin-top:6px; color:var(--navy-900); font:600 22px Fraunces,serif; }
-    .side-card { border:1px solid var(--line); border-radius:8px; padding:14px; background:var(--card); margin-bottom:12px; }
-    .side-card h2 { color:var(--navy-900); font-size:15px; }
-    .side-card p, .side-card li { color:var(--slate); font-size:12px; line-height:1.5; }
-    .side-card p { margin-top:7px; }.side-card ul { margin:9px 0 0 17px; }
+    .rsu-steps { display:grid; gap:18px; }
+    .rsu-steps > * { min-width:0; }
+    .field-grid { display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:12px; }
+    .field { display:flex; flex-direction:column; gap:4px; }
+    .field label { font-size:11px; color:var(--slate); font-weight:600; }
+    .field .hint { font-size:10.5px; color:var(--mute); }
+    .field input, .field select { border:1px solid #cfd8e6; border-radius:6px; padding:7px 8px; color:var(--ink); background:#fff; font:13px Inter,sans-serif; width:100%; }
+    .panel-note { color:var(--slate); font-size:12.5px; line-height:1.55; margin:-6px 0 12px; }
+
+    .summary { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:12px; }
+    .summary .kpi { padding:14px 16px; }
+    .summary .kpi-value { font-size:24px; margin:6px 0 2px; }
+
+    .tbl-title { font-family:'Fraunces',serif; font-size:18px; font-weight:600; color:var(--navy-900); }
+    .tbl-sub { font-size:12px; color:var(--slate); margin:3px 0 12px; }
+    .rsu-wrap { overflow-x:auto; border:1px solid var(--line); border-radius:8px; }
+    .rsu { width:100%; border-collapse:collapse; font-size:12px; font-variant-numeric:tabular-nums; }
+    .rsu th { font-size:10px; text-transform:uppercase; letter-spacing:.3px; color:var(--slate); background:var(--bg); padding:7px 6px; border-bottom:1px solid var(--line); text-align:right; vertical-align:bottom; line-height:1.25; }
+    .rsu th.l, .rsu td.l { text-align:left; }
+    .rsu td { padding:5px 6px; border-bottom:1px solid var(--line-soft); text-align:right; white-space:nowrap; vertical-align:middle; }
+    .rsu td small { display:block; font-size:10px; color:var(--mute); }
+    .rsu input { border:1px solid #e6d9b8; background:#fffbef; border-radius:4px; padding:4px 5px; font:12px Inter,sans-serif; color:var(--ink); text-align:right; width:70px; }
+    .rsu input.l { text-align:left; }
+    .rsu input[type=date] { width:118px; text-align:left; }
+    .rsu input.sm { width:38px; }
+    .rsu input.ov { border-color:var(--gold); background:var(--gold-soft); font-weight:600; }
+    .rsu .neg { color:var(--red); }
+    .rsu .pos { color:var(--green); }
+    .rsu .net { background:#eef4fb; font-weight:700; color:var(--navy-700); }
+    .rsu .mar { background:#f5eefa; font-weight:700; color:#5b2d82; }
+    .rsu .key { font-weight:700; color:var(--navy-900); }
+    .rsu tr.tot td { background:var(--bg); font-weight:700; border-top:2px solid var(--line); }
+    .rsu tr.grp td { background:#fff8e6; font-weight:700; color:#6b4e12; }
+    .rsu tr.dup td { color:#8a6a2a; }
+    .rsu tr.sec td { background:#f3f6fb; font-weight:700; color:var(--navy-700); text-align:left; font-size:11px; text-transform:uppercase; letter-spacing:.4px; }
+    .rsu tr.split td { background:#f5eefa; font-weight:700; color:#5b2d82; border-top:2px solid #e2d3ef; }
+    .rsu tr.sep td { color:var(--mute); }
+    .treat { white-space:normal; min-width:200px; text-align:left !important; font-size:11.5px; }
+    .rm { border:0; background:none; color:var(--mute); cursor:pointer; font:600 14px Inter,sans-serif; padding:0 4px; }
+    .rm:hover { color:var(--red); }
+    .callout { padding:10px 12px; border-left:4px solid var(--gold); background:#fffdf8; color:var(--slate); border-radius:6px; font-size:12px; line-height:1.55; margin-top:12px; }
+    .callout.warn { border-left-color:var(--red); background:var(--red-soft); color:#7a2b1f; }
+    .law summary { cursor:pointer; font-weight:600; color:var(--navy-700); font-size:13px; }
+    .law h4 { font-size:13px; color:var(--navy-900); margin:12px 0 4px; }
+    .law p, .law li { font-size:12.5px; color:var(--slate); line-height:1.6; }
+    .law ul { margin:4px 0 0 18px; }
     .actions { display:flex; gap:9px; flex-wrap:wrap; }
     .status { margin-top:10px; color:var(--mute); font-size:11px; }
-    @media (max-width:1100px) { .rsu-layout { grid-template-columns:1fr; } .rsu-aside { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px; }.side-card { margin:0; } }
-    @media (max-width:760px) { body { grid-template-columns:1fr; }.sidebar { display:none; }.topbar { padding:12px 18px; }.topbar-right { display:none; }.content { padding:20px 16px; }.page-head { flex-direction:column; align-items:flex-start; gap:14px; }.field-grid,.result-grid,.rsu-aside { grid-template-columns:1fr; } }
+    @media (max-width:1200px) { .field-grid { grid-template-columns:repeat(3,minmax(0,1fr)); } .summary { grid-template-columns:repeat(2,minmax(0,1fr)); } }
+    @media (max-width:700px) { .field-grid, .summary { grid-template-columns:1fr; } .page-head { flex-direction:column; align-items:flex-start; gap:12px; } }
+    @media print {
+      @page { size: landscape; margin: 10mm; }
+      .sidebar, .topbar, .actions, .no-print, [data-party-box], #veritasTimeChip { display:none !important; }
+      body { display:block; } .main { margin:0; } .content { padding:0; }
+      .panel { box-shadow:none; border:0; padding:0; }
+      .print-break { break-before:page; }
+      .rsu-wrap { overflow:visible; border:0; }
+      .rsu { font-size:9.5px; }
+      .rsu input { border:0; background:none; padding:0; width:auto; }
+      .rsu input[type=date] { width:auto; }
+    }
   </style>
 </head>
 <body>
-  <aside class="sidebar">
-    <div class="brand"><div class="brand-mark"><img src="logo-vfi.jpg" alt="VFI Logo" /><span class="brand-mark-fallback">VFI</span></div><div class="brand-text"><span class="brand-name">Veritas</span><span class="brand-sub">Legal Financial Intelligence</span></div></div>
-    <nav class="nav"><div class="nav-group-label">Workspace</div><a class="nav-item" href="index.html">Dashboard</a><a class="nav-item" href="cases.html">Matters</a><a class="nav-item" href="schedules.html">Calendar</a><div class="nav-group-label">Analysis Modules</div><a class="nav-item" href="income-imputation.html">Income Engine</a><a class="nav-item" href="spousal.html">Support Calculator</a><a class="nav-item" href="cashflow.html">Cash Flow</a><a class="nav-item" href="child-support.html">Child Support</a><a class="nav-item" href="estate.html">Inventory of Property and Debts</a><a class="nav-item" href="equitable-distribution.html">Equitable Distribution</a><a class="nav-item" href="asset-division-valuation.html">Asset Valuation</a><a class="nav-item" href="discovery-intake.html">Discovery</a><a class="nav-item" href="custody.html">Custody</a><a class="nav-item" href="afi.html">AFI Expenses</a><a class="nav-item active" href="rsu.html">RSU Analysis</a><a class="nav-item" href="estate.html">Reports</a></nav>
-    <div class="sidebar-foot"><div class="plan-chip">Secure connection · encrypted and confidential</div></div>
-  </aside>
+  <aside class="sidebar"></aside>
   <main class="main">
-    <header class="topbar"><div class="matter-switcher"><span class="matter-label">Active Matter</span><div class="matter-btn"><strong>No active matter</strong><span class="case-no">Upload award documents to start an analysis</span></div></div><div class="topbar-right"><div class="user"><div class="avatar">VU</div><div class="user-meta"><span class="user-name">Workspace User</span><span class="user-role">Template workspace</span></div></div></div></header>
+    <header class="topbar"><div class="matter-switcher"><span class="matter-label">Active Matter</span><div class="matter-btn"><strong>Loading…</strong><span class="case-no"></span></div></div></header>
     <div class="content">
-      <section class="page-head"><div><h1>RSU Analysis</h1><p class="sub">Analyze an equity award using dates and values verified from the uploaded record.</p></div><div class="actions"><button class="btn ghost" id="resetRsu" type="button">Clear analysis</button><button class="btn primary" id="printRsu" type="button">Print summary</button></div></section>
-      <div class="rsu-layout">
-        <div>
-          <section class="panel"><div class="panel-head"><h3>Upload award documents</h3><span class="tag">Reference only</span></div><p class="panel-note">Add award notices, equity plan documents, vesting schedules, or brokerage statements. This template lists file names locally; it does not extract or transmit document content.</p><div class="dropzone" id="rsuDropzone"><label for="rsuFiles">Choose RSU award documents</label><p>PDF, Word, Excel, image, or CSV</p><input id="rsuFiles" type="file" multiple accept=".pdf,.doc,.docx,.xls,.xlsx,.csv,.jpg,.jpeg,.png" /></div><div class="document-list" id="rsuDocumentList"><div class="document-item"><span>No documents selected.</span></div></div></section>
-          <section class="panel" style="margin-top:18px"><div class="panel-head"><h3>Award inputs</h3><span class="tag">Required fields</span></div><div class="field-grid"><div class="field"><label for="grantDate">Grant date</label><input id="grantDate" type="date" /></div><div class="field"><label for="vestDate">Vest date</label><input id="vestDate" type="date" /></div><div class="field"><label for="separationDate">Date of service or separation</label><input id="separationDate" type="date" /></div><div class="field"><label for="awardValue">Award value at selected valuation date</label><input id="awardValue" type="number" min="0" step="0.01" placeholder="0.00" /></div><div class="field"><label for="awardShares">Vested or scheduled shares</label><input id="awardShares" type="number" min="0" step="0.0001" placeholder="0" /></div><div class="field"><label for="formula">Allocation approach</label><select id="formula"><option value="future">Future-service formula</option><option value="past">Past-service formula</option></select></div></div><div class="formula-note" id="formulaNote">Future-service formula: marital percentage is the service time from grant to separation divided by the service time from grant to vest.</div></section>
-          <section class="panel" style="margin-top:18px"><div class="panel-head"><h3>Allocation result</h3><span class="tag" id="rsuState">Awaiting inputs</span></div><div class="result-grid"><div class="result"><span>Marital percentage</span><output id="maritalPercent">—</output></div><div class="result"><span>Marital award value</span><output id="maritalValue">—</output></div><div class="result"><span>Marital shares</span><output id="maritalShares">—</output></div></div><p class="panel-note" id="rsuNarrative" style="margin-top:14px">Enter the grant, vest, and separation dates to calculate the time-based marital percentage.</p><p class="status" id="rsuSaveStatus">Draft inputs are saved locally in this browser.</p></section>
-        </div>
-        <aside class="rsu-aside"><section class="side-card"><h2>Formula selection</h2><p>The correct formula depends on the award's purpose and governing jurisdiction.</p><ul><li><strong>Future service:</strong> measures the marital part of service between grant and separation.</li><li><strong>Past service:</strong> measures service from employment start to separation against employment start to vest.</li></ul><p>Obtain legal review before relying on a classification or allocation.</p></section><section class="side-card"><h2>Documentation checklist</h2><ul><li>Award agreement and plan terms</li><li>Grant and vesting dates</li><li>Separation or service date</li><li>Share count and valuation evidence</li><li>Any sales or withholding records</li></ul></section></aside>
+      <section class="page-head">
+        <div><h1>RSU / Stock Analysis</h1><p class="sub">Table 1 divides the shares held in the stock plan account. Table 2 shows every tranche vesting after the date of service, so post-service vests are counted once and only the still-unvested shares are left to split.</p></div>
+        <div class="actions"><button class="btn ghost" id="rsuCsv" type="button">Download CSV</button><button class="btn ghost" id="rsuReset" type="button">Clear</button><button class="btn primary" id="rsuPrint" type="button">Print tables</button></div>
+      </section>
+
+      <div data-party-box></div>
+
+      <div class="rsu-steps">
+        <!-- Case details -->
+        <section class="panel no-print">
+          <div class="panel-head"><h3>Case details</h3><span class="tag" id="introTag">Marriage and service dates come from Case Intake where available</span></div>
+          <div class="field-grid">
+            <div class="field"><label for="employee">Employee spouse</label><select id="employee"><option value="a">Party A</option><option value="b">Party B</option></select></div>
+            <div class="field"><label for="marriageDate">Date of marriage</label><input id="marriageDate" type="date" /><span class="hint" id="marriageHint"></span></div>
+            <div class="field"><label for="dosDate">Date of service (DOS)</label><input id="dosDate" type="date" /><span class="hint" id="dosHint">Community ends here — A.R.S. § 25-211(A)(2)</span></div>
+            <div class="field"><label for="hireDate">Hire date</label><input id="hireDate" type="date" /><span class="hint">Start of the Hug fraction</span></div>
+            <div class="field"><label for="method">Method</label><select id="method"><option value="hug">Hug (from hire date)</option><option value="nelson">Nelson (from grant date)</option></select></div>
+            <div class="field"><label for="split">Non-employee share (%)</label><input id="split" type="number" min="0" max="100" step="0.01" placeholder="50" /></div>
+            <div class="field"><label for="account">Account</label><input id="account" type="text" placeholder="e.g. stock plan ••209" autocomplete="off" /></div>
+            <div class="field"><label for="asOf">Ledger as of</label><input id="asOf" type="date" /><span class="hint">Statement date for Table 1</span></div>
+            <div class="field"><label for="valDate">Price date</label><input id="valDate" type="date" /></div>
+            <div class="field"><label for="price">Share price ($)</label><input id="price" type="number" min="0" step="0.01" placeholder="0.00" /></div>
+            <div class="field"><label for="ticker">Ticker</label><input id="ticker" type="text" placeholder="e.g. ABC" autocomplete="off" /></div>
+            <div class="field"><label for="reserve">Tax reserve on gain (%)</label><input id="reserve" type="number" min="0" max="60" step="0.1" placeholder="15" /></div>
+          </div>
+        </section>
+
+        <!-- Summary -->
+        <section class="summary" id="summary"></section>
+
+        <!-- Table 1 -->
+        <section class="panel">
+          <div class="tbl-title" id="t1Title">Table 1 — RSU Grant Summary</div>
+          <div class="tbl-sub" id="t1Sub"></div>
+          <div class="rsu-wrap">
+            <table class="rsu" id="t1">
+              <thead><tr>
+                <th class="l">Grant ID</th><th class="l">Grant date</th><th class="l">Vesting<br><small>installments × months</small></th>
+                <th>Shares granted</th><th>Vested @ DOS</th><th>Vested to date</th><th>− Tax withheld</th><th>+ DEU / DRIP</th><th>− Sold</th>
+                <th>= Net held</th><th id="t1PctHead">Marital %</th><th>Marital shares</th><th>Gross marital value</th><th>Basis / share</th><th>Unrealized gain</th><th id="t1ResHead">Less gain reserve</th><th id="t1SplitHead">Split (shares each)</th><th class="no-print"></th>
+              </tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <div class="no-print" style="margin-top:10px;"><button class="btn subtle" id="addGrant" type="button">+ Add grant</button></div>
+          <p class="panel-note" style="margin:10px 0 0">Yellow cells are entered from the grant notices and the account statement. Net held counts only shares vested by the ledger date, so unvested shares are never in both tables. Marital % blends the grant's vested tranches (Table 2 shows each one).</p>
+          <div class="callout no-print" id="t1Check" hidden></div>
+        </section>
+
+        <!-- Table 2 -->
+        <section class="panel print-break">
+          <div class="tbl-title">Table 2 — Tranches Unvested at Date of Service: Hug vs. Nelson</div>
+          <div class="tbl-sub" id="t2Sub"></div>
+          <div class="rsu-wrap">
+            <table class="rsu" id="t2">
+              <thead><tr>
+                <th class="l">Grant</th><th class="l">Vest date</th><th>Shares</th><th>Hug %</th><th>Nelson %</th><th id="t2MarHead">Marital shares</th>
+                <th>W-2 / FMV basis<br><small>gross at vest</small></th><th id="t2ValHead">Marital value</th><th class="l">Treatment</th>
+              </tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <p class="panel-note" style="margin:10px 0 0">Tranches that vested after the date of service are already in the account (Table 1). They are listed here only so the W-2 / payroll figures tie out, and are not counted again. Edit a vest date or share count to match what was actually delivered.</p>
+          <p class="panel-note" id="narrative" style="margin:10px 0 0;color:var(--ink);"></p>
+          <p class="status no-print" id="saveStatus">Saved automatically for this client only.</p>
+        </section>
+
+        <!-- Method notes -->
+        <section class="panel law no-print">
+          <details>
+            <summary>Method notes — verify before filing</summary>
+            <h4>Formulas (time rule)</h4>
+            <ul>
+              <li><strong>Hug</strong> (<em>In re Marriage of Hug</em>, 154 Cal. App. 3d 780 (1984)): (date of service − hire date) ÷ (vest date − hire date). Treats the award as pay for service since hire; gives the larger community share.</li>
+              <li><strong>Nelson</strong> (<em>In re Marriage of Nelson</em>, 177 Cal. App. 3d 150 (1986)): (date of service − grant date) ÷ (vest date − grant date). Treats the award as pay for future service.</li>
+              <li>If the start date is before the marriage, the numerator starts at the date of marriage. A tranche that vested during the marriage and before service is 100% community when the start date is after the marriage.</li>
+              <li>Grants made after the date of service are separate (0%) unless shown to reward pre-service work.</li>
+            </ul>
+            <h4>Arizona</h4>
+            <p>Community ends on service of a petition that results in a decree (A.R.S. § 25-211(A)(2)); community property is divided equitably, usually equally (§ 25-318(A)). No Arizona statute picks Hug or Nelson; courts have looked to these California cases. Confirm current authority.</p>
+            <h4>Watch for</h4>
+            <ul>
+              <li><strong>Double counting:</strong> post-service vests are in the account and also on the W-2. Divide them once, and address whether the same shares are also counted as income for support.</li>
+              <li><strong>Taxes:</strong> shares are delivered net of withholding (Table 1, − Tax withheld). The gain reserve estimates tax on the unrealized gain if the shares are sold.</li>
+              <li><strong>Unvested shares:</strong> divide "if, as, and when vested," in shares.</li>
+            </ul>
+          </details>
+        </section>
       </div>
     </div>
   </main>
-  <script src="rsu.js"></script>
-  <script src="template-data-sanitizer.js"></script>
+  <script src="sidebar-loader.js"></script>
+  <script src="party-box.js"></script>
+  <script src="rsu.js?v=3"></script>
 </body>
 </html>

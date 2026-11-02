@@ -255,4 +255,9 @@
 
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();
+
+  // Billing time capture runs on every page this script is on.
+  const tracker = document.createElement('script');
+  tracker.src = 'time-tracker.js';
+  document.head.appendChild(tracker);
 })();

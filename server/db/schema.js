@@ -160,6 +160,108 @@ function initializeDatabase() {
           )
         `);
 
+        // ===== Billing: time capture, retainer / trust, statements =====
+        // One row per heartbeat (about a minute) of active work on a matter.
+        // entry_id links the activity to the draft time entry built from it;
+        // 'below_minimum' marks a session too short to bill.
+        db.run(`
+          CREATE TABLE IF NOT EXISTS time_activity (
+            id TEXT PRIMARY KEY,
+            matter_id TEXT NOT NULL,
+            user_id TEXT NOT NULL,
+            user_name TEXT,
+            page TEXT,
+            page_label TEXT,
+            local_date TEXT,
+            started_at TEXT NOT NULL,
+            ended_at TEXT NOT NULL,
+            active_seconds INTEGER NOT NULL DEFAULT 0,
+            actions TEXT,
+            entry_id TEXT,
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (matter_id) REFERENCES matters(id)
+          )
+        `);
+        db.run(`CREATE INDEX IF NOT EXISTS ix_time_activity_matter ON time_activity(matter_id, started_at)`);
+
+        // Billable time entries. Auto entries start as drafts built from
+        // time_activity; nothing is billed until an attorney approves it.
+        db.run(`
+          CREATE TABLE IF NOT EXISTS time_entries (
+            id TEXT PRIMARY KEY,
+            matter_id TEXT NOT NULL,
+            user_id TEXT,
+            timekeeper TEXT,
+            role TEXT NOT NULL DEFAULT 'attorney' CHECK(role IN ('attorney', 'paralegal')),
+            work_date TEXT NOT NULL,
+            started_at TEXT,
+            ended_at TEXT,
+            active_seconds INTEGER DEFAULT 0,
+            hours REAL NOT NULL,
+            rate REAL NOT NULL,
+            task_code TEXT,
+            narrative TEXT,
+            status TEXT NOT NULL DEFAULT 'draft' CHECK(status IN ('draft', 'approved', 'written_off', 'billed')),
+            source TEXT NOT NULL DEFAULT 'auto' CHECK(source IN ('auto', 'manual')),
+            invoice_id TEXT,
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+            approved_at TEXT,
+            FOREIGN KEY (matter_id) REFERENCES matters(id)
+          )
+        `);
+
+        // Per-matter fee agreement terms.
+        db.run(`
+          CREATE TABLE IF NOT EXISTS matter_billing (
+            matter_id TEXT PRIMARY KEY,
+            attorney_rate REAL NOT NULL DEFAULT 350,
+            paralegal_rate REAL NOT NULL DEFAULT 150,
+            retainer_amount REAL NOT NULL DEFAULT 5000,
+            evergreen_min REAL NOT NULL DEFAULT 2500,
+            rounding TEXT NOT NULL DEFAULT 'up' CHECK(rounding IN ('up', 'nearest')),
+            updated_at TEXT DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (matter_id) REFERENCES matters(id)
+          )
+        `);
+
+        // Firm's own "manual estimate" minutes per unit of work, for the efficiency report (JSON).
+        db.run(`ALTER TABLE matter_billing ADD COLUMN baselines TEXT`, () => {});
+
+        // Client trust (IOLTA) ledger. Amounts are positive; kind gives direction.
+        db.run(`
+          CREATE TABLE IF NOT EXISTS trust_transactions (
+            id TEXT PRIMARY KEY,
+            matter_id TEXT NOT NULL,
+            txn_date TEXT NOT NULL,
+            kind TEXT NOT NULL CHECK(kind IN ('deposit', 'applied', 'refund')),
+            amount REAL NOT NULL CHECK(amount > 0),
+            memo TEXT,
+            invoice_id TEXT,
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (matter_id) REFERENCES matters(id)
+          )
+        `);
+
+        // Monthly statements. Totals are frozen at issue time.
+        db.run(`
+          CREATE TABLE IF NOT EXISTS invoices (
+            id TEXT PRIMARY KEY,
+            matter_id TEXT NOT NULL,
+            number INTEGER NOT NULL,
+            period_start TEXT,
+            period_end TEXT,
+            hours_total REAL NOT NULL,
+            fees_total REAL NOT NULL,
+            trust_applied REAL NOT NULL,
+            amount_due REAL NOT NULL,
+            trust_balance_after REAL NOT NULL,
+            replenish_requested REAL NOT NULL DEFAULT 0,
+            created_at TEXT DEFAULT CURRENT_TIMESTAMP,
+            FOREIGN KEY (matter_id) REFERENCES matters(id),
+            UNIQUE(matter_id, number)
+          )
+        `);
+
         // Flags table
         db.run(`
           CREATE TABLE IF NOT EXISTS flags (
