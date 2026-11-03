@@ -16,7 +16,7 @@
     clientId: window.VERITAS_AUTH?.clientId || '',
     tenantId: window.VERITAS_AUTH?.tenantId || '',
     apiScope: window.VERITAS_AUTH?.apiScope || '',
-    apiBase: window.API_BASE || 'http://localhost:3000/api',
+    apiBase: window.API_BASE,
   };
 
   let msalApp = null;

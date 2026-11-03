@@ -1,6 +1,6 @@
 /* Discovery Intake — upload, auto-categorize, render category buckets & stats. */
 
-const API_BASE = window.API_BASE || 'http://localhost:3000/api';
+const API_BASE = window.API_BASE;
 const BUCKETS = ['financial', 'income', 'property', 'legal', 'disclosure', 'other'];
 const BUCKET_LABEL = {
   financial: '💰 Financial Statements',

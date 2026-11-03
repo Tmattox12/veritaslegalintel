@@ -257,7 +257,7 @@ async function handleSubmit(event) {
   const successMsg = document.getElementById('successMessage');
   const isUpdate = !!boundMatterId;
   try {
-    const url = isUpdate ? `http://localhost:3000/api/matters/${boundMatterId}` : 'http://localhost:3000/api/matters';
+    const url = isUpdate ? `${window.API_BASE}/matters/${boundMatterId}` : `${window.API_BASE}/matters`;
     const resp = await fetch(url, {
       method: isUpdate ? 'PUT' : 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -311,7 +311,7 @@ async function loadActiveMatter() {
   const mid = localStorage.getItem('currentMatterId');
   if (!mid) return false;
   try {
-    const resp = await fetch(`http://localhost:3000/api/matters/${mid}`);
+    const resp = await fetch(`${window.API_BASE}/matters/${mid}`);
     if (!resp.ok) {
       // Stale id (matter deleted or backend reset) — stay on a blank template.
       localStorage.removeItem('currentMatterId');

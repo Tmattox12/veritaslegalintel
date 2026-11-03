@@ -510,7 +510,7 @@
       }
 
       // Load merchants that need review (status = 'review')
-      fetch(`http://localhost:3000/api/matters/${currentMatterId}/merchants/review`)
+      fetch(`${window.API_BASE}/matters/${currentMatterId}/merchants/review`)
         .then(r => r.json())
         .then(data => {
           reviewMerchants = data.review || [];
@@ -519,7 +519,7 @@
         .catch(err => console.error('Error loading review merchants:', err));
 
       // Load merchants that need reclassification
-      fetch(`http://localhost:3000/api/matters/${currentMatterId}/merchants/reclassify`)
+      fetch(`${window.API_BASE}/matters/${currentMatterId}/merchants/reclassify`)
         .then(r => r.json())
         .then(data => {
           reclassifyMerchants = data.reclassify || [];
@@ -634,7 +634,7 @@
     }
 
     function confirmMapping(description, category) {
-      fetch(`http://localhost:3000/api/matters/${currentMatterId}/merchants/${encodeURIComponent(description)}/confirm`, {
+      fetch(`${window.API_BASE}/matters/${currentMatterId}/merchants/${encodeURIComponent(description)}/confirm`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ category })
@@ -650,7 +650,7 @@
     function changeMapping(description) {
       const newCategory = prompt('Enter new AFI category code:\n' + Object.keys(AFI_CATEGORIES).slice(0, 10).join(', '));
       if (newCategory) {
-        fetch(`http://localhost:3000/api/matters/${currentMatterId}/merchants/${encodeURIComponent(description)}/remap`, {
+        fetch(`${window.API_BASE}/matters/${currentMatterId}/merchants/${encodeURIComponent(description)}/remap`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ category: newCategory })

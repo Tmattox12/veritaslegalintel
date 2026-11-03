@@ -13,7 +13,7 @@
 // reviews, reclassifications, ...). Pages can add their own:
 //   VeritasTime.log('Built', 'income imputation scenario', 'Mother — 40 hr/wk at $18')
 (function () {
-  const API = 'http://localhost:3000/api';
+  const API = window.API_BASE;
   const PAGE = (location.pathname.split('/').pop() || 'index.html').toLowerCase();
   // Billing administration and setup pages are not billable client work.
   const NOT_TRACKED = new Set(['billing.html', 'auth.html', 'admin-reset.html', 'reset-data.html', 'sidebar.html', 'cases.html']);

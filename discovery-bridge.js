@@ -3,7 +3,7 @@
  * totals on AFI, spousal-maintenance, and child-support pages for the active matter.
  */
 (function () {
-  const API_BASE = window.API_BASE || 'http://localhost:3000/api';
+  const API_BASE = window.API_BASE;
 
   function matterId() {
     return new URLSearchParams(location.search).get('matter') || localStorage.getItem('currentMatterId') || null;

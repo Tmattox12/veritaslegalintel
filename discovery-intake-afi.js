@@ -2,7 +2,7 @@
    Loaded by document-hub-expenses.html; intake only parses. */
 
 (function () {
-  const API_BASE = window.API_BASE || 'http://localhost:3000/api';
+  const API_BASE = window.API_BASE;
 
   // Categories, AFI-line roll-up and merchant rules all come from the shared
   // taxonomy in afi-taxonomy.js, loaded as a script before this file.

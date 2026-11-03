@@ -11,7 +11,12 @@
 //    this tab too.
 // 4. Pages refuse to work until a client is selected (picker overlay).
 (function () {
-  const API = 'http://localhost:3000/api';
+  // Where the API lives, for every page (this script loads first). Pages served
+  // by the Veritas server itself — locally on :3000 or hosted — use their own
+  // origin; pages opened from a dev static server (e.g. Live Server) or a file
+  // reach the local server on :3000.
+  const isDevStatic = location.protocol === 'file:' || (/^(localhost|127\.0\.0\.1)$/.test(location.hostname) && location.port !== '3000');
+  const API = window.API_BASE = window.API_BASE || (isDevStatic ? 'http://localhost:3000/api' : `${location.origin}/api`);
   const ACTIVE_KEY = 'currentMatterId';
   const NAME_KEY = 'currentMatterName';
   const MIGRATED_KEY = 'veritas.scopedStorage.v1';

@@ -5,7 +5,7 @@
  * and nothing is stored in localStorage. This is the one place the logic
  * lives, so category pages stay a blank template until real data exists. */
 (function () {
-  const API_BASE = window.API_BASE || 'http://localhost:3000/api';
+  const API_BASE = window.API_BASE;
   const config = window.HUB_CONFIG || {};
 
   function matterId() {

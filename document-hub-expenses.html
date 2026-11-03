@@ -214,7 +214,7 @@
 
   <script>
     (function () {
-      const API_BASE = window.API_BASE || 'http://localhost:3000/api';
+      const API_BASE = window.API_BASE;
       const esc = window.renderSafeText;
       const money = (n) => '$' + (Number(n) || 0).toLocaleString('en-US', { maximumFractionDigits: 0 });
 

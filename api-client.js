@@ -1,6 +1,6 @@
 // Veritas API Client - Frontend wrapper for backend API
 class VeritasAPI {
-  constructor(baseUrl = 'http://localhost:3000/api') {
+  constructor(baseUrl = window.API_BASE) {
     this.baseUrl = baseUrl;
   }
 

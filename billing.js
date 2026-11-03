@@ -3,7 +3,7 @@
  * /api/matters/:id/billing (server/routes/billing.js). Time is captured by
  * time-tracker.js on every other page; this page is not tracked itself. */
 (function () {
-  const API_BASE = window.API_BASE || 'http://localhost:3000/api';
+  const API_BASE = window.API_BASE;
   const esc = window.renderSafeText;
 
   let summary = null;

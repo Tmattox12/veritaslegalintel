@@ -410,7 +410,7 @@ class VeritasAIChat {
 
   async fetchRegulations() {
     try {
-      const response = await fetch('http://localhost:3000/api/regulations/afi');
+      const response = await fetch(`${window.API_BASE}/regulations/afi`);
       if (!response.ok) throw new Error('Failed to fetch regulations');
 
       const result = await response.json();

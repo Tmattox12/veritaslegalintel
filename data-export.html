@@ -370,7 +370,7 @@
       document.getElementById('matterInfo').textContent = `Matter ID: ${currentMatterId}`;
 
       try {
-        const response = await fetch(`http://localhost:3000/api/matters/${currentMatterId}/data`);
+        const response = await fetch(`${window.API_BASE}/matters/${currentMatterId}/data`);
         if (!response.ok) throw new Error('Failed to load data');
 
         extractedData = await response.json();
@@ -471,7 +471,7 @@
       if (!currentMatterId) return;
 
       try {
-        const response = await fetch(`http://localhost:3000/api/matters/${currentMatterId}/export/${category}.csv`);
+        const response = await fetch(`${window.API_BASE}/matters/${currentMatterId}/export/${category}.csv`);
         if (!response.ok) throw new Error('Download failed');
 
         const csv = await response.text();
@@ -494,7 +494,7 @@
       if (!currentMatterId) return;
 
       try {
-        const response = await fetch(`http://localhost:3000/api/matters/${currentMatterId}/transactions.csv`);
+        const response = await fetch(`${window.API_BASE}/matters/${currentMatterId}/transactions.csv`);
         if (!response.ok) throw new Error('Download failed');
 
         const csv = await response.text();
@@ -517,7 +517,7 @@
       if (!currentMatterId) return;
 
       try {
-        const response = await fetch(`http://localhost:3000/api/matters/${currentMatterId}/income-summary.csv`);
+        const response = await fetch(`${window.API_BASE}/matters/${currentMatterId}/income-summary.csv`);
         if (!response.ok) throw new Error('Download failed');
 
         const csv = await response.text();
@@ -555,7 +555,7 @@
       // With JSZip, bundle them
       for (const cat of categories) {
         try {
-          const response = await fetch(`http://localhost:3000/api/matters/${currentMatterId}/export/${cat}.csv`);
+          const response = await fetch(`${window.API_BASE}/matters/${currentMatterId}/export/${cat}.csv`);
           if (response.ok) {
             const csv = await response.text();
             zip.file(`${cat}-documents.csv`, csv);

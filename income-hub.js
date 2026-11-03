@@ -5,7 +5,7 @@
  * are shown for comparison and are never accepted income. All data comes from
  * the backend for the active matter. */
 (function () {
-  const API_BASE = window.API_BASE || 'http://localhost:3000/api';
+  const API_BASE = window.API_BASE;
   const esc = window.renderSafeText;
   // The classifier files business returns under the same tax-record type as
   // personal returns, so business income is recognized by its form name.

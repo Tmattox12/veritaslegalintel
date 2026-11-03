@@ -91,7 +91,7 @@ function getVeritasChatConfig(pageKey) {
     pageContext: config.pageContext,
     systemPrompt: config.systemPrompt,
     suggestedQuestions: config.suggestedQuestions,
-    apiEndpoint: 'http://localhost:3000/api/chat',
+    apiEndpoint: `${window.API_BASE}/chat`,
     storageKey: 'veritas-chat-history'
   };
 }

@@ -72,7 +72,7 @@
   <script src="safe-text.js"></script>
   <script>
   (function () {
-    const API = 'http://localhost:3000/api';
+    const API = window.API_BASE;
     const esc = window.renderSafeText;
     const money = (n) => (Number(n) || 0).toLocaleString('en-US', { style: 'currency', currency: 'USD', maximumFractionDigits: 0 });
     const matterId = () => (window.VeritasMatter && window.VeritasMatter.id) || null;
