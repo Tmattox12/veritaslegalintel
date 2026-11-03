@@ -4,12 +4,15 @@
   <meta charset="UTF-8" />
   <script src="matter-context.js"></script>
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Income Engine — Builder Mode</title>
+  <title>Income Engine - Veritas</title>
   <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: 'Inter', sans-serif; background: #fafbfc; color: #1a2f4f; }
-    .container { max-width: 1400px; margin: 0 auto; padding: 24px; }
+    body { font-family: 'Inter', sans-serif; color: #1a2f4f; }
+    .container { max-width: 1400px; margin: 0 auto; padding: 24px 28px; }
+    .header .accepted-link { font-size: 13px; margin-top: 10px; color: var(--slate); }
+    .header .accepted-link a { color: var(--navy-600); font-weight: 600; }
 
     .header { margin-bottom: 32px; padding-bottom: 24px; border-bottom: 2px solid #e0e7ff; }
     h1 { font-size: 32px; font-weight: 700; margin-bottom: 8px; }
@@ -103,12 +106,20 @@
   </style>
 </head>
 <body>
+  <aside class="sidebar"></aside>
+  <main class="main">
+  <header class="topbar">
+    <div class="matter-switcher">
+      <span class="matter-label">Active Matter</span>
+      <button class="matter-btn"><strong>Loading client…</strong><span class="chev">▾</span></button>
+    </div>
+  </header>
   <div class="container">
     <!-- Header -->
     <div class="header">
       <h1>Income Engine — Builder Mode</h1>
       <p class="subtitle">Select income sources · sections appear automatically · color-coded by type · fully collapsible</p>
-
+      <p class="accepted-link">Documents accepted as income are reviewed in the <a href="document-hub-income.html">Income Hub</a>.</p>
     </div>
 
     <!-- Parties: names + roles from the matter; editable here -->
@@ -405,6 +416,7 @@
       <p>Check income types · sections appear automatically · color-coded by income type · fully collapsible</p>
     </div>
   </div>
+  </main>
 
   <script>
     const INCOME_TYPES = {
@@ -930,5 +942,6 @@
     })();
   </script>
   <script src="party-box.js"></script>
+  <script src="sidebar-loader.js"></script>
 </body>
 </html>
