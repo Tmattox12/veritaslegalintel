@@ -39,6 +39,16 @@ function getKey(header, cb) {
 }
 
 function requireAuth(req, res, next) {
+  // AUTH_MODE=easyauth: Azure App Service signs users in before any request reaches
+  // Node and passes the signed-in user in x-ms-client-principal-* headers. Those
+  // headers are only trustworthy on App Service, which strips client-sent copies.
+  if (MODE === 'easyauth') {
+    const id = req.headers['x-ms-client-principal-id'];
+    if (!process.env.WEBSITE_SITE_NAME || !id) return res.status(401).json({ error: 'Authentication required' });
+    const name = req.headers['x-ms-client-principal-name'] || '';
+    req.user = { id, name, email: name };
+    return next();
+  }
   if (MODE !== 'entra') return next(); // open (local dev)
 
   const auth = req.headers.authorization || '';
@@ -64,6 +74,7 @@ function requireAuth(req, res, next) {
   );
 }
 
+// True only for the browser-side MSAL flow; with easyauth the platform handles sign-in.
 function authEnabled() {
   return MODE === 'entra' && TENANT && CLIENT_ID;
 }

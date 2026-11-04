@@ -53,13 +53,15 @@ async function storeOriginal(matterId, docId, originalname, buffer) {
   // local disk
   const dir = path.join(UPLOADS_DIR, matterId || 'misc');
   fs.mkdirSync(dir, { recursive: true });
-  const key = path.join(matterId || 'misc', `${docId}_${safeName}`);
+  const key = `${matterId || 'misc'}/${docId}_${safeName}`;
   fs.writeFileSync(path.join(UPLOADS_DIR, key), buffer);
   return { key, mode: 'local' };
 }
 
 /** Retrieve a stored original (for re-processing or download). */
 async function getOriginal(key) {
+  // Keys saved on Windows use backslashes; blob names and Linux paths use '/'.
+  key = String(key).replace(/\\/g, '/');
   if (isAzure()) {
     const container = await getContainer();
     const block = container.getBlobClient(key);
