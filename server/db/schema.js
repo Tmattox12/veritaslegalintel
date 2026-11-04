@@ -1,7 +1,12 @@
 const sqlite3 = require('sqlite3').verbose();
 const path = require('path');
 
-const DB_PATH = path.join(__dirname, '../../.data/veritas.sqlite');
+const fs = require('fs');
+
+// DATA_DIR lets a host keep the database on persistent storage (e.g. /home/data on Azure App Service).
+const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, '../../.data');
+fs.mkdirSync(DATA_DIR, { recursive: true });
+const DB_PATH = path.join(DATA_DIR, 'veritas.sqlite');
 
 function initializeDatabase() {
   return new Promise((resolve, reject) => {

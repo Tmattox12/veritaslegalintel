@@ -18,11 +18,27 @@ const { requireAuth, authEnabled, MODE } = require('./auth');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(cors());
+// Only the app's own pages (and local dev servers like Live Server) may call the API.
+// An open CORS policy would let any website opened in the same browser read client data.
+const LOCAL_ORIGIN = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/;
+const EXTRA_ORIGINS = (process.env.ALLOWED_ORIGINS || '').split(',').map(s => s.trim()).filter(Boolean);
+app.use(cors({
+  origin: (origin, cb) => cb(null, !origin || LOCAL_ORIGIN.test(origin) || EXTRA_ORIGINS.includes(origin)),
+}));
 app.use(express.json());
 
-// Serve static HTML files from root directory
-app.use(express.static(path.join(__dirname, '..')));
+// Serve the front-end pages from the repo root, but never the database, uploaded
+// documents, server code, dependencies, or any dot-folder (.data, .git, .env).
+const PRIVATE_PATHS = /^\/(server|scripts|node_modules|uploads|\.[^/]*)(\/|$)/i;
+app.use((req, res, next) => {
+  let p = req.path;
+  try { p = decodeURIComponent(p); } catch (e) { return res.status(400).end(); }
+  if (PRIVATE_PATHS.test(p) || /\/\./.test(p) || /\.(sqlite|db|bak[^/]*|env|log)$/i.test(p) || /^\/package(-lock)?\.json$/i.test(p)) {
+    return res.status(404).end();
+  }
+  next();
+});
+app.use(express.static(path.join(__dirname, '..'), { dotfiles: 'deny', index: 'index.html' }));
 
 // Report whether auth is enforced (frontend uses this to decide whether to show login)
 app.get('/api/auth-status', (req, res) => {
@@ -832,7 +848,11 @@ app.post('/api/admin/reset', (req, res) => {
 // Initialize database and start server
 initializeDatabase()
   .then(() => {
-    app.listen(PORT, () => {
+    // Listen only on this computer unless told otherwise (Azure App Service sets
+    // WEBSITE_SITE_NAME and needs all interfaces). Otherwise anyone on the same
+    // Wi-Fi could reach the API.
+    const HOST = process.env.HOST || (process.env.WEBSITE_SITE_NAME ? '0.0.0.0' : '127.0.0.1');
+    app.listen(PORT, HOST, () => {
       console.log(`Veritas server running on http://localhost:${PORT}`);
       console.log(`Health check: http://localhost:${PORT}/api/health`);
 

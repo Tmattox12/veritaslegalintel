@@ -16,7 +16,7 @@ const { v4: uuidv4 } = require('uuid');
 
 const MODE = (process.env.STORAGE_MODE || 'local').toLowerCase();
 const CONTAINER = process.env.AZURE_STORAGE_CONTAINER || 'veritas-documents';
-const UPLOADS_DIR = path.join(__dirname, '..', 'uploads');
+const UPLOADS_DIR = process.env.UPLOADS_DIR || path.join(__dirname, '..', 'uploads');
 
 let blobClient = null;
 
