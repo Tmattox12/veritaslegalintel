@@ -13,6 +13,8 @@ const documentExtractionRouter = require('./routes/document-extraction');
 const merchantMappingRouter = require('./routes/merchant-mapping');
 const chatRouter = require('./routes/chat');
 const billingRouter = require('./routes/billing');
+const spousalRouter = require('./routes/spousal');
+const redFlagsRouter = require('./routes/red-flags');
 const { requireAuth, authEnabled, MODE } = require('./auth');
 
 const app = express();
@@ -79,6 +81,8 @@ app.use('/api/matters/:matterId/bank-statements', bankStatementsRouter);
 app.use('/api/matters/:matterId/documents', documentsRouter);
 app.use('/api/matters/:matterId/merchants', merchantMappingRouter);
 app.use('/api/matters/:matterId/billing', billingRouter);
+app.use('/api/matters/:matterId/spousal', spousalRouter);
+app.use('/api/matters/:matterId/red-flags', redFlagsRouter);
 app.use('/api/matters/:matterId', documentExtractionRouter);
 app.use('/api/chat', chatRouter);
 

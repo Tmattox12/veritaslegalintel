@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <script src="matter-context.js"></script>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Spousal Maintenance | Veritas</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+  <style>
+    .sm-steps { display:grid; gap:18px; }
+    .sm-steps > * { min-width:0; }
+    .field-grid { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:12px; }
+    .field { display:flex; flex-direction:column; gap:4px; min-width:0; }
+    .field label { font-size:11px; color:var(--slate); font-weight:600; }
+    .field .hint { font-size:10.5px; color:var(--mute); }
+    .field input, .field select { border:1px solid #cfd8e6; border-radius:6px; padding:7px 8px; color:var(--ink); background:#fff; font:13px Inter,sans-serif; width:100%; }
+    .panel-note { color:var(--slate); font-size:12.5px; line-height:1.55; margin:-6px 0 12px; }
+
+    .summary { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:14px; }
+    .party-sum { border:1px solid var(--line); border-radius:10px; padding:14px 16px; background:#fff; min-width:0; }
+    .party-sum h4 { margin:0 0 8px; font-size:13px; color:var(--navy-900); display:flex; justify-content:space-between; gap:8px; }
+    .party-sum .role { font-size:10.5px; font-weight:600; color:var(--mute); text-transform:uppercase; letter-spacing:.4px; }
+    .sum-line { display:flex; justify-content:space-between; gap:10px; font-size:12.5px; padding:3px 0; color:var(--slate); }
+    .sum-line b { color:var(--ink); font-variant-numeric:tabular-nums; }
+    .sum-line.off { opacity:.5; text-decoration:line-through; }
+    .sum-total { display:flex; justify-content:space-between; border-top:2px solid var(--line); margin-top:6px; padding-top:8px; font-weight:700; color:var(--navy-900); }
+    .sum-total span:last-child { font-family:'Fraunces',serif; font-size:22px; }
+    .combined { grid-column:1 / -1; display:flex; justify-content:space-between; align-items:center; padding:10px 16px; border-radius:10px; background:#fff7ec; border:1px solid #f2d3a8; font-weight:700; color:#7a4a0c; }
+    .combined span:last-child { font-family:'Fraunces',serif; font-size:22px; }
+
+    .guide { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
+    .g-card { text-align:left; border:2px solid var(--line); border-radius:10px; padding:14px 16px; background:#fff; cursor:pointer; font:inherit; color:inherit; }
+    .g-card:hover { border-color:var(--navy-700); }
+    .g-card.on { border-color:var(--navy-700); box-shadow:0 0 0 3px rgba(46,91,138,.18); background:#f3f7fc; }
+    .g-card .lbl { font-size:10.5px; font-weight:700; color:var(--slate); text-transform:uppercase; letter-spacing:.4px; }
+    .g-card .val { font-family:'Fraunces',serif; font-size:28px; color:var(--navy-900); margin:6px 0 2px; font-variant-numeric:tabular-nums; }
+    .g-card .sub { font-size:11px; color:var(--mute); }
+    .g-low { border-top:4px solid #f0a14a; } .g-mid { border-top:4px solid #2f7d5b; } .g-high { border-top:4px solid #b0413e; }
+    .facts { display:flex; flex-wrap:wrap; gap:8px 18px; margin-top:12px; font-size:12px; color:var(--slate); }
+    .facts b { color:var(--ink); }
+    .calc-status { margin-top:10px; font-size:11.5px; color:var(--mute); }
+    .calc-status.err { color:var(--red); }
+    .callout { padding:10px 12px; border-left:4px solid var(--gold); background:#fffdf8; color:var(--slate); border-radius:6px; font-size:12px; line-height:1.55; margin-top:12px; }
+    .callout.warn { border-left-color:var(--red); background:var(--red-soft); color:#7a2b1f; }
+
+    .src-cols { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:18px; }
+    .src-cols > * { min-width:0; }
+    .src-col h4 { margin:0 0 10px; font-size:13px; color:var(--navy-900); display:flex; justify-content:space-between; align-items:center; gap:8px; }
+    .src { border:1px solid var(--line); border-radius:10px; padding:10px 12px; margin-bottom:12px; background:#fff; }
+    .src.excluded { opacity:.55; }
+    .src-head { display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-bottom:8px; }
+    .src-head input.name { flex:1 1 140px; min-width:0; font:600 13px Inter,sans-serif; border:1px solid transparent; border-radius:5px; padding:4px 6px; color:var(--navy-900); }
+    .src-head input.name:hover, .src-head input.name:focus { border-color:#cfd8e6; }
+    .src-head label { font-size:11px; color:var(--slate); display:flex; align-items:center; gap:4px; white-space:nowrap; }
+    .opts { display:grid; gap:6px; }
+    .opt { display:grid; grid-template-columns:18px minmax(0,1.3fr) minmax(0,1fr) 22px; gap:6px; align-items:center; padding:5px 6px; border-radius:7px; border:1px solid transparent; }
+    .opt.on { background:#eef4fb; border-color:#bcd0e8; }
+    .opt input[type=text], .opt input[type=number] { min-width:0; width:100%; border:1px solid #e6d9b8; background:#fffbef; border-radius:4px; padding:4px 6px; font:12px Inter,sans-serif; color:var(--ink); }
+    .opt input[type=number] { text-align:right; font-variant-numeric:tabular-nums; }
+    .rm { border:0; background:none; color:var(--mute); cursor:pointer; font:600 14px Inter,sans-serif; padding:0 4px; }
+    .rm:hover { color:var(--red); }
+    .link-btn { border:0; background:none; color:var(--navy-700); font:600 12px Inter,sans-serif; cursor:pointer; padding:2px 0; }
+    .link-btn:hover { text-decoration:underline; }
+    .adj { display:flex; gap:8px; align-items:center; font-size:12px; color:var(--slate); margin-top:4px; }
+    .adj input { width:130px; border:1px solid #cfd8e6; border-radius:6px; padding:6px 8px; font:12px Inter,sans-serif; text-align:right; }
+
+    .var-grid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
+    .var-grid .party-sum .val { font-family:'Fraunces',serif; font-size:24px; color:var(--navy-900); margin-top:4px; font-variant-numeric:tabular-nums; }
+    .actions { display:flex; gap:9px; flex-wrap:wrap; }
+
+    @media (max-width:1200px) { .field-grid { grid-template-columns:repeat(3,minmax(0,1fr)); } .var-grid { grid-template-columns:1fr; } }
+    @media (max-width:900px) { .summary, .src-cols, .guide { grid-template-columns:1fr; } }
+    @media (max-width:700px) { .field-grid { grid-template-columns:1fr; } .page-head { flex-direction:column; align-items:flex-start; gap:12px; } }
+    @media print {
+      .sidebar, .topbar, .actions, .no-print, [data-party-box], #veritasTimeChip { display:none !important; }
+      body { display:block; } .main { margin:0; } .content { padding:0; }
+      .panel { box-shadow:none; }
+    }
+  </style>
+</head>
+<body>
+  <aside class="sidebar"></aside>
+  <main class="main">
+    <header class="topbar"><div class="matter-switcher"><span class="matter-label">Active Matter</span><div class="matter-btn"><strong>Loading…</strong><span class="case-no"></span></div></div></header>
+    <div class="content">
+      <section class="page-head">
+        <div><h1>Spousal Maintenance</h1><p class="sub">Pick each party's income composition and get the Arizona guideline range from the courts' official calculator. Names and the case number are never sent to it.</p></div>
+        <div class="actions"><button class="btn ghost" id="smReset" type="button">Clear</button><button class="btn primary" id="smPrint" type="button">Print</button></div>
+      </section>
+
+      <div data-party-box></div>
+
+      <div class="sm-steps">
+        <!-- Case details -->
+        <section class="panel no-print">
+          <div class="panel-head"><h3>Calculator inputs</h3><span class="tag">Dates and county come from Case Intake where available</span></div>
+          <div class="field-grid">
+            <div class="field"><label for="requesting">Party requesting maintenance</label><select id="requesting"><option value="a">Party A</option><option value="b">Party B</option></select></div>
+            <div class="field"><label for="familySize">Family size</label><input id="familySize" type="number" min="2" max="20" step="1" placeholder="e.g. 4" /><span class="hint">Both parties + children in the home</span></div>
+            <div class="field"><label for="marriageDate">Date of marriage</label><input id="marriageDate" type="date" /><span class="hint" id="marriageHint"></span></div>
+            <div class="field"><label for="serviceDate">Date of service of process</label><input id="serviceDate" type="date" /><span class="hint" id="serviceHint"></span></div>
+            <div class="field"><label for="hearingDate">Hearing / calculation date</label><input id="hearingDate" type="date" /></div>
+            <div class="field"><label for="dobA" id="dobALabel">Date of birth, Party A</label><input id="dobA" type="date" /></div>
+            <div class="field"><label for="dobB" id="dobBLabel">Date of birth, Party B</label><input id="dobB" type="date" /></div>
+            <div class="field"><label for="county">County</label><input id="county" type="text" placeholder="e.g. Maricopa" autocomplete="off" /></div>
+            <div class="field"><label for="mortgage">Family mortgage principal ($)</label><input id="mortgage" type="number" min="0" step="1" placeholder="0" /><span class="hint">Monthly principal paid, if any</span></div>
+            <div class="field"><label for="attrA" id="attrALabel">Attributed income, Party A ($/yr)</label><input id="attrA" type="number" min="0" step="1" placeholder="0" /></div>
+            <div class="field"><label for="attrB" id="attrBLabel">Attributed income, Party B ($/yr)</label><input id="attrB" type="number" min="0" step="1" placeholder="0" /></div>
+          </div>
+        </section>
+
+        <!-- Summary -->
+        <section class="summary" id="summary"></section>
+
+        <!-- Official result -->
+        <section class="panel">
+          <div class="panel-head"><h3>Arizona guideline range</h3><span class="tag" id="sourceTag">Official calculator</span></div>
+          <div class="guide" id="guide">
+            <button type="button" class="g-card g-low" data-level="low"><div class="lbl">Guideline low</div><div class="val" id="gLow">—</div><div class="sub">per month</div></button>
+            <button type="button" class="g-card g-mid" data-level="mid"><div class="lbl">Guideline mid</div><div class="val" id="gMid">—</div><div class="sub">per month</div></button>
+            <button type="button" class="g-card g-high" data-level="high"><div class="lbl">Guideline high</div><div class="val" id="gHigh">—</div><div class="sub">per month</div></button>
+          </div>
+          <div class="facts" id="facts"></div>
+          <div class="calc-status" id="calcStatus"></div>
+          <div class="callout" id="selNote" hidden></div>
+        </section>
+
+        <!-- Income composition -->
+        <section class="panel">
+          <div class="panel-head"><h3>Income composition</h3><span class="tag">Click an option to use it; untick "Include" to leave a source out</span></div>
+          <p class="panel-note">Add each income source (salary, bonus, RSU, second job, imputed capacity…) and the alternative figures you are weighing, such as YTD annualized, last full year, or a 2- or 3-year average. Mark bonus- or RSU-type sources as <b>variable</b> to see the percentage analysis below.</p>
+          <div class="src-cols">
+            <div class="src-col" id="colA"></div>
+            <div class="src-col" id="colB"></div>
+          </div>
+        </section>
+
+        <!-- Variable income analysis -->
+        <section class="panel">
+          <div class="panel-head"><h3>Variable income as a percentage</h3><span class="tag">If bonus/RSU are paid as a share instead of included in the base</span></div>
+          <p class="panel-note">Compares the guideline mid with all selected income against the guideline mid with the paying party's variable sources left out. The difference, spread over the variable income, is the share of each bonus or RSU dollar that would pay the same total.</p>
+          <div class="var-grid" id="varGrid"></div>
+          <div class="calc-status" id="varStatus"></div>
+        </section>
+      </div>
+    </div>
+  </main>
+  <script src="sidebar-loader.js"></script>
+  <script src="party-box.js"></script>
+  <script src="spousal-maintenance.js?v=1"></script>
+</body>
+</html>

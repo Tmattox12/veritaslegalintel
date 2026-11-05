@@ -48,6 +48,7 @@
     'income-engine-builder.html': 'Income analysis',
     'income-reconciliation.html': 'Income reconciliation',
     'spousal.html': 'Spousal maintenance analysis',
+    'spousal-maintenance.html': 'Spousal maintenance analysis',
     'child-support.html': 'Child support calculation',
     'child-support-calculator.html': 'Child support calculation',
     'equitable-distribution.html': 'Community property division analysis',
