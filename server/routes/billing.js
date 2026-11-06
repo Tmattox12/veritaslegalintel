@@ -470,8 +470,8 @@ router.get('/efficiency', async (req, res) => {
     const [settings, docs, statements, txns, incomeDocs, pages] = await Promise.all([
       q.get('SELECT * FROM matter_billing WHERE matter_id = ?', [matterId]),
       q.get('SELECT COUNT(*) AS n FROM documents WHERE matter_id = ? AND deleted_at IS NULL', [matterId]),
-      q.get(`SELECT COUNT(*) AS n FROM bank_statements WHERE matter_id = ? AND processing_status = 'completed'`, [matterId]),
-      q.get('SELECT COUNT(*) AS n FROM bank_transactions bt JOIN bank_statements bs ON bs.id = bt.bank_statement_id WHERE bs.matter_id = ?', [matterId]),
+      q.get(`SELECT COUNT(*) AS n FROM bank_statements WHERE matter_id = ? AND document_id IN (SELECT id FROM documents WHERE deleted_at IS NULL) AND processing_status = 'completed'`, [matterId]),
+      q.get('SELECT COUNT(*) AS n FROM bank_transactions bt JOIN bank_statements bs ON bs.id = bt.bank_statement_id WHERE bs.matter_id = ? AND bs.document_id IN (SELECT id FROM documents WHERE deleted_at IS NULL)', [matterId]),
       q.get(`SELECT COUNT(*) AS n FROM income_evidence_reviews WHERE matter_id = ? AND status IN ('accepted', 'rejected')`, [matterId]),
       q.all('SELECT page, SUM(active_seconds) AS seconds FROM time_activity WHERE matter_id = ? GROUP BY page', [matterId]),
     ]);

@@ -26,6 +26,7 @@
   function basisLabel(basis) {
     return {
       accepted: 'Accepted document evidence',
+      builder: 'Income Engine selection',
       avg12: '12-month bank-deposit average',
       avg6: '6-month bank-deposit average',
       avg3: '3-month bank-deposit average',

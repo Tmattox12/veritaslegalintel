@@ -215,7 +215,7 @@ router.post('/expense-workbook', async (req, res) => {
         `SELECT bt.amount, bt.description, bt.transaction_date, bt.flow_type, bt.suggested_category, bt.mapped_category
          FROM bank_transactions bt
          JOIN bank_statements bs ON bs.id = bt.bank_statement_id
-         WHERE bs.matter_id = ?`,
+         WHERE bs.matter_id = ? AND bs.document_id IN (SELECT id FROM documents WHERE deleted_at IS NULL)`,
         [matterId],
         (error, rows) => error ? reject(error) : resolve(rows || [])
       );
@@ -421,7 +421,7 @@ router.get('/gap-analysis', async (req, res) => {
     });
     const stmts = await new Promise((resolve, reject) => {
       req.db.all(`SELECT bs.*, d.filename FROM bank_statements bs LEFT JOIN documents d ON bs.document_id = d.id
-                  WHERE bs.matter_id = ? AND bs.processing_status = 'completed' ORDER BY bs.statement_start ASC`,
+                  WHERE bs.matter_id = ? AND bs.document_id IN (SELECT id FROM documents WHERE deleted_at IS NULL) AND bs.processing_status = 'completed' ORDER BY bs.statement_start ASC`,
         [matterId], (e, r) => e ? reject(e) : resolve(r || []));
     });
 
@@ -497,7 +497,7 @@ async function buildRfp(req, matterId) {
     req.db.all('SELECT id, filename, category FROM documents WHERE matter_id = ? AND deleted_at IS NULL', [matterId], (e, r) => resolve(r || []));
   });
   const stmts = await new Promise((resolve) => {
-    req.db.all(`SELECT bs.*, d.filename FROM bank_statements bs LEFT JOIN documents d ON bs.document_id = d.id WHERE bs.matter_id = ? AND bs.processing_status='completed' ORDER BY bs.statement_start ASC`, [matterId], (e, r) => resolve(r || []));
+    req.db.all(`SELECT bs.*, d.filename FROM bank_statements bs LEFT JOIN documents d ON bs.document_id = d.id WHERE bs.matter_id = ? AND bs.document_id IN (SELECT id FROM documents WHERE deleted_at IS NULL) AND bs.processing_status='completed' ORDER BY bs.statement_start ASC`, [matterId], (e, r) => resolve(r || []));
   });
 
   const text = docs.map((d) => `${(d.category || '').toLowerCase()} ${(d.filename || '').toLowerCase()}`).join(' ');

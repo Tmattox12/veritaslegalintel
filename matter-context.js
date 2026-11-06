@@ -261,8 +261,32 @@
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
   else init();
 
+  // The recon audit opens every page without a person present: it must never save
+  // anything or log billable time.
+  const RECON_AUDIT = /[?&]reconAudit=1\b/.test(location.search);
+  if (RECON_AUDIT) {
+    // Nobody is there to answer a pop-up.
+    window.alert = () => {};
+    window.confirm = () => false;
+    window.prompt = () => null;
+    const realFetch = window.fetch.bind(window);
+    window.fetch = (input, init) => {
+      const method = String((init && init.method) || (input && input.method) || 'GET').toUpperCase();
+      const url = String((input && input.url) || input);
+      if (method !== 'GET' && !/\/recon\/(lookup|sources)$/.test(url)) return Promise.reject(new Error('Blocked during audit'));
+      return realFetch(input, init);
+    };
+  }
+
   // Billing time capture runs on every page this script is on.
-  const tracker = document.createElement('script');
-  tracker.src = 'time-tracker.js';
-  document.head.appendChild(tracker);
+  if (!RECON_AUDIT) {
+    const tracker = document.createElement('script');
+    tracker.src = 'time-tracker.js';
+    document.head.appendChild(tracker);
+  }
+
+  // Every number on every page opens a reconciliation.
+  const recon = document.createElement('script');
+  recon.src = 'recon.js';
+  document.head.appendChild(recon);
 })();

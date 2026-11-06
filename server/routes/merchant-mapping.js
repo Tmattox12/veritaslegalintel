@@ -18,7 +18,7 @@ router.get('/review', (req, res) => {
        MAX(bt.transaction_date) as date_end
      FROM bank_transactions bt
      JOIN bank_statements bs ON bt.bank_statement_id = bs.id
-     WHERE bs.matter_id = ?
+     WHERE bs.matter_id = ? AND bs.document_id IN (SELECT id FROM documents WHERE deleted_at IS NULL)
        AND bt.mapped_category IS NULL
        AND bt.suggested_category IS NOT NULL
        AND bt.flow_type = 'expense'
@@ -58,7 +58,7 @@ router.get('/reclassify', (req, res) => {
        MAX(bt.transaction_date) as date_end
      FROM bank_transactions bt
      JOIN bank_statements bs ON bt.bank_statement_id = bs.id
-     WHERE bs.matter_id = ?
+     WHERE bs.matter_id = ? AND bs.document_id IN (SELECT id FROM documents WHERE deleted_at IS NULL)
        AND bt.mapped_category IN ('disc_shopping', 'disc_entertainment', 'disc_subscription_other')
        AND bt.flow_type = 'expense'
      GROUP BY bt.description, bt.mapped_category

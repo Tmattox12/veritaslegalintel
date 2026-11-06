@@ -538,6 +538,7 @@
             <p>No merchants need review. All categorizations have been confirmed.</p>
           </div>
         `;
+        updateProgress('review');
         return;
       }
 
@@ -677,10 +678,8 @@
 
     function updateProgress(tab) {
       const total = tab === 'review' ? reviewMerchants.length : reclassifyMerchants.length;
-      const completed = tab === 'review' ?
-        Math.floor(Math.random() * total * 0.3) :
-        Math.floor(Math.random() * total * 0.2);
-      const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
+      // Every merchant listed still needs a decision; an empty list means all are done.
+      const percent = total > 0 ? 0 : 100;
       document.getElementById(tab + '-progress').style.width = percent + '%';
       document.getElementById(tab + '-count').textContent = total;
     }

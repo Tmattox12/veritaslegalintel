@@ -9,8 +9,8 @@
 (() => {
   const STORE = 'veritas.rsu.v3';
   const OLD_STORE = 'veritas.rsu.v2';
-  const SETTINGS = ['employee', 'marriageDate', 'dosDate', 'hireDate', 'method', 'split', 'account', 'asOf', 'valDate', 'price', 'ticker', 'reserve'];
-  const METHODS = { hug: 'Hug', nelson: 'Nelson' };
+  const SETTINGS = ['employee', 'marriageDate', 'dosDate', 'hireDate', 'method', 'split', 'account', 'asOf', 'valDate', 'price', 'ticker', 'reserve', 'nelsonPct', 'otherPct', 'otherBasis'];
+  const METHODS = { hug: 'Hug', nelson: 'Nelson', mix: 'Mix', neither: 'Other basis' };
   const $ = (id) => document.getElementById(id);
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const money = (n) => (n == null || Number.isNaN(n) ? '—' : n.toLocaleString('en-US', { style: 'currency', currency: 'USD' }));
@@ -77,7 +77,7 @@
       const key = `${g.id}:${i}`;
       const ov = state.tranches[key] || {};
       const shares = ov.shares !== undefined && ov.shares !== '' ? num(ov.shares) : total / count;
-      return { key, grant: g, date: ov.date || addMonths(first, months * i), dateEdited: !!ov.date, shares, sharesEdited: ov.shares !== undefined && ov.shares !== '', basis: ov.basis ?? '' };
+      return { key, grant: g, index: i + 1, count, date: ov.date || addMonths(first, months * i), dateEdited: !!ov.date, shares, sharesEdited: ov.shares !== undefined && ov.shares !== '', basis: ov.basis ?? '', vestPrice: ov.vestPrice ?? '', priceSource: ov.priceSource ?? '' };
     });
   }
 
@@ -86,12 +86,24 @@
     const asOf = setting('asOf');
     const price = num(setting('price'));
     const method = setting('method');
+    const nelsonShare = setting('nelsonPct') === '' ? 0.5 : clamp01(num(setting('nelsonPct')) / 100);
+    const otherShare = setting('otherPct') === '' ? null : clamp01(num(setting('otherPct')) / 100);
+    METHODS.mix = `${(nelsonShare * 100).toFixed(0)}% Nelson / ${((1 - nelsonShare) * 100).toFixed(0)}% Hug`;
     const split = setting('split') === '' ? 0.5 : clamp01(num(setting('split')) / 100);
     const reserve = setting('reserve') === '' ? 0.15 : clamp01(num(setting('reserve')) / 100);
 
     const all = [];
     const t1 = state.grants.map((g) => {
-      const tr = tranchesOf(g).map((t) => ({ ...t, hug: maritalPct(g, t.date, 'hug', ctx), nelson: maritalPct(g, t.date, 'nelson', ctx) }));
+      const tr = tranchesOf(g).map((t) => {
+        const hug = maritalPct(g, t.date, 'hug', ctx);
+        const nelson = maritalPct(g, t.date, 'nelson', ctx);
+        const mix = hug == null || nelson == null ? null : nelsonShare * nelson + (1 - nelsonShare) * hug;
+        // Neither formula: the entered community share, except that a grant made after
+        // the date of service stays separate because the community had already ended.
+        const postGrant = !!ctx.dos && ms(g.grantDate) > ms(ctx.dos);
+        const neither = postGrant ? 0 : otherShare;
+        return { ...t, hug, nelson, mix, neither };
+      });
       all.push(...tr);
       const atDos = ctx.dos ? tr.filter((t) => ms(t.date) <= ms(ctx.dos)).reduce((s, t) => s + t.shares, 0) : null;
       const vestedNow = tr.filter((t) => ms(t.date) <= ms(asOf));
@@ -124,7 +136,9 @@
       t.post = ms(t.grant.grantDate) > ms(ctx.dos);
       t.vested = ms(t.date) <= ms(asOf);
       t.mShares = t.pct == null ? null : t.shares * t.pct;
-      t.basisValue = t.basis !== '' ? num(t.basis) : t.vested ? null : t.shares * price;
+      // No W-2 figure entered: a vested tranche uses shares × its vesting-date price (Table 3).
+      t.basisFromVestPrice = t.basis === '' && t.vested && t.vestPrice !== '';
+      t.basisValue = t.basis !== '' ? num(t.basis) : t.vested ? (t.basisFromVestPrice ? t.shares * num(t.vestPrice) : null) : t.shares * price;
       t.basisIsFmv = t.basis === '' && !t.vested;
       t.mValue = t.basisValue == null || t.pct == null ? null : t.basisValue * t.pct;
     });
@@ -134,9 +148,18 @@
       mShares: sum(remaining, 'mShares'),
       hugShares: remaining.reduce((s, t) => (s == null || t.hug == null ? null : s + t.shares * t.hug), 0),
       nelsonShares: remaining.reduce((s, t) => (s == null || t.nelson == null ? null : s + t.shares * t.nelson), 0),
+      mixShares: remaining.reduce((s, t) => (s == null || t.mix == null ? null : s + t.shares * t.mix), 0),
       mValue: sum(remaining, 'mValue'),
     };
-    return { ctx, asOf, price, method, split, reserve, t1, t1Tot, t2, remaining, remTot };
+    // Table 3: every tranche, by vesting date, with its price and value at vest.
+    const t3 = all.slice().sort((a, b) => ms(a.date) - ms(b.date) || a.grant.grantDate.localeCompare(b.grant.grantDate));
+    t3.forEach((t) => {
+      t.vestValue = t.vestPrice === '' ? null : t.shares * num(t.vestPrice);
+      t.future = ms(t.date) > ms(asOf);
+      t.postGrant = !!ctx.dos && ms(t.grant.grantDate) > ms(ctx.dos);
+    });
+    const t3Tot = { shares: t3.reduce((s, t) => s + t.shares, 0), value: t3.reduce((s, t) => s + (t.vestValue || 0), 0), missing: t3.filter((t) => t.vestPrice === '' && !t.future).length };
+    return { ctx, asOf, price, method, split, reserve, nelsonShare, otherShare, t1, t1Tot, t2, remaining, remTot, t3, t3Tot };
   }
 
   // ---- Rendering ---------------------------------------------------------
@@ -150,11 +173,16 @@
   const inp = (field, value, cls = '', type = 'number', extra = '') =>
     `<input data-g="${field}" type="${type}" ${type === 'number' ? 'step="any" min="0"' : ''} class="${cls}" value="${esc(value)}" ${extra} />`;
 
+  // Shares to each spouse: one figure at 50/50, otherwise non-employee / employee.
+  function splitText(r, total, npShare) {
+    return r.split === 0.5 ? `${sh(npShare)} each` : `${sh(npShare)} / ${sh(total - npShare)}`;
+  }
+
   function renderTable1(r, n) {
     const M = METHODS[r.method];
     $('t1PctHead').textContent = `${M} %`;
     $('t1ResHead').textContent = `Less ${(r.reserve * 100).toFixed(0)}% gain reserve`;
-    $('t1SplitHead').textContent = `${(r.split * 100).toFixed(0)}/${(100 - r.split * 100).toFixed(0)} split (shares each)`;
+    $('t1SplitHead').textContent = r.split === 0.5 ? '50/50 split (shares each)' : `${(r.split * 100).toFixed(0)}/${(100 - r.split * 100).toFixed(0)} split (non-employee / employee shares)`;
     const acct = setting('account');
     $('t1Title').textContent = `Table 1 — RSU Grant Summary: ${M} Apportionment (Vested / Sellable Shares)`;
     $('t1Sub').textContent = [acct && `Account ${acct}`, `Ledger through ${longDate(r.asOf)}`, `Date of service ${longDate(r.ctx.dos)}`,
@@ -175,13 +203,13 @@
         <td>${inp('deu', g.deu, '', 'number', 'title="Dividend equivalent units / reinvested dividend shares"')}</td>
         <td>${inp('sold', g.sold, '', 'number', 'title="Shares sold from this grant"')}</td>
         <td class="net">${sh(row.net)}</td>
-        <td>${row.blend == null ? `<small>${r.method === 'hug' ? 'needs hire date' : 'needs dates'}</small>` : pct(row.blend)}</td>
+        <td>${row.blend == null ? `<small>${r.method === 'neither' ? 'enter community %' : r.method === 'nelson' ? 'needs dates' : 'needs hire date'}</small>` : pct(row.blend)}</td>
         <td class="mar">${sh(row.mShares)}</td>
         <td class="key">${r.price ? money(row.gross) : '—'}</td>
         <td>${inp('basis', g.basis, '', 'number', 'title="Cost basis per share (FMV at vest)"')}</td>
         <td class="pos">${r.price ? money(row.gain) : '—'}</td>
         <td class="key">${r.price ? money(row.afterReserve) : '—'}</td>
-        <td class="key">${row.each == null ? '—' : `${sh(row.each)} each`}</td>
+        <td class="key">${row.each == null ? '—' : splitText(r, row.mShares, row.each)}</td>
         <td class="no-print"><button class="rm" type="button" data-rm="${g.id}" title="Remove grant">×</button></td>
       </tr>`;
     }).join('') + `<tr class="tot">
@@ -189,7 +217,7 @@
         <td class="neg">${r.t1Tot.tax ? `−${sh(r.t1Tot.tax)}` : '—'}</td><td class="pos">${r.t1Tot.deu ? `+${sh(r.t1Tot.deu)}` : '—'}</td><td class="neg">${r.t1Tot.sold ? `−${sh(r.t1Tot.sold)}` : '—'}</td>
         <td class="net">${sh(r.t1Tot.net)}</td><td></td><td class="mar">${sh(r.t1Tot.mShares)}</td>
         <td>${r.price ? money(r.t1Tot.gross) : '—'}</td><td></td><td>${r.price ? money(r.t1Tot.gain) : '—'}</td><td>${r.price ? money(r.t1Tot.afterReserve) : '—'}</td>
-        <td>${r.t1Tot.each == null ? '—' : `${sh(r.t1Tot.each)} each`}</td><td class="no-print"></td></tr>`;
+        <td>${r.t1Tot.each == null ? '—' : splitText(r, r.t1Tot.mShares, r.t1Tot.each)}</td><td class="no-print"></td></tr>`;
   }
 
   function renderTable2(r, n) {
@@ -229,7 +257,7 @@
       const tBasis = rows.reduce((s, t) => s + (t.basisValue || 0), 0);
       const tVal = pre.reduce((s, t) => (s == null || t.mValue == null ? null : s + t.mValue), 0);
       html += `<tr class="grp"><td class="l" colspan="2">${y} W-2 duplicate subtotal</td><td>${sh(tShares)}${rows.length > pre.length ? `<small>post-DOS grant excluded</small>` : ''}</td><td colspan="2">row ${METHODS[r.method]} %</td>
-        <td>${sh(tM)}</td><td>${tBasis ? money(tBasis) : '—'}<small>payroll gross</small></td><td>${money(tVal)}</td><td class="treat">Ties to the ${y} paystub / W-2, reduced by ${METHODS[r.method]} %. Not added to the split.</td></tr>`;
+        <td>${sh(tM)}</td><td>${tBasis ? money(tBasis) : '—'}<small>payroll gross or vest value</small></td><td>${money(tVal)}</td><td class="treat">Ties to the ${y} paystub / W-2, reduced by ${METHODS[r.method]} %. Not added to the split.</td></tr>`;
     });
 
     html += `<tr class="sec"><td colspan="9">Still unvested — remaining to split</td></tr>`;
@@ -248,6 +276,60 @@
     body.innerHTML = html;
   }
 
+  function renderMethod(r) {
+    document.querySelectorAll('#methodToggle [data-method]').forEach((b) => {
+      const on = b.dataset.method === r.method;
+      b.classList.toggle('on', on);
+      b.setAttribute('aria-pressed', on ? 'true' : 'false');
+    });
+    $('mixFields').hidden = r.method !== 'mix';
+    $('neitherFields').hidden = r.method !== 'neither';
+    if (document.activeElement !== $('hugPct')) $('hugPct').value = setting('nelsonPct') === '' ? '' : String(Math.round((100 - num(setting('nelsonPct'))) * 100) / 100);
+    const rt = r.remTot;
+    const line = (key, label) => `<div class="m-card${r.method === key ? ' on' : ''}"><span>${esc(label)}</span><b>${sh(rt[`${key}Shares`])}</b><small>unvested marital shares</small></div>`;
+    $('methodCompare').innerHTML = line('hug', 'Hug') + line('nelson', 'Nelson') + (r.method === 'mix' ? line('mix', METHODS.mix) : '')
+      + (r.method === 'neither' ? `<div class="m-card on"><span>Other basis</span><b>${sh(rt.mShares)}</b><small>unvested marital shares</small></div>` : '');
+  }
+
+  function renderTable3(r) {
+    const M = METHODS[r.method];
+    const ticker = setting('ticker');
+    $('t3Title').textContent = `Table 3 — ${ticker ? `${ticker} ` : ''}Historical Stock Prices on Vesting Dates`;
+    $('t3PctHead').textContent = `Note (${M})`;
+    const body = $('t3').querySelector('tbody');
+    const ex = $('t3Example');
+    const check = $('t3Check');
+    if (!r.t3.length) {
+      body.innerHTML = '<tr><td class="l" colspan="7" style="color:var(--mute);padding:14px;">Add grants in Table 1 and each vesting date will appear here.</td></tr>';
+      ex.hidden = true; check.hidden = true;
+      return;
+    }
+    const note = (t) => {
+      const pctValue = t[r.method];
+      const text = t.postGrant ? 'Separate (granted after date of service)'
+        : pctValue == null ? (r.method === 'neither' ? 'Enter the community % above' : r.method === 'nelson' ? 'Needs date of service' : 'Needs hire date and date of service')
+        : pctValue === 0 ? 'Separate (0% community)' : `${pct(pctValue)} community`;
+      return `${esc(text)}${t.future ? '<span class="fut">Not vested yet: any price here is an estimate</span>' : ''}`;
+    };
+    body.innerHTML = r.t3.map((t) => `<tr data-key="${t.key}">
+        <td class="l">${fmtDate(t.date)}</td>
+        <td><input data-t="vestPrice" type="number" step="any" min="0" value="${esc(t.vestPrice)}" placeholder="0.00" aria-label="Stock price on ${fmtDate(t.date)}" /></td>
+        <td class="l"><input data-t="priceSource" class="src" type="text" value="${esc(t.priceSource)}" placeholder="e.g. historical closing price" aria-label="Price source" /></td>
+        <td class="l">${esc(t.grant.grantId || 'Grant')} (${t.index}/${t.count})<small>granted ${fmtDate(t.grant.grantDate)}</small></td>
+        <td>${sh(t.shares)}</td>
+        <td class="key">${t.vestValue == null ? '—' : money(t.vestValue)}</td>
+        <td class="note">${note(t)}</td>
+      </tr>`).join('') + `<tr class="tot"><td class="l" colspan="4">Totals</td><td>${sh(r.t3Tot.shares)}</td><td>${money(r.t3Tot.value)}</td><td class="note">Value includes only tranches with a price entered</td></tr>`;
+
+    // Example line built from this client's own entered prices.
+    const priced = r.t3.filter((t) => t.vestPrice !== '');
+    const first = priced[0] && priced.filter((t) => t.grant.id === priced[0].grant.id);
+    ex.hidden = !first || first.length < 2;
+    if (first && first.length >= 2) ex.innerHTML = `<strong>Example from this case:</strong> grant ${esc(first[0].grant.grantId || '')} vested on ${first.map((t) => `${fmtDate(t.date)} (${money(num(t.vestPrice))})`).join(', ')}.`;
+    check.hidden = !r.t3Tot.missing;
+    check.textContent = r.t3Tot.missing ? `${r.t3Tot.missing} vested tranche${r.t3Tot.missing === 1 ? ' has' : 's have'} no price yet.` : '';
+  }
+
   function renderSummary(r, n) {
     const M = METHODS[r.method];
     const t1Each = r.t1Tot.each;
@@ -258,14 +340,15 @@
       card('Table 1 · marital shares held', sh(r.t1Tot.mShares), r.price ? `${money(r.t1Tot.gross)} gross · ${money(r.t1Tot.afterReserve)} after reserve` : 'Enter share price') +
       card('Table 2 · unvested marital shares', sh(r.remTot.mShares), `${sh(r.remTot.shares)} unvested shares from pre-DOS grants`) +
       card(`To ${esc(n.np)}`, totalNp == null ? '—' : `${sh(totalNp)} <span class="unit">sh</span>`, `${sh(t1Each)} now + ${sh(t2Np)} when vested`) +
-      card('Method', M, `${(r.split * 100).toFixed(0)}% of community to ${esc(n.np)}`);
+      card('Method', esc(M), `${(r.split * 100).toFixed(0)}% of community to ${esc(n.np)}`);
 
-    const other = r.method === 'hug' ? 'nelson' : 'hug';
-    const otherShares = r.remTot[`${other}Shares`];
+    // Compare with whichever formulas are not selected.
+    const compare = ['hug', 'nelson'].filter((m) => m !== r.method && r.remTot[`${m}Shares`] != null)
+      .map((m) => `${METHODS[m]} would give ${sh(r.remTot[`${m}Shares`] * r.split)} shares`).join('; ');
     $('narrative').textContent = totalNp == null
-      ? 'Enter the date of service, hire date, and grants to see the division.'
+      ? (r.method === 'neither' ? 'Enter the date of service, the community share, and grants to see the division.' : 'Enter the date of service, hire date, and grants to see the division.')
       : `Under ${M}, ${n.np} receives ${sh(t1Each)} shares from the account now (Table 1) and ${sh(t2Np)} shares of the unvested tranches as they vest (Table 2), ${sh(totalNp)} shares in total.` +
-        (otherShares != null ? ` For the unvested tranches, ${METHODS[other]} would give ${sh(otherShares * r.split)} shares instead of ${sh(t2Np)}.` : '') +
+        (compare ? ` For the unvested tranches, ${compare}, instead of ${sh(t2Np)}.` : '') +
         ' Post-DOS vests already in the account are counted once, in Table 1. Confirm delivered share counts and dates against the statements.';
   }
 
@@ -289,9 +372,11 @@
     empSel.options[0].text = n.all.a; empSel.options[1].text = n.all.b;
     $('marriageHint').textContent = !state.settings.marriageDate && intake.marriageDate ? 'From Case Intake' : '';
     $('dosHint').textContent = !state.settings.dosDate && intake.separationDate ? 'From Case Intake — confirm it is the service date' : 'Community ends here — A.R.S. § 25-211(A)(2)';
+    renderMethod(r);
     renderSummary(r, n);
     renderTable1(r, n);
     renderTable2(r, n);
+    renderTable3(r);
     renderChecks(r);
   }
 
@@ -347,7 +432,7 @@
     const f4 = (v) => (v == null || Number.isNaN(v) ? '' : (v * 100).toFixed(4));
     const lines = [
       ['RSU / Stock Analysis'], ['Account', setting('account')], ['Employee spouse', n.emp], ['Date of marriage', setting('marriageDate')], ['Date of service', setting('dosDate')],
-      ['Hire date', setting('hireDate')], ['Ledger as of', r.asOf], ['Price', r.price], ['Price date', setting('valDate')], ['Method', M], [`Share to ${n.np}`, `${(r.split * 100).toFixed(2)}%`], ['Gain reserve', `${(r.reserve * 100).toFixed(1)}%`], [],
+      ['Hire date', setting('hireDate')], ['Ledger as of', r.asOf], ['Price', r.price], ['Price date', setting('valDate')], ['Method', M], ...(r.method === 'neither' ? [['Basis for treatment', setting('otherBasis')]] : []), [`Share to ${n.np}`, `${(r.split * 100).toFixed(2)}%`], ['Gain reserve', `${(r.reserve * 100).toFixed(1)}%`], [],
       ['Table 1 - RSU Grant Summary'],
       ['Grant ID', 'Grant date', 'Installments', 'Months apart', 'Shares granted', 'Vested @ DOS', 'Vested to date', 'Tax withheld', 'DEU / DRIP', 'Sold', 'Net held', `${M} %`, 'Marital shares', 'Gross marital value', 'Basis / share', 'Unrealized gain', 'Less gain reserve', 'Shares each'],
       ...r.t1.map((x) => [x.g.grantId, x.g.grantDate, x.g.count, x.g.months, x.g.shares, f2(x.atDos), f2(x.vestedShares), x.g.tax, x.g.deu, x.g.sold, f2(x.net), f4(x.blend), f2(x.mShares), f2(x.gross), x.g.basis, f2(x.gain), f2(x.afterReserve), f2(x.each)]),
@@ -358,6 +443,11 @@
       ...r.t2.map((t) => [t.grant.grantId, t.grant.grantDate, t.date, f2(t.shares), f4(t.hug), f4(t.nelson), f2(t.mShares), f2(t.basisValue), f2(t.mValue),
         t.post ? 'Granted after DOS - separate' : t.vested ? 'Already in Table 1 (W-2 duplicate)' : 'Unvested - remaining to split']),
       ['Total counted for split', '', '', f2(r.remTot.shares), '', '', f2(r.remTot.mShares), '', f2(r.remTot.mValue), `${n.np}: ${f2(r.remTot.mShares == null ? null : r.remTot.mShares * r.split)} shares`],
+      [],
+      ['Table 3 - Historical Stock Prices on Vesting Dates'],
+      ['Vesting date', 'Stock price on vesting date', 'Price source', 'Grant ID', 'Tranche', 'Shares', 'Value at vest', `${M} community %`, 'Not vested yet'],
+      ...r.t3.map((t) => [t.date, t.vestPrice, t.priceSource, t.grant.grantId, `${t.index}/${t.count}`, f2(t.shares), f2(t.vestValue), f4(t[r.method]), t.future ? 'Yes' : '']),
+      ['Totals', '', '', '', '', f2(r.t3Tot.shares), f2(r.t3Tot.value)],
     ];
     const blob = new Blob([lines.map((l) => l.map(q).join(',')).join('\r\n')], { type: 'text/csv' });
     const a = document.createElement('a');
@@ -408,6 +498,29 @@
       if (!tr || !f) return;
       state.tranches[tr.dataset.key] = { ...(state.tranches[tr.dataset.key] || {}), [f]: e.target.value };
       save(); rerenderKeepingFocus();
+    });
+
+    $('t3').querySelector('tbody').addEventListener('change', (e) => {
+      const tr = e.target.closest('tr[data-key]'); const f = e.target.dataset.t;
+      if (!tr || !f) return;
+      state.tranches[tr.dataset.key] = { ...(state.tranches[tr.dataset.key] || {}), [f]: e.target.value };
+      save(); rerenderKeepingFocus();
+    });
+
+    $('methodToggle').addEventListener('click', (e) => {
+      const b = e.target.closest('[data-method]');
+      if (!b) return;
+      $('method').value = b.dataset.method;
+      state.settings.method = b.dataset.method;
+      save(); render();
+    });
+    // The two percentages always add to 100; typing in one sets the other.
+    $('hugPct').addEventListener('input', () => {
+      const v = $('hugPct').value;
+      const nelson = v === '' ? '' : String(Math.round((100 - clamp01(num(v) / 100) * 100) * 100) / 100);
+      state.settings.nelsonPct = nelson;
+      $('nelsonPct').value = nelson;
+      save(); render();
     });
 
     $('rsuCsv').addEventListener('click', toCsv);

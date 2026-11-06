@@ -104,7 +104,7 @@ router.get('/export/:category.csv', (req, res) => {
            FROM bank_statements bs
            LEFT JOIN bank_transactions bt ON bs.id = bt.bank_statement_id
            LEFT JOIN documents d ON bs.document_id = d.id
-           WHERE bs.matter_id = ?
+           WHERE bs.matter_id = ? AND bs.document_id IN (SELECT id FROM documents WHERE deleted_at IS NULL)
            GROUP BY bs.id
            ORDER BY bs.statement_end DESC`,
           [matterId],
@@ -172,7 +172,7 @@ router.get('/transactions.csv', (req, res) => {
        bt.mapping_status
      FROM bank_transactions bt
      JOIN bank_statements bs ON bt.bank_statement_id = bs.id
-     WHERE bs.matter_id = ?
+     WHERE bs.matter_id = ? AND bs.document_id IN (SELECT id FROM documents WHERE deleted_at IS NULL)
      ORDER BY bt.transaction_date DESC`,
     [matterId],
     (err, rows) => {
@@ -343,7 +343,7 @@ router.get('/income-source/:sourceId/reconciliation', (req, res) => {
               },
               {
                 title: 'Verification Status',
-                text: `✓ Verified against uploaded discovery documents and bank statements.`,
+                text: `Not checked automatically. Compare this figure against the documents listed.`,
               },
               {
                 title: 'Calculation Method',

@@ -1204,8 +1204,9 @@
       document.getElementById('party2NetValue').textContent = '$' + party2NetValue.toLocaleString('en-US', {minimumFractionDigits: 2});
 
       // Update KPIs
-      const totalAssets = party1AssetTotal + party2AssetTotal;
-      const totalDebts = party1DebtTotal + party2DebtTotal;
+      // Joint items appear in both party columns, so totals come from the item lists.
+      const totalAssets = assetDivisionData.assets.reduce((sum, a) => sum + a.value, 0);
+      const totalDebts = assetDivisionData.liabilities.reduce((sum, l) => sum + l.value, 0);
       const netEstate = totalAssets - totalDebts;
       const equalShare = netEstate / 2;
 

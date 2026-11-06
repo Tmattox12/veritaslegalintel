@@ -262,7 +262,7 @@
     setNote('Loading parsed transactions from discovery…');
     try {
       const [txRes, stRes] = await Promise.all([
-        fetch(`${API_BASE}/matters/${mid}/bank-statements/transactions?limit=5000`),
+        fetch(`${API_BASE}/matters/${mid}/bank-statements/transactions?limit=1000000`),
         fetch(`${API_BASE}/matters/${mid}/bank-statements`),
       ]);
       const rows = await txRes.json();
@@ -566,16 +566,10 @@
   }
 
   function statementMonths() {
-    // Prefer actual statement coverage: sum of statement periods in months.
-    if (statementSpans.length) {
-      let totalDays = 0;
-      statementSpans.forEach((s) => {
-        const a = new Date(s.statement_start), b = new Date(s.statement_end);
-        if (!isNaN(a) && !isNaN(b) && b > a) totalDays += (b - a) / 86400000;
-      });
-      const months = totalDays / 30.44;
-      if (months > 0) return Math.max(1, months);
-    }
+    // Calendar months with a statement. Accounts covering the same month count once,
+    // so overlapping accounts can't inflate the divisor. Same count as analysis-summary.
+    const covered = new Set(statementSpans.map((s) => (s.statement_start || '').slice(0, 7)).filter(Boolean));
+    if (covered.size) return covered.size;
     // Fallback: count distinct YYYY-MM in expense transactions, min 1.
     const months = new Set();
     allTransactions.forEach((t) => {

@@ -15,6 +15,7 @@ const chatRouter = require('./routes/chat');
 const billingRouter = require('./routes/billing');
 const spousalRouter = require('./routes/spousal');
 const redFlagsRouter = require('./routes/red-flags');
+const reconRouter = require('./routes/recon');
 const { requireAuth, authEnabled, MODE } = require('./auth');
 
 const app = express();
@@ -83,6 +84,7 @@ app.use('/api/matters/:matterId/merchants', merchantMappingRouter);
 app.use('/api/matters/:matterId/billing', billingRouter);
 app.use('/api/matters/:matterId/spousal', spousalRouter);
 app.use('/api/matters/:matterId/red-flags', redFlagsRouter);
+app.use('/api/matters/:matterId/recon', reconRouter);
 app.use('/api/matters/:matterId', documentExtractionRouter);
 app.use('/api/chat', chatRouter);
 
@@ -152,11 +154,12 @@ app.get('/api/matters/:id', (req, res) => {
     Promise.all([
       all('SELECT COUNT(*) AS count FROM documents WHERE matter_id = ? AND deleted_at IS NULL', [id]),
       all(`SELECT id, account_type, statement_start, statement_end
-           FROM bank_statements WHERE matter_id = ? AND processing_status = 'completed'`, [id]),
+           FROM bank_statements WHERE matter_id = ? AND processing_status = 'completed'
+             AND document_id IN (SELECT id FROM documents WHERE deleted_at IS NULL)`, [id]),
       all(`SELECT bt.amount, bt.description, bt.suggested_category, bt.mapped_category, bt.mapping_status, bt.flow_type, bs.account_type
            FROM bank_transactions bt
            JOIN bank_statements bs ON bs.id = bt.bank_statement_id
-           WHERE bs.matter_id = ?`, [id]),
+           WHERE bs.matter_id = ? AND bs.document_id IN (SELECT id FROM documents WHERE deleted_at IS NULL)`, [id]),
       all(`SELECT ier.document_id AS documentId, ier.party, ier.annual_amount AS annualAmount,
                   d.filename AS filename, d.document_type AS documentType
            FROM income_evidence_reviews ier
@@ -230,6 +233,7 @@ app.get('/api/matters/:id', (req, res) => {
     if (INCOME_MOVEMENT_RE.test(t.description || '')) return 'transfer_or_refund';
     return null;
   }
+  app.locals.reconRules = { incomeExclusion };
 
   // What Document Intake took in for a matter: documents by category, how many
   // statements parsed, and every parsed transaction. Both hubs start from this.
@@ -239,13 +243,14 @@ app.get('/api/matters/:id', (req, res) => {
     });
     return Promise.all([
       all(`SELECT id, category FROM documents WHERE matter_id = ? AND deleted_at IS NULL`, [id]),
-      all(`SELECT document_id, processing_status FROM bank_statements WHERE matter_id = ?`, [id]),
+      all(`SELECT document_id, processing_status FROM bank_statements WHERE matter_id = ?
+             AND document_id IN (SELECT id FROM documents WHERE deleted_at IS NULL)`, [id]),
       all(`SELECT bt.amount, bt.description, bt.transaction_date, bt.flow_type,
                   bt.suggested_category, bt.mapped_category, bt.mapping_status, bs.account_type,
                   bs.bank_name, bs.account_number_masked
            FROM bank_transactions bt
            JOIN bank_statements bs ON bs.id = bt.bank_statement_id
-           WHERE bs.matter_id = ?`, [id]),
+           WHERE bs.matter_id = ? AND bs.document_id IN (SELECT id FROM documents WHERE deleted_at IS NULL)`, [id]),
     ]).then(([docs, statements, transactions]) => {
       const byCategory = {};
       docs.forEach((d) => { const c = d.category || 'Unclassified'; byCategory[c] = (byCategory[c] || 0) + 1; });
@@ -380,7 +385,7 @@ app.get('/api/matters/:id', (req, res) => {
                   bt.suggested_category, bt.mapped_category, bt.mapping_status, bs.account_type
            FROM bank_transactions bt
            JOIN bank_statements bs ON bs.id = bt.bank_statement_id
-           WHERE bs.matter_id = ?`, [id]),
+           WHERE bs.matter_id = ? AND bs.document_id IN (SELECT id FROM documents WHERE deleted_at IS NULL)`, [id]),
       all(`SELECT ier.party, ier.annual_amount AS annualAmount, d.document_type AS documentType, d.filename
            FROM income_evidence_reviews ier
            JOIN documents d ON d.id = ier.document_id

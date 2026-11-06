@@ -180,7 +180,7 @@
 
       scenarios.forEach((scenario, idx) => {
         const partyATotal = scenario.partyAAssets + scenario.partyAChildSupport + scenario.partyASpousalSupport - scenario.partyADebt;
-        const partyBTotal = scenario.partyBAssets + scenario.partyBChildSupport + scenario.partyBSpousalSupport - scenario.partyBDebt;
+        const partyBTotal = scenario.partyBAssets - scenario.partyBChildSupport - scenario.partyBSpousalSupport - scenario.partyBDebt;
 
         html += `<div class="scenario-box">
           <div class="scenario-header">
@@ -260,7 +260,7 @@
       let html = '';
       const metrics = [
         { label: 'Party A Total Value', field: (s) => s.partyAAssets + s.partyAChildSupport + s.partyASpousalSupport - s.partyADebt },
-        { label: 'Party B Total Value', field: (s) => s.partyBAssets + s.partyBChildSupport + s.partyBSpousalSupport - s.partyBDebt },
+        { label: 'Party B Total Value', field: (s) => s.partyBAssets - s.partyBChildSupport - s.partyBSpousalSupport - s.partyBDebt },
         { label: 'Total Assets Divided', field: (s) => s.partyAAssets + s.partyBAssets },
         { label: 'Total Support Obligations', field: (s) => s.partyAChildSupport + s.partyBChildSupport + s.partyASpousalSupport + s.partyBSpousalSupport },
         { label: 'Total Debt Assigned', field: (s) => s.partyADebt + s.partyBDebt }

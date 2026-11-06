@@ -311,7 +311,7 @@ router.get('/coverage', (req, res) => {
             (SELECT COUNT(*) FROM bank_transactions WHERE bank_statement_id = bs.id) as transaction_count
      FROM bank_statements bs
      LEFT JOIN documents d ON bs.document_id = d.id
-     WHERE bs.matter_id = ? AND bs.processing_status = 'completed'
+     WHERE bs.matter_id = ? AND bs.document_id IN (SELECT id FROM documents WHERE deleted_at IS NULL) AND bs.processing_status = 'completed'
      ORDER BY bs.statement_start ASC`,
     [matterId],
     (err, rows) => {
@@ -334,7 +334,7 @@ router.get('/coverage', (req, res) => {
 
 // GET /api/matters/:matterId/bank-statements/export.csv (must come before generic GET)
 router.get('/export.csv', (req, res) => {
-  sendStatementsCsv(req, res, 'bs.matter_id = ?', [req.params.matterId], 'bank-statements-export.csv');
+  sendStatementsCsv(req, res, 'bs.matter_id = ? AND bs.document_id IN (SELECT id FROM documents WHERE deleted_at IS NULL)', [req.params.matterId], 'bank-statements-export.csv');
 });
 
 // GET /api/matters/:matterId/bank-statements/transactions - all transactions for matter (must come before generic GET)
@@ -346,7 +346,7 @@ router.get('/transactions', (req, res) => {
     `SELECT bt.*, bs.bank_name, bs.statement_start, bs.statement_end, bs.account_number_masked
      FROM bank_transactions bt
      JOIN bank_statements bs ON bt.bank_statement_id = bs.id
-     WHERE bs.matter_id = ?
+     WHERE bs.matter_id = ? AND bs.document_id IN (SELECT id FROM documents WHERE deleted_at IS NULL)
      ORDER BY bt.transaction_date DESC
      LIMIT ? OFFSET ?`,
     [matterId, parseInt(limit), parseInt(offset)],
@@ -362,7 +362,7 @@ router.get('/transactions', (req, res) => {
 // GET /api/matters/:matterId/bank-statements/:statementId/export.csv - one statement's transactions
 router.get('/:statementId/export.csv', (req, res) => {
   const { matterId, statementId } = req.params;
-  sendStatementsCsv(req, res, 'bs.matter_id = ? AND bs.id = ?', [matterId, statementId], `statement-${statementId}.csv`);
+  sendStatementsCsv(req, res, 'bs.matter_id = ? AND bs.document_id IN (SELECT id FROM documents WHERE deleted_at IS NULL) AND bs.id = ?', [matterId, statementId], `statement-${statementId}.csv`);
 });
 
 // POST /api/matters/:matterId/bank-statements/refresh-headers
@@ -378,7 +378,7 @@ router.post('/refresh-headers', async (req, res) => {
   try {
     const stmts = await all(
       `SELECT bs.id, d.filename, d.s3_key FROM bank_statements bs JOIN documents d ON d.id = bs.document_id
-       WHERE bs.matter_id = ? AND d.s3_key IS NOT NULL`, [matterId]);
+       WHERE bs.matter_id = ? AND bs.document_id IN (SELECT id FROM documents WHERE deleted_at IS NULL) AND d.s3_key IS NOT NULL`, [matterId]);
     let updated = 0, failed = 0;
     for (const st of stmts) {
       try {
@@ -410,7 +410,7 @@ router.get('/', (req, res) => {
             (SELECT COUNT(*) FROM bank_transactions WHERE bank_statement_id = bs.id) as transaction_count
      FROM bank_statements bs
      LEFT JOIN documents d ON bs.document_id = d.id
-     WHERE bs.matter_id = ? AND bs.processing_status IN ('completed', 'error')
+     WHERE bs.matter_id = ? AND bs.document_id IN (SELECT id FROM documents WHERE deleted_at IS NULL) AND bs.processing_status IN ('completed', 'error')
      ORDER BY bs.created_at DESC`,
     [matterId],
     (err, rows) => {

@@ -36,6 +36,22 @@
     .rsu input[type=date] { width:118px; text-align:left; }
     .rsu input.sm { width:38px; }
     .rsu input.ov { border-color:var(--gold); background:var(--gold-soft); font-weight:600; }
+    .m-toggle { display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:8px; }
+    .m-toggle button { border:2px solid var(--line); background:#fff; border-radius:10px; padding:10px 12px; font:700 13px Inter,sans-serif; color:var(--navy-900); cursor:pointer; text-align:left; }
+    .m-toggle button small { display:block; font-weight:500; font-size:11px; color:var(--mute); margin-top:2px; }
+    .m-toggle button:hover { border-color:var(--navy-700); }
+    .m-toggle button.on { border-color:var(--navy-700); background:#f3f7fc; box-shadow:0 0 0 3px rgba(46,91,138,.18); }
+    .m-fields { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; margin-top:12px; }
+    .m-fields[hidden] { display:none; }
+    .m-compare { display:flex; gap:10px; flex-wrap:wrap; margin-top:12px; }
+    .m-card { flex:1 1 150px; border:1px solid var(--line); border-radius:8px; padding:8px 12px; }
+    .m-card.on { border-color:var(--navy-700); background:#f3f7fc; }
+    .m-card span { display:block; font-size:11px; font-weight:600; color:var(--slate); }
+    .m-card b { font-family:'Fraunces',serif; font-size:19px; color:var(--navy-900); }
+    .m-card small { display:block; font-size:10.5px; color:var(--mute); }
+    .rsu input.src { width:180px; text-align:left; }
+    .rsu td.note { white-space:normal; min-width:170px; text-align:left; font-size:11.5px; color:var(--slate); }
+    .rsu td.note .fut { display:block; color:#8a6a2a; font-size:10.5px; }
     .rsu .neg { color:var(--red); }
     .rsu .pos { color:var(--green); }
     .rsu .net { background:#eef4fb; font-weight:700; color:var(--navy-700); }
@@ -59,7 +75,8 @@
     .actions { display:flex; gap:9px; flex-wrap:wrap; }
     .status { margin-top:10px; color:var(--mute); font-size:11px; }
     @media (max-width:1200px) { .field-grid { grid-template-columns:repeat(3,minmax(0,1fr)); } .summary { grid-template-columns:repeat(2,minmax(0,1fr)); } }
-    @media (max-width:700px) { .field-grid, .summary { grid-template-columns:1fr; } .page-head { flex-direction:column; align-items:flex-start; gap:12px; } }
+    @media (max-width:900px) { .m-toggle, .m-fields { grid-template-columns:1fr 1fr; } }
+    @media (max-width:700px) { .field-grid, .summary, .m-toggle, .m-fields { grid-template-columns:1fr; } .page-head { flex-direction:column; align-items:flex-start; gap:12px; } }
     @media print {
       @page { size: landscape; margin: 10mm; }
       .sidebar, .topbar, .actions, .no-print, [data-party-box], #veritasTimeChip { display:none !important; }
@@ -94,15 +111,37 @@
             <div class="field"><label for="marriageDate">Date of marriage</label><input id="marriageDate" type="date" /><span class="hint" id="marriageHint"></span></div>
             <div class="field"><label for="dosDate">Date of service (DOS)</label><input id="dosDate" type="date" /><span class="hint" id="dosHint">Community ends here — A.R.S. § 25-211(A)(2)</span></div>
             <div class="field"><label for="hireDate">Hire date</label><input id="hireDate" type="date" /><span class="hint">Start of the Hug fraction</span></div>
-            <div class="field"><label for="method">Method</label><select id="method"><option value="hug">Hug (from hire date)</option><option value="nelson">Nelson (from grant date)</option></select></div>
+            <select id="method" hidden aria-hidden="true" tabindex="-1"><option value="hug">Hug</option><option value="nelson">Nelson</option><option value="mix">Mix</option><option value="neither">Neither</option></select>
             <div class="field"><label for="split">Non-employee share (%)</label><input id="split" type="number" min="0" max="100" step="0.01" placeholder="50" /></div>
-            <div class="field"><label for="account">Account</label><input id="account" type="text" placeholder="e.g. stock plan ••209" autocomplete="off" /></div>
+            <div class="field"><label for="account">Account</label><input id="account" type="text" placeholder="e.g. stock plan ••1234" autocomplete="off" /></div>
             <div class="field"><label for="asOf">Ledger as of</label><input id="asOf" type="date" /><span class="hint">Statement date for Table 1</span></div>
             <div class="field"><label for="valDate">Price date</label><input id="valDate" type="date" /></div>
             <div class="field"><label for="price">Share price ($)</label><input id="price" type="number" min="0" step="0.01" placeholder="0.00" /></div>
             <div class="field"><label for="ticker">Ticker</label><input id="ticker" type="text" placeholder="e.g. ABC" autocomplete="off" /></div>
             <div class="field"><label for="reserve">Tax reserve on gain (%)</label><input id="reserve" type="number" min="0" max="60" step="0.1" placeholder="15" /></div>
           </div>
+        </section>
+
+        <!-- Method -->
+        <section class="panel no-print">
+          <div class="panel-head"><h3>Apportionment method</h3><span class="tag">Every number on this page updates when you switch</span></div>
+          <div class="m-toggle" id="methodToggle" role="group" aria-label="Apportionment method">
+            <button type="button" data-method="hug">Hug<small>from hire date</small></button>
+            <button type="button" data-method="nelson">Nelson<small>from grant date</small></button>
+            <button type="button" data-method="mix">Percentage of each<small>for settlement scenarios</small></button>
+            <button type="button" data-method="neither">Neither applies<small>enter the community share</small></button>
+          </div>
+          <div class="m-fields" id="mixFields" hidden>
+            <div class="field"><label for="nelsonPct">Nelson %</label><input id="nelsonPct" type="number" min="0" max="100" step="0.01" placeholder="50" /></div>
+            <div class="field"><label for="hugPct">Hug %</label><input id="hugPct" type="number" min="0" max="100" step="0.01" placeholder="50" /></div>
+            <p class="panel-note" style="margin:0;align-self:end;">The two always add to 100%. Each tranche's community share = Nelson % × its Nelson share + Hug % × its Hug share.</p>
+          </div>
+          <div class="m-fields" id="neitherFields" hidden>
+            <div class="field"><label for="otherPct">Community share of each tranche (%)</label><input id="otherPct" type="number" min="0" max="100" step="0.01" placeholder="e.g. 0 or 100" /></div>
+            <div class="field" style="grid-column:span 2"><label for="otherBasis">Why neither applies</label><input id="otherBasis" type="text" placeholder="e.g. plan terms, agreement, or court order" autocomplete="off" /></div>
+            <p class="panel-note" style="margin:0;grid-column:1 / -1;">Neither formula is used. This percentage applies to every tranche, except grants made after the date of service, which stay separate.</p>
+          </div>
+          <div class="m-compare" id="methodCompare"></div>
         </section>
 
         <!-- Summary -->
@@ -145,6 +184,31 @@
           <p class="status no-print" id="saveStatus">Saved automatically for this client only.</p>
         </section>
 
+        <!-- Table 3 -->
+        <section class="panel print-break">
+          <div class="tbl-title" id="t3Title">Table 3 — Historical Stock Prices on Vesting Dates</div>
+          <div class="tbl-sub">Each tranche is valued at the stock price on its own vesting date. Every tranche from Table 1 is listed here automatically.</div>
+          <div class="callout" style="margin:0 0 12px;">
+            <strong>Why each vesting date has a different price</strong>
+            <ul style="margin:6px 0 0 18px;">
+              <li><strong>RSUs vest in installments.</strong> Each grant vests on several dates set by its schedule, and each date has its own market price.</li>
+              <li><strong>The price changes over time.</strong> Using the price on each vesting date reflects what the shares were actually worth when delivered, instead of one price for every tranche.</li>
+              <li><strong>It ties to payroll.</strong> Shares × vesting-date price should match the income reported for that tranche on the paystub or W-2, so differences show up here.</li>
+              <li><strong>It can be checked.</strong> Record where each price came from so anyone can look up the same historical price.</li>
+              <li id="t3Example" hidden></li>
+            </ul>
+          </div>
+          <div class="rsu-wrap">
+            <table class="rsu" id="t3">
+              <thead><tr>
+                <th class="l">Vesting date</th><th>Stock price on vesting date</th><th class="l">Price source</th><th class="l">Grant</th><th>Shares</th><th>Value at vest</th><th class="l" id="t3PctHead">Note</th>
+              </tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <div class="callout no-print" id="t3Check" hidden></div>
+        </section>
+
         <!-- Method notes -->
         <section class="panel law no-print">
           <details>
@@ -155,6 +219,8 @@
               <li><strong>Nelson</strong> (<em>In re Marriage of Nelson</em>, 177 Cal. App. 3d 150 (1986)): (date of service − grant date) ÷ (vest date − grant date). Treats the award as pay for future service.</li>
               <li>If the start date is before the marriage, the numerator starts at the date of marriage. A tranche that vested during the marriage and before service is 100% community when the start date is after the marriage.</li>
               <li>Grants made after the date of service are separate (0%) unless shown to reward pre-service work.</li>
+              <li><strong>Percentage of each:</strong> a weighted mix for modeling settlement scenarios. It is not a legal method on its own.</li>
+              <li><strong>Neither applies:</strong> use when plan terms, an agreement, or an order set the treatment. Record why in the field provided.</li>
             </ul>
             <h4>Arizona</h4>
             <p>Community ends on service of a petition that results in a decree (A.R.S. § 25-211(A)(2)); community property is divided equitably, usually equally (§ 25-318(A)). No Arizona statute picks Hug or Nelson; courts have looked to these California cases. Confirm current authority.</p>
@@ -171,6 +237,6 @@
   </main>
   <script src="sidebar-loader.js"></script>
   <script src="party-box.js"></script>
-  <script src="rsu.js?v=3"></script>
+  <script src="rsu.js?v=5"></script>
 </body>
 </html>

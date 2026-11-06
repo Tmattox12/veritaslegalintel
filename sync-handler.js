@@ -38,7 +38,7 @@ class SyncHandler {
 
   // Join the current case room
   joinCurrentCase() {
-    const caseData = caseManager.getCurrentCase();
+    const caseData = caseManager.getCurrentCase ? caseManager.getCurrentCase() : null;
     if (!caseData) return;
 
     const userId = localStorage.getItem('veritas_user_name') || 'You';
@@ -47,7 +47,7 @@ class SyncHandler {
 
   // Leave current case room
   leaveCurrentCase() {
-    const caseData = caseManager.getCurrentCase();
+    const caseData = caseManager.getCurrentCase ? caseManager.getCurrentCase() : null;
     if (!caseData) return;
 
     const userId = localStorage.getItem('veritas_user_name') || 'You';
@@ -65,7 +65,7 @@ class SyncHandler {
     console.log(`↙ Received update: ${moduleName} from ${userId}`);
 
     // Load updated data into case manager
-    const caseData = caseManager.getCurrentCase();
+    const caseData = caseManager.getCurrentCase ? caseManager.getCurrentCase() : null;
     if (caseData) {
       caseData.modules = caseData.modules || {};
       caseData.modules[moduleName] = result;
